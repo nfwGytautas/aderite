@@ -34,7 +34,7 @@ namespace aderite {
 		/**
 		 * @brief Makes this window the current active one where rendering will be submitted to
 		*/
-		virtual void make_active() = 0;
+		virtual void make_active();
 	private:
 		window(const window& o) = delete;
 		friend class window_manager;

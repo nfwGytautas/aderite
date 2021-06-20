@@ -8,7 +8,7 @@
 #endif
 
 namespace aderite {
-
+	
 	renderer* renderer::create_instance() {
 		LOG_TRACE("Creating renderer instance");
 #if GL_BACKEND
@@ -17,6 +17,21 @@ namespace aderite {
 
 		LOG_ERROR("No rendering backend specified");
 		return nullptr;
+	}
+
+	void renderer::shutdown() {
+		for (auto& layer : m_layers) {
+			layer->i_shutdown();
+		}
+	}
+
+	void renderer::render() {
+		for (auto& layer : m_layers) {
+			// TODO: Layer ordering
+			if (layer->ready()) {
+				layer->render();
+			}
+		}
 	}
 
 }

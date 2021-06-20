@@ -32,12 +32,25 @@ namespace aderite {
 		 * @param options Options to create with
 		*/
 		ref<window> create_window(window::create_options options);
+
+		/**
+		 * @brief Function gets called when the current active window is changed by calling window->make_active
+		*/
+		void active_window_changed(relay_ptr<window> window);
+
+		/**
+		 * @brief Returns the current active window
+		*/
+		relay_ptr<window> get_current_active_window() {
+			return m_current_window;
+		}
 	private:
 		window_manager() {}
 		friend class engine;
 
 	private:
 		std::vector<ref<window>> m_windows;
+		relay_ptr<window> m_current_window;
 	};
 
 }

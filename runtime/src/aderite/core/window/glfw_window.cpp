@@ -21,6 +21,7 @@ namespace aderite {
 
 			void glfw_window::make_active() {
 				glfwMakeContextCurrent(m_window);
+				window::make_active();
 			}
 
 			void glfw_window::begin_frame() {

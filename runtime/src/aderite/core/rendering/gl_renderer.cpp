@@ -26,7 +26,7 @@ namespace aderite {
 			}
 
 			void gl_renderer::shutdown() {
-
+				renderer::shutdown();
 			}
 
 			void gl_renderer::set_vsync(bool enabled) {
