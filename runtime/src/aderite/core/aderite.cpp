@@ -35,8 +35,7 @@ namespace aderite {
 			}
 
 			// Renderer
-			m_renderer = renderer::create_instance();
-			// Delay init for until there are windows
+			m_renderer = renderer::create_instance(); // Delay init for until there are windows
 
 			return true;
 		});

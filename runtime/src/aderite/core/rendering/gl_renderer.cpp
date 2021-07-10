@@ -22,6 +22,7 @@ namespace aderite {
 				}
 #endif
 
+				m_initialized = true;
 				return true;
 			}
 
@@ -41,11 +42,37 @@ namespace aderite {
 			}
 
 			void gl_renderer::begin_frame() {
+				if (!ready()) {
+					return;
+				}
 
+				//glClearColor(1.0f, 0.0f, 0.5f, 1.0f);
+				//glClear(GL_COLOR_BUFFER_BIT);
 			}
 
 			void gl_renderer::end_frame() {
+				if (!ready()) {
+					return;
+				}
 
+
+			}
+
+			void gl_renderer::set_output(relay_ptr<fbo> target) {
+				if (!ready()) {
+					return;
+				}
+
+				if (!target.valid()) {
+					glBindFramebuffer(GL_FRAMEBUFFER, 0);
+				}
+				else {
+					target->bind();
+				}
+			}
+
+			bool gl_renderer::ready() {
+				return m_initialized;
 			}
 
 		}

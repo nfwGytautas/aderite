@@ -18,12 +18,16 @@ namespace aderite {
 				
 				virtual void begin_frame() override;
 				virtual void end_frame() override;
+				virtual void set_output(relay_ptr<fbo> target) override;
+				virtual bool ready() override;
 
 			private:
 				gl_renderer() {}
 				friend class renderer;
+
+			private:
+				bool m_initialized = false;
 			};
 		}
 	}
 }
-

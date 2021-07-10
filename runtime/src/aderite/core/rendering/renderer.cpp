@@ -8,7 +8,7 @@
 #endif
 
 namespace aderite {
-	
+
 	renderer* renderer::create_instance() {
 		LOG_TRACE("Creating renderer instance");
 #if GL_BACKEND
@@ -26,9 +26,15 @@ namespace aderite {
 	}
 
 	void renderer::render() {
+		if (!ready()) {
+			return;
+		}
+
 		for (auto& layer : m_layers) {
 			// TODO: Layer ordering
 			if (layer->ready()) {
+				// Bind target
+				set_output(layer->target);
 				layer->render();
 			}
 		}

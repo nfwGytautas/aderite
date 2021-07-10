@@ -1,5 +1,7 @@
 #pragma once
 
+#include "aderite/core/rendering/fbo/fbo.hpp"
+
 namespace aderite {
 
 	/**
@@ -36,6 +38,10 @@ namespace aderite {
 	protected:
 		layer();
 		friend class renderer;
+
+	protected:
+		// The target where the renderer will render this layer to
+		relay_ptr<fbo> target = nullptr;
 	};
 
 }

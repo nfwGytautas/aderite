@@ -50,7 +50,7 @@ namespace aderite {
 
 	private:
 		std::vector<ref<window>> m_windows;
-		relay_ptr<window> m_current_window;
+		relay_ptr<window> m_current_window = nullptr;
 	};
 
 }

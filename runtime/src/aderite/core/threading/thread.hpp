@@ -50,6 +50,13 @@ namespace aderite {
 			 * @param count Number of invokes to wait if this is 0 then all invokes are processed
 			*/
 			void process_n_invokes(size_t count);
+
+			/**
+			 * @brief Returns the thread id of this thread object
+			*/
+			std::thread::id id() {
+				return m_thread.get_id();
+			}
 		protected:
 			bool m_wants_to_join = false;
 			std::thread m_thread;

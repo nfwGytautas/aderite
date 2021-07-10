@@ -9,6 +9,9 @@
 #include "aderite/core/aderite.hpp"
 #include "aderite/core/window/glfw_window.hpp"
 #include "aderite/core/rendering/layer.hpp"
+#include "aderite/core/rendering/fbo/gl_fbo.hpp"
+
+aderite::ref<aderite::render_backend::opengl::gl_fbo> viewport = nullptr;
 
 class editor_layer : public aderite::layer {
 public:
@@ -118,6 +121,13 @@ public:
 			ImGui::ShowDemoWindow(&show_demo_window);
 		}
 
+		// Viewport
+		ImGui::Begin("Viewport");
+		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		ImVec2 viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+		ImGui::Image((ImTextureID)viewport->get_ta(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::End();
+
 		// Dockspace components end here
 
 		ImGui::End();
@@ -154,6 +164,103 @@ private:
 	GLFWwindow* m_handle = nullptr;
 };
 
+class viewport_layer : public aderite::layer {
+public:
+	virtual void init() override {
+		// Create viewport
+		viewport = aderite::fbo::create({ 800, 600 }).as<aderite::render_backend::opengl::gl_fbo>();
+		target = viewport.relay_as<aderite::fbo>();
+
+		float vertices[] = {
+			 0.5f,  0.5f, 0.0f,  // top right
+			 0.5f, -0.5f, 0.0f,  // bottom right
+			-0.5f, -0.5f, 0.0f,  // bottom left
+			-0.5f,  0.5f, 0.0f   // top left 
+		};
+
+		unsigned int indices[] = {  // note that we start from 0!
+			0, 1, 3,  // first Triangle
+			1, 2, 3   // second Triangle
+		};
+
+		const char* vertexShaderSource = "#version 330 core\n"
+			"layout (location = 0) in vec3 aPos;\n"
+			"void main()\n"
+			"{\n"
+			"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+			"}\0";
+
+		const char* fragmentShaderSource = "#version 330 core\n"
+			"out vec4 FragColor;\n"
+			"void main()\n"
+			"{\n"
+			"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+			"}\n\0";
+
+		m_vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+		glShaderSource(m_vertexShader, 1, &vertexShaderSource, NULL);
+		glCompileShader(m_vertexShader);
+
+		m_fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(m_fragmentShader, 1, &fragmentShaderSource, NULL);
+		glCompileShader(m_fragmentShader);
+
+		m_shader = glCreateProgram();
+		glAttachShader(m_shader, m_vertexShader);
+		glAttachShader(m_shader, m_fragmentShader);
+		glLinkProgram(m_shader);
+
+		glDeleteShader(m_vertexShader);
+		glDeleteShader(m_fragmentShader);
+
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
+		glBindVertexArray(VAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+		m_initialized = true;
+	}
+
+	virtual void render() override {
+		glUseProgram(m_shader);
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	}
+
+	virtual void shutdown() override {
+		glDeleteVertexArrays(1, &VAO);
+		glDeleteBuffers(1, &VBO);
+		glDeleteBuffers(1, &EBO);
+		glDeleteProgram(m_shader);
+	}
+
+	virtual bool ready() override {
+		return m_initialized;
+	}
+
+private:
+	bool m_initialized = false;
+
+	unsigned int m_vbo = 0;
+	unsigned int m_vertexShader = 0;
+	unsigned int m_fragmentShader = 0;
+	unsigned int m_shader = 0;
+	unsigned int VBO, VAO, EBO;
+};
+
 int main(int argc, char** argv) {
 	if (aderite::engine::get()->init({})) {
 		// Initialized successfully
@@ -163,6 +270,9 @@ int main(int argc, char** argv) {
 
 		// ImGui layer
 		aderite::engine::get()->get_renderer()->add_layer<editor_layer>();
+
+		// Game layers
+		aderite::engine::get()->get_renderer()->add_layer<viewport_layer>();
 
 		aderite::engine::get()->loop();
 		aderite::engine::get()->shutdown();

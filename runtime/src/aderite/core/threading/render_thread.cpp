@@ -22,13 +22,12 @@ namespace aderite {
 				// If there is time process calls
 				this->process_n_invokes(0);
 
-
 				engine::get()->begin_frame();
+
 				// START OF RENDER CODE
-
 				engine::get()->get_renderer()->render();
-
 				// END OF RENDER CODE
+
 				engine::get()->end_frame();
 			}
 		}
