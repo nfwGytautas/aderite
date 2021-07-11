@@ -5,8 +5,9 @@
 #include "aderite/core/window/window_manager.hpp"
 #include "aderite/core/rendering/renderer.hpp"
 #include "aderite/core/threading/threader.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
 
-#define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: relay_ptr<class_name> public_name() { return field_name.relay(); } private: ref<class_name> field_name;
+#define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: relay_ptr<class_name> public_name() { return field_name; } private: class_name* field_name;
 
 namespace aderite {
 
@@ -58,13 +59,12 @@ namespace aderite {
 
 	private:
 		bool m_wants_to_shutdown = false;
-		std::mutex m_mutex;
-		std::condition_variable m_exit_cond;
 
 	private:
 		ADERITE_SYSTEM_PTR(get_window_manager, window_manager, m_window_manager)
 		ADERITE_SYSTEM_PTR(get_renderer, renderer, m_renderer)
 		ADERITE_SYSTEM_PTR(get_threader, thread::threader, m_threader)
+		ADERITE_SYSTEM_PTR(get_asset_manager, asset::asset_manager, m_asset_manager)
 	};
 
 }

@@ -19,10 +19,18 @@ namespace aderite {
 		return nullptr;
 	}
 
+	bool renderer::init(relay_ptr<window> wnd) {
+		// Setup default render target
+		m_attached_to = wnd;
+		return true;
+	}
+
 	void renderer::shutdown() {
 		for (auto& layer : m_layers) {
 			layer->i_shutdown();
 		}
+
+		m_layers.clear();
 	}
 
 	void renderer::render() {
@@ -38,6 +46,26 @@ namespace aderite {
 				layer->render();
 			}
 		}
+
+		// Restore default
+		set_output(nullptr);
+	}
+
+	void renderer::set_output(relay_ptr<fbo> target) {
+		if (!ready()) {
+			return;
+		}
+
+		if (target.valid()) {
+			target->bind();
+		}
+		else {
+			output_to_default();
+		}
+	}
+
+	void renderer::set_default_target(relay_ptr<fbo> target) {
+		m_default_target = target;
 	}
 
 }

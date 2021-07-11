@@ -6,12 +6,10 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
-#include "aderite/core/aderite.hpp"
+#include "aderite/aderite.hpp"
 #include "aderite/core/window/glfw_window.hpp"
 #include "aderite/core/rendering/layer.hpp"
 #include "aderite/core/rendering/fbo/gl_fbo.hpp"
-
-aderite::ref<aderite::render_backend::opengl::gl_fbo> viewport = nullptr;
 
 class editor_layer : public aderite::layer {
 public:
@@ -49,14 +47,23 @@ public:
 		ImGui_ImplGlfw_InitForOpenGL(m_handle, true);
 		ImGui_ImplOpenGL3_Init("#version 150");
 
+		// Setup game
+		m_viewport = aderite::fbo::create({ 800, 600 }).as<aderite::render_backend::opengl::gl_fbo>();
+		renderer->set_default_target(m_viewport.relay_as<aderite::fbo>());
+		auto asset = assets->create<aderite::fbo>(m_viewport.as<aderite::fbo>());
+		auto systemic_asset = asset->in_group(aderite::asset::asset_group::SYSTEMIC);
+
 		m_initialized = true;
 	}
 
 	virtual void render() override {
-		// Our state
+		// State
 		bool show_demo_window = true;
 		bool show_another_window = false;
 		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+		// Render in the window
+		renderer->reset_output();
 
 		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -95,7 +102,7 @@ public:
 		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
 		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("Dockspace", &dockspaceOpen, window_flags);
+		ImGui::Begin("Dockspace Window", &dockspaceOpen, window_flags);
 		ImGui::PopStyleVar();
 
 		if (opt_fullscreen) {
@@ -117,16 +124,35 @@ public:
 
 		// Dockspace components start here
 
+		// Menubar
+		if (ImGui::BeginMenuBar()) {
+			if (ImGui::BeginMenu("File"))
+			{
+
+				if (ImGui::MenuItem("Exit")) {
+					aderite::engine::get()->request_exit();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
+
 		if (show_demo_window) {
 			ImGui::ShowDemoWindow(&show_demo_window);
 		}
 
 		// Viewport
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
+		//ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		ImGui::Begin("Viewport");
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		ImVec2 viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-		ImGui::Image((ImTextureID)viewport->get_ta(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)m_viewport->get_ta(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
+		ImGui::PopStyleVar();
+		//ImGui::PopStyleVar();
 
 		// Dockspace components end here
 
@@ -161,16 +187,13 @@ public:
 
 private:
 	bool m_initialized = false;
+	aderite::ref<aderite::render_backend::opengl::gl_fbo> m_viewport;
 	GLFWwindow* m_handle = nullptr;
 };
 
-class viewport_layer : public aderite::layer {
+class game_layer : public aderite::layer {
 public:
 	virtual void init() override {
-		// Create viewport
-		viewport = aderite::fbo::create({ 800, 600 }).as<aderite::render_backend::opengl::gl_fbo>();
-		target = viewport.relay_as<aderite::fbo>();
-
 		float vertices[] = {
 			 0.5f,  0.5f, 0.0f,  // top right
 			 0.5f, -0.5f, 0.0f,  // bottom right
@@ -235,6 +258,8 @@ public:
 	}
 
 	virtual void render() override {
+		renderer->clear();
+
 		glUseProgram(m_shader);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -272,7 +297,7 @@ int main(int argc, char** argv) {
 		aderite::engine::get()->get_renderer()->add_layer<editor_layer>();
 
 		// Game layers
-		aderite::engine::get()->get_renderer()->add_layer<viewport_layer>();
+		aderite::engine::get()->get_renderer()->add_layer<game_layer>();
 
 		aderite::engine::get()->loop();
 		aderite::engine::get()->shutdown();

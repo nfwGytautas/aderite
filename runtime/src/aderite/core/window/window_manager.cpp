@@ -1,7 +1,7 @@
 #include "window_manager.hpp"
 
 #include "aderite/config.hpp"
-#include "aderite/core/aderite.hpp"
+#include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
 
 #if GLFW_BACKEND
@@ -35,6 +35,8 @@ namespace aderite {
 			wnd->destroy();
 		}
 
+		m_windows.clear();
+
 		f_shutdown(this);
 	}
 
@@ -42,18 +44,13 @@ namespace aderite {
 		ref<window> wnd = nullptr;
 
 		// Initialize rest of the systems on rendering thread
-		ref<thread::void_invoke> invoke = new thread::void_invoke([&]() {
-			wnd = f_create(options);
-			wnd->make_active();
+		wnd = f_create(options);
+		wnd->make_active();
 
-			// Run renderer init on this window
-			engine::get()->get_renderer()->init();
+		// Run renderer init on this window
+		engine::get()->get_renderer()->init(wnd.relay());
 
-			m_windows.push_back(wnd);
-		});
-
-		engine::get()->get_threader()->get_render_thread()->invoke(invoke.as<thread::thread_invoke_base>());
-		invoke->wait();
+		m_windows.push_back(wnd);
 
 		return wnd;
 	}

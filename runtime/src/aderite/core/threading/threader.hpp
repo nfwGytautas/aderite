@@ -6,8 +6,6 @@
 #include "aderite/core/threading/thread.hpp"
 #include "aderite/utility/pointer.hpp"
 
-#include "aderite/core/threading/render_thread.hpp"
-
 namespace aderite {
 	namespace thread {
 
@@ -21,15 +19,16 @@ namespace aderite {
 			*/
 			bool init();
 
-			/**
-			 * @brief Returns the rendering thread
-			*/
-			relay_ptr<render_thread> get_render_thread();
+			std::thread::id get_render_thread_id() const {
+				return m_renderThreadID;
+			}
+
+		private:
+			threader() {}
+			friend class engine;
 		private:
 			std::vector<ref<thread>> m_threads;
-
-			// Long running threads
-			ref<render_thread> m_render = nullptr;
+			std::thread::id m_renderThreadID;
 		};
 
 	}

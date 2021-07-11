@@ -9,6 +9,8 @@ namespace aderite {
 		namespace opengl {
 
 			gl_fbo::gl_fbo(const fbo_create_args& args) {
+				ASSERT_RENDER_THREAD;
+
 				glGenFramebuffers(1, &m_fbo);
 				this->bind();
 
@@ -50,6 +52,8 @@ namespace aderite {
 			}
 
 			void gl_fbo::bind() {
+				ASSERT_RENDER_THREAD;
+
 				glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 				glViewport(0, 0, width, height);
 			}

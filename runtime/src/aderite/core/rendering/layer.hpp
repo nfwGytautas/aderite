@@ -1,8 +1,15 @@
 #pragma once
 
-#include "aderite/core/rendering/fbo/fbo.hpp"
+#include "aderite/utility/pointer.hpp"
 
 namespace aderite {
+
+	class renderer;
+	class fbo;
+
+	namespace asset {
+		class asset_manager;
+	}
 
 	/**
 	 * @brief Rendering layer for aderite
@@ -42,6 +49,10 @@ namespace aderite {
 	protected:
 		// The target where the renderer will render this layer to
 		relay_ptr<fbo> target = nullptr;
+
+		// Convenience
+		relay_ptr<renderer> renderer = nullptr;
+		relay_ptr<asset::asset_manager> assets = nullptr;
 	};
 
 }

@@ -26,46 +26,46 @@ namespace aderite {
 			return false;
 		}
 
-		// Initialize rest of the systems on rendering thread
-		ref<thread::f_invoke<bool>> invoke = new thread::f_invoke<bool>([&]() {
-			// Window system
-			m_window_manager = new window_manager();
-			if (!m_window_manager->init()) {
-				return false;
-			}
-
-			// Renderer
-			m_renderer = renderer::create_instance(); // Delay init for until there are windows
-
-			return true;
-		});
-
-		m_threader->get_render_thread()->invoke(invoke.as<thread::thread_invoke_base>());
-		invoke->wait();
-		bool result = *(bool*)invoke->result();
-		if (!result) {
+		// Asset manager
+		m_asset_manager = new asset::asset_manager();
+		if (!m_asset_manager->init()) {
 			LOG_ERROR("Aborting aderite initialization");
 			return false;
 		}
+
+		// Window system
+		m_window_manager = new window_manager();
+		if (!m_window_manager->init()) {
+			LOG_ERROR("Aborting aderite initialization");
+			return false;
+		}
+
+		// Renderer
+		m_renderer = renderer::create_instance(); // Delay init for until there are windows
 
 		return true;
 	}
 
 	void engine::shutdown() {
-		m_window_manager->shutdown();
+		m_asset_manager->shutdown();
 		m_renderer->shutdown();
+		m_window_manager->shutdown();
+
+		delete m_asset_manager;
+		delete m_renderer;
+		delete m_window_manager;
 	}
 
 	void engine::loop() {
-		std::unique_lock<std::mutex> lock(m_mutex);
-		m_exit_cond.wait(lock, [this]() { return m_wants_to_shutdown; });
-		m_threader->get_render_thread()->join();
+		while (!m_wants_to_shutdown) {
+			begin_frame();
+			m_renderer->render();
+			end_frame();
+		}
 	}
 
 	void engine::request_exit() {
-		std::unique_lock<std::mutex> lock(m_mutex);
 		m_wants_to_shutdown = true;
-		m_exit_cond.notify_all();
 	}
 
 	void engine::begin_frame() {

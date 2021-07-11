@@ -1,30 +1,21 @@
 #include "layer.hpp"
 
-#include "aderite/utility/log.hpp"
-#include "aderite/utility/pointer.hpp"
-#include "aderite/core/threading/thread_invoke.hpp"
-#include "aderite/core/aderite.hpp"
+#include "aderite/aderite.hpp"
+#include "aderite/utility/macros.hpp"
 
 namespace aderite {
 	void layer::i_init() {
-		// Initialize rest of the systems on rendering thread
-		ref<thread::void_invoke> invoke = new thread::void_invoke([&]() {
-			this->init();
-		});
-
-		engine::get()->get_threader()->get_render_thread()->invoke(invoke.as<thread::thread_invoke_base>());
+		ASSERT_RENDER_THREAD;
+		this->init();
 	}
 
 	void layer::i_shutdown() {
-		// Initialize rest of the systems on rendering thread
-		ref<thread::void_invoke> invoke = new thread::void_invoke([&]() {
-			this->shutdown();
-		});
-
-		engine::get()->get_threader()->get_render_thread()->invoke(invoke.as<thread::thread_invoke_base>());
+		ASSERT_RENDER_THREAD;
+		this->shutdown();
 	}
 
 	layer::layer()
+		: renderer(engine::get()->get_renderer()), assets(engine::get()->get_asset_manager())
 	{}
 
 	layer::~layer()

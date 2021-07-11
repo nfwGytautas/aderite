@@ -1,6 +1,6 @@
 #include "window.hpp"
 
-#include "aderite/core/aderite.hpp"
+#include "aderite/aderite.hpp"
 
 namespace aderite {
 

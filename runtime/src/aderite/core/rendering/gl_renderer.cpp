@@ -12,7 +12,11 @@ namespace aderite {
 	namespace render_backend {
 		namespace opengl {
 
-			bool gl_renderer::init() {
+			bool gl_renderer::init(relay_ptr<window> wnd) {
+				if (!renderer::init(wnd)) {
+					return false;
+				}
+
 				LOG_DEBUG("OpenGL renderer");
 				
 #if GLFW_BACKEND
@@ -46,8 +50,6 @@ namespace aderite {
 					return;
 				}
 
-				//glClearColor(1.0f, 0.0f, 0.5f, 1.0f);
-				//glClear(GL_COLOR_BUFFER_BIT);
 			}
 
 			void gl_renderer::end_frame() {
@@ -55,24 +57,33 @@ namespace aderite {
 					return;
 				}
 
-
-			}
-
-			void gl_renderer::set_output(relay_ptr<fbo> target) {
-				if (!ready()) {
-					return;
-				}
-
-				if (!target.valid()) {
-					glBindFramebuffer(GL_FRAMEBUFFER, 0);
-				}
-				else {
-					target->bind();
-				}
 			}
 
 			bool gl_renderer::ready() {
 				return m_initialized;
+			}
+
+			void gl_renderer::clear() {
+				constexpr float v = 37.0f / 255.0f;
+				glClearColor(v, v, v, 1.0f);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			}
+
+			void gl_renderer::output_to_default() {
+				if (!m_default_target.valid()) {
+					reset_output();
+					return;
+				}
+
+				m_default_target->bind();
+			}
+
+			void gl_renderer::reset_output() {
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+				// Set viewport
+				glm::vec2 size = m_attached_to->get_size();
+				glViewport(0, 0, (int)size.x, (int)size.y);
 			}
 
 		}

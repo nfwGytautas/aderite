@@ -2,6 +2,7 @@
 
 #include <functional>
 #include "aderite/interfaces/iframe_object.hpp"
+#include <glm/glm.hpp>
 
 namespace aderite {
 
@@ -35,6 +36,12 @@ namespace aderite {
 		 * @brief Makes this window the current active one where rendering will be submitted to
 		*/
 		virtual void make_active();
+
+		/**
+		 * @brief Returns the size of the window
+		 * @return GLM vector 2D (width, height)
+		*/
+		virtual glm::vec2 get_size() = 0;
 	private:
 		window(const window& o) = delete;
 		friend class window_manager;

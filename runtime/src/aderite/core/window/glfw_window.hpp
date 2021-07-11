@@ -17,6 +17,7 @@ namespace aderite {
 				void make_active() override;
 				void begin_frame() override;
 				void end_frame() override;
+				virtual glm::vec2 get_size() override;
 
 				GLFWwindow* get_handle() {
 					return m_window;

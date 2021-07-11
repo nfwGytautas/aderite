@@ -11,8 +11,12 @@ namespace aderite {
 				: m_window(nullptr)
 			{
 				m_window = glfwCreateWindow(options.width, options.height, options.title, NULL, NULL);
+			}
 
-
+			glm::vec2 glfw_window::get_size() {
+				int width, height = 0;
+				glfwGetFramebufferSize(m_window, &width, &height);
+				return { width, height };
 			}
 
 			void glfw_window::destroy() {
