@@ -1,10 +1,6 @@
 # Dependencies
-dependencies/*
-!dependencies/glad/
 dependencies/glad/build/
-!dependencies/imgui/
 dependencies/imgui/build/
-!dependencies/README.md
 
 *.vcxproj
 *.vcxproj.filters

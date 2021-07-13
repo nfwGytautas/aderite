@@ -27,6 +27,7 @@ namespace aderite {
 #endif
 
 				m_initialized = true;
+				engine::get()->renderer_initialized();
 				return true;
 			}
 

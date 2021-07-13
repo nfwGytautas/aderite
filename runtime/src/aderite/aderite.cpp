@@ -5,6 +5,8 @@
 
 constexpr char* version = "0.0.0";
 
+#define EDITOR_ACTION(action, ...) if (m_editor != nullptr) {m_editor->action(__VA_ARGS__);}
+
 namespace aderite {
 
 	engine* engine::get() {
@@ -43,10 +45,14 @@ namespace aderite {
 		// Renderer
 		m_renderer = renderer::create_instance(); // Delay init for until there are windows
 
+		EDITOR_ACTION(on_runtime_initialized);
+
 		return true;
 	}
 
 	void engine::shutdown() {
+		EDITOR_ACTION(on_runtime_shutdown);
+
 		m_asset_manager->shutdown();
 		m_renderer->shutdown();
 		m_window_manager->shutdown();
@@ -58,14 +64,23 @@ namespace aderite {
 
 	void engine::loop() {
 		while (!m_wants_to_shutdown) {
+			EDITOR_ACTION(on_begin_frame);
 			begin_frame();
+			EDITOR_ACTION(on_start_render);
 			m_renderer->render();
+			EDITOR_ACTION(on_end_render);
 			end_frame();
+			EDITOR_ACTION(on_end_frame);
 		}
 	}
 
 	void engine::request_exit() {
 		m_wants_to_shutdown = true;
+		EDITOR_ACTION(on_requested_exit);
+	}
+
+	void engine::abort_exit() {
+		m_wants_to_shutdown = false;
 	}
 
 	void engine::begin_frame() {
@@ -76,6 +91,14 @@ namespace aderite {
 	void engine::end_frame() {
 		m_renderer->end_frame();
 		m_window_manager->end_frame();
+	}
+
+	void engine::renderer_initialized() {
+		EDITOR_ACTION(on_renderer_initialized);
+	}
+
+	void engine::attach_editor(interfaces::iaderite_editor* editor) {
+		m_editor = editor;
 	}
 
 }

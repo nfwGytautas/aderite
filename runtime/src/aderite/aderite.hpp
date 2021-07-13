@@ -7,7 +7,9 @@
 #include "aderite/core/threading/threader.hpp"
 #include "aderite/core/assets/asset_manager.hpp"
 
-#define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: relay_ptr<class_name> public_name() { return field_name; } private: class_name* field_name;
+#include "aderite/interfaces/iaderite_editor.hpp"
+
+#define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static relay_ptr<class_name> public_name() { return engine::get()->field_name; } private: class_name* field_name = nullptr;
 
 namespace aderite {
 
@@ -50,15 +52,32 @@ namespace aderite {
 		*/
 		void request_exit();
 
+		/**
+		 * @brief Aborts a requested exit
+		*/
+		void abort_exit();
+
 		// Inherited via iframe_object
 		virtual void begin_frame() override;
 		virtual void end_frame() override;
+
+		/**
+		 * @brief Function is invoked when the renderer was initialized
+		*/
+		void renderer_initialized();
+
+		/**
+		 * @brief Attaches a aderite editor to the runtime
+		 * @param editor Editor to attach
+		*/
+		void attach_editor(interfaces::iaderite_editor* editor);
 	private:
 		engine() {}
 		engine(const engine& o) = delete;
 
 	private:
 		bool m_wants_to_shutdown = false;
+		interfaces::iaderite_editor* m_editor = nullptr;
 
 	private:
 		ADERITE_SYSTEM_PTR(get_window_manager, window_manager, m_window_manager)

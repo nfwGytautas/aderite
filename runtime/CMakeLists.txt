@@ -24,13 +24,13 @@ set_property(TARGET aderite_runtime PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CM
 
 # Libraries to link
 if(BUILD_RELEASE)
-    target_link_libraries(aderite_runtime PUBLIC spdlog)
+    target_link_libraries(aderite_runtime PUBLIC spdlog yaml-cpp)
 else()
-	target_link_libraries(aderite_runtime PUBLIC spdlogd)
+	target_link_libraries(aderite_runtime PUBLIC spdlogd yaml-cppd)
 endif()
 
 # Same name
-target_link_libraries(aderite_runtime PUBLIC glfw3 glad)
+target_link_libraries(aderite_runtime PUBLIC glfw3 glad )
 
 # Some MSVC flags
 set_property(TARGET aderite_runtime PROPERTY
