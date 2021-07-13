@@ -7,10 +7,14 @@
 #include <imgui/imgui_impl_opengl3.h>
 
 #include "aderite/aderite.hpp"
+#include "aderite/utility/log.hpp"
+
+// Probably not necessary
 #include "aderite/core/window/glfw_window.hpp"
 #include "aderite/core/rendering/layer.hpp"
 #include "aderite/core/rendering/fbo/gl_fbo.hpp"
-#include "aderite/utility/log.hpp"
+#include "aderite/core/rendering/shader/shader.hpp"
+#include "aderite/core/assets/object/shader_asset.hpp"
 
 class game_layer : public aderite::layer {
 public:
@@ -27,36 +31,17 @@ public:
 			1, 2, 3   // second Triangle
 		};
 
-		const char* vertexShaderSource = "#version 330 core\n"
-			"layout (location = 0) in vec3 aPos;\n"
-			"void main()\n"
-			"{\n"
-			"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-			"}\0";
+		/*m_shader = aderite::engine::get_asset_manager()->create<aderite::asset::shader_asset>(aderite::asset::shader_asset::fields{
+					"0_vertex.txt",
+					"0_fragment.txt"
+			});
+		m_shader->set_name("QuadShader");
+		m_shader->serialize("res/shaders/0_QuadShader.shader");*/
 
-		const char* fragmentShaderSource = "#version 330 core\n"
-			"out vec4 FragColor;\n"
-			"void main()\n"
-			"{\n"
-			"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-			"}\n\0";
-
-		m_vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-		glShaderSource(m_vertexShader, 1, &vertexShaderSource, NULL);
-		glCompileShader(m_vertexShader);
-
-		m_fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(m_fragmentShader, 1, &fragmentShaderSource, NULL);
-		glCompileShader(m_fragmentShader);
-
-		m_shader = glCreateProgram();
-		glAttachShader(m_shader, m_vertexShader);
-		glAttachShader(m_shader, m_fragmentShader);
-		glLinkProgram(m_shader);
-
-		glDeleteShader(m_vertexShader);
-		glDeleteShader(m_fragmentShader);
+		aderite::engine::get_asset_manager()->read_asset<aderite::asset::shader_asset>("shaders/0_QuadShader.shader");
+		m_shader = aderite::engine::get_asset_manager()->get<aderite::asset::shader_asset>("QuadShader");
+		m_shader->prepare_load();
+		m_shader->load();
 
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);
@@ -81,7 +66,7 @@ public:
 	virtual void render() override {
 		renderer->clear();
 
-		glUseProgram(m_shader);
+		(*m_shader)->bind();
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
@@ -90,7 +75,8 @@ public:
 		glDeleteVertexArrays(1, &VAO);
 		glDeleteBuffers(1, &VBO);
 		glDeleteBuffers(1, &EBO);
-		glDeleteProgram(m_shader);
+
+		m_shader = nullptr;
 	}
 
 	virtual bool ready() override {
@@ -101,10 +87,9 @@ private:
 	bool m_initialized = false;
 
 	unsigned int m_vbo = 0;
-	unsigned int m_vertexShader = 0;
-	unsigned int m_fragmentShader = 0;
-	unsigned int m_shader = 0;
 	unsigned int VBO, VAO, EBO;
+
+	aderite::asset::shader_asset* m_shader = nullptr;
 };
 
 namespace aderite {
@@ -118,6 +103,8 @@ namespace aderite {
 
 			// Create window
 			m_editor_window = engine::get_window_manager()->create_window({});
+
+			// TODO: Load project or create a new one
 
 			// TODO: Load the default scene or create a new one
 			engine::get_renderer()->add_layer<game_layer>();
@@ -157,10 +144,8 @@ namespace aderite {
 			ImGui_ImplOpenGL3_Init("#version 150");
 
 			// Setup game
-			m_viewport = aderite::fbo::create({ 800, 600 }).as<aderite::render_backend::opengl::gl_fbo>();
-			engine::get_renderer()->set_default_target(m_viewport.relay_as<aderite::fbo>());
-			/*auto asset = engine::get_asset_manager()->create<aderite::fbo>(m_viewport.as<aderite::fbo>());
-			auto systemic_asset = asset->in_group(aderite::asset::asset_group::SYSTEMIC);*/
+			m_viewport = dynamic_cast<aderite::render_backend::opengl::gl_fbo*>(aderite::fbo::create({ 800, 600 }));
+			engine::get_renderer()->set_default_target(m_viewport);
 		}
 
 		void windows_editor::on_end_render() {

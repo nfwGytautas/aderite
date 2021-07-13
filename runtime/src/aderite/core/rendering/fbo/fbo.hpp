@@ -28,9 +28,9 @@ namespace aderite {
 		/**
 		 * @brief Creates a new API dependent framebuffer object
 		 * @param args Arguments of creation
-		 * @return ifbo* instance
+		 * @return fbo instance
 		*/
-		static ref<fbo> create(const fbo_create_args& args);
+		static fbo* create(const fbo_create_args& args);
 
 	protected:
 		unsigned int width;

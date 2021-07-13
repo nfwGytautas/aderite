@@ -1,10 +1,10 @@
 #pragma once
 
+#include <string>
 #include <vector>
 #include <algorithm>
 #include "aderite/core/assets/asset.hpp"
 #include "aderite/utility/pointer.hpp"
-#include "aderite/core/assets/asset_template_detail.hpp"
 
 namespace aderite {
 	namespace asset {
@@ -13,6 +13,10 @@ namespace aderite {
 		 * @brief Aderite asset manager
 		*/
 		class asset_manager {
+		public:
+			const std::string RootDir = "res/";
+			const std::string RawDir = RootDir + "raw/";
+
 		public:
 			/**
 			 * @brief Initializes the asset manager
@@ -27,13 +31,12 @@ namespace aderite {
 			/**
 			 * @brief Create an asset
 			 * @tparam T Type of the asset
-			 * @param object Object instance of the asset
 			*/
-			template<class T>
-			ref<asset<T>> create(typename std::enable_if<true, ref<T>>::type object) {
+			template<class T, class ...Args>
+			T* create(Args&&... args) {
 				// Create asset
-				ref<asset<T>> a = new asset<T>(object, get_handle());
-				m_assets.push_back(a.as<asset_base>());
+				T* a = new T(get_handle(), std::forward<Args>(args)...);
+				m_assets.push_back(static_cast<asset_base*>(a));
 				return a;
 			}
 
@@ -41,8 +44,8 @@ namespace aderite {
 			 * @brief Get an asset by name
 			*/
 			template<class T>
-			ref<asset<T>> get(const std::string& name) {
-				auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](const ref<asset_base>& asset) { 
+			T* get(const std::string& name) {
+				auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](asset_base* asset) { 
 					return asset->get_name() == name;
 				});
 
@@ -51,15 +54,15 @@ namespace aderite {
 					return nullptr;
 				}
 
-				return (*it).as<asset<T>>();
+				return static_cast<T*>(*it);
 			}
 
 			/**
 			 * @brief Get an asset by handle
 			*/
 			template<class T>
-			ref<asset<T>> get(const asset_handle& handle) {
-				auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](const ref<asset_base>& asset) {
+			T* get(const asset_handle& handle) {
+				auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](asset_base* asset) {
 					return asset->get_handle() == handle;
 				});
 
@@ -70,6 +73,39 @@ namespace aderite {
 
 				return (*it).as<asset<T>>();
 			}
+
+			/**
+			 * @brief Return true if the asset_manager has information or an asset with the specified name
+			*/
+			bool has(const std::string& name);
+
+			/**
+			 * @brief Loads the specified asset info (path is relative to the root assets directory)
+			 * this method does not load the asset, just reads its meta information.
+			*/
+			template<class T>
+			T* read_asset(const std::string& path) {
+				T* a = new T(0, {});
+				if (!a->deserialize(RootDir + path)) {
+					LOG_ERROR("Couldn't deserialize {0}", path);
+					delete a;
+					return nullptr;
+				}
+
+				if (a->p_handle > m_next_handle) {
+					m_next_handle = a->p_handle + 1;
+				}
+				m_assets.push_back(static_cast<asset_base*>(a));
+				return a;
+			}
+
+			/**
+			 * @brief Loads the specified file contents into a string, guaranteed by the asset manager to be
+			 * thread safe
+			 * @param path Path to file
+			 * @return String containing the contents of the file
+			*/
+			std::string load_txt_file(const std::string& path);
 		private:
 			asset_handle get_handle();
 
@@ -79,7 +115,7 @@ namespace aderite {
 
 		private:
 			size_t m_next_handle = 0;
-			std::vector<ref<asset_base>> m_assets;
+			std::vector<asset_base*> m_assets;
 		};
 
 	}

@@ -20,3 +20,17 @@
 
 // Is aderite using OpenGL backend (Uses GLAD)
 #define GL_BACKEND 1
+
+
+// ---------------------------------
+// RESOURCE SAVE TYPE
+// Only one save type can be active at a time
+// 0 - Disabled
+// 1 - Active
+// ---------------------------------
+
+// Is aderite loading binary compressed files (Optimized for released games and applications)
+#define BINARY_SAVE_TYPE 0
+
+// Is aderite using some human readable type (Editors and debug builds)
+#define HUMAN_READABLE_SAVE_TYPE 1

@@ -1,20 +1,20 @@
-#include "fbo.hpp"
+#include "shader.hpp"
 
 #include "aderite/config.hpp"
 #include "aderite/utility/log.hpp"
 #include "aderite/utility/macros.hpp"
 
 #ifdef GL_BACKEND
-#include "aderite/core/rendering/fbo/gl_fbo.hpp"
+#include "aderite/core/rendering/shader/gl_shader.hpp"
 #endif
 
 namespace aderite {
 
-	fbo* fbo::create(const fbo_create_args& args) {
+	shader* shader::create(const shader_create_args& args) {
 		ASSERT_RENDER_THREAD;
 
 #if GL_BACKEND
-		return new render_backend::opengl::gl_fbo(args);
+		return new render_backend::opengl::gl_shader(args);
 #endif
 
 		LOG_ERROR("No rendering backend specified");

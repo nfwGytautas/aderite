@@ -1,4 +1,5 @@
 # Dependencies
+dependencies/include/
 dependencies/glad/build/
 dependencies/imgui/build/
 

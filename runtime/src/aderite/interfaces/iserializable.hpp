@@ -15,14 +15,16 @@ namespace aderite {
 			/**
 			 * @brief Serialize object to the specified path
 			 * @param path File to save to
+			 * @return True if serialized without errors, false otherwise
 			*/
-			virtual void serialize(const std::string& path) = 0;
+			virtual bool serialize(const std::string& path) = 0;
 
 			/**
 			 * @brief Deserialize object from specified path
 			 * @param path File to deserialize from
+			 * @return True if deserialized without errors, false otherwise
 			*/
-			virtual void deserialize(const std::string& path) = 0;
+			virtual bool deserialize(const std::string& path) = 0;
 		};
 
 	}

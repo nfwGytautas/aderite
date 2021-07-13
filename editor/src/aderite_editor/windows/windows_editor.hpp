@@ -24,7 +24,7 @@ namespace aderite {
 			ref<window> m_editor_window = nullptr;
 
 			// TODO: Move to a UI component
-			ref<aderite::render_backend::opengl::gl_fbo> m_viewport;
+			aderite::render_backend::opengl::gl_fbo* m_viewport;
 		};
 
 	}
