@@ -14,9 +14,8 @@ namespace aderite {
 		*/
 		class asset_manager {
 		public:
-			const std::string RootDir = "res/";
-			const std::string RawDir = RootDir + "raw/";
-
+			const std::string ResDir = "res/";
+			const std::string RawDir = ResDir + "raw/";
 		public:
 			/**
 			 * @brief Initializes the asset manager
@@ -24,9 +23,21 @@ namespace aderite {
 			bool init();
 
 			/**
-			 * @brief Frees all asset_manager information
+			 * @brief Frees all asset manager information
 			*/
 			void shutdown();
+
+			/**
+			 * @brief Sets the root directory of the manager to the specified one
+			*/
+			void set_root_dir(const std::string& path);
+
+			/**
+			 * @brief Returns the resource directory
+			*/
+			std::string get_res_dir() const {
+				return m_rootDir + ResDir;
+			}
 
 			/**
 			 * @brief Create an asset
@@ -44,7 +55,7 @@ namespace aderite {
 			 * @brief Get an asset by name
 			*/
 			template<class T>
-			T* get(const std::string& name) {
+			T* get_by_name(const std::string& name) {
 				auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](asset_base* asset) { 
 					return asset->get_name() == name;
 				});
@@ -61,7 +72,7 @@ namespace aderite {
 			 * @brief Get an asset by handle
 			*/
 			template<class T>
-			T* get(const asset_handle& handle) {
+			T* get_by_handle(const asset_handle& handle) {
 				auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](asset_base* asset) {
 					return asset->get_handle() == handle;
 				});
@@ -85,16 +96,13 @@ namespace aderite {
 			*/
 			template<class T>
 			T* read_asset(const std::string& path) {
-				T* a = new T(0, {});
-				if (!a->deserialize(RootDir + path)) {
+				T* a = new T("", {});
+				if (!a->deserialize(get_res_dir() + path)) {
 					LOG_ERROR("Couldn't deserialize {0}", path);
 					delete a;
 					return nullptr;
 				}
 
-				if (a->p_handle > m_next_handle) {
-					m_next_handle = a->p_handle + 1;
-				}
 				m_assets.push_back(static_cast<asset_base*>(a));
 				return a;
 			}
@@ -107,6 +115,9 @@ namespace aderite {
 			*/
 			std::string load_txt_file(const std::string& path);
 		private:
+			/**
+			 * @brief Generates a UUID handle
+			*/
 			asset_handle get_handle();
 
 		private:
@@ -114,8 +125,9 @@ namespace aderite {
 			friend class engine;
 
 		private:
-			size_t m_next_handle = 0;
 			std::vector<asset_base*> m_assets;
+			
+			std::string m_rootDir = "";
 		};
 
 	}

@@ -8,12 +8,16 @@
 // Previous versions:
 //	- 2021_07_13r1
 
-constexpr const char* current_version = "2021_07_03r1";
+constexpr const char* current_version = "2021_07_13r1";
 
 namespace aderite {
 	namespace asset {
 		shader_asset::~shader_asset() {
 			unload();
+		}
+
+		asset_type shader_asset::type() const {
+			return asset_type::SHADER;
 		}
 
 		bool shader_asset::serialize(const std::string& path) {
@@ -58,7 +62,7 @@ namespace aderite {
 				return false;
 			}
 
-			p_handle = data["Handle"].as<size_t>();
+			p_handle = data["Handle"].as<std::string>();
 			p_name = data["Name"].as<std::string>();
 			m_info.VertexPath = data["Vertex"].as<std::string>();
 			m_info.FragmentPath = data["Fragment"].as<std::string>();

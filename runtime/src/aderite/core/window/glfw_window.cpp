@@ -19,6 +19,10 @@ namespace aderite {
 				return { width, height };
 			}
 
+			void glfw_window::set_title(const std::string& title) {
+				glfwSetWindowTitle(m_window, title.c_str());
+			}
+
 			void glfw_window::destroy() {
 				glfwDestroyWindow(m_window);
 			}

@@ -5,6 +5,7 @@
 
 #include "aderite/config.hpp"
 #include "aderite/utility/log.hpp"
+#include "aderite/utility/random.hpp"
 
 namespace aderite {
 	namespace asset {
@@ -24,16 +25,6 @@ namespace aderite {
 			// data files
 #if HUMAN_READABLE_SAVE_TYPE == 1
 			LOG_DEBUG("Human readable save type");
-			LOG_TRACE("Creating resource directories");
-
-			// Create directories if they don't exist
-			if (!std::filesystem::is_directory(RootDir) || !std::filesystem::exists(RootDir)) {
-				std::filesystem::create_directory(RootDir);
-			}
-			
-			if (!std::filesystem::is_directory(RawDir) || !std::filesystem::exists(RawDir)) {
-				std::filesystem::create_directory(RawDir);
-			}
 #endif
 
 			return true;
@@ -48,9 +39,24 @@ namespace aderite {
 		}
 
 		asset_handle asset_manager::get_handle() {
-			return m_next_handle++;
+			return random::generate_uuid();
 		}
 
+		void asset_manager::set_root_dir(const std::string& path) {
+			m_rootDir = path;
+
+			LOG_TRACE("Creating resource directories in {0}", m_rootDir);
+
+			// Create directories if they don't exist
+			if (!std::filesystem::is_directory(m_rootDir + ResDir) || !std::filesystem::exists(m_rootDir + ResDir)) {
+				std::filesystem::create_directory(m_rootDir + ResDir);
+			}
+
+			if (!std::filesystem::is_directory(m_rootDir + RawDir) || !std::filesystem::exists(m_rootDir + RawDir)) {
+				std::filesystem::create_directory(m_rootDir + RawDir);
+			}
+		}
+		
 		bool asset_manager::has(const std::string& name) {
 			auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](asset_base* asset) {
 				return asset->get_name() == name;
@@ -63,7 +69,7 @@ namespace aderite {
 			std::ifstream fin;
 			std::stringstream fstream;
 
-			fin.open(RawDir + path);
+			fin.open(m_rootDir + RawDir + path);
 
 			if (!fin)
 			{

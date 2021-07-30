@@ -15,87 +15,97 @@
 #include "aderite/core/rendering/fbo/gl_fbo.hpp"
 #include "aderite/core/rendering/shader/shader.hpp"
 #include "aderite/core/assets/object/shader_asset.hpp"
+#include "aderite/core/scene/scene.hpp"
 
-class game_layer : public aderite::layer {
-public:
-	virtual void init() override {
-		float vertices[] = {
-			 0.5f,  0.5f, 0.0f,  // top right
-			 0.5f, -0.5f, 0.0f,  // bottom right
-			-0.5f, -0.5f, 0.0f,  // bottom left
-			-0.5f,  0.5f, 0.0f   // top left 
-		};
-
-		unsigned int indices[] = {  // note that we start from 0!
-			0, 1, 3,  // first Triangle
-			1, 2, 3   // second Triangle
-		};
-
-		/*m_shader = aderite::engine::get_asset_manager()->create<aderite::asset::shader_asset>(aderite::asset::shader_asset::fields{
-					"0_vertex.txt",
-					"0_fragment.txt"
-			});
-		m_shader->set_name("QuadShader");
-		m_shader->serialize("res/shaders/0_QuadShader.shader");*/
-
-		aderite::engine::get_asset_manager()->read_asset<aderite::asset::shader_asset>("shaders/0_QuadShader.shader");
-		m_shader = aderite::engine::get_asset_manager()->get<aderite::asset::shader_asset>("QuadShader");
-		m_shader->prepare_load();
-		m_shader->load();
-
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		glGenBuffers(1, &EBO);
-		glBindVertexArray(VAO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-
-		m_initialized = true;
-	}
-
-	virtual void render() override {
-		renderer->clear();
-
-		(*m_shader)->bind();
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	}
-
-	virtual void shutdown() override {
-		glDeleteVertexArrays(1, &VAO);
-		glDeleteBuffers(1, &VBO);
-		glDeleteBuffers(1, &EBO);
-
-		m_shader = nullptr;
-	}
-
-	virtual bool ready() override {
-		return m_initialized;
-	}
-
-private:
-	bool m_initialized = false;
-
-	unsigned int m_vbo = 0;
-	unsigned int VBO, VAO, EBO;
-
-	aderite::asset::shader_asset* m_shader = nullptr;
-};
+//class game_layer : public aderite::layer {
+//public:
+//	virtual void init() override {
+//		float vertices[] = {
+//			 0.5f,  0.5f, 0.0f,  // top right
+//			 0.5f, -0.5f, 0.0f,  // bottom right
+//			-0.5f, -0.5f, 0.0f,  // bottom left
+//			-0.5f,  0.5f, 0.0f   // top left 
+//		};
+//
+//		unsigned int indices[] = {  // note that we start from 0!
+//			0, 1, 3,  // first Triangle
+//			1, 2, 3   // second Triangle
+//		};
+//
+//		/*m_shader = aderite::engine::get_asset_manager()->create<aderite::asset::shader_asset>(aderite::asset::shader_asset::fields{
+//					"0_vertex.txt",
+//					"0_fragment.txt"
+//			});
+//		m_shader->set_name("QuadShader");
+//		m_shader->serialize("res/shaders/0_QuadShader.shader");*/
+//
+//		aderite::engine::get_asset_manager()->read_asset<aderite::asset::shader_asset>("shaders/0_QuadShader.shader");
+//		m_shader = aderite::engine::get_asset_manager()->get_by_name<aderite::asset::shader_asset>("QuadShader");
+//		m_shader->prepare_load();
+//		m_shader->load();
+//
+//		aderite::scene::scene* scene = aderite::engine::get_scene_manager()->new_scene();
+//		scene->set_name("SampleScene");
+//		scene->use_asset(m_shader);
+//		scene->serialize("res/scenes/SampleScene.scene");
+//		aderite::engine::get_scene_manager()->set_active(scene);
+//
+//		glGenVertexArrays(1, &VAO);
+//		glGenBuffers(1, &VBO);
+//		glGenBuffers(1, &EBO);
+//		glBindVertexArray(VAO);
+//
+//		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+//
+//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+//		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+//
+//		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+//		glEnableVertexAttribArray(0);
+//
+//		glBindBuffer(GL_ARRAY_BUFFER, 0);
+//		glBindVertexArray(0);
+//
+//		m_initialized = true;
+//	}
+//
+//	virtual void render() override {
+//		renderer->clear();
+//
+//		(*m_shader)->bind();
+//		glBindVertexArray(VAO);
+//		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+//	}
+//
+//	virtual void shutdown() override {
+//		glDeleteVertexArrays(1, &VAO);
+//		glDeleteBuffers(1, &VBO);
+//		glDeleteBuffers(1, &EBO);
+//
+//		m_shader = nullptr;
+//	}
+//
+//	virtual bool ready() override {
+//		return m_initialized;
+//	}
+//
+//private:
+//	bool m_initialized = false;
+//
+//	unsigned int m_vbo = 0;
+//	unsigned int VBO, VAO, EBO;
+//
+//	aderite::asset::shader_asset* m_shader = nullptr;
+//};
 
 namespace aderite {
 	namespace editor {
 
 		windows_editor::windows_editor(int argc, char** argv) {
+			m_toolbar = new components::toolbar();
+			m_viewport = new components::viewport();
+			m_scene_view = new components::scene_view();
 		}
 
 		void windows_editor::on_runtime_initialized() {
@@ -104,10 +114,13 @@ namespace aderite {
 			// Create window
 			m_editor_window = engine::get_window_manager()->create_window({});
 
-			// TODO: Load project or create a new one
+			// No project path until a new one isn't created
+
+			// Startup with an empty project
+			new_project("untitled project");
 
 			// TODO: Load the default scene or create a new one
-			engine::get_renderer()->add_layer<game_layer>();
+			//engine::get_renderer()->add_layer<game_layer>();
 		}
 
 		void windows_editor::on_renderer_initialized() {
@@ -121,7 +134,7 @@ namespace aderite {
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 			//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-			//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+			//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 			//io.ConfigViewportsNoAutoMerge = true;
 			//io.ConfigViewportsNoTaskBarIcon = true;
 
@@ -143,9 +156,8 @@ namespace aderite {
 			ImGui_ImplGlfw_InitForOpenGL(handle, true);
 			ImGui_ImplOpenGL3_Init("#version 150");
 
-			// Setup game
-			m_viewport = dynamic_cast<aderite::render_backend::opengl::gl_fbo*>(aderite::fbo::create({ 800, 600 }));
-			engine::get_renderer()->set_default_target(m_viewport);
+			// Components
+			m_viewport->init();
 		}
 
 		void windows_editor::on_end_render() {
@@ -215,35 +227,15 @@ namespace aderite {
 
 			// Dockspace components start here
 
-			// Menubar
-			if (ImGui::BeginMenuBar()) {
-				if (ImGui::BeginMenu("File"))
-				{
+			// Components
+			m_toolbar->render();
+			m_viewport->render();
+			m_scene_view->render();
 
-					if (ImGui::MenuItem("Exit")) {
-						aderite::engine::get()->request_exit();
-					}
-
-					ImGui::EndMenu();
-				}
-
-				ImGui::EndMenuBar();
-			}
-
+			// DEMO WINDOW
 			if (show_demo_window) {
 				ImGui::ShowDemoWindow(&show_demo_window);
 			}
-
-			// Viewport
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-			//ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			ImGui::Begin("Viewport");
-			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-			ImVec2 viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-			ImGui::Image((ImTextureID)m_viewport->get_ta(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
-			ImGui::End();
-			ImGui::PopStyleVar();
-			//ImGui::PopStyleVar();
 
 			// Dockspace components end here
 
@@ -268,12 +260,29 @@ namespace aderite {
 		}
 
 		void windows_editor::on_runtime_shutdown() {
+			m_viewport->shutdown();
+
 			// Shutdown ImGui
 			ImGui_ImplOpenGL3_Shutdown();
 			ImGui_ImplGlfw_Shutdown();
 			ImGui::DestroyContext();
+
+			delete m_project;
 		}
 
+		void windows_editor::on_selected_entity_changed(scene::entity* entity) {
+			m_scene_view->set_active_entity(entity);
+		}
+
+		void windows_editor::new_project(const std::string& name) {
+			m_editor_window->set_title(name);
+			
+			if (m_project) {
+				delete m_project;
+			}
+
+			m_project = new project();
+		}
 
 	}
 }

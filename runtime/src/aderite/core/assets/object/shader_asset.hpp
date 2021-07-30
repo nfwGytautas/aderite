@@ -18,6 +18,7 @@ namespace aderite {
 		public:
 			~shader_asset();
 
+			virtual asset_type type() const override;
 			virtual bool serialize(const std::string& path) override;
 			virtual bool deserialize(const std::string& path) override;
 			virtual void prepare_load() override;

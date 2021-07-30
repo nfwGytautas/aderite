@@ -6,12 +6,21 @@
 
 namespace aderite {
 	namespace asset {
-		using asset_handle = size_t;
+		using asset_handle = std::string;
 
-		enum class asset_group : size_t
-		{
+		/**
+		 * @brief Possible asset groups a single asset can have multiple groups
+		*/
+		enum class asset_group : size_t {
 			SYSTEMIC = 0,
 			SHADER = 1
+		};
+
+		/**
+		 * @brief The asset type
+		*/
+		enum class asset_type : size_t {
+			SHADER = 0,
 		};
 
 		/**
@@ -34,12 +43,18 @@ namespace aderite {
 			}
 
 			/**
+			 * @brief Returns the asset type
+			*/
+			virtual asset_type type() const = 0;
+
+			/**
 			 * @brief Returns true if the asset is in group
 			*/
 			virtual bool in_group(asset_group group) const = 0;
 
 			/**
-			 * @brief Prepare the asset to be loaded into memory
+			 * @brief Prepare the asset to be loaded into memory, this method preferably should not block the caller
+			 * therefor it is advised to use asset manager functions to load inside a thread pool
 			*/
 			virtual void prepare_load() = 0;
 

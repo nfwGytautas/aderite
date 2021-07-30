@@ -38,6 +38,11 @@ namespace aderite {
 		virtual void make_active();
 
 		/**
+		 * @brief Set the title of the window
+		*/
+		virtual void set_title(const std::string& title) = 0;
+
+		/**
 		 * @brief Returns the size of the window
 		 * @return GLM vector 2D (width, height)
 		*/
