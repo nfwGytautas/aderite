@@ -5,9 +5,12 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <pfd/portable-file-dialogs.h>
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
+
+#include "aderite_editor/core/event_router.hpp"
 
 // Probably not necessary
 #include "aderite/core/window/glfw_window.hpp"
@@ -16,6 +19,8 @@
 #include "aderite/core/rendering/shader/shader.hpp"
 #include "aderite/core/assets/object/shader_asset.hpp"
 #include "aderite/core/scene/scene.hpp"
+
+#include "aderite/core/assets/object/shader_asset.hpp"
 
 //class game_layer : public aderite::layer {
 //public:
@@ -99,6 +104,8 @@
 //	aderite::asset::shader_asset* m_shader = nullptr;
 //};
 
+#define EVENT_ROUTE(e, dst) event_router::e = std::bind(&windows_editor::dst, this, std::placeholders::_1)
+
 namespace aderite {
 	namespace editor {
 
@@ -106,6 +113,9 @@ namespace aderite {
 			m_toolbar = new components::toolbar();
 			m_viewport = new components::viewport();
 			m_scene_view = new components::scene_view();
+
+			// Setup event router
+			event_router::Sink = this;
 		}
 
 		void windows_editor::on_runtime_initialized() {
@@ -114,10 +124,18 @@ namespace aderite {
 			// Create window
 			m_editor_window = engine::get_window_manager()->create_window({});
 
+			// Check for pfd
+			if (!pfd::settings::available()) {
+				LOG_ERROR("PFD not available on a WINDOWS editor. Incorrect editor choice? Aborting.");
+				engine::get()->request_exit();
+				return;
+			}
+
+			m_editor_window->set_title("Aderite");
+
 			// No project path until a new one isn't created
 
-			// Startup with an empty project
-			new_project("untitled project");
+			// TODO: Startup dialog e.g. create new project, load project, etc.
 
 			// TODO: Load the default scene or create a new one
 			//engine::get_renderer()->add_layer<game_layer>();
@@ -270,18 +288,77 @@ namespace aderite {
 			delete m_project;
 		}
 
-		void windows_editor::on_selected_entity_changed(scene::entity* entity) {
+		void windows_editor::selected_entity_changed(scene::entity* entity) {
 			m_scene_view->set_active_entity(entity);
 		}
 
-		void windows_editor::new_project(const std::string& name) {
+		void windows_editor::new_project(const std::string& dir, const std::string& name) {
+			LOG_TRACE("New project name: {0} at directory {1}", name, dir);
 			m_editor_window->set_title(name);
 			
 			if (m_project) {
 				delete m_project;
 			}
 
-			m_project = new project();
+			m_project = new project(dir, name);
+
+			// Setup asset manager
+			engine::get_asset_manager()->set_root_dir(m_project->get_root_dir().string());
+		}
+
+		void windows_editor::save_project() {
+			if (!m_project) {
+				// TODO: Create new project?
+				return;
+			}
+
+			// Save all scenes
+			for (scene::scene* scene : *engine::get_scene_manager()) {
+				engine::get_scene_manager()->save_scene(scene);
+			}
+
+			m_project->save();
+		}
+
+		void windows_editor::load_project(const std::string& path) {
+			ASSERT_RENDER_THREAD;
+			LOG_TRACE("Loading project {0}", path);
+			if (m_project) {
+				// TODO: Ask for saving if there are changes
+				delete m_project;
+			}
+
+			m_project = project::load(path);
+
+			m_editor_window->set_title(m_project->get_name());
+
+			// Setup asset manager
+			engine::get_asset_manager()->set_root_dir(m_project->get_root_dir().string());
+
+			if (!m_project->get_active_scene().empty()) {
+				scene::scene* s = engine::get_scene_manager()->read_scene(m_project->get_active_scene());
+				engine::get_scene_manager()->set_active(s);
+
+				if (!s->is_preparing()) {
+					s->prepare_load();
+				}
+
+				while (!s->ready_to_load()) {
+					// TODO: Loading screen
+
+					// Sleep for 1 second
+					::aderite::engine::get_threader()->sleep_caller(1000);
+				}
+				s->load();
+			}
+		}
+
+		void windows_editor::new_scene(const std::string& name) {
+			LOG_TRACE("New scene with name: {0}", name);
+
+			// TODO: Error screen or special naming
+			scene::scene* s = engine::get_scene_manager()->new_scene(name);
+			engine::get_scene_manager()->set_active(s);
 		}
 
 	}

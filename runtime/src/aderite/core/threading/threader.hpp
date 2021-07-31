@@ -23,6 +23,11 @@ namespace aderite {
 				return m_renderThreadID;
 			}
 
+			/**
+			 * @brief Sleeps the calling thread for ms amount of milliseconds
+			*/
+			void sleep_caller(size_t ms);
+
 		private:
 			threader() {}
 			friend class engine;

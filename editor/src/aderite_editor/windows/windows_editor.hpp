@@ -4,7 +4,8 @@
 #include "aderite/core/window/window.hpp"
 #include "aderite/utility/pointer.hpp"
 
-#include "aderite_editor/project/project.hpp"
+#include "aderite_editor/core/project.hpp"
+#include "aderite_editor/core/event_router.hpp"
 
 // Components forward declare?
 #include "aderite_editor/components/toolbar.hpp"
@@ -17,7 +18,7 @@ namespace aderite {
 		/**
 		 * @brief Editor for windows operating system
 		*/
-		class windows_editor : public interfaces::iaderite_editor {
+		class windows_editor : public interfaces::iaderite_editor, public ievent_sink {
 		public:
 			windows_editor(int argc, char** argv);
 
@@ -26,14 +27,14 @@ namespace aderite {
 			virtual void on_end_render() override;
 			virtual void on_runtime_shutdown() override;
 
-			// Special
-			virtual void on_selected_entity_changed(scene::entity* entity);
-
-			/**
-			 * @brief Creates a new project
-			 * @param name Name of the project
-			*/
-			void new_project(const std::string& name);
+			// ============================================================================
+			// Start of event routes, look at ievent_sink interface for more information
+			// ============================================================================
+			virtual void selected_entity_changed(scene::entity* entity) override;
+			virtual void new_project(const std::string& dir, const std::string& name) override;
+			virtual void save_project() override;
+			virtual void load_project(const std::string& path) override;
+			virtual void new_scene(const std::string& name) override;
 		private:
 			ref<window> m_editor_window = nullptr;
 			project* m_project = nullptr;

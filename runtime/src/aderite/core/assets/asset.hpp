@@ -2,12 +2,11 @@
 
 #include <string>
 #include "aderite/interfaces/iserializable.hpp"
+#include "aderite/interfaces/iloadable.hpp"
 #include "aderite/utility/pointer.hpp"
 
 namespace aderite {
 	namespace asset {
-		using asset_handle = std::string;
-
 		/**
 		 * @brief Possible asset groups a single asset can have multiple groups
 		*/
@@ -26,7 +25,7 @@ namespace aderite {
 		/**
 		 * @brief Asset base generic class
 		*/
-		class asset_base : public interfaces::iserializable {
+		class asset_base : public interfaces::iserializable, public interfaces::iloadable {
 		public:
 			virtual ~asset_base() {}
 
@@ -38,10 +37,6 @@ namespace aderite {
 				p_name = name;
 			}
 
-			asset_handle get_handle() const {
-				return p_handle;
-			}
-
 			/**
 			 * @brief Returns the asset type
 			*/
@@ -51,39 +46,14 @@ namespace aderite {
 			 * @brief Returns true if the asset is in group
 			*/
 			virtual bool in_group(asset_group group) const = 0;
-
-			/**
-			 * @brief Prepare the asset to be loaded into memory, this method preferably should not block the caller
-			 * therefor it is advised to use asset manager functions to load inside a thread pool
-			*/
-			virtual void prepare_load() = 0;
-
-			/**
-			 * @brief Is the asset ready to be loaded
-			 * @return True if the asset can be loaded, false otherwise
-			*/
-			virtual bool ready_to_load() = 0;
-
-			/**
-			 * @brief Load the asset from memory into an actual object, this has no effect
-			 * on assets that are not graphic, audio, etc.
-			*/
-			virtual void load() = 0;
-
-			/**
-			 * @brief Unload the asset from memory, but keep the information how to load it
-			 * back at any other time
-			*/
-			virtual void unload() = 0;
 		protected:
-			asset_base(asset_handle handle)
-				: p_handle(handle)
+			asset_base(const std::string& name)
+				: p_name(name)
 			{}
 
 			friend class asset_manager;
 		protected:
 			std::string p_name;
-			asset_handle p_handle;
 			
 			// Asset loaded into memory
 			bool p_loaded = false;

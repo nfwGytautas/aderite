@@ -54,13 +54,6 @@ namespace aderite {
 			 * @brief Function invoked when a exit was requested from the engine
 			*/
 			virtual void on_requested_exit() {};
-
-			/**
-			 * @brief Function invoked when the currently selected entity is changed (could be changed through scripts)
-			 * or invoked by a user in custom components
-			 * @param entity The new active entity
-			*/
-			virtual void on_selected_entity_changed(scene::entity* entity) {};
 		};
 
 	}

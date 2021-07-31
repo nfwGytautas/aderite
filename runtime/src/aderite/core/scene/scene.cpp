@@ -7,19 +7,19 @@
 #include "aderite/utility/macros.hpp"
 
 // Previous versions:
-//	- 2021_07_14r1
+//	- 2021_07_31r1
 
-constexpr const char* current_version = "2021_07_14r1";
+constexpr const char* current_version = "2021_07_31r1";
 
 namespace aderite {
 	namespace scene {
 
-		void scene::use_asset(relay_ptr<asset::asset_base> asset) {
-			m_assets.push_back(asset->get_handle());
+		void scene::use_asset(asset::asset_base* asset) {
+			m_assets.push_back(asset);
 		}
 
-		void scene::remove_asset(relay_ptr<asset::asset_base> asset) {
-			m_assets.erase(std::find(m_assets.begin(), m_assets.end(), asset->get_handle()));
+		void scene::remove_asset(asset::asset_base* asset) {
+			m_assets.erase(std::find(m_assets.begin(), m_assets.end(), asset));
 		}
 
 		bool scene::serialize(const std::string& path) {
@@ -28,7 +28,6 @@ namespace aderite {
 
 			// Common
 			out << YAML::Key << "Version" << YAML::Value << current_version;
-			out << YAML::Key << "Handle" << YAML::Value << m_handle;
 			out << YAML::Key << "Name" << YAML::Value << m_name;
 			out << YAML::Key << "Type" << YAML::Value << "Scene";
 
@@ -36,7 +35,14 @@ namespace aderite {
 			out << YAML::Key << "Assets" << YAML::BeginSeq; // Assets
 
 			for (auto& asset : m_assets) {
-				out << YAML::Value << asset;
+				out << YAML::BeginMap; // Asset
+				out << YAML::Key << "File" << YAML::Value << asset->get_name();
+
+				// No packing for non binary files
+				out << YAML::Key << "Start" << YAML::Value << 0;
+				out << YAML::Key << "Stride" << YAML::Value << 0;
+
+				out << YAML::EndMap; // Asset
 			}
 
 			out << YAML::EndSeq; // Assets
@@ -68,11 +74,58 @@ namespace aderite {
 				return false;
 			}
 
-			m_handle = data["Handle"].as<std::string>();
 			m_name = data["Name"].as<std::string>();
 
 			for (auto asset : data["Assets"]) {
-				m_assets.push_back(asset.as<std::string>());
+				// Ignore Start and Stride cause this is non binary format
+				// Order asset manager to load asset metainfo
+				std::string file = asset["File"].as<std::string>();
+				asset::asset_base* pAsset = engine::get_asset_manager()->read_asset(file);
+
+				if (!pAsset) {
+					LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", m_name, file);
+					return false;
+				}
+
+				m_assets.push_back(pAsset);
+			}
+
+			return true;
+		}
+
+		void scene::prepare_load() {
+			for (asset::asset_base* asset : m_assets) {
+				asset->prepare_load();
+			}
+		}
+
+		bool scene::ready_to_load() {
+			for (asset::asset_base* asset : m_assets) {
+				if (!asset->ready_to_load()) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		void scene::load() {
+			for (asset::asset_base* asset : m_assets) {
+				asset->load();
+			}
+		}
+
+		void scene::unload() {
+			for (asset::asset_base* asset : m_assets) {
+				asset->unload();
+			}
+		}
+
+		bool scene::is_preparing() {
+			for (asset::asset_base* asset : m_assets) {
+				if (!asset->is_preparing()) {
+					return false;
+				}
 			}
 
 			return true;

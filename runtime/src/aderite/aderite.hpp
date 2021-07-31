@@ -12,7 +12,7 @@
 #include "aderite/core/assets/asset_manager.hpp"
 #include "aderite/core/scene/scene_manager.hpp"
 
-#define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static relay_ptr<class_name> public_name() { return engine::get()->field_name; } private: class_name* field_name = nullptr;
+#define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static class_name* public_name() { return engine::get()->field_name; } private: class_name* field_name = nullptr;
 
 namespace aderite {
 

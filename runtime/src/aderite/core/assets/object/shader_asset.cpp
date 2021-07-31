@@ -6,9 +6,9 @@
 #include "aderite/utility/macros.hpp"
 
 // Previous versions:
-//	- 2021_07_13r1
+//	- 2021_07_31r1
 
-constexpr const char* current_version = "2021_07_13r1";
+constexpr const char* current_version = "2021_07_31r1";
 
 namespace aderite {
 	namespace asset {
@@ -26,7 +26,6 @@ namespace aderite {
 			
 			// Common
 			out << YAML::Key << "Version" << YAML::Value << current_version;
-			out << YAML::Key << "Handle" << YAML::Value << p_handle;
 			out << YAML::Key << "Name" << YAML::Value << p_name;
 			out << YAML::Key << "Type" << YAML::Value << "Shader";
 
@@ -62,7 +61,6 @@ namespace aderite {
 				return false;
 			}
 
-			p_handle = data["Handle"].as<std::string>();
 			p_name = data["Name"].as<std::string>();
 			m_info.VertexPath = data["Vertex"].as<std::string>();
 			m_info.FragmentPath = data["Fragment"].as<std::string>();
@@ -73,7 +71,7 @@ namespace aderite {
 		void shader_asset::load() {
 			ASSERT_RENDER_THREAD;
 			if (p_loaded) {
-				LOG_WARN("Loading an already loaded asset {0} {1}, is this intended?", p_handle, p_name);
+				LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);
 				unload();
 			}
 
@@ -92,8 +90,12 @@ namespace aderite {
 			p_loaded = false;
 		}
 
-		shader_asset::shader_asset(asset_handle handle, const fields& info)
-			: asset_base(handle), m_info(info)
+		bool shader_asset::is_preparing() {
+			return m_being_prepared;
+		}
+
+		shader_asset::shader_asset(const std::string& name, const fields& info)
+			: asset_base(name), m_info(info)
 		{}
 
 		bool shader_asset::in_group(asset_group group) const {
@@ -109,6 +111,7 @@ namespace aderite {
 			// Load sources
 			m_vertexSource = engine::get_asset_manager()->load_txt_file(m_info.VertexPath);
 			m_fragmentSource = engine::get_asset_manager()->load_txt_file(m_info.FragmentPath);
+			m_being_prepared = true;
 		}
 
 		bool shader_asset::ready_to_load() {

@@ -4,8 +4,8 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
-
 #include "aderite/core/scene/scene.hpp"
+#include "aderite_editor/core/event_router.hpp"
 
 namespace aderite {
 	namespace editor {
@@ -32,7 +32,7 @@ namespace aderite {
 
 					ImGui::TreeNodeEx((void*)(intptr_t)entity, node_flags, "Entity: %ld", entity);
 					if (ImGui::IsItemClicked()) {
-						aderite::engine::get_editor()->on_selected_entity_changed(&entity);
+						event_router::Sink->selected_entity_changed(&entity);
 					}
 				}
 			}

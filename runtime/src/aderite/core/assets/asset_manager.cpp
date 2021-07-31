@@ -38,22 +38,20 @@ namespace aderite {
 			m_assets.clear();
 		}
 
-		asset_handle asset_manager::get_handle() {
-			return random::generate_uuid();
-		}
-
 		void asset_manager::set_root_dir(const std::string& path) {
-			m_rootDir = path;
+			m_rootDir = std::filesystem::path(path);
+			std::filesystem::path res_dir = get_res_dir();
+			std::filesystem::path raw_dir = get_raw_dir();
 
-			LOG_TRACE("Creating resource directories in {0}", m_rootDir);
+			LOG_TRACE("Setting root directory to {0}", m_rootDir.string());
 
 			// Create directories if they don't exist
-			if (!std::filesystem::is_directory(m_rootDir + ResDir) || !std::filesystem::exists(m_rootDir + ResDir)) {
-				std::filesystem::create_directory(m_rootDir + ResDir);
+			if (!std::filesystem::is_directory(res_dir) || !std::filesystem::exists(res_dir)) {
+				std::filesystem::create_directory(res_dir);
 			}
 
-			if (!std::filesystem::is_directory(m_rootDir + RawDir) || !std::filesystem::exists(m_rootDir + RawDir)) {
-				std::filesystem::create_directory(m_rootDir + RawDir);
+			if (!std::filesystem::is_directory(raw_dir) || !std::filesystem::exists(raw_dir)) {
+				std::filesystem::create_directory(raw_dir);
 			}
 		}
 		
@@ -69,7 +67,7 @@ namespace aderite {
 			std::ifstream fin;
 			std::stringstream fstream;
 
-			fin.open(m_rootDir + RawDir + path);
+			fin.open(get_raw_dir() / path);
 
 			if (!fin)
 			{

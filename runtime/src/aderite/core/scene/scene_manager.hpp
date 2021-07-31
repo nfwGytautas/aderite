@@ -23,16 +23,17 @@ namespace aderite {
 
 			/**
 			 * @brief Creates a new scene
+			 * @param name Name of the scene
 			 * @return The created scene object
 			*/
-			scene* new_scene();
+			scene* new_scene(const std::string& name);
 
 			/**
-			 * @brief Load the scene from the path
-			 * @param path Path to the scene
+			 * @brief Read the scene metadata from memory, doesn't load assets
+			 * @param scene Scene name
 			 * @return Loaded scene or nullptr
 			*/
-			scene* load_file(const std::string& path);
+			scene* read_scene(const std::string& name);
 
 			/**
 			 * @brief Sets the specified scene as active
@@ -44,12 +45,28 @@ namespace aderite {
 			 * @brief Returns the current active scene or nullptr if no active scene
 			*/
 			scene* current_scene() const;
-		private:
-			/**
-			 * @brief Generates a UUID scene handle
-			*/
-			scene_handle get_handle();
 
+			/**
+			 * @brief Serializes the specified scene to memory
+			 * @param scene Scene to serialize
+			*/
+			void save_scene(scene* scene);
+
+			auto begin() {
+				return m_scenes.begin();
+			}
+
+			auto begin() const {
+				return m_scenes.begin();
+			}
+
+			auto end() {
+				return m_scenes.end();
+			}
+
+			auto end() const {
+				return m_scenes.end();
+			}
 		private:
 			scene_manager() {}
 			friend class engine;

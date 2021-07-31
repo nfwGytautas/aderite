@@ -104,7 +104,6 @@ namespace aderite {
 
 							ImGui::CloseCurrentPopup(); 
 						}
-
 						ImGui::SetItemDefaultFocus();
 						ImGui::SameLine();
 						
