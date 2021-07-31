@@ -1,12 +1,14 @@
 #pragma once
 
+#include "aderite/core/scene/entity.hpp"
+
 namespace aderite {
 	namespace interfaces {
 
 		/**
 		 * @brief A special interface that is used to hookup a custom editor layer/object, functionality to
 		 * aderite engine. By using this users can create a custom editor for example if a special lightweight 
-		 * debug editor is needed, a user can implement an interface and attach it to the runtime.
+		 * debug editor is needed, a user can implement the interface and attach it to the runtime.
 		*/
 		class iaderite_editor {
 		public:
@@ -55,4 +57,10 @@ namespace aderite {
 		};
 
 	}
+
+	/**
+	 * @brief Implementation of iaderite_editor, that does nothing, this is used as the default
+	 * implementation.
+	*/
+	class null_editor : public interfaces::iaderite_editor {};
 }

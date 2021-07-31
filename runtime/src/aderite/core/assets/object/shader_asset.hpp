@@ -18,13 +18,17 @@ namespace aderite {
 		public:
 			~shader_asset();
 
+			virtual asset_type type() const override;
+			virtual bool in_group(asset_group group) const override;
+
 			virtual bool serialize(const std::string& path) override;
 			virtual bool deserialize(const std::string& path) override;
+			
 			virtual void prepare_load() override;
 			virtual bool ready_to_load() override;
 			virtual void load() override;
 			virtual void unload() override;
-			virtual bool in_group(asset_group group) const override;
+			virtual bool is_preparing() override;
 			
 			/**
 			 * Returns the underlying asset object
@@ -33,7 +37,7 @@ namespace aderite {
 				return m_shader;
 			}
 		protected:
-			shader_asset(asset_handle handle, const fields& info);
+			shader_asset(const std::string& name, const fields& info);
 
 			friend class asset_manager;
 
@@ -43,6 +47,8 @@ namespace aderite {
 
 			std::string m_vertexSource = "";
 			std::string m_fragmentSource = "";
+
+			bool m_being_prepared = false;
 		};
 
 	}

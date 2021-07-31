@@ -1,15 +1,18 @@
 #pragma once
 
+#include "aderite/config.hpp"
 #include "aderite/utility/pointer.hpp"
 #include "aderite/interfaces/iframe_object.hpp"
+#include "aderite/interfaces/iaderite_editor.hpp"
+
+// Forward declare?
 #include "aderite/core/window/window_manager.hpp"
 #include "aderite/core/rendering/renderer.hpp"
 #include "aderite/core/threading/threader.hpp"
 #include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/scene/scene_manager.hpp"
 
-#include "aderite/interfaces/iaderite_editor.hpp"
-
-#define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static relay_ptr<class_name> public_name() { return engine::get()->field_name; } private: class_name* field_name = nullptr;
+#define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static class_name* public_name() { return engine::get()->field_name; } private: class_name* field_name = nullptr;
 
 namespace aderite {
 
@@ -67,7 +70,7 @@ namespace aderite {
 		void renderer_initialized();
 
 		/**
-		 * @brief Attaches a aderite editor to the runtime
+		 * @brief Attaches a aderite editor instance to the runtime, previous one is deleted
 		 * @param editor Editor to attach
 		*/
 		void attach_editor(interfaces::iaderite_editor* editor);
@@ -77,13 +80,16 @@ namespace aderite {
 
 	private:
 		bool m_wants_to_shutdown = false;
-		interfaces::iaderite_editor* m_editor = nullptr;
-
 	private:
 		ADERITE_SYSTEM_PTR(get_window_manager, window_manager, m_window_manager)
 		ADERITE_SYSTEM_PTR(get_renderer, renderer, m_renderer)
 		ADERITE_SYSTEM_PTR(get_threader, thread::threader, m_threader)
 		ADERITE_SYSTEM_PTR(get_asset_manager, asset::asset_manager, m_asset_manager)
+		ADERITE_SYSTEM_PTR(get_scene_manager, scene::scene_manager, m_scene_manager)
+
+#if EDITOR_ENABLED == 1
+		ADERITE_SYSTEM_PTR(get_editor, interfaces::iaderite_editor, m_editor)
+#endif
 	};
 
 }
