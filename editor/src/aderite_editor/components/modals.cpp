@@ -4,24 +4,13 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
+#include "aderite_editor/components/utility.hpp"
 
 namespace aderite {
 	namespace editor {
 		namespace components {
 			namespace modals {
 				constexpr size_t input_length = 64;
-
-				static int InputTextCallback(ImGuiInputTextCallbackData* data) {
-					if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
-						// Resize string callback
-						// If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them back to what we want.
-						std::string* str = (std::string*)data->UserData;
-						//IM_ASSERT(data->Buf == str->c_str());
-						str->resize(data->BufTextLen);
-						data->Buf = (char*)str->c_str();
-					}
-					return 0;
-				}
 
 				text_input::text_input(const std::string& title, const std::string& text, const Options& options)
 					: m_text(text), m_title(title), m_options(options)
@@ -76,7 +65,7 @@ namespace aderite {
 					{
 						ImGui::Text("%s", m_text.c_str());
 						ImGui::SameLine();
-						ImGui::InputText("", (char*)m_value.c_str(), m_value.capacity() + 1, input_flags, InputTextCallback, &m_value);
+						DynamicInputText("", &m_value, input_flags);
 						ImGui::Separator();
 
 						float width = ImGui::GetContentRegionAvail().x * 0.4855f;

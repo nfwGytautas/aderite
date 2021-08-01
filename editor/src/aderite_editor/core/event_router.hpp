@@ -16,9 +16,8 @@ namespace aderite {
 
 			/**
 			 * @brief Invoked when the current selected entity is changed
-			 * @param entity 
 			*/
-			virtual void selected_entity_changed(scene::entity* entity) = 0;
+			virtual void selected_entity_changed(scene::entity& entity) = 0;
 
 			/**
 			 * @brief Creates a new project
@@ -43,6 +42,18 @@ namespace aderite {
 			 * @param name Name of the scene
 			*/
 			virtual void new_scene(const std::string& name) = 0;
+
+			/**
+			 * @brief Create new entity for current active scene
+			 * @param name Name of the entity
+			*/
+			virtual void create_entity(const std::string& name) = 0;
+
+			/**
+			 * @brief Destroy entity from current active scene
+			 * @param entity Entity to destroy
+			*/
+			virtual void destroy_entity(const scene::entity& entity) = 0;
 		};
 
 		/**

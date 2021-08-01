@@ -11,6 +11,7 @@
 #include "aderite_editor/components/toolbar.hpp"
 #include "aderite_editor/components/viewport.hpp"
 #include "aderite_editor/components/scene_view.hpp"
+#include "aderite_editor/components/property_editor.hpp"
 
 namespace aderite {
 	namespace editor {
@@ -30,11 +31,13 @@ namespace aderite {
 			// ============================================================================
 			// Start of event routes, look at ievent_sink interface for more information
 			// ============================================================================
-			virtual void selected_entity_changed(scene::entity* entity) override;
+			virtual void selected_entity_changed(scene::entity& entity) override;
 			virtual void new_project(const std::string& dir, const std::string& name) override;
 			virtual void save_project() override;
 			virtual void load_project(const std::string& path) override;
 			virtual void new_scene(const std::string& name) override;
+			virtual void create_entity(const std::string& name) override;
+			virtual void destroy_entity(const scene::entity& entity) override;
 		private:
 			ref<window> m_editor_window = nullptr;
 			project* m_project = nullptr;
@@ -43,6 +46,7 @@ namespace aderite {
 			ref<components::toolbar> m_toolbar = nullptr;
 			ref<components::viewport> m_viewport = nullptr;
 			ref<components::scene_view> m_scene_view = nullptr;
+			ref<components::property_editor> m_property_editor = nullptr;
 		};
 
 	}

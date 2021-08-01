@@ -1,13 +1,17 @@
 #pragma once
 
 #include <vector>
+#include <entt/entity/registry.hpp>
 #include "aderite/interfaces/iserializable.hpp"
 #include "aderite/interfaces/iloadable.hpp"
 #include "aderite/utility/pointer.hpp"
 #include "aderite/core/assets/asset.hpp"
+#include "aderite/core/scene/components.hpp"
 
 namespace aderite {
 	namespace scene {
+
+		class entity;
 
 		/**
 		 * @brief Scene object, at any given time a single scene can be active in aderite.
@@ -30,6 +34,24 @@ namespace aderite {
 			std::string get_name() const {
 				return m_name;
 			}
+
+			/**
+			 * @brief Returns entt registry
+			*/
+			entt::registry& get_entity_registry() {
+				return m_registry;
+			}
+
+			/**
+			 * @brief Create entity with a meta component
+			 * @return Entity instance
+			*/
+			entity create_entity(const components::meta& meta);
+
+			/**
+			 * @brief Destroy an entity
+			*/
+			void destroy_entity(entity entity);
 
 			/**
 			 * @brief Marks the asset as being used by the scene
@@ -70,8 +92,9 @@ namespace aderite {
 
 			friend class scene_manager;
 		private:
-			// Assets (handles) that the scene uses
+			// Assets that the scene uses
 			std::vector<asset::asset_base*> m_assets;
+			entt::registry m_registry;
 
 			std::string m_name = "";
 		};

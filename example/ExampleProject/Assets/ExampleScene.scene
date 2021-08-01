@@ -3,3 +3,7 @@ Name: ExampleScene
 Type: Scene
 Assets:
   []
+Entities:
+  - Entity: 0
+    Meta:
+      Name: Cube

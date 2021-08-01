@@ -113,6 +113,7 @@ namespace aderite {
 			m_toolbar = new components::toolbar();
 			m_viewport = new components::viewport();
 			m_scene_view = new components::scene_view();
+			m_property_editor = new components::property_editor();
 
 			// Setup event router
 			event_router::Sink = this;
@@ -249,6 +250,7 @@ namespace aderite {
 			m_toolbar->render();
 			m_viewport->render();
 			m_scene_view->render();
+			m_property_editor->render();
 
 			// DEMO WINDOW
 			if (show_demo_window) {
@@ -288,8 +290,9 @@ namespace aderite {
 			delete m_project;
 		}
 
-		void windows_editor::selected_entity_changed(scene::entity* entity) {
+		void windows_editor::selected_entity_changed(scene::entity& entity) {
 			m_scene_view->set_active_entity(entity);
+			m_property_editor->set_active_entity(entity);
 		}
 
 		void windows_editor::new_project(const std::string& dir, const std::string& name) {
@@ -359,6 +362,16 @@ namespace aderite {
 			// TODO: Error screen or special naming
 			scene::scene* s = engine::get_scene_manager()->new_scene(name);
 			engine::get_scene_manager()->set_active(s);
+		}
+
+		void windows_editor::create_entity(const std::string& name) {
+			scene::scene* s = engine::get_scene_manager()->current_scene();
+			s->create_entity(::aderite::scene::components::meta(name));
+		}
+
+		void windows_editor::destroy_entity(const scene::entity& entity) {
+			scene::scene* s = engine::get_scene_manager()->current_scene();
+			s->destroy_entity(entity);
 		}
 
 	}
