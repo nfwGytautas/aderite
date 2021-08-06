@@ -12,8 +12,69 @@
 
 constexpr const char* current_version = "2021_07_31r1";
 
+// YAML extensions
+namespace YAML {
+	template<>
+	struct convert<glm::vec3> {
+		static Node encode(const glm::vec3& rhs) {
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.push_back(rhs.z);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::vec3& rhs) {
+			if (!node.IsSequence() || node.size() != 3)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+			rhs.z = node[2].as<float>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::vec4> {
+		static Node encode(const glm::vec4& rhs) {
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.push_back(rhs.z);
+			node.push_back(rhs.w);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::vec4& rhs) {
+			if (!node.IsSequence() || node.size() != 4)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+			rhs.z = node[2].as<float>();
+			rhs.w = node[3].as<float>();
+			return true;
+		}
+	};
+}
+
 namespace aderite {
 	namespace scene {
+
+		YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v) {
+			out << YAML::Flow;
+			out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
+			return out;
+		}
+
+		YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
+			out << YAML::Flow;
+			out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
+			return out;
+		}
 
 		void serialize_entity(YAML::Emitter& out, entity e) {
 			out << YAML::BeginMap; // Entity
@@ -37,6 +98,36 @@ namespace aderite {
 
 			// Serialize rest of components
 
+			// Transform
+			if (e.has_component<components::transform>()) {
+				out << YAML::Key << "Transform";
+				out << YAML::BeginMap; // Transform
+
+				components::transform& transform = e.get_component<components::transform>();
+				out << YAML::Key << "Position" << YAML::Value << transform.Position;
+				out << YAML::Key << "Rotation" << YAML::Value << transform.Rotation;
+				out << YAML::Key << "Scale" << YAML::Value << transform.Scale;
+
+				out << YAML::EndMap; // Transform
+			}
+
+			// Mesh renderer
+			if (e.has_component<components::mesh_renderer>()) {
+				out << YAML::Key << "MeshRenderer";
+				out << YAML::BeginMap; // MeshRenderer
+
+				components::mesh_renderer& mesh_renderer = e.get_component<components::mesh_renderer>();
+
+				if (mesh_renderer.MeshHandle) {
+					out << YAML::Key << "Mesh" << mesh_renderer.MeshHandle->get_name();
+				}
+
+				if (mesh_renderer.MaterialHandle) {
+					out << YAML::Key << "Material" << mesh_renderer.MaterialHandle->get_name();
+				}
+
+				out << YAML::EndMap; // MeshRenderer
+			}
 
 			out << YAML::EndMap; // Entity
 		}
@@ -56,6 +147,29 @@ namespace aderite {
 			entity e = scene->create_entity(meta);
 
 			// Deserialize rest of components
+
+			// Transform
+			auto transform_node = e_node["Transform"];
+			if (transform_node) {
+				auto& transform = e.add_component<components::transform>();
+				transform.Position = transform_node["Position"].as<glm::vec3>();
+				transform.Rotation = transform_node["Rotation"].as<glm::vec3>();
+				transform.Scale = transform_node["Scale"].as<glm::vec3>();
+			}
+
+			// Mesh renderer
+			auto mr_node = e_node["MeshRenderer"];
+			if (mr_node) {
+				auto& mesh_renderer = e.add_component<components::mesh_renderer>();
+				
+				if (mr_node["Mesh"]) {
+					mesh_renderer.MeshHandle = engine::get_asset_manager()->get_by_name(mr_node["Mesh"].as<std::string>());
+				}
+
+				if (mr_node["Material"]) {
+					mesh_renderer.MaterialHandle = engine::get_asset_manager()->get_by_name(mr_node["Material"].as<std::string>());
+				}
+			}
 
 			return e;
 		}

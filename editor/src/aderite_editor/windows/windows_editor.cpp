@@ -140,6 +140,8 @@ namespace aderite {
 
 			// TODO: Load the default scene or create a new one
 			//engine::get_renderer()->add_layer<game_layer>();
+
+			this->load_project("../example/ExampleProject/ExampleProject.aproj");
 		}
 
 		void windows_editor::on_renderer_initialized() {

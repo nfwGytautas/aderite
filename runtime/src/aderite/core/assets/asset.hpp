@@ -3,7 +3,6 @@
 #include <string>
 #include "aderite/interfaces/iserializable.hpp"
 #include "aderite/interfaces/iloadable.hpp"
-#include "aderite/utility/pointer.hpp"
 
 namespace aderite {
 	namespace asset {

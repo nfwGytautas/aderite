@@ -55,6 +55,19 @@ namespace aderite {
 			}
 		}
 		
+		asset_base* asset_manager::get_by_name(const std::string& name) {
+			auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](asset_base* asset) {
+				return asset->get_name() == name;
+			});
+
+			if (it == m_assets.end()) {
+				LOG_WARN("Tried to get non existing asset with name {0}", name);
+				return nullptr;
+			}
+
+			return *it;
+		}
+
 		bool asset_manager::has(const std::string& name) {
 			auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](asset_base* asset) {
 				return asset->get_name() == name;
@@ -81,5 +94,8 @@ namespace aderite {
 			return fstream.str();
 		}
 
+		asset::asset_base* asset_manager::read_asset(const std::string& path) {
+			return nullptr;
+		}
 	}
 }

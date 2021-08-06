@@ -6,6 +6,12 @@
 
 #include <string>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 namespace aderite {
 	namespace scene {
 		namespace components {
@@ -22,6 +28,52 @@ namespace aderite {
 					: Name(name) {}
 			};
 
+			/**
+			 * @brief Transform component, used to situate an entity in world space
+			*/
+			struct transform {
+				glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
+				glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
+				glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
+
+				transform() = default;
+				transform(const transform&) = default;
+				transform(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
+					: Position(position), Rotation(rotation), Scale(scale) {}
+
+				/**
+				 * @brief Computes the transformation matrix of the component
+				 * @param t Transform component
+				 * @return Computed transformation matrix
+				*/
+				static glm::mat4 ComputeTransform(const transform& t) {
+					glm::mat4 rotation = glm::toMat4(glm::quat(t.Rotation));
+					return glm::translate(glm::mat4(1.0f), t.Position) * rotation * glm::scale(glm::mat4(1.0f), t.Scale);
+				}
+			};
+
+			/**
+			 * @brief Mesh rendering component, this component contains information needed for rendering meshes
+			*/
+			struct mesh_renderer {
+				asset::asset_base* MeshHandle = nullptr;
+				asset::asset_base* MaterialHandle = nullptr;
+
+				mesh_renderer() = default;
+				mesh_renderer(const mesh_renderer&) = default;
+				mesh_renderer(asset::asset_base* mesh, asset::asset_base* material)
+					: MeshHandle(mesh), MaterialHandle(material) {}
+			};
+
+			/**
+			 * @brief Camera component, which basically references a specific camera settings asset
+			*/
+			struct camera {
+				glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
+
+				camera() = default;
+				camera(const camera&) = default;
+			};
 		}
 	}
 }
