@@ -6,7 +6,7 @@
 #include "aderite/utility/log.hpp"
 #include "aderite/core/scene/scene.hpp"
 #include "aderite/utility/random.hpp"
-#include "aderite_editor/core/event_router.hpp"
+#include "aderite_editor/core/state.hpp"
 #include "aderite_editor/components/utility.hpp"
 
 namespace aderite {
@@ -46,7 +46,7 @@ namespace aderite {
 				{
 					if (ImGui::Selectable("Create entity")) {
 						// TODO: Make sure that this is actually unique
-						event_router::Sink->create_entity(random::generate_string(16));
+						state::Sink->create_entity(random::generate_string(16));
 					}
 
 					ImGui::EndPopup();
@@ -77,16 +77,16 @@ namespace aderite {
 						ImGui::TreeNodeEx((void*)(intptr_t)(uint32_t)entity, node_flags, "%s", meta.Name.c_str());
 
 						if (ImGui::IsItemClicked()) {
-							event_router::Sink->selected_entity_changed(e);
+							state::Sink->selected_entity_changed(e);
 						}
 					}
 
 					// Context menu
 					if (ImGui::BeginPopupContextItem()) {
-						event_router::Sink->selected_entity_changed(e);
+						state::Sink->selected_entity_changed(e);
 
 						if (ImGui::Selectable("Delete")) {
-							event_router::Sink->destroy_entity(e);
+							state::Sink->destroy_entity(e);
 						}
 
 						ImGui::EndPopup();

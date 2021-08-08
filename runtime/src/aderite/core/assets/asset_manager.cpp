@@ -2,10 +2,20 @@
 
 #include <fstream>
 #include <filesystem>
+#include <yaml-cpp/yaml.h>
 
 #include "aderite/config.hpp"
 #include "aderite/utility/log.hpp"
 #include "aderite/utility/random.hpp"
+
+// Asset types
+#include "aderite/core/scene/scene.hpp"
+#include "aderite/core/assets/object/shader_asset.hpp"
+
+// Previous versions:
+//	- 2021_07_31r1
+
+constexpr const char* current_version = "2021_07_31r1";
 
 namespace aderite {
 	namespace asset {
@@ -31,11 +41,7 @@ namespace aderite {
 		}
 
 		void asset_manager::shutdown() {
-			for (auto& m_asset : m_assets) {
-				delete m_asset;
-			}
-
-			m_assets.clear();
+			unload_all();
 		}
 
 		void asset_manager::set_root_dir(const std::string& path) {
@@ -95,7 +101,104 @@ namespace aderite {
 		}
 
 		asset::asset_base* asset_manager::read_asset(const std::string& path) {
-			return nullptr;
+			// Open YAML reader
+			YAML::Node data = YAML::LoadFile((get_res_dir() / path).string());
+
+			// Check version
+			if (!data["Version"]) {
+				LOG_ERROR("Loading asset from {0} failed because there is no version information", path);
+				return nullptr;
+			}
+
+			// Check type
+			if (!data["Type"]) {
+				LOG_ERROR("Loading asset from {0} failed because no type information was given", path);
+				return nullptr;
+			}
+
+			// Check that the name is the same
+			if (!data["Name"]) {
+				LOG_ERROR("Loading asset from {0} failed because no name information was given", path);
+				return nullptr;
+			}
+
+			// Check that the name is the same
+			std::string name = data["Name"].as<std::string>();
+			if (name != path) {
+				LOG_WARN("Asset {0} was previously moved incorrectly, cause recorded name is {1}", path, name);
+				return nullptr;
+			}
+
+			// Now deserialize
+			asset_type type = (asset_type)(data["Type"].as<size_t>());
+			asset::asset_base* asset = nullptr;
+
+			if (type == asset_type::SCENE) {
+				asset = new scene::scene(name);
+			}
+			else if (type == asset_type::SHADER) {
+				asset = new asset::shader_asset(name);
+			}
+			else {
+				LOG_ERROR("Unknown asset type {0}", type);
+				return nullptr;
+			}
+
+			if (!asset->deserialize(data)) {
+				LOG_ERROR("Failed to deserialize asset from {0}", name);
+				delete asset;
+				return nullptr;
+			}
+
+			m_assets.push_back(asset);
+			return asset;
+		}
+		
+		asset::asset_base* asset_manager::get_or_read(const std::string& name) {
+			if (!has(name)) {
+				return read_asset(name);
+			}
+			else {
+				return get_by_name(name);
+			}
+		}
+
+		void asset_manager::save_asset(asset::asset_base* asset) {
+			YAML::Emitter out;
+
+			out << YAML::BeginMap;
+
+			// Common
+			out << YAML::Key << "Version" << YAML::Value << current_version;
+			out << YAML::Key << "Name" << YAML::Value << asset->get_name();
+			out << YAML::Key << "Type" << YAML::Value << (size_t)asset->type();
+
+			if (!asset->serialize(out)) {
+				LOG_ERROR("Failed to save asset {0}", asset->get_name());
+				return;
+			}
+
+			out << YAML::EndMap;
+
+			std::ofstream fout(get_res_dir() / asset->get_name());
+			fout << out.c_str();
+		}
+
+		void asset_manager::unload_all() {
+			for (auto& m_asset : m_assets) {
+				delete m_asset;
+			}
+
+			m_assets.clear();
+		}
+
+		bool asset_manager::can_create(const std::string& name) {
+			// Check for conflicts (editor only thing so this will never be called from scripts / runtime so no need to check for binary format)
+			if (std::filesystem::exists(get_res_dir() / name)) {
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

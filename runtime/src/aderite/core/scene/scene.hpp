@@ -9,9 +9,13 @@
 #include "aderite/core/scene/components.hpp"
 
 namespace aderite {
-	namespace scene {
+	namespace asset {
+		class asset_manager;
+	}
 
+	namespace scene {
 		class entity;
+		class scene_manager;
 
 		/**
 		 * @brief Scene object, at any given time a single scene can be active in aderite.
@@ -19,22 +23,8 @@ namespace aderite {
 		 * be it meshes, materials, etc. However these resources are loaded as trunks into the asset manager
 		 * the actual data is not loaded until needed.
 		*/
-		class scene : public interfaces::iserializable, public interfaces::iloadable {
+		class scene : public asset::asset_base {
 		public:
-			/**
-			 * @brief Set the name of the scene
-			*/
-			void set_name(const std::string name) {
-				m_name = name;
-			}
-
-			/**
-			 * @brief Get the name of the scene
-			*/
-			std::string get_name() const {
-				return m_name;
-			}
-
 			/**
 			 * @brief Returns entt registry
 			*/
@@ -65,38 +55,29 @@ namespace aderite {
 			*/
 			virtual void remove_asset(asset::asset_base* asset);
 
-			// Inherited via iloadable
+			// Inherited via asset_base
 			virtual void prepare_load() override;
 			virtual bool ready_to_load() override;
 			virtual void load() override;
 			virtual void unload() override;
 			virtual bool is_preparing() override;
-		private:
-			/**
-			 * @brief Serializes the scene to file
-			 * @param path Path to the scene file
-			 * @return True if serialized without errors, false otherwise
-			*/
-			virtual bool serialize(const std::string& path) override;
 
-			/**
-			 * @brief Deserializes the scene from the specified path
-			 * @param path Path to the scene file
-			 * @return True if deserialized without errors, false otherwise
-			*/
-			virtual bool deserialize(const std::string& path) override;
+			virtual asset::asset_type type() const override;
+			virtual bool in_group(asset::asset_group group) const override;
+		protected:
+			virtual bool serialize(YAML::Emitter& out) override;
+			virtual bool deserialize(YAML::Node& data) override;
 
 			scene(const std::string& name)
-				: m_name(name)
+				: asset_base(name)
 			{}
 
 			friend class scene_manager;
+			friend class ::aderite::asset::asset_manager;
 		private:
 			// Assets that the scene uses
 			std::vector<asset::asset_base*> m_assets;
 			entt::registry m_registry;
-
-			std::string m_name = "";
 		};
 
 	}

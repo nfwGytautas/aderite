@@ -55,14 +55,5 @@ namespace aderite {
 			*/
 			virtual void destroy_entity(const scene::entity& entity) = 0;
 		};
-
-		/**
-		 * @brief Event router for editor, this is setup by the editor
-		*/
-		class event_router {
-		public:
-			static ievent_sink* Sink;
-		};
-
 	}
 }

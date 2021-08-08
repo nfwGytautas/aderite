@@ -21,9 +21,6 @@ namespace aderite {
 			virtual asset_type type() const override;
 			virtual bool in_group(asset_group group) const override;
 
-			virtual bool serialize(const std::string& path) override;
-			virtual bool deserialize(const std::string& path) override;
-			
 			virtual void prepare_load() override;
 			virtual bool ready_to_load() override;
 			virtual void load() override;
@@ -37,10 +34,13 @@ namespace aderite {
 				return m_shader;
 			}
 		protected:
+			shader_asset(const std::string& name);
 			shader_asset(const std::string& name, const fields& info);
 
-			friend class asset_manager;
+			virtual bool serialize(YAML::Emitter& out) override;
+			virtual bool deserialize(YAML::Node& data) override;
 
+			friend class asset_manager;
 		private:
 			shader* m_shader = nullptr;
 			fields m_info = {};

@@ -55,9 +55,16 @@ namespace aderite {
 			 * @tparam T Type of the asset
 			*/
 			template<class T, class ...Args>
-			T* create(Args&&... args) {
+			T* create(const std::string& name, Args&&... args) {
+				// Check for conflict
+				if (!can_create(name)) {
+					return nullptr;
+				}
+
 				// Create asset
-				T* a = new T(std::forward<Args>(args)...);
+				T* a = new T(name, std::forward<Args>(args)...);
+
+				// Register
 				m_assets.push_back(static_cast<asset_base*>(a));
 				return a;
 			}
@@ -89,10 +96,45 @@ namespace aderite {
 			 * @return Asset pointer or nullptr if reading failed
 			*/
 			asset::asset_base* read_asset(const std::string& path);
+
+			/**
+			 * @brief Gets an asset of the specified name or reads it if it's not known
+			 * @param name Name of the asset
+			 * @return Asset pointer or nullptr if reading failed
+			*/
+			asset::asset_base* get_or_read(const std::string& name);
+
+			/**
+			 * @brief Saves the asset to device memory
+			 * @param asset Asset to save
+			*/
+			void save_asset(asset::asset_base* asset);
+
+			/**
+			 * @brief Unloads all assets
+			*/
+			void unload_all();
+
+			auto begin() {
+				return m_assets.begin();
+			}
+
+			auto begin() const {
+				return m_assets.begin();
+			}
+
+			auto end() {
+				return m_assets.end();
+			}
+
+			auto end() const {
+				return m_assets.end();
+			}
 		private:
 			asset_manager() {}
 			friend class engine;
 
+			bool can_create(const std::string& name);
 		private:
 			std::vector<asset_base*> m_assets;
 			std::filesystem::path m_rootDir = "";

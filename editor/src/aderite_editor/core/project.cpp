@@ -21,6 +21,9 @@ namespace aderite {
 			m_directory.append(m_name);
 		}
 
+		project::~project() {
+		}
+
 		bool project::save() {
 			std::filesystem::path root = std::filesystem::path(m_directory);
 
@@ -39,6 +42,7 @@ namespace aderite {
 
 			if (engine::get_scene_manager()->current_scene()) {
 				out << YAML::Key << "ActiveScene" << YAML::Value << engine::get_scene_manager()->current_scene()->get_name();
+				m_active_scene = engine::get_scene_manager()->current_scene()->get_name();
 			}
 
 			out << YAML::EndMap; // Root

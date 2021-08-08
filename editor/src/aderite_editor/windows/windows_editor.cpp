@@ -10,7 +10,7 @@
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
 
-#include "aderite_editor/core/event_router.hpp"
+#include "aderite_editor/core/state.hpp"
 
 // Probably not necessary
 #include "aderite/core/window/glfw_window.hpp"
@@ -114,9 +114,11 @@ namespace aderite {
 			m_viewport = new components::viewport();
 			m_scene_view = new components::scene_view();
 			m_property_editor = new components::property_editor();
+			m_asset_browser = new components::asset_browser();
 
 			// Setup event router
-			event_router::Sink = this;
+			state::Sink = this;
+			state::Project = nullptr;
 		}
 
 		void windows_editor::on_runtime_initialized() {
@@ -132,6 +134,7 @@ namespace aderite {
 				return;
 			}
 
+			// Default title
 			m_editor_window->set_title("Aderite");
 
 			// No project path until a new one isn't created
@@ -178,7 +181,11 @@ namespace aderite {
 			ImGui_ImplOpenGL3_Init("#version 150");
 
 			// Components
+			m_toolbar->init();
 			m_viewport->init();
+			m_scene_view->init();
+			m_property_editor->init();
+			m_asset_browser->init();
 		}
 
 		void windows_editor::on_end_render() {
@@ -238,6 +245,7 @@ namespace aderite {
 			ImGuiStyle& style = ImGui::GetStyle();
 			float minWinSizeX = style.WindowMinSize.x;
 			style.WindowMinSize.x = 370.0f;
+			
 			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 			{
 				ImGuiID dockspace_id = ImGui::GetID("Dockspace");
@@ -253,6 +261,7 @@ namespace aderite {
 			m_viewport->render();
 			m_scene_view->render();
 			m_property_editor->render();
+			m_asset_browser->render();
 
 			// DEMO WINDOW
 			if (show_demo_window) {
@@ -282,14 +291,18 @@ namespace aderite {
 		}
 
 		void windows_editor::on_runtime_shutdown() {
+			m_toolbar->shutdown();
 			m_viewport->shutdown();
+			m_scene_view->shutdown();
+			m_property_editor->shutdown();
+			m_asset_browser->shutdown();
 
 			// Shutdown ImGui
 			ImGui_ImplOpenGL3_Shutdown();
 			ImGui_ImplGlfw_Shutdown();
 			ImGui::DestroyContext();
 
-			delete m_project;
+			delete state::Project;
 		}
 
 		void windows_editor::selected_entity_changed(scene::entity& entity) {
@@ -301,47 +314,78 @@ namespace aderite {
 			LOG_TRACE("New project name: {0} at directory {1}", name, dir);
 			m_editor_window->set_title(name);
 			
-			if (m_project) {
-				delete m_project;
+			if (state::Project) {
+				delete state::Project;
 			}
 
-			m_project = new project(dir, name);
+			state::Project = new project(dir, name);
 
 			// Setup asset manager
-			engine::get_asset_manager()->set_root_dir(m_project->get_root_dir().string());
+			engine::get_asset_manager()->set_root_dir(state::Project->get_root_dir().string());
 		}
 
 		void windows_editor::save_project() {
-			if (!m_project) {
+			if (!state::Project) {
 				// TODO: Create new project?
 				return;
 			}
 
-			// Save all scenes
-			for (scene::scene* scene : *engine::get_scene_manager()) {
-				engine::get_scene_manager()->save_scene(scene);
+			// Save all assets
+			for (asset::asset_base* asset : *engine::get_asset_manager()) {
+				engine::get_asset_manager()->save_asset(asset);
 			}
 
-			m_project->save();
+			state::Project->save();
 		}
 
 		void windows_editor::load_project(const std::string& path) {
 			ASSERT_RENDER_THREAD;
 			LOG_TRACE("Loading project {0}", path);
-			if (m_project) {
+			if (state::Project) {
 				// TODO: Ask for saving if there are changes
-				delete m_project;
+				delete state::Project;
 			}
 
-			m_project = project::load(path);
+			// Unload all assets
+			engine::get_asset_manager()->unload_all();
 
-			m_editor_window->set_title(m_project->get_name());
+			// TODO: Verify all assets are in their name directories
+
+			state::Project = project::load(path);
+
+			m_editor_window->set_title(state::Project->get_name());
 
 			// Setup asset manager
-			engine::get_asset_manager()->set_root_dir(m_project->get_root_dir().string());
+			engine::get_asset_manager()->set_root_dir(state::Project->get_root_dir().string());
 
-			if (!m_project->get_active_scene().empty()) {
-				scene::scene* s = engine::get_scene_manager()->read_scene(m_project->get_active_scene());
+			// Now load every single asset metadata.
+			// This is done to be able to move and rename them. By loading them on demand it overcomplicates other
+			// parts of the program. Since asset metadata is pretty small (400 bytes at most) at one time in 4GB of RAM
+			// about 20 million of them can be loaded. If someone is using this engine with more assets than that then it's
+			// rather surprising considering that this isn't a professional game engine. Also note that all these assets are loaded
+			// only in editor configuration in runtime this is optimized out and only those assets that are needed are read.
+
+			for (auto& path : std::filesystem::recursive_directory_iterator(engine::get_asset_manager()->get_res_dir())) {
+				// Ignore directories
+				if (path.is_directory()) {
+					continue;
+				}
+
+				// Make sure to ignore Raw directory, cause it contains not assets, but their actual data, since Raw directory is one
+				// big directory of data, the check is as simple as checking for parent to not be Raw/
+				if (path.path().parent_path() == engine::get_asset_manager()->get_raw_dir()) {
+					continue;
+				}
+
+				// Now read the asset
+				std::filesystem::path p = std::filesystem::relative(path.path(), engine::get_asset_manager()->get_res_dir());
+				engine::get_asset_manager()->read_asset(p.string());
+			}
+			
+
+			if (!state::Project->get_active_scene().empty()) {
+				// Should have been read
+				scene::scene* s = static_cast<scene::scene*>(engine::get_asset_manager()->get_by_name(state::Project->get_active_scene()));
 				engine::get_scene_manager()->set_active(s);
 
 				if (!s->is_preparing()) {
@@ -362,7 +406,7 @@ namespace aderite {
 			LOG_TRACE("New scene with name: {0}", name);
 
 			// TODO: Error screen or special naming
-			scene::scene* s = engine::get_scene_manager()->new_scene(name);
+			scene::scene* s = engine::get_asset_manager()->create<scene::scene>(name);
 			engine::get_scene_manager()->set_active(s);
 		}
 

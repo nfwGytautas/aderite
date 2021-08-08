@@ -5,11 +5,6 @@
 
 #include "aderite/utility/macros.hpp"
 
-// Previous versions:
-//	- 2021_07_31r1
-
-constexpr const char* current_version = "2021_07_31r1";
-
 namespace aderite {
 	namespace asset {
 		shader_asset::~shader_asset() {
@@ -20,48 +15,15 @@ namespace aderite {
 			return asset_type::SHADER;
 		}
 
-		bool shader_asset::serialize(const std::string& path) {
-			YAML::Emitter out;
-			out << YAML::BeginMap;
-			
-			// Common
-			out << YAML::Key << "Version" << YAML::Value << current_version;
-			out << YAML::Key << "Name" << YAML::Value << p_name;
-			out << YAML::Key << "Type" << YAML::Value << "Shader";
-
+		bool shader_asset::serialize(YAML::Emitter& out) {
 			// Shader
 			out << YAML::Key << "Vertex" << YAML::Value << m_info.VertexPath;
 			out << YAML::Key << "Fragment" << YAML::Value << m_info.FragmentPath;
 
-			out << YAML::EndMap;
-
-			std::ofstream fout(path);
-			fout << out.c_str();
-
 			return true;
 		}
 
-		bool shader_asset::deserialize(const std::string& path) {
-			YAML::Node data = YAML::LoadFile(path);
-
-			// Check version
-			if (!data["Version"]) {
-				LOG_ERROR("Loading shader from {0} failed because there is no version information", path);
-				return false;
-			}
-
-			// Check type
-			if (!data["Type"]) {
-				LOG_ERROR("Loading shader from {0} failed because no type information was given", path);
-				return false;
-			}
-
-			if (data["Type"].as<std::string>() != "Shader") {
-				LOG_ERROR("Trying to load asset of type {0} as a shader. File {1}", data["Type"].as<std::string>(), path);
-				return false;
-			}
-
-			p_name = data["Name"].as<std::string>();
+		bool shader_asset::deserialize(YAML::Node& data) {
 			m_info.VertexPath = data["Vertex"].as<std::string>();
 			m_info.FragmentPath = data["Fragment"].as<std::string>();
 
@@ -93,6 +55,10 @@ namespace aderite {
 		bool shader_asset::is_preparing() {
 			return m_being_prepared;
 		}
+
+		shader_asset::shader_asset(const std::string& name)
+			: asset_base(name)
+		{}
 
 		shader_asset::shader_asset(const std::string& name, const fields& info)
 			: asset_base(name), m_info(info)

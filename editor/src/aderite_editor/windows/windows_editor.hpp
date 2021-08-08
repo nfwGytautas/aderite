@@ -4,7 +4,6 @@
 #include "aderite/core/window/window.hpp"
 #include "aderite/utility/pointer.hpp"
 
-#include "aderite_editor/core/project.hpp"
 #include "aderite_editor/core/event_router.hpp"
 
 // Components forward declare?
@@ -12,6 +11,7 @@
 #include "aderite_editor/components/viewport.hpp"
 #include "aderite_editor/components/scene_view.hpp"
 #include "aderite_editor/components/property_editor.hpp"
+#include "aderite_editor/components/asset_browser.hpp"
 
 namespace aderite {
 	namespace editor {
@@ -40,13 +40,13 @@ namespace aderite {
 			virtual void destroy_entity(const scene::entity& entity) override;
 		private:
 			ref<window> m_editor_window = nullptr;
-			project* m_project = nullptr;
 
 			// Components
 			ref<components::toolbar> m_toolbar = nullptr;
 			ref<components::viewport> m_viewport = nullptr;
 			ref<components::scene_view> m_scene_view = nullptr;
 			ref<components::property_editor> m_property_editor = nullptr;
+			ref<components::asset_browser> m_asset_browser = nullptr;
 		};
 
 	}

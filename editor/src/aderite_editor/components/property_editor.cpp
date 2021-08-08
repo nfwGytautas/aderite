@@ -6,7 +6,7 @@
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
 #include "aderite/core/scene/scene.hpp"
-#include "aderite_editor/core/event_router.hpp"
+#include "aderite_editor/core/state.hpp"
 #include "aderite_editor/components/utility.hpp"
 #include "aderite_editor/core/config.hpp"
 
@@ -31,7 +31,7 @@ namespace aderite {
 					ImGui::PopStyleVar();
 
 					ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-					if (ImGui::Button("X", ImVec2{ lineHeight, lineHeight })) {
+					if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight })) {
 						ImGui::OpenPopup("ComponentSettings");
 					}
 
@@ -150,7 +150,7 @@ namespace aderite {
 				if (!m_selected_entity.has_component<::aderite::scene::components::meta>()) {
 					// This shouldn't happen
 					LOG_ERROR("Entity without meta information selected");
-					event_router::Sink->selected_entity_changed(scene::entity::null());
+					state::Sink->selected_entity_changed(scene::entity::null());
 					ImGui::End();
 					return;
 				}

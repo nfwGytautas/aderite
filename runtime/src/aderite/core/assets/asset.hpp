@@ -11,7 +11,8 @@ namespace aderite {
 		*/
 		enum class asset_group : size_t {
 			SYSTEMIC = 0,
-			SHADER = 1
+			SHADER = 1,
+			SCENE = 2,
 		};
 
 		/**
@@ -19,6 +20,7 @@ namespace aderite {
 		*/
 		enum class asset_type : size_t {
 			SHADER = 0,
+			SCENE = 1,
 		};
 
 		/**

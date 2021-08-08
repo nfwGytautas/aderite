@@ -4,7 +4,7 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
-#include "aderite_editor/core/event_router.hpp"
+#include "aderite_editor/core/state.hpp"
 
 // OS Specific
 #include "aderite_editor/utility/file_dialog.hpp"
@@ -32,7 +32,7 @@ namespace aderite {
 								m_text_modal->set_title("New project");
 								m_text_modal->set_text("Project name:");
 								m_text_modal->set_confirm_action([&, project_dir](const std::string& value) {
-									event_router::Sink->new_project(project_dir, value);
+									state::Sink->new_project(project_dir, value);
 								});
 
 								m_text_modal->show();
@@ -40,14 +40,14 @@ namespace aderite {
 						}
 
 						if (ImGui::MenuItem("Save project")) {
-							event_router::Sink->save_project();
+							state::Sink->save_project();
 						}
 
 						if (ImGui::MenuItem("Load project")) {
 							std::string file = file_dialog::select_file("Select aderite project", { "Aderite project", "*.aproj" });
 
 							if (!file.empty()) {
-								event_router::Sink->load_project(file);
+								state::Sink->load_project(file);
 							}
 						}
 
@@ -64,7 +64,7 @@ namespace aderite {
 							m_text_modal->set_title("New scene");
 							m_text_modal->set_text("Scene name:");
 							m_text_modal->set_confirm_action([&](const std::string& value) {
-								event_router::Sink->new_scene(value);
+								state::Sink->new_scene(value);
 							});
 
 							m_text_modal->show();

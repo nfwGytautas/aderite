@@ -2,7 +2,6 @@
 
 #include <string>
 #include <filesystem>
-#include "aderite/interfaces/iserializable.hpp"
 
 namespace aderite {
 	namespace editor {
@@ -16,6 +15,7 @@ namespace aderite {
 			 * @brief Creates a new project object with name and base directory
 			*/
 			project(const std::string& dir, const std::string& name);
+			virtual ~project();
 
 			/**
 			 * @brief Save project to file

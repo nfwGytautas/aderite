@@ -1,6 +1,6 @@
 Version: 2021_07_31r1
-Name: ExampleScene
-Type: Scene
+Name: ExampleScene.scene
+Type: 1
 Assets:
   []
 Entities:
