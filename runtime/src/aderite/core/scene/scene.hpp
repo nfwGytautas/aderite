@@ -61,6 +61,7 @@ namespace aderite {
 			virtual void load() override;
 			virtual void unload() override;
 			virtual bool is_preparing() override;
+			virtual bool is_loaded() override;
 
 			virtual asset::asset_type type() const override;
 			virtual bool in_group(asset::asset_group group) const override;

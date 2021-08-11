@@ -16,12 +16,16 @@ namespace aderite {
 					UNKNOWN = -1,
 					DIRECTORY = 0,
 					SCENE = 1,
+					SHADER = 2,
+					MESH = 3,
+					MATERIAL = 4
 				};
 
 				struct fs_node {
 					fs_node_type Type;
 					std::string Stem;
 					std::string Name;
+					std::string Extension;
 				};
 
 			public:
@@ -36,6 +40,19 @@ namespace aderite {
 				 * @brief Resolve the directories depending on the current dir
 				*/
 				void resolve_fs();
+
+				/**
+				 * @brief Deletes an item from the filesystem, be it directory or a simple file
+				 * @param path Path to object delete
+				*/
+				void delete_item(std::filesystem::path path);
+
+				/**
+				 * @brief Renames an item and updates asset manager registry
+				 * @param prevName Previous name of the object
+				 * @param newName New name of the object
+				*/
+				void rename_item(const std::string& prevName, const std::string& newName);
 
 			private:
 				// How many frames to wait before updating

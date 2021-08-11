@@ -44,6 +44,12 @@ namespace aderite {
 			 * @brief Returns the active scene of the project
 			*/
 			std::string get_active_scene() const;
+
+			/**
+			 * @brief Validates project information, for example if the current scene name changed the project 
+			 * will automatically update it self to reflect these changes
+			*/
+			void validate();
 		private:
 			std::filesystem::path m_directory;
 			std::string m_name;

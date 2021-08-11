@@ -11,6 +11,9 @@ namespace aderite {
 		*/
 		class shader_asset : public asset_base {
 		public:
+			/**
+			 * @brief Editable fields of the asset, this information is stored inside the asset file
+			*/
 			struct fields {
 				std::string VertexPath = "";
 				std::string FragmentPath = "";
@@ -26,7 +29,26 @@ namespace aderite {
 			virtual void load() override;
 			virtual void unload() override;
 			virtual bool is_preparing() override;
+			virtual bool is_loaded() override;
+
+			/**
+			 * @brief Returns the info of shader fields
+			*/
+			fields get_fields() const {
+				return m_info;
+			}
 			
+			/**
+			 * @brief Returns mutable field structure
+			*/
+			fields& get_fields_mutable() {
+				return m_info;
+			}
+			
+			shader* object() {
+				return m_shader;
+			}
+
 			/**
 			 * Returns the underlying asset object
 			 */

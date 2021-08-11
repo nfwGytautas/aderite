@@ -11,6 +11,8 @@ namespace aderite {
 		*/
 		class scene_manager {
 		public:
+			// TODO: Queue scene load API
+
 			/**
 			 * @brief Initializes the scene manager
 			*/
@@ -22,7 +24,7 @@ namespace aderite {
 			void shutdown();
 
 			/**
-			 * @brief Sets the specified scene as active
+			 * @brief Sets the specified scene as active, if the new scene isn't loaded yet than this call will block until it is loaded
 			 * @param scene New active scene
 			*/
 			void set_active(scene* scene);

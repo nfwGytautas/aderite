@@ -113,8 +113,9 @@ namespace aderite {
 			m_toolbar = new components::toolbar();
 			m_viewport = new components::viewport();
 			m_scene_view = new components::scene_view();
-			m_property_editor = new components::property_editor();
+			m_property_editor = new components::entity_editor();
 			m_asset_browser = new components::asset_browser();
+			m_asset_editor = new components::asset_editor();
 
 			// Setup event router
 			state::Sink = this;
@@ -186,6 +187,7 @@ namespace aderite {
 			m_scene_view->init();
 			m_property_editor->init();
 			m_asset_browser->init();
+			m_asset_editor->init();
 		}
 
 		void windows_editor::on_end_render() {
@@ -262,6 +264,7 @@ namespace aderite {
 			m_scene_view->render();
 			m_property_editor->render();
 			m_asset_browser->render();
+			m_asset_editor->render();
 
 			// DEMO WINDOW
 			if (show_demo_window) {
@@ -286,16 +289,26 @@ namespace aderite {
 			// Exit
 			auto activeWindow = aderite::engine::get()->get_window_manager()->get_current_active_window();
 			if (activeWindow.valid() && activeWindow->closed) {
+				// TODO: Request save
+				m_expected_shutdown = true;
+				save_project();
 				engine::get()->request_exit();
 			}
 		}
 
 		void windows_editor::on_runtime_shutdown() {
+			if (!m_expected_shutdown) {
+				// Try to save
+				LOG_WARN("Unexpected shutdown trying to save");
+				save_project();
+			}
+
 			m_toolbar->shutdown();
 			m_viewport->shutdown();
 			m_scene_view->shutdown();
 			m_property_editor->shutdown();
 			m_asset_browser->shutdown();
+			m_asset_editor->shutdown();
 
 			// Shutdown ImGui
 			ImGui_ImplOpenGL3_Shutdown();
@@ -387,18 +400,6 @@ namespace aderite {
 				// Should have been read
 				scene::scene* s = static_cast<scene::scene*>(engine::get_asset_manager()->get_by_name(state::Project->get_active_scene()));
 				engine::get_scene_manager()->set_active(s);
-
-				if (!s->is_preparing()) {
-					s->prepare_load();
-				}
-
-				while (!s->ready_to_load()) {
-					// TODO: Loading screen
-
-					// Sleep for 1 second
-					::aderite::engine::get_threader()->sleep_caller(1000);
-				}
-				s->load();
 			}
 		}
 
@@ -418,6 +419,10 @@ namespace aderite {
 		void windows_editor::destroy_entity(const scene::entity& entity) {
 			scene::scene* s = engine::get_scene_manager()->current_scene();
 			s->destroy_entity(entity);
+		}
+
+		void windows_editor::selected_asset_changed(asset::asset_base* asset) {
+			m_asset_editor->set_active_asset(asset);
 		}
 
 	}

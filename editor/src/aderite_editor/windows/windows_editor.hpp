@@ -10,8 +10,9 @@
 #include "aderite_editor/components/toolbar.hpp"
 #include "aderite_editor/components/viewport.hpp"
 #include "aderite_editor/components/scene_view.hpp"
-#include "aderite_editor/components/property_editor.hpp"
+#include "aderite_editor/components/entity_editor.hpp"
 #include "aderite_editor/components/asset_browser.hpp"
+#include "aderite_editor/components/asset_editor.hpp"
 
 namespace aderite {
 	namespace editor {
@@ -38,6 +39,7 @@ namespace aderite {
 			virtual void new_scene(const std::string& name) override;
 			virtual void create_entity(const std::string& name) override;
 			virtual void destroy_entity(const scene::entity& entity) override;
+			virtual void selected_asset_changed(asset::asset_base* asset) override;
 		private:
 			ref<window> m_editor_window = nullptr;
 
@@ -45,8 +47,15 @@ namespace aderite {
 			ref<components::toolbar> m_toolbar = nullptr;
 			ref<components::viewport> m_viewport = nullptr;
 			ref<components::scene_view> m_scene_view = nullptr;
-			ref<components::property_editor> m_property_editor = nullptr;
+			ref<components::entity_editor> m_property_editor = nullptr;
 			ref<components::asset_browser> m_asset_browser = nullptr;
+			ref<components::asset_editor> m_asset_editor = nullptr;
+
+			/**
+			 * @brief Flag that is true when the user requests to exit the editor otherwise the
+			 * application is being closed unexpectedly
+			*/
+			bool m_expected_shutdown = false;
 		};
 
 	}

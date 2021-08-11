@@ -11,8 +11,7 @@ namespace aderite {
 		*/
 		enum class asset_group : size_t {
 			SYSTEMIC = 0,
-			SHADER = 1,
-			SCENE = 2,
+			SCENE = 1,
 		};
 
 		/**
@@ -21,6 +20,8 @@ namespace aderite {
 		enum class asset_type : size_t {
 			SHADER = 0,
 			SCENE = 1,
+			MATERIAL = 2,
+			MESH = 3,
 		};
 
 		/**
@@ -55,9 +56,6 @@ namespace aderite {
 			friend class asset_manager;
 		protected:
 			std::string p_name;
-			
-			// Asset loaded into memory
-			bool p_loaded = false;
 		};
 	}
 }

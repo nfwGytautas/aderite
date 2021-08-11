@@ -4,7 +4,7 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
-#include "aderite_editor/components/utility.hpp"
+#include "aderite_editor/components/component_utility.hpp"
 
 namespace aderite {
 	namespace editor {

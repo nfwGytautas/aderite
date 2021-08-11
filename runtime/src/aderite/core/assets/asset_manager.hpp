@@ -115,6 +115,12 @@ namespace aderite {
 			*/
 			void unload_all();
 
+			/**
+			 * @brief Removes an asset with the specified name
+			 * @param name Name of the asset to remove
+			*/
+			void unload(const std::string& name);
+
 			auto begin() {
 				return m_assets.begin();
 			}

@@ -192,6 +192,19 @@ namespace aderite {
 			m_assets.clear();
 		}
 
+		void asset_manager::unload(const std::string& name) {
+			auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](asset_base* asset) {
+				return asset->get_name() == name;
+			});
+
+			if (it == m_assets.end()) {
+				return;
+			}
+
+			delete (*it);
+			m_assets.erase(it);
+		}
+
 		bool asset_manager::can_create(const std::string& name) {
 			// Check for conflicts (editor only thing so this will never be called from scripts / runtime so no need to check for binary format)
 			if (std::filesystem::exists(get_res_dir() / name)) {

@@ -1,4 +1,4 @@
-#include "property_editor.hpp"
+#include "entity_editor.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
@@ -7,7 +7,7 @@
 #include "aderite/utility/log.hpp"
 #include "aderite/core/scene/scene.hpp"
 #include "aderite_editor/core/state.hpp"
-#include "aderite_editor/components/utility.hpp"
+#include "aderite_editor/components/component_utility.hpp"
 #include "aderite_editor/core/config.hpp"
 
 namespace aderite {
@@ -124,19 +124,19 @@ namespace aderite {
 				ImGui::PopID();
 			}
 
-			property_editor::property_editor()
+			entity_editor::entity_editor()
 			{}
 
-			property_editor::~property_editor()
+			entity_editor::~entity_editor()
 			{}
 
-			void property_editor::render() {
+			void entity_editor::render() {
 				static ImGuiInputTextFlags edit_flags = ImGuiInputTextFlags_CallbackResize | ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_EnterReturnsTrue;
 				static bool renaming = false;
 				static bool appearing = false;
 				static std::string rename_value = "";
 
-				if (!ImGui::Begin("Property editor")) {
+				if (!ImGui::Begin("Entity editor")) {
 					ImGui::End();
 					return;
 				}
@@ -215,7 +215,7 @@ namespace aderite {
 						ImGui::PushItemWidth(-FLT_MIN);
 
 						if (c.MeshHandle) {
-							ImGui::Button(c.MeshHandle->get_name().c_str(), ImVec2(0.0f, ImGui::CalcItemWidth()));
+							ImGui::Button(c.MeshHandle->get_name().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
 						}
 						else {
 							ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
@@ -284,7 +284,7 @@ namespace aderite {
 				ImGui::End();
 			}
 
-			void property_editor::set_active_entity(scene::entity& entity) {
+			void entity_editor::set_active_entity(scene::entity& entity) {
 				m_selected_entity = entity;
 			}
 

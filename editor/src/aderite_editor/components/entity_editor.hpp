@@ -10,12 +10,12 @@ namespace aderite {
 		namespace components {
 
 			/**
-			 * @brief Scene view is a component that allows to edit specific selected entity information
+			 * @brief Entity editor is a component that allows to edit specific selected entity information
 			*/
-			class property_editor : public base_component {
+			class entity_editor : public base_component {
 			public:
-				property_editor();
-				virtual ~property_editor();
+				entity_editor();
+				virtual ~entity_editor();
 
 				// Inherited via base_component
 				virtual void render() override;

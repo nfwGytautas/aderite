@@ -289,13 +289,23 @@ namespace aderite {
 			return true;
 		}
 
+		bool scene::is_loaded() {
+			for (asset::asset_base* asset : m_assets) {
+				if (!asset->is_loaded()) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+
 		asset::asset_type scene::type() const {
 			return asset::asset_type::SCENE;
 		}
 
 		bool scene::in_group(asset::asset_group group) const {
 			switch (group) {
-			case asset::asset_group::SHADER:
+			case asset::asset_group::SCENE:
 				return true;
 			default:
 				return false;

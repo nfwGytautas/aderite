@@ -18,6 +18,11 @@ namespace aderite {
 		constexpr char* DDPayloadID_MaterialAsset = "DDPayloadID_MaterialAsset";
 
 		/**
+		 * @brief Drag and drop id passed when the object that is being dragged is a shader object
+		*/
+		constexpr char* DDPayloadID_ShaderAsset = "DDPayloadID_ShaderAsset";
+
+		/**
 		 * @brief Drag and drop id passed when the object that is being dragged is a generic object
 		*/
 		constexpr char* DDPayloadID_GenericAsset = "DDPayloadID_GenericAsset";
@@ -31,5 +36,10 @@ namespace aderite {
 		 * @brief Drag and drop id passed when the object that is being dragged is a directory
 		*/
 		constexpr char* DDPayloadID_Directory = "DDPayloadID_Directory";
+
+		/**
+		 * @brief Drag and drop id passed when the object that is being dragged is a raw file
+		*/
+		constexpr char* DDPayloadID_RawData = "DDPayloadID_RawData";
 	}
 }

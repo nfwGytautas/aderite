@@ -69,6 +69,18 @@ namespace aderite {
 
 							m_text_modal->show();
 						}
+
+						ImGui::Separator();
+
+						if (ImGui::MenuItem("Optimize Raw folder")) {
+							// Removes unused files from Raw folder
+
+						}
+
+						if (ImGui::MenuItem("Recompile shaders")) {
+							// Get all currently used shaders and then complete a unload/load cycle
+							LOG_WARN("Not implemented feature called 'Recompile shaders'");
+						}
 						
 						ImGui::EndMenu();
 					}

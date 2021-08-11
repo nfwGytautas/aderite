@@ -39,6 +39,11 @@ namespace aderite {
 			 * @brief Returns true if the object is being prepared to load, false otherwise
 			*/
 			virtual bool is_preparing() = 0;
+
+			/**
+			 * @brief Returns true if the object is currently loaded into memory, false otherwise
+			*/
+			virtual bool is_loaded() = 0;
 		};
 
 	}

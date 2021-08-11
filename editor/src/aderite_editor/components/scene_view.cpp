@@ -7,7 +7,7 @@
 #include "aderite/core/scene/scene.hpp"
 #include "aderite/utility/random.hpp"
 #include "aderite_editor/core/state.hpp"
-#include "aderite_editor/components/utility.hpp"
+#include "aderite_editor/components/component_utility.hpp"
 
 namespace aderite {
 	namespace editor {

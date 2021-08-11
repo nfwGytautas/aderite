@@ -32,7 +32,7 @@ namespace aderite {
 
 		void shader_asset::load() {
 			ASSERT_RENDER_THREAD;
-			if (p_loaded) {
+			if (is_loaded()) {
 				LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);
 				unload();
 			}
@@ -41,19 +41,20 @@ namespace aderite {
 				m_vertexSource,
 				m_fragmentSource
 			});
-
-			p_loaded = true;
 		}
 
 		void shader_asset::unload() {
 			ASSERT_RENDER_THREAD;
 			delete m_shader;
 			m_shader = nullptr;
-			p_loaded = false;
 		}
 
 		bool shader_asset::is_preparing() {
 			return m_being_prepared;
+		}
+
+		bool shader_asset::is_loaded() {
+			return m_shader != nullptr;
 		}
 
 		shader_asset::shader_asset(const std::string& name)
@@ -66,8 +67,6 @@ namespace aderite {
 
 		bool shader_asset::in_group(asset_group group) const {
 			switch (group) {
-			case asset_group::SHADER:
-				return true;
 			default:
 				return false;
 			}

@@ -54,6 +54,12 @@ namespace aderite {
 			 * @param entity Entity to destroy
 			*/
 			virtual void destroy_entity(const scene::entity& entity) = 0;
+
+			/**
+			 * @brief Invoked when the selected asset has been changed
+			 * @param asset New selected asset
+			*/
+			virtual void selected_asset_changed(asset::asset_base* asset) = 0;
 		};
 	}
 }
