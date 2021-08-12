@@ -6,9 +6,11 @@
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
 #include "aderite/core/scene/scene.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
 #include "aderite_editor/core/state.hpp"
-#include "aderite_editor/components/component_utility.hpp"
 #include "aderite_editor/core/config.hpp"
+#include "aderite_editor/core/event_router.hpp"
+#include "aderite_editor/components/component_utility.hpp"
 
 namespace aderite {
 	namespace editor {
@@ -142,6 +144,7 @@ namespace aderite {
 				}
 
 				if (m_selected_entity == scene::entity::null()) {
+					ImGui::Text("Select entity from scene view");
 					ImGui::End();
 					return;
 				}
@@ -223,7 +226,11 @@ namespace aderite {
 
 						if (ImGui::BeginDragDropTarget()) {
 							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DDPayloadID_MeshAsset)) {
-
+								std::string name = static_cast<const char*>(payload->Data);
+								asset::asset_base* asset = engine::get_asset_manager()->get_by_name(name);
+								if (asset) {
+									c.MeshHandle = asset;
+								}
 							}
 
 							ImGui::EndDragDropTarget();
@@ -245,7 +252,11 @@ namespace aderite {
 
 						if (ImGui::BeginDragDropTarget()) {
 							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DDPayloadID_MaterialAsset)) {
-
+								std::string name = static_cast<const char*>(payload->Data);
+								asset::asset_base* asset = engine::get_asset_manager()->get_by_name(name);
+								if (asset) {
+									c.MaterialHandle = asset;
+								}
 							}
 
 							ImGui::EndDragDropTarget();

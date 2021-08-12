@@ -4,11 +4,13 @@
 #include <vector>
 #include <algorithm>
 #include <filesystem>
-#include "aderite/core/assets/asset.hpp"
-#include "aderite/utility/pointer.hpp"
+#include <functional>
 
 namespace aderite {
 	namespace asset {
+		class asset_base;
+		class mesh_source;
+
 		/**
 		 * @brief Aderite asset manager. 
 		 * Primary task of the asset manager is as the name implies to handle assets. Important note of the asset manager that it 
@@ -88,6 +90,14 @@ namespace aderite {
 			 * @return String containing the contents of the file
 			*/
 			std::string load_txt_file(const std::string& path);
+
+			/**
+			 * @brief Loads a mesh file asynchronously and invokes the callback function once loaded, the caller must 
+			 * take ownership of the mesh_source
+			 * @param path File to load
+			 * @param loaded Function to invoke once loaded
+			*/
+			void load_mesh_source(const std::string& path, std::function<void(mesh_source*)> loaded);
 
 			/**
 			 * @brief Reads asset from file (non binary format), this automatically finds the type and makes the asset

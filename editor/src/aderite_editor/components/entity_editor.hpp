@@ -1,9 +1,7 @@
 #pragma once
 
 #include "aderite/core/scene/entity.hpp"
-#include "aderite/core/rendering/fbo/gl_fbo.hpp"
 #include "aderite_editor/components/base_component.hpp"
-#include "aderite_editor/components/modals.hpp"
 
 namespace aderite {
 	namespace editor {

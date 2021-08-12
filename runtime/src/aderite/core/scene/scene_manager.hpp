@@ -1,10 +1,10 @@
 #pragma once
 
 #include <vector>
-#include "aderite/core/scene/scene.hpp"
 
 namespace aderite {
 	namespace scene {
+		class scene;
 
 		/**
 		 * @brief Scene manager for aderite

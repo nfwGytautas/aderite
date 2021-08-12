@@ -1,4 +1,4 @@
-#include "shader.hpp"
+#include "vao.hpp"
 
 #include "aderite/config.hpp"
 #include "aderite/aderite.hpp"
@@ -7,16 +7,16 @@
 #include "aderite/core/threading/threader.hpp"
 
 #ifdef GL_BACKEND
-#include "aderite/core/rendering/shader/gl_shader.hpp"
+#include "aderite/core/rendering/vao/gl_vao.hpp"
 #endif
 
 namespace aderite {
 
-	shader* shader::create(const shader_create_args& args) {
+	vao* vao::create() {
 		ASSERT_RENDER_THREAD;
 
 #if GL_BACKEND
-		return new render_backend::opengl::gl_shader(args);
+		return new render_backend::opengl::gl_vao();
 #endif
 
 		LOG_ERROR("No rendering backend specified");

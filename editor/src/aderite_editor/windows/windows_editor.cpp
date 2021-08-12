@@ -9,100 +9,23 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
-
-#include "aderite_editor/core/state.hpp"
-
-// Probably not necessary
+#include "aderite/utility/macros.hpp"
+#include "aderite/core/rendering/renderer.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/scene/scene_manager.hpp"
+#include "aderite/core/threading/threader.hpp"
+#include "aderite/core/window/window_manager.hpp"
+#include "aderite/core/window/window.hpp"
 #include "aderite/core/window/glfw_window.hpp"
-#include "aderite/core/rendering/layer.hpp"
-#include "aderite/core/rendering/fbo/gl_fbo.hpp"
-#include "aderite/core/rendering/shader/shader.hpp"
-#include "aderite/core/assets/object/shader_asset.hpp"
-#include "aderite/core/scene/scene.hpp"
+#include "aderite_editor/core/state.hpp"
+#include "aderite_editor/core/project.hpp"
+#include "aderite_editor/components/toolbar.hpp"
+#include "aderite_editor/components/viewport.hpp"
+#include "aderite_editor/components/scene_view.hpp"
+#include "aderite_editor/components/entity_editor.hpp"
+#include "aderite_editor/components/asset_browser.hpp"
+#include "aderite_editor/components/asset_editor.hpp"
 
-#include "aderite/core/assets/object/shader_asset.hpp"
-
-//class game_layer : public aderite::layer {
-//public:
-//	virtual void init() override {
-//		float vertices[] = {
-//			 0.5f,  0.5f, 0.0f,  // top right
-//			 0.5f, -0.5f, 0.0f,  // bottom right
-//			-0.5f, -0.5f, 0.0f,  // bottom left
-//			-0.5f,  0.5f, 0.0f   // top left 
-//		};
-//
-//		unsigned int indices[] = {  // note that we start from 0!
-//			0, 1, 3,  // first Triangle
-//			1, 2, 3   // second Triangle
-//		};
-//
-//		/*m_shader = aderite::engine::get_asset_manager()->create<aderite::asset::shader_asset>(aderite::asset::shader_asset::fields{
-//					"0_vertex.txt",
-//					"0_fragment.txt"
-//			});
-//		m_shader->set_name("QuadShader");
-//		m_shader->serialize("res/shaders/0_QuadShader.shader");*/
-//
-//		aderite::engine::get_asset_manager()->read_asset<aderite::asset::shader_asset>("shaders/0_QuadShader.shader");
-//		m_shader = aderite::engine::get_asset_manager()->get_by_name<aderite::asset::shader_asset>("QuadShader");
-//		m_shader->prepare_load();
-//		m_shader->load();
-//
-//		aderite::scene::scene* scene = aderite::engine::get_scene_manager()->new_scene();
-//		scene->set_name("SampleScene");
-//		scene->use_asset(m_shader);
-//		scene->serialize("res/scenes/SampleScene.scene");
-//		aderite::engine::get_scene_manager()->set_active(scene);
-//
-//		glGenVertexArrays(1, &VAO);
-//		glGenBuffers(1, &VBO);
-//		glGenBuffers(1, &EBO);
-//		glBindVertexArray(VAO);
-//
-//		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-//
-//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-//		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-//
-//		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-//		glEnableVertexAttribArray(0);
-//
-//		glBindBuffer(GL_ARRAY_BUFFER, 0);
-//		glBindVertexArray(0);
-//
-//		m_initialized = true;
-//	}
-//
-//	virtual void render() override {
-//		renderer->clear();
-//
-//		(*m_shader)->bind();
-//		glBindVertexArray(VAO);
-//		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-//	}
-//
-//	virtual void shutdown() override {
-//		glDeleteVertexArrays(1, &VAO);
-//		glDeleteBuffers(1, &VBO);
-//		glDeleteBuffers(1, &EBO);
-//
-//		m_shader = nullptr;
-//	}
-//
-//	virtual bool ready() override {
-//		return m_initialized;
-//	}
-//
-//private:
-//	bool m_initialized = false;
-//
-//	unsigned int m_vbo = 0;
-//	unsigned int VBO, VAO, EBO;
-//
-//	aderite::asset::shader_asset* m_shader = nullptr;
-//};
 
 #define EVENT_ROUTE(e, dst) event_router::e = std::bind(&windows_editor::dst, this, std::placeholders::_1)
 
@@ -122,6 +45,15 @@ namespace aderite {
 			state::Project = nullptr;
 		}
 
+		windows_editor::~windows_editor() {
+			delete m_toolbar;
+			delete m_viewport;
+			delete m_scene_view;
+			delete m_property_editor;
+			delete m_asset_browser;
+			delete m_asset_editor;
+		}
+
 		void windows_editor::on_runtime_initialized() {
 			LOG_DEBUG("Using WINDOWS editor");
 
@@ -138,13 +70,7 @@ namespace aderite {
 			// Default title
 			m_editor_window->set_title("Aderite");
 
-			// No project path until a new one isn't created
-
 			// TODO: Startup dialog e.g. create new project, load project, etc.
-
-			// TODO: Load the default scene or create a new one
-			//engine::get_renderer()->add_layer<game_layer>();
-
 			this->load_project("../example/ExampleProject/ExampleProject.aproj");
 		}
 
@@ -175,8 +101,8 @@ namespace aderite {
 			}
 
 			// Setup Platform/Renderer backends
-			GLFWwindow* handle = aderite::engine::get()->get_window_manager()->get_current_active_window()
-				.as<aderite::window_backend::glfw::glfw_window>()->get_handle();
+			GLFWwindow* handle = static_cast<aderite::window_backend::glfw::glfw_window*>(
+				aderite::engine::get()->get_window_manager()->get_current_active_window())->get_handle();
 
 			ImGui_ImplGlfw_InitForOpenGL(handle, true);
 			ImGui_ImplOpenGL3_Init("#version 150");
@@ -288,7 +214,7 @@ namespace aderite {
 
 			// Exit
 			auto activeWindow = aderite::engine::get()->get_window_manager()->get_current_active_window();
-			if (activeWindow.valid() && activeWindow->closed) {
+			if (activeWindow != nullptr && activeWindow->closed) {
 				// TODO: Request save
 				m_expected_shutdown = true;
 				save_project();
@@ -392,7 +318,9 @@ namespace aderite {
 
 				// Now read the asset
 				std::filesystem::path p = std::filesystem::relative(path.path(), engine::get_asset_manager()->get_res_dir());
-				engine::get_asset_manager()->read_asset(p.string());
+
+				// get_or_read, because read will log a warning, since some assets might have already been loaded by others
+				engine::get_asset_manager()->get_or_read(p.string());
 			}
 			
 

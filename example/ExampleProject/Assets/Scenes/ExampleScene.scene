@@ -1,18 +1,17 @@
 Version: 2021_07_31r1
 Name: Scenes\ExampleScene.scene
 Type: 1
-Assets:
-  []
 Entities:
   - Entity: 1
     Meta:
-      Name: SceneCamera
-  - Entity: 0
-    Meta:
       Name: Cube
     Transform:
-      Position: [0, 27.7999992, 0]
+      Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshRenderer:
-      {}
+      Mesh: Meshes\CubeMesh.mesh
+      Material: Materials\ExampleMaterial.material
+  - Entity: 0
+    Meta:
+      Name: SceneCamera

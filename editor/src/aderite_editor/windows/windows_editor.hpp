@@ -1,21 +1,20 @@
 #pragma once
 
 #include "aderite/interfaces/iaderite_editor.hpp"
-#include "aderite/core/window/window.hpp"
-#include "aderite/utility/pointer.hpp"
-
 #include "aderite_editor/core/event_router.hpp"
 
-// Components forward declare?
-#include "aderite_editor/components/toolbar.hpp"
-#include "aderite_editor/components/viewport.hpp"
-#include "aderite_editor/components/scene_view.hpp"
-#include "aderite_editor/components/entity_editor.hpp"
-#include "aderite_editor/components/asset_browser.hpp"
-#include "aderite_editor/components/asset_editor.hpp"
-
 namespace aderite {
+	class window;
+
 	namespace editor {
+		namespace components {
+			class toolbar;
+			class viewport;
+			class scene_view;
+			class entity_editor;
+			class asset_browser;
+			class asset_editor;
+		}
 
 		/**
 		 * @brief Editor for windows operating system
@@ -23,6 +22,7 @@ namespace aderite {
 		class windows_editor : public interfaces::iaderite_editor, public ievent_sink {
 		public:
 			windows_editor(int argc, char** argv);
+			~windows_editor();
 
 			virtual void on_runtime_initialized() override;
 			virtual void on_renderer_initialized() override;
@@ -41,15 +41,15 @@ namespace aderite {
 			virtual void destroy_entity(const scene::entity& entity) override;
 			virtual void selected_asset_changed(asset::asset_base* asset) override;
 		private:
-			ref<window> m_editor_window = nullptr;
+			window* m_editor_window = nullptr;
 
 			// Components
-			ref<components::toolbar> m_toolbar = nullptr;
-			ref<components::viewport> m_viewport = nullptr;
-			ref<components::scene_view> m_scene_view = nullptr;
-			ref<components::entity_editor> m_property_editor = nullptr;
-			ref<components::asset_browser> m_asset_browser = nullptr;
-			ref<components::asset_editor> m_asset_editor = nullptr;
+			components::toolbar* m_toolbar = nullptr;
+			components::viewport* m_viewport = nullptr;
+			components::scene_view* m_scene_view = nullptr;
+			components::entity_editor* m_property_editor = nullptr;
+			components::asset_browser* m_asset_browser = nullptr;
+			components::asset_editor* m_asset_editor = nullptr;
 
 			/**
 			 * @brief Flag that is true when the user requests to exit the editor otherwise the

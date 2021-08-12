@@ -1,10 +1,13 @@
 #pragma once
 
-#include "aderite/core/assets/asset.hpp"
 #include "aderite_editor/components/base_component.hpp"
 #include "aderite_editor/components/modals.hpp"
 
 namespace aderite {
+	namespace asset {
+		class asset_base;
+	}
+
 	namespace editor {
 		namespace components {
 
@@ -30,6 +33,15 @@ namespace aderite {
 				*/
 				void shader_render();
 
+				/**
+				 * @brief UI for material asset
+				*/
+				void material_render();
+
+				/**
+				 * @brief UI for mesh asset
+				*/
+				void mesh_render();
 			private:
 				asset::asset_base* m_selected_asset = nullptr;
 			};

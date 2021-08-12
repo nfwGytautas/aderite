@@ -2,21 +2,27 @@
 
 #include <glad/glad.h>
 
+#include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
+#include "aderite/utility/macros.hpp"
+#include "aderite/core/threading/threader.hpp"
 
 namespace aderite {
 	namespace render_backend {
 		namespace opengl {
 
 			gl_shader::~gl_shader(){
+				ASSERT_RENDER_THREAD;
 				glDeleteProgram(m_shader);
 			}
 
 			void gl_shader::bind() {
+				ASSERT_RENDER_THREAD;
 				glUseProgram(m_shader);
 			}
 
 			gl_shader::gl_shader(const shader_create_args& args) {
+				ASSERT_RENDER_THREAD;
 				if (args.vertex_source.empty()) {
 					LOG_ERROR("No vertex source given");
 					return;

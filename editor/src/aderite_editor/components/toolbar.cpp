@@ -1,12 +1,18 @@
 #include "toolbar.hpp"
 
+#include <vector>
+#include <filesystem>
+
 #include <imgui/imgui.h>
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/assets/object/mesh_asset.hpp"
+#include "aderite/core/assets/object/shader_asset.hpp"
 #include "aderite_editor/core/state.hpp"
-
-// OS Specific
+#include "aderite_editor/core/event_router.hpp"
+#include "aderite_editor/components/modals.hpp"
 #include "aderite_editor/utility/file_dialog.hpp"
 
 namespace aderite {
@@ -74,7 +80,38 @@ namespace aderite {
 
 						if (ImGui::MenuItem("Optimize Raw folder")) {
 							// Removes unused files from Raw folder
+							std::vector<std::filesystem::path> used = {};
+							for (asset::asset_base* asset : *engine::get_asset_manager()) {
+								if (asset->in_group(asset::asset_group::DEPENDS_ON_RAW)) {
+									switch (asset->type()) {
+									case asset::asset_type::MESH: {
+										used.push_back(engine::get_asset_manager()->get_raw_dir() / static_cast<asset::mesh_asset*>(asset)->get_fields().SourceFile);
+										break;
+									}
+									case asset::asset_type::SHADER: {
+										used.push_back(engine::get_asset_manager()->get_raw_dir() / static_cast<asset::shader_asset*>(asset)->get_fields().VertexPath);
+										used.push_back(engine::get_asset_manager()->get_raw_dir() / static_cast<asset::shader_asset*>(asset)->get_fields().FragmentPath);
+										break;
+									}
+									case asset::asset_type::SCENE:
+									case asset::asset_type::MATERIAL: {
+										continue;
+									}
+									default:
+										LOG_WARN("Unimplemented type for DEPENDS_ON_RAW asset, aborting");
+										return;
+									}
+								}
+							}
 
+							for (auto& file : std::filesystem::recursive_directory_iterator(engine::get_asset_manager()->get_raw_dir())) {
+								auto& it = std::find(used.begin(), used.end(), file.path());
+
+								if (it == used.end()) {
+									LOG_TRACE("Removing {0}", file.path().string());
+									std::filesystem::remove(file.path());
+								}
+							}
 						}
 
 						if (ImGui::MenuItem("Recompile shaders")) {

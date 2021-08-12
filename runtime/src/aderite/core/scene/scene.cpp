@@ -4,7 +4,9 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "aderite/utility/macros.hpp"
+#include "aderite/aderite.hpp"
+#include "aderite/utility/log.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
 #include "aderite/core/scene/entity.hpp"
 
 // YAML extensions
@@ -158,11 +160,31 @@ namespace aderite {
 				auto& mesh_renderer = e.add_component<components::mesh_renderer>();
 				
 				if (mr_node["Mesh"]) {
-					mesh_renderer.MeshHandle = engine::get_asset_manager()->get_by_name(mr_node["Mesh"].as<std::string>());
+					const std::string name = mr_node["Mesh"].as<std::string>();
+					asset::asset_base* pAsset = engine::get_asset_manager()->get_or_read(name);
+
+					if (!pAsset) {
+						LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", scene->get_name(), name);
+						return entity::null();
+					}
+
+					scene->use_asset(pAsset);
+
+					mesh_renderer.MeshHandle = pAsset;
 				}
 
 				if (mr_node["Material"]) {
-					mesh_renderer.MaterialHandle = engine::get_asset_manager()->get_by_name(mr_node["Material"].as<std::string>());
+					const std::string name = mr_node["Material"].as<std::string>();
+					asset::asset_base* pAsset = engine::get_asset_manager()->get_or_read(name);
+
+					if (!pAsset) {
+						LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", scene->get_name(), name);
+						return entity::null();
+					}
+
+					scene->use_asset(pAsset);
+
+					mesh_renderer.MaterialHandle = pAsset;
 				}
 			}
 
@@ -189,23 +211,8 @@ namespace aderite {
 		}
 
 		bool scene::serialize(YAML::Emitter& out) {
-			// Used assets
-			out << YAML::Key << "Assets" << YAML::BeginSeq; // Assets
-
-			for (auto& asset : m_assets) {
-				out << YAML::BeginMap; // Asset
-				out << YAML::Key << "File" << YAML::Value << asset->get_name();
-
-				// No packing for non binary files
-				out << YAML::Key << "Start" << YAML::Value << 0;
-				out << YAML::Key << "Stride" << YAML::Value << 0;
-
-				out << YAML::EndMap; // Asset
-			}
-
-			out << YAML::EndSeq; // Assets
-
-			out << YAML::Key << "Entities" << YAML::BeginSeq; // Entities
+			// Entities
+			out << YAML::Key << "Entities" << YAML::BeginSeq;
 
 			m_registry.each([&](auto entity_id) {
 				entity e = entity(entity_id, this);
@@ -224,22 +231,8 @@ namespace aderite {
 		}
 
 		bool scene::deserialize(YAML::Node& data) {
-			// Assets
-			for (auto asset : data["Assets"]) {
-				// Ignore Start and Stride cause this is non binary format
-				// Order asset manager to load asset metainfo
-				std::string file = asset["File"].as<std::string>();
-				asset::asset_base* pAsset = engine::get_asset_manager()->read_asset(file);
-
-				if (!pAsset) {
-					LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", p_name, file);
-					return false;
-				}
-
-				m_assets.push_back(pAsset);
-			}
-
 			// Entities
+			m_assets.clear();
 			auto entities = data["Entities"];
 			if (entities) {
 				for (auto entity : entities) {
@@ -305,8 +298,6 @@ namespace aderite {
 
 		bool scene::in_group(asset::asset_group group) const {
 			switch (group) {
-			case asset::asset_group::SCENE:
-				return true;
 			default:
 				return false;
 			}

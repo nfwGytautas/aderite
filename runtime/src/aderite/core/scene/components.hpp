@@ -46,7 +46,7 @@ namespace aderite {
 				 * @param t Transform component
 				 * @return Computed transformation matrix
 				*/
-				static glm::mat4 ComputeTransform(const transform& t) {
+				static glm::mat4 compute_transform(const transform& t) {
 					glm::mat4 rotation = glm::toMat4(glm::quat(t.Rotation));
 					return glm::translate(glm::mat4(1.0f), t.Position) * rotation * glm::scale(glm::mat4(1.0f), t.Scale);
 				}

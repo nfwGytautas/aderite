@@ -4,11 +4,16 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
+#include "aderite/core/assets/object/shader_asset.hpp"
+#include "aderite/core/assets/object/material_asset.hpp"
+#include "aderite/core/assets/object/mesh_asset.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/scene/scene_manager.hpp"
 #include "aderite_editor/core/config.hpp"
 #include "aderite_editor/core/state.hpp"
+#include "aderite_editor/core/project.hpp"
+#include "aderite_editor/core/event_router.hpp"
 #include "aderite_editor/components/component_utility.hpp"
-
-#include "aderite/core/assets/object/shader_asset.hpp"
 
 namespace aderite {
 	namespace editor {
@@ -205,11 +210,11 @@ namespace aderite {
 							}
 
 							if (ImGui::MenuItem("Mesh")) {
-
+								create_item<asset::mesh_asset>(m_current_dir, "New mesh", ".mesh");
 							}
 
 							if (ImGui::MenuItem("Material")) {
-
+								create_item<asset::material_asset>(m_current_dir, "New material", ".material");
 							}
 
 							if (ImGui::MenuItem("Shader")) {
@@ -251,29 +256,38 @@ namespace aderite {
 							std::string target = "";
 							switch (node.Type) {
 							case fs_node_type::SCENE:
+							{
 								target = DDPayloadID_SceneAsset;
 								break;
+							}
 							case fs_node_type::SHADER:
+							{
 								target = DDPayloadID_ShaderAsset;
 								break;
+							}
 							case fs_node_type::MATERIAL:
+							{
 								target = DDPayloadID_MaterialAsset;
 								break;
+							}
 							case fs_node_type::MESH:
+							{
 								target = DDPayloadID_MeshAsset;
 								break;
+							}
+							case fs_node_type::DIRECTORY:
+							{
+								target = DDPayloadID_Directory;
+								break;
+							}
+							default:
+							{
+								target = DDPayloadID_GenericAsset;
+							}
 							}
 
 							if (!target.empty()) {
 								ImGui::SetDragDropPayload(target.c_str(), node.Name.c_str(), node.Name.size() + 1);
-							}
-							
-							// Generic
-							if (node.Type != fs_node_type::DIRECTORY) {
-								ImGui::SetDragDropPayload(DDPayloadID_GenericAsset, node.Name.c_str(), node.Name.size() + 1);
-							}
-							else {
-								ImGui::SetDragDropPayload(DDPayloadID_Directory, node.Name.c_str(), node.Name.size() + 1);
 							}
 
 							ImGui::EndDragDropSource();
@@ -375,6 +389,7 @@ namespace aderite {
 						type = fs_node_type::DIRECTORY;
 					}
 					else {
+						// TODO: Error check
 						if (ext == ".scene") {
 							type = fs_node_type::SCENE;
 						}

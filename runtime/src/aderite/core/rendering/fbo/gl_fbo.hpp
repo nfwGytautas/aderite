@@ -16,8 +16,8 @@ namespace aderite {
 				// Inherited via fbo
 				virtual void bind() override;
 
-				unsigned int get_ta() {
-					return m_tcolor;
+				virtual void* get_ta() override {
+					return &m_tcolor;
 				}
 
 			private:

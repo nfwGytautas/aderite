@@ -1,8 +1,10 @@
 #include "fbo.hpp"
 
 #include "aderite/config.hpp"
+#include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
 #include "aderite/utility/macros.hpp"
+#include "aderite/core/threading/threader.hpp"
 
 #ifdef GL_BACKEND
 #include "aderite/core/rendering/fbo/gl_fbo.hpp"

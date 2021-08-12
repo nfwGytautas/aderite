@@ -1,18 +1,20 @@
 #include "asset_editor.hpp"
 
 #include <imgui/imgui.h>
-#include <imgui/imgui_internal.h>
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
 #include "aderite/core/scene/scene.hpp"
+#include "aderite/core/assets/asset.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/assets/object/shader_asset.hpp"
+#include "aderite/core/assets/object/material_asset.hpp"
+#include "aderite/core/assets/object/mesh_asset.hpp"
 #include "aderite_editor/core/state.hpp"
-#include "aderite_editor/components/component_utility.hpp"
 #include "aderite_editor/core/config.hpp"
+#include "aderite_editor/components/component_utility.hpp"
 #include "aderite_editor/utility/file_dialog.hpp"
 #include "aderite_editor/utility/utility.hpp"
-
-#include "aderite/core/assets/object/shader_asset.hpp"
 
 namespace aderite {
 	namespace editor {
@@ -35,6 +37,7 @@ namespace aderite {
 				}
 
 				if (m_selected_asset == nullptr) {
+					ImGui::Text("Select asset from asset browser");
 					ImGui::End();
 					return;
 				}
@@ -78,6 +81,16 @@ namespace aderite {
 				case asset::asset_type::SHADER:
 				{
 					shader_render();
+					break;
+				}
+				case asset::asset_type::MATERIAL:
+				{
+					material_render();
+					break;
+				}
+				case asset::asset_type::MESH:
+				{
+					mesh_render();
 					break;
 				}
 				default:
@@ -171,6 +184,93 @@ namespace aderite {
 					}
 
 					// TODO: Try compile button
+
+					ImGui::EndTable();
+				}
+			}
+
+			void asset_editor::material_render() {
+				asset::material_asset* material = static_cast<asset::material_asset*>(m_selected_asset);
+				asset::material_asset::fields& finfo = material->get_fields_mutable();
+
+				if (ImGui::BeginTable("MaterialEditTable", 2)) {
+					ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+					ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+					ImGui::TableNextRow();
+
+					ImGui::TableSetColumnIndex(0);
+					ImGui::Text("Shader");
+
+					ImGui::TableSetColumnIndex(1);
+					ImGui::PushItemWidth(-FLT_MIN);
+
+					if (finfo.Shader != nullptr) {
+						ImGui::Button(finfo.Shader->get_name().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+					}
+					else {
+						ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+					}
+
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DDPayloadID_ShaderAsset)) {
+							std::string name = static_cast<const char*>(payload->Data);
+							asset::asset_base* asset = engine::get_asset_manager()->get_by_name(name);
+							if (asset) {
+								finfo.Shader = asset;
+							}
+						}
+
+						ImGui::EndDragDropTarget();
+					}
+
+					ImGui::EndTable();
+				}
+			}
+
+			void asset_editor::mesh_render() {
+				asset::mesh_asset* mesh = static_cast<asset::mesh_asset*>(m_selected_asset);
+				asset::mesh_asset::fields& finfo = mesh->get_fields_mutable();
+
+				if (ImGui::BeginTable("MeshEditTable", 3)) {
+					ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+					ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+					ImGui::TableSetupColumn("Add", ImGuiTableColumnFlags_WidthFixed, 20.0f);
+
+					ImGui::TableNextRow();
+
+					ImGui::TableSetColumnIndex(0);
+					ImGui::Text("Source");
+
+					ImGui::TableSetColumnIndex(1);
+					ImGui::PushItemWidth(-FLT_MIN);
+
+					if (!finfo.SourceFile.empty()) {
+						ImGui::Button(finfo.SourceFile.c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+					}
+					else {
+						ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+					}
+
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DDPayloadID_RawData)) {
+
+						}
+
+						ImGui::EndDragDropTarget();
+					}
+
+					ImGui::TableSetColumnIndex(2);
+					if (ImGui::Button("+###MeshSelect")) {
+						std::string file = file_dialog::select_file("Select mesh file");
+
+						if (!file.empty()) {
+							std::filesystem::path filename = std::filesystem::path(file).filename();
+							std::filesystem::path raw_dst = utility::make_unique_path(engine::get_asset_manager()->get_raw_dir() / filename);
+							std::filesystem::copy_file(file, raw_dst);
+							finfo.SourceFile = raw_dst.filename().string();
+						}
+					}
 
 					ImGui::EndTable();
 				}

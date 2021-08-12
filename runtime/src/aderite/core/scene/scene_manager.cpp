@@ -3,6 +3,8 @@
 #include "aderite/aderite.hpp"
 #include "aderite/utility/random.hpp"
 #include "aderite/utility/macros.hpp"
+#include "aderite/core/threading/threader.hpp"
+#include "aderite/core/scene/scene.hpp"
 
 namespace aderite {
 	namespace scene {
@@ -30,16 +32,12 @@ namespace aderite {
 
 			// Wait until the scene 
 			while (!scene->ready_to_load()) {
-				// TODO: Loading screen
-
 				// Sleep for 1 second
 				::aderite::engine::get_threader()->sleep_caller(1000);
 			}
-			scene->load();
 
-			if (scene->is_loaded()) {
-				m_activeScene = scene;
-				return;
+			if (!scene->is_loaded()) {
+				scene->load();
 			}
 
 			m_activeScene = scene;

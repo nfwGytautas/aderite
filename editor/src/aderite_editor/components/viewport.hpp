@@ -1,9 +1,10 @@
 #pragma once
 
 #include "aderite_editor/components/base_component.hpp"
-#include "aderite/core/rendering/fbo/gl_fbo.hpp"
 
 namespace aderite {
+	class fbo;
+
 	namespace editor {
 		namespace components {
 
@@ -18,7 +19,7 @@ namespace aderite {
 				virtual void render() override;
 
 			private:
-				aderite::render_backend::opengl::gl_fbo* m_viewport;
+				fbo* m_viewport;
 			};
 
 		}

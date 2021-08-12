@@ -3,8 +3,6 @@
 #include <functional>
 #include <string>
 
-#include "aderite_editor/components/base_component.hpp"
-
 namespace aderite {
 	namespace editor {
 		namespace components {

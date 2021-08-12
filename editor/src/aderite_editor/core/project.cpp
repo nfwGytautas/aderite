@@ -4,8 +4,10 @@
 #include <filesystem>
 #include <yaml-cpp/yaml.h>
 
-#include "aderite/utility/log.hpp"
 #include "aderite/aderite.hpp"
+#include "aderite/utility/log.hpp"
+#include "aderite/core/scene/scene_manager.hpp"
+#include "aderite/core/scene/scene.hpp"
 
 // Previous versions:
 //	- 2021_07_31r1

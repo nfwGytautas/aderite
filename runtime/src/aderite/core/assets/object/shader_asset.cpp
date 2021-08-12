@@ -3,12 +3,19 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
+#include "aderite/aderite.hpp"
+#include "aderite/utility/log.hpp"
 #include "aderite/utility/macros.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/threading/threader.hpp"
+#include "aderite/core/rendering/shader/shader.hpp"
 
 namespace aderite {
 	namespace asset {
 		shader_asset::~shader_asset() {
-			unload();
+			if (m_shader) {
+				LOG_WARN("Deleting a loaded shader asset {0}", get_name());
+			}
 		}
 
 		asset_type shader_asset::type() const {
@@ -24,6 +31,7 @@ namespace aderite {
 		}
 
 		bool shader_asset::deserialize(YAML::Node& data) {
+			// TODO: Error check
 			m_info.VertexPath = data["Vertex"].as<std::string>();
 			m_info.FragmentPath = data["Fragment"].as<std::string>();
 
@@ -41,12 +49,16 @@ namespace aderite {
 				m_vertexSource,
 				m_fragmentSource
 			});
+
+			m_being_prepared = false;
 		}
 
 		void shader_asset::unload() {
 			ASSERT_RENDER_THREAD;
-			delete m_shader;
-			m_shader = nullptr;
+			if (m_shader) {
+				delete m_shader;
+				m_shader = nullptr;
+			}
 		}
 
 		bool shader_asset::is_preparing() {
@@ -67,6 +79,10 @@ namespace aderite {
 
 		bool shader_asset::in_group(asset_group group) const {
 			switch (group) {
+			case asset_group::DEPENDS_ON_RAW:
+			{
+				return true;
+			}
 			default:
 				return false;
 			}
@@ -74,6 +90,7 @@ namespace aderite {
 
 		void shader_asset::prepare_load() {
 			// Load sources
+			// TODO: Async
 			m_vertexSource = engine::get_asset_manager()->load_txt_file(m_info.VertexPath);
 			m_fragmentSource = engine::get_asset_manager()->load_txt_file(m_info.FragmentPath);
 			m_being_prepared = true;

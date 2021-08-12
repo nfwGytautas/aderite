@@ -1,10 +1,13 @@
 #pragma once
 
-#include <functional>
 #include <string>
 #include "aderite/core/scene/entity.hpp"
 
 namespace aderite {
+	namespace asset {
+		class asset_base;
+	}
+
 	namespace editor {
 
 		/**

@@ -7,10 +7,11 @@
 #include "aderite/config.hpp"
 #include "aderite/utility/log.hpp"
 #include "aderite/utility/random.hpp"
-
-// Asset types
 #include "aderite/core/scene/scene.hpp"
 #include "aderite/core/assets/object/shader_asset.hpp"
+#include "aderite/core/assets/object/material_asset.hpp"
+#include "aderite/core/assets/object/mesh_asset.hpp"
+#include "aderite/core/assets/sources/mesh_source.hpp"
 
 // Previous versions:
 //	- 2021_07_31r1
@@ -100,7 +101,20 @@ namespace aderite {
 			return fstream.str();
 		}
 
+		void asset_manager::load_mesh_source(const std::string& path, std::function<void(mesh_source*)> loaded) {
+			LOG_WARN("load_mesh_source not async yet");
+			loaded(new mesh_source(get_raw_dir() / path));
+		}
+
 		asset::asset_base* asset_manager::read_asset(const std::string& path) {
+			LOG_TRACE("Asset manager reading {0}", path);
+
+			// Check for duplication
+			if (has(path)) {
+				LOG_WARN("Requested double read");
+				return get_by_name(path);
+			}
+
 			// Open YAML reader
 			YAML::Node data = YAML::LoadFile((get_res_dir() / path).string());
 
@@ -138,6 +152,12 @@ namespace aderite {
 			}
 			else if (type == asset_type::SHADER) {
 				asset = new asset::shader_asset(name);
+			}
+			else if (type == asset_type::MATERIAL) {
+				asset = new asset::material_asset(name);
+			}
+			else if (type == asset_type::MESH) {
+				asset = new asset::mesh_asset(name);
 			}
 			else {
 				LOG_ERROR("Unknown asset type {0}", type);
@@ -185,6 +205,11 @@ namespace aderite {
 		}
 
 		void asset_manager::unload_all() {
+			// Unload all then delete
+			for (auto& m_asset : m_assets) {
+				m_asset->unload();
+			}
+
 			for (auto& m_asset : m_assets) {
 				delete m_asset;
 			}

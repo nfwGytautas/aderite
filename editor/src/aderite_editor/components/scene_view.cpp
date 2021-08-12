@@ -4,9 +4,12 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
-#include "aderite/core/scene/scene.hpp"
 #include "aderite/utility/random.hpp"
+#include "aderite/core/scene/scene.hpp"
+#include "aderite/core/scene/scene_manager.hpp"
 #include "aderite_editor/core/state.hpp"
+#include "aderite_editor/core/event_router.hpp"
+#include "aderite_editor/components/modals.hpp"
 #include "aderite_editor/components/component_utility.hpp"
 
 namespace aderite {

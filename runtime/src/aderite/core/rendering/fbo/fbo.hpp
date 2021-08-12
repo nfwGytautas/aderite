@@ -1,8 +1,5 @@
 #pragma once
 
-#include "aderite/utility/pointer.hpp"
-#include "aderite/core/rendering/texture/texture.hpp"
-
 namespace aderite {
 
 	/**
@@ -24,6 +21,11 @@ namespace aderite {
 		 * @brief Bind the framebuffer
 		*/
 		virtual void bind() = 0;
+
+		/**
+		 * @brief Returns the texture attachment object
+		*/
+		virtual void* get_ta() = 0;
 
 		/**
 		 * @brief Creates a new API dependent framebuffer object

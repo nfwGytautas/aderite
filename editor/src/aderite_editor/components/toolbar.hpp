@@ -1,11 +1,13 @@
 #pragma once
 
 #include "aderite_editor/components/base_component.hpp"
-#include "aderite_editor/components/modals.hpp"
 
 namespace aderite {
 	namespace editor {
 		namespace components {
+			namespace modals {
+				class text_input;
+			}
 
 			/**
 			 * @brief Toolbar of the editor, the bar that goes at the top of the window

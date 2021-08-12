@@ -2,9 +2,6 @@
 
 #include <vector>
 #include <entt/entity/registry.hpp>
-#include "aderite/interfaces/iserializable.hpp"
-#include "aderite/interfaces/iloadable.hpp"
-#include "aderite/utility/pointer.hpp"
 #include "aderite/core/assets/asset.hpp"
 #include "aderite/core/scene/components.hpp"
 
