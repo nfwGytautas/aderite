@@ -4,13 +4,15 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
+#include "aderite/core/rendering/renderer.hpp"
+#include "aderite/core/rendering/fbo/fbo.hpp"
 
 namespace aderite {
 	namespace editor {
 		namespace components {
 
 			void viewport::init() {
-				m_viewport = dynamic_cast<aderite::render_backend::opengl::gl_fbo*>(aderite::fbo::create({ 800, 600 }));
+				m_viewport = aderite::fbo::create({ 800, 600 });
 				engine::get_renderer()->set_default_target(m_viewport);
 			}
 
@@ -24,7 +26,7 @@ namespace aderite {
 				ImGui::Begin("Viewport");
 				ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 				ImVec2 viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-				ImGui::Image((ImTextureID)m_viewport->get_ta(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+				ImGui::Image(static_cast<ImTextureID>(m_viewport->get_ta()), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 				ImGui::End();
 				ImGui::PopStyleVar();
 			}

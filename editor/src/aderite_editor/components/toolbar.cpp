@@ -1,12 +1,18 @@
 #include "toolbar.hpp"
 
+#include <vector>
+#include <filesystem>
+
 #include <imgui/imgui.h>
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/assets/object/mesh_asset.hpp"
+#include "aderite/core/assets/object/shader_asset.hpp"
+#include "aderite_editor/core/state.hpp"
 #include "aderite_editor/core/event_router.hpp"
-
-// OS Specific
+#include "aderite_editor/components/modals.hpp"
 #include "aderite_editor/utility/file_dialog.hpp"
 
 namespace aderite {
@@ -32,7 +38,7 @@ namespace aderite {
 								m_text_modal->set_title("New project");
 								m_text_modal->set_text("Project name:");
 								m_text_modal->set_confirm_action([&, project_dir](const std::string& value) {
-									event_router::Sink->new_project(project_dir, value);
+									state::Sink->new_project(project_dir, value);
 								});
 
 								m_text_modal->show();
@@ -40,14 +46,14 @@ namespace aderite {
 						}
 
 						if (ImGui::MenuItem("Save project")) {
-							event_router::Sink->save_project();
+							state::Sink->save_project();
 						}
 
 						if (ImGui::MenuItem("Load project")) {
 							std::string file = file_dialog::select_file("Select aderite project", { "Aderite project", "*.aproj" });
 
 							if (!file.empty()) {
-								event_router::Sink->load_project(file);
+								state::Sink->load_project(file);
 							}
 						}
 
@@ -64,10 +70,53 @@ namespace aderite {
 							m_text_modal->set_title("New scene");
 							m_text_modal->set_text("Scene name:");
 							m_text_modal->set_confirm_action([&](const std::string& value) {
-								event_router::Sink->new_scene(value);
+								state::Sink->new_scene(value);
 							});
 
 							m_text_modal->show();
+						}
+
+						ImGui::Separator();
+
+						if (ImGui::MenuItem("Optimize Raw folder")) {
+							// Removes unused files from Raw folder
+							std::vector<std::filesystem::path> used = {};
+							for (asset::asset_base* asset : *engine::get_asset_manager()) {
+								if (asset->in_group(asset::asset_group::DEPENDS_ON_RAW)) {
+									switch (asset->type()) {
+									case asset::asset_type::MESH: {
+										used.push_back(engine::get_asset_manager()->get_raw_dir() / static_cast<asset::mesh_asset*>(asset)->get_fields().SourceFile);
+										break;
+									}
+									case asset::asset_type::SHADER: {
+										used.push_back(engine::get_asset_manager()->get_raw_dir() / static_cast<asset::shader_asset*>(asset)->get_fields().VertexPath);
+										used.push_back(engine::get_asset_manager()->get_raw_dir() / static_cast<asset::shader_asset*>(asset)->get_fields().FragmentPath);
+										break;
+									}
+									case asset::asset_type::SCENE:
+									case asset::asset_type::MATERIAL: {
+										continue;
+									}
+									default:
+										LOG_WARN("Unimplemented type for DEPENDS_ON_RAW asset, aborting");
+										return;
+									}
+								}
+							}
+
+							for (auto& file : std::filesystem::recursive_directory_iterator(engine::get_asset_manager()->get_raw_dir())) {
+								auto& it = std::find(used.begin(), used.end(), file.path());
+
+								if (it == used.end()) {
+									LOG_TRACE("Removing {0}", file.path().string());
+									std::filesystem::remove(file.path());
+								}
+							}
+						}
+
+						if (ImGui::MenuItem("Recompile shaders")) {
+							// Get all currently used shaders and then complete a unload/load cycle
+							LOG_WARN("Not implemented feature called 'Recompile shaders'");
 						}
 						
 						ImGui::EndMenu();

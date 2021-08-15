@@ -9,100 +9,23 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
-
-#include "aderite_editor/core/event_router.hpp"
-
-// Probably not necessary
+#include "aderite/utility/macros.hpp"
+#include "aderite/core/rendering/renderer.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/scene/scene_manager.hpp"
+#include "aderite/core/threading/threader.hpp"
+#include "aderite/core/window/window_manager.hpp"
+#include "aderite/core/window/window.hpp"
 #include "aderite/core/window/glfw_window.hpp"
-#include "aderite/core/rendering/layer.hpp"
-#include "aderite/core/rendering/fbo/gl_fbo.hpp"
-#include "aderite/core/rendering/shader/shader.hpp"
-#include "aderite/core/assets/object/shader_asset.hpp"
-#include "aderite/core/scene/scene.hpp"
+#include "aderite_editor/core/state.hpp"
+#include "aderite_editor/core/project.hpp"
+#include "aderite_editor/components/toolbar.hpp"
+#include "aderite_editor/components/viewport.hpp"
+#include "aderite_editor/components/scene_view.hpp"
+#include "aderite_editor/components/entity_editor.hpp"
+#include "aderite_editor/components/asset_browser.hpp"
+#include "aderite_editor/components/asset_editor.hpp"
 
-#include "aderite/core/assets/object/shader_asset.hpp"
-
-//class game_layer : public aderite::layer {
-//public:
-//	virtual void init() override {
-//		float vertices[] = {
-//			 0.5f,  0.5f, 0.0f,  // top right
-//			 0.5f, -0.5f, 0.0f,  // bottom right
-//			-0.5f, -0.5f, 0.0f,  // bottom left
-//			-0.5f,  0.5f, 0.0f   // top left 
-//		};
-//
-//		unsigned int indices[] = {  // note that we start from 0!
-//			0, 1, 3,  // first Triangle
-//			1, 2, 3   // second Triangle
-//		};
-//
-//		/*m_shader = aderite::engine::get_asset_manager()->create<aderite::asset::shader_asset>(aderite::asset::shader_asset::fields{
-//					"0_vertex.txt",
-//					"0_fragment.txt"
-//			});
-//		m_shader->set_name("QuadShader");
-//		m_shader->serialize("res/shaders/0_QuadShader.shader");*/
-//
-//		aderite::engine::get_asset_manager()->read_asset<aderite::asset::shader_asset>("shaders/0_QuadShader.shader");
-//		m_shader = aderite::engine::get_asset_manager()->get_by_name<aderite::asset::shader_asset>("QuadShader");
-//		m_shader->prepare_load();
-//		m_shader->load();
-//
-//		aderite::scene::scene* scene = aderite::engine::get_scene_manager()->new_scene();
-//		scene->set_name("SampleScene");
-//		scene->use_asset(m_shader);
-//		scene->serialize("res/scenes/SampleScene.scene");
-//		aderite::engine::get_scene_manager()->set_active(scene);
-//
-//		glGenVertexArrays(1, &VAO);
-//		glGenBuffers(1, &VBO);
-//		glGenBuffers(1, &EBO);
-//		glBindVertexArray(VAO);
-//
-//		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-//
-//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-//		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-//
-//		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-//		glEnableVertexAttribArray(0);
-//
-//		glBindBuffer(GL_ARRAY_BUFFER, 0);
-//		glBindVertexArray(0);
-//
-//		m_initialized = true;
-//	}
-//
-//	virtual void render() override {
-//		renderer->clear();
-//
-//		(*m_shader)->bind();
-//		glBindVertexArray(VAO);
-//		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-//	}
-//
-//	virtual void shutdown() override {
-//		glDeleteVertexArrays(1, &VAO);
-//		glDeleteBuffers(1, &VBO);
-//		glDeleteBuffers(1, &EBO);
-//
-//		m_shader = nullptr;
-//	}
-//
-//	virtual bool ready() override {
-//		return m_initialized;
-//	}
-//
-//private:
-//	bool m_initialized = false;
-//
-//	unsigned int m_vbo = 0;
-//	unsigned int VBO, VAO, EBO;
-//
-//	aderite::asset::shader_asset* m_shader = nullptr;
-//};
 
 #define EVENT_ROUTE(e, dst) event_router::e = std::bind(&windows_editor::dst, this, std::placeholders::_1)
 
@@ -113,10 +36,22 @@ namespace aderite {
 			m_toolbar = new components::toolbar();
 			m_viewport = new components::viewport();
 			m_scene_view = new components::scene_view();
-			m_property_editor = new components::property_editor();
+			m_property_editor = new components::entity_editor();
+			m_asset_browser = new components::asset_browser();
+			m_asset_editor = new components::asset_editor();
 
 			// Setup event router
-			event_router::Sink = this;
+			state::Sink = this;
+			state::Project = nullptr;
+		}
+
+		windows_editor::~windows_editor() {
+			delete m_toolbar;
+			delete m_viewport;
+			delete m_scene_view;
+			delete m_property_editor;
+			delete m_asset_browser;
+			delete m_asset_editor;
 		}
 
 		void windows_editor::on_runtime_initialized() {
@@ -132,14 +67,11 @@ namespace aderite {
 				return;
 			}
 
+			// Default title
 			m_editor_window->set_title("Aderite");
 
-			// No project path until a new one isn't created
-
 			// TODO: Startup dialog e.g. create new project, load project, etc.
-
-			// TODO: Load the default scene or create a new one
-			//engine::get_renderer()->add_layer<game_layer>();
+			this->load_project("../example/ExampleProject/ExampleProject.aproj");
 		}
 
 		void windows_editor::on_renderer_initialized() {
@@ -169,14 +101,19 @@ namespace aderite {
 			}
 
 			// Setup Platform/Renderer backends
-			GLFWwindow* handle = aderite::engine::get()->get_window_manager()->get_current_active_window()
-				.as<aderite::window_backend::glfw::glfw_window>()->get_handle();
+			GLFWwindow* handle = static_cast<aderite::window_backend::glfw::glfw_window*>(
+				aderite::engine::get()->get_window_manager()->get_current_active_window())->get_handle();
 
 			ImGui_ImplGlfw_InitForOpenGL(handle, true);
 			ImGui_ImplOpenGL3_Init("#version 150");
 
 			// Components
+			m_toolbar->init();
 			m_viewport->init();
+			m_scene_view->init();
+			m_property_editor->init();
+			m_asset_browser->init();
+			m_asset_editor->init();
 		}
 
 		void windows_editor::on_end_render() {
@@ -236,6 +173,7 @@ namespace aderite {
 			ImGuiStyle& style = ImGui::GetStyle();
 			float minWinSizeX = style.WindowMinSize.x;
 			style.WindowMinSize.x = 370.0f;
+			
 			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 			{
 				ImGuiID dockspace_id = ImGui::GetID("Dockspace");
@@ -251,6 +189,8 @@ namespace aderite {
 			m_viewport->render();
 			m_scene_view->render();
 			m_property_editor->render();
+			m_asset_browser->render();
+			m_asset_editor->render();
 
 			// DEMO WINDOW
 			if (show_demo_window) {
@@ -274,20 +214,34 @@ namespace aderite {
 
 			// Exit
 			auto activeWindow = aderite::engine::get()->get_window_manager()->get_current_active_window();
-			if (activeWindow.valid() && activeWindow->closed) {
+			if (activeWindow != nullptr && activeWindow->closed) {
+				// TODO: Request save
+				m_expected_shutdown = true;
+				save_project();
 				engine::get()->request_exit();
 			}
 		}
 
 		void windows_editor::on_runtime_shutdown() {
+			if (!m_expected_shutdown) {
+				// Try to save
+				LOG_WARN("Unexpected shutdown trying to save");
+				save_project();
+			}
+
+			m_toolbar->shutdown();
 			m_viewport->shutdown();
+			m_scene_view->shutdown();
+			m_property_editor->shutdown();
+			m_asset_browser->shutdown();
+			m_asset_editor->shutdown();
 
 			// Shutdown ImGui
 			ImGui_ImplOpenGL3_Shutdown();
 			ImGui_ImplGlfw_Shutdown();
 			ImGui::DestroyContext();
 
-			delete m_project;
+			delete state::Project;
 		}
 
 		void windows_editor::selected_entity_changed(scene::entity& entity) {
@@ -299,60 +253,81 @@ namespace aderite {
 			LOG_TRACE("New project name: {0} at directory {1}", name, dir);
 			m_editor_window->set_title(name);
 			
-			if (m_project) {
-				delete m_project;
+			if (state::Project) {
+				delete state::Project;
 			}
 
-			m_project = new project(dir, name);
+			state::Project = new project(dir, name);
 
 			// Setup asset manager
-			engine::get_asset_manager()->set_root_dir(m_project->get_root_dir().string());
+			engine::get_asset_manager()->set_root_dir(state::Project->get_root_dir().string());
 		}
 
 		void windows_editor::save_project() {
-			if (!m_project) {
+			if (!state::Project) {
 				// TODO: Create new project?
 				return;
 			}
 
-			// Save all scenes
-			for (scene::scene* scene : *engine::get_scene_manager()) {
-				engine::get_scene_manager()->save_scene(scene);
+			// Save all assets
+			for (asset::asset_base* asset : *engine::get_asset_manager()) {
+				engine::get_asset_manager()->save_asset(asset);
 			}
 
-			m_project->save();
+			state::Project->save();
 		}
 
 		void windows_editor::load_project(const std::string& path) {
 			ASSERT_RENDER_THREAD;
 			LOG_TRACE("Loading project {0}", path);
-			if (m_project) {
+			if (state::Project) {
 				// TODO: Ask for saving if there are changes
-				delete m_project;
+				delete state::Project;
 			}
 
-			m_project = project::load(path);
+			// Unload all assets
+			engine::get_asset_manager()->unload_all();
 
-			m_editor_window->set_title(m_project->get_name());
+			// TODO: Verify all assets are in their name directories
+
+			state::Project = project::load(path);
+
+			m_editor_window->set_title(state::Project->get_name());
 
 			// Setup asset manager
-			engine::get_asset_manager()->set_root_dir(m_project->get_root_dir().string());
+			engine::get_asset_manager()->set_root_dir(state::Project->get_root_dir().string());
 
-			if (!m_project->get_active_scene().empty()) {
-				scene::scene* s = engine::get_scene_manager()->read_scene(m_project->get_active_scene());
+			// Now load every single asset metadata.
+			// This is done to be able to move and rename them. By loading them on demand it overcomplicates other
+			// parts of the program. Since asset metadata is pretty small (400 bytes at most) at one time in 4GB of RAM
+			// about 20 million of them can be loaded. If someone is using this engine with more assets than that then it's
+			// rather surprising considering that this isn't a professional game engine. Also note that all these assets are loaded
+			// only in editor configuration in runtime this is optimized out and only those assets that are needed are read.
+
+			for (auto& path : std::filesystem::recursive_directory_iterator(engine::get_asset_manager()->get_res_dir())) {
+				// Ignore directories
+				if (path.is_directory()) {
+					continue;
+				}
+
+				// Make sure to ignore Raw directory, cause it contains not assets, but their actual data, since Raw directory is one
+				// big directory of data, the check is as simple as checking for parent to not be Raw/
+				if (path.path().parent_path() == engine::get_asset_manager()->get_raw_dir()) {
+					continue;
+				}
+
+				// Now read the asset
+				std::filesystem::path p = std::filesystem::relative(path.path(), engine::get_asset_manager()->get_res_dir());
+
+				// get_or_read, because read will log a warning, since some assets might have already been loaded by others
+				engine::get_asset_manager()->get_or_read(p.string());
+			}
+			
+
+			if (!state::Project->get_active_scene().empty()) {
+				// Should have been read
+				scene::scene* s = static_cast<scene::scene*>(engine::get_asset_manager()->get_by_name(state::Project->get_active_scene()));
 				engine::get_scene_manager()->set_active(s);
-
-				if (!s->is_preparing()) {
-					s->prepare_load();
-				}
-
-				while (!s->ready_to_load()) {
-					// TODO: Loading screen
-
-					// Sleep for 1 second
-					::aderite::engine::get_threader()->sleep_caller(1000);
-				}
-				s->load();
 			}
 		}
 
@@ -360,7 +335,7 @@ namespace aderite {
 			LOG_TRACE("New scene with name: {0}", name);
 
 			// TODO: Error screen or special naming
-			scene::scene* s = engine::get_scene_manager()->new_scene(name);
+			scene::scene* s = engine::get_asset_manager()->create<scene::scene>(name);
 			engine::get_scene_manager()->set_active(s);
 		}
 
@@ -372,6 +347,10 @@ namespace aderite {
 		void windows_editor::destroy_entity(const scene::entity& entity) {
 			scene::scene* s = engine::get_scene_manager()->current_scene();
 			s->destroy_entity(entity);
+		}
+
+		void windows_editor::selected_asset_changed(asset::asset_base* asset) {
+			m_asset_editor->set_active_asset(asset);
 		}
 
 	}

@@ -3,7 +3,6 @@
 #include <string>
 #include "aderite/interfaces/iserializable.hpp"
 #include "aderite/interfaces/iloadable.hpp"
-#include "aderite/utility/pointer.hpp"
 
 namespace aderite {
 	namespace asset {
@@ -11,8 +10,11 @@ namespace aderite {
 		 * @brief Possible asset groups a single asset can have multiple groups
 		*/
 		enum class asset_group : size_t {
+			// Is the asset a system type asset
 			SYSTEMIC = 0,
-			SHADER = 1
+
+			// Does the asset depend on some external resource from Raw/ directory
+			DEPENDS_ON_RAW = 1,
 		};
 
 		/**
@@ -20,6 +22,9 @@ namespace aderite {
 		*/
 		enum class asset_type : size_t {
 			SHADER = 0,
+			SCENE = 1,
+			MATERIAL = 2,
+			MESH = 3,
 		};
 
 		/**
@@ -54,9 +59,6 @@ namespace aderite {
 			friend class asset_manager;
 		protected:
 			std::string p_name;
-			
-			// Asset loaded into memory
-			bool p_loaded = false;
 		};
 	}
 }

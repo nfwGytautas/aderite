@@ -1,7 +1,5 @@
 #pragma once
 
-#include "aderite/core/scene/entity.hpp"
-
 namespace aderite {
 	namespace interfaces {
 

@@ -2,7 +2,6 @@
 
 #include <string>
 #include <filesystem>
-#include "aderite/interfaces/iserializable.hpp"
 
 namespace aderite {
 	namespace editor {
@@ -16,6 +15,7 @@ namespace aderite {
 			 * @brief Creates a new project object with name and base directory
 			*/
 			project(const std::string& dir, const std::string& name);
+			virtual ~project();
 
 			/**
 			 * @brief Save project to file
@@ -44,6 +44,12 @@ namespace aderite {
 			 * @brief Returns the active scene of the project
 			*/
 			std::string get_active_scene() const;
+
+			/**
+			 * @brief Validates project information, for example if the current scene name changed the project 
+			 * will automatically update it self to reflect these changes
+			*/
+			void validate();
 		private:
 			std::filesystem::path m_directory;
 			std::string m_name;

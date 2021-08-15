@@ -1,9 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "aderite/utility/pointer.hpp"
-#include "aderite/core/window/window.hpp"
 #include "aderite/interfaces/iframe_object.hpp"
+#include "aderite/core/window/window.hpp"
 
 namespace aderite {
 
@@ -31,17 +30,17 @@ namespace aderite {
 		 * @brief Creates a new window with specified options
 		 * @param options Options to create with
 		*/
-		ref<window> create_window(window::create_options options);
+		window* create_window(window::create_options options);
 
 		/**
 		 * @brief Function gets called when the current active window is changed by calling window->make_active
 		*/
-		void active_window_changed(relay_ptr<window> window);
+		void active_window_changed(window* window);
 
 		/**
 		 * @brief Returns the current active window
 		*/
-		relay_ptr<window> get_current_active_window() {
+		window* get_current_active_window() {
 			return m_current_window;
 		}
 	private:
@@ -49,8 +48,8 @@ namespace aderite {
 		friend class engine;
 
 	private:
-		std::vector<ref<window>> m_windows;
-		relay_ptr<window> m_current_window = nullptr;
+		std::vector<window*> m_windows;
+		window* m_current_window = nullptr;
 	};
 
 }

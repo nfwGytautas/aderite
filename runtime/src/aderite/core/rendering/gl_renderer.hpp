@@ -12,7 +12,7 @@ namespace aderite {
 			class gl_renderer : public renderer {
 			public:
 				// Inherited via renderer
-				virtual bool init(relay_ptr<window> wnd) override;
+				virtual bool init(window* wnd) override;
 				virtual void shutdown() override;
 				virtual void set_vsync(bool enabled) override;
 				

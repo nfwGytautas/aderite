@@ -1,20 +1,28 @@
 #pragma once
 
 #include "aderite/config.hpp"
-#include "aderite/utility/pointer.hpp"
 #include "aderite/interfaces/iframe_object.hpp"
 #include "aderite/interfaces/iaderite_editor.hpp"
-
-// Forward declare?
-#include "aderite/core/window/window_manager.hpp"
-#include "aderite/core/rendering/renderer.hpp"
-#include "aderite/core/threading/threader.hpp"
-#include "aderite/core/assets/asset_manager.hpp"
-#include "aderite/core/scene/scene_manager.hpp"
 
 #define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static class_name* public_name() { return engine::get()->field_name; } private: class_name* field_name = nullptr;
 
 namespace aderite {
+
+	class window_manager;
+	class renderer;
+	
+	namespace thread {
+		class threader;
+	}
+
+	namespace asset {
+		class asset_manager;
+	}
+
+	namespace scene {
+		class scene_manager;
+	}
+
 
 	/**
 	 * @brief Main aderite engine instance

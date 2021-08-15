@@ -26,6 +26,9 @@ constexpr char* EngineVersion = "0.0.0";
 // Is aderite using OpenGL backend (Uses GLAD)
 #define GL_BACKEND 1
 
+// Is aderite using DirectX backend
+#define DX_BACKEND 0
+
 
 // ---------------------------------
 // RESOURCE SAVE TYPE

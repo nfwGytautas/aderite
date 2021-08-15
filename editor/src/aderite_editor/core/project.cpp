@@ -4,8 +4,10 @@
 #include <filesystem>
 #include <yaml-cpp/yaml.h>
 
-#include "aderite/utility/log.hpp"
 #include "aderite/aderite.hpp"
+#include "aderite/utility/log.hpp"
+#include "aderite/core/scene/scene_manager.hpp"
+#include "aderite/core/scene/scene.hpp"
 
 // Previous versions:
 //	- 2021_07_31r1
@@ -19,6 +21,9 @@ namespace aderite {
 			: m_directory(dir), m_name(name)
 		{
 			m_directory.append(m_name);
+		}
+
+		project::~project() {
 		}
 
 		bool project::save() {
@@ -39,6 +44,7 @@ namespace aderite {
 
 			if (engine::get_scene_manager()->current_scene()) {
 				out << YAML::Key << "ActiveScene" << YAML::Value << engine::get_scene_manager()->current_scene()->get_name();
+				m_active_scene = engine::get_scene_manager()->current_scene()->get_name();
 			}
 
 			out << YAML::EndMap; // Root
@@ -89,6 +95,15 @@ namespace aderite {
 
 		std::string project::get_active_scene() const {
 			return m_active_scene;
+		}
+
+		void project::validate() {
+			if (engine::get_scene_manager()->current_scene() == nullptr && !m_active_scene.empty()) {
+				save();
+			}
+			else if (engine::get_scene_manager()->current_scene()->get_name() != m_active_scene) {
+				save();
+			}
 		}
 	}
 }

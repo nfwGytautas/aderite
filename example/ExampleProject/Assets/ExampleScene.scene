@@ -1,9 +1,0 @@
-Version: 2021_07_31r1
-Name: ExampleScene
-Type: Scene
-Assets:
-  []
-Entities:
-  - Entity: 0
-    Meta:
-      Name: Cube

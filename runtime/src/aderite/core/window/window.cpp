@@ -1,6 +1,7 @@
 #include "window.hpp"
 
 #include "aderite/aderite.hpp"
+#include "aderite/core/window/window_manager.hpp"
 
 namespace aderite {
 

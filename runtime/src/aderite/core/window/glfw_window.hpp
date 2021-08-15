@@ -1,10 +1,12 @@
 #pragma once
 
-#include "GLFW/glfw3.h"
 #include "aderite/core/window/window.hpp"
-#include "aderite/core/window/window_manager.hpp"
+
+class GLFWwindow;
 
 namespace aderite {
+	class window_manager;
+
 	namespace window_backend {
 		namespace glfw {
 

@@ -4,16 +4,74 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "aderite/utility/macros.hpp"
+#include "aderite/aderite.hpp"
+#include "aderite/utility/log.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
 #include "aderite/core/scene/entity.hpp"
 
-// Previous versions:
-//	- 2021_07_31r1
+// YAML extensions
+namespace YAML {
+	template<>
+	struct convert<glm::vec3> {
+		static Node encode(const glm::vec3& rhs) {
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.push_back(rhs.z);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
 
-constexpr const char* current_version = "2021_07_31r1";
+		static bool decode(const Node& node, glm::vec3& rhs) {
+			if (!node.IsSequence() || node.size() != 3)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+			rhs.z = node[2].as<float>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<glm::vec4> {
+		static Node encode(const glm::vec4& rhs) {
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			node.push_back(rhs.z);
+			node.push_back(rhs.w);
+			node.SetStyle(EmitterStyle::Flow);
+			return node;
+		}
+
+		static bool decode(const Node& node, glm::vec4& rhs) {
+			if (!node.IsSequence() || node.size() != 4)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+			rhs.z = node[2].as<float>();
+			rhs.w = node[3].as<float>();
+			return true;
+		}
+	};
+}
 
 namespace aderite {
 	namespace scene {
+
+		YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v) {
+			out << YAML::Flow;
+			out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
+			return out;
+		}
+
+		YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
+			out << YAML::Flow;
+			out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
+			return out;
+		}
 
 		void serialize_entity(YAML::Emitter& out, entity e) {
 			out << YAML::BeginMap; // Entity
@@ -37,6 +95,36 @@ namespace aderite {
 
 			// Serialize rest of components
 
+			// Transform
+			if (e.has_component<components::transform>()) {
+				out << YAML::Key << "Transform";
+				out << YAML::BeginMap; // Transform
+
+				components::transform& transform = e.get_component<components::transform>();
+				out << YAML::Key << "Position" << YAML::Value << transform.Position;
+				out << YAML::Key << "Rotation" << YAML::Value << transform.Rotation;
+				out << YAML::Key << "Scale" << YAML::Value << transform.Scale;
+
+				out << YAML::EndMap; // Transform
+			}
+
+			// Mesh renderer
+			if (e.has_component<components::mesh_renderer>()) {
+				out << YAML::Key << "MeshRenderer";
+				out << YAML::BeginMap; // MeshRenderer
+
+				components::mesh_renderer& mesh_renderer = e.get_component<components::mesh_renderer>();
+
+				if (mesh_renderer.MeshHandle) {
+					out << YAML::Key << "Mesh" << mesh_renderer.MeshHandle->get_name();
+				}
+
+				if (mesh_renderer.MaterialHandle) {
+					out << YAML::Key << "Material" << mesh_renderer.MaterialHandle->get_name();
+				}
+
+				out << YAML::EndMap; // MeshRenderer
+			}
 
 			out << YAML::EndMap; // Entity
 		}
@@ -56,6 +144,49 @@ namespace aderite {
 			entity e = scene->create_entity(meta);
 
 			// Deserialize rest of components
+
+			// Transform
+			auto transform_node = e_node["Transform"];
+			if (transform_node) {
+				auto& transform = e.add_component<components::transform>();
+				transform.Position = transform_node["Position"].as<glm::vec3>();
+				transform.Rotation = transform_node["Rotation"].as<glm::vec3>();
+				transform.Scale = transform_node["Scale"].as<glm::vec3>();
+			}
+
+			// Mesh renderer
+			auto mr_node = e_node["MeshRenderer"];
+			if (mr_node) {
+				auto& mesh_renderer = e.add_component<components::mesh_renderer>();
+				
+				if (mr_node["Mesh"]) {
+					const std::string name = mr_node["Mesh"].as<std::string>();
+					asset::asset_base* pAsset = engine::get_asset_manager()->get_or_read(name);
+
+					if (!pAsset) {
+						LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", scene->get_name(), name);
+						return entity::null();
+					}
+
+					scene->use_asset(pAsset);
+
+					mesh_renderer.MeshHandle = pAsset;
+				}
+
+				if (mr_node["Material"]) {
+					const std::string name = mr_node["Material"].as<std::string>();
+					asset::asset_base* pAsset = engine::get_asset_manager()->get_or_read(name);
+
+					if (!pAsset) {
+						LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", scene->get_name(), name);
+						return entity::null();
+					}
+
+					scene->use_asset(pAsset);
+
+					mesh_renderer.MaterialHandle = pAsset;
+				}
+			}
 
 			return e;
 		}
@@ -79,32 +210,9 @@ namespace aderite {
 			m_assets.erase(std::find(m_assets.begin(), m_assets.end(), asset));
 		}
 
-		bool scene::serialize(const std::string& path) {
-			YAML::Emitter out;
-			out << YAML::BeginMap; // Root
-
-			// Common
-			out << YAML::Key << "Version" << YAML::Value << current_version;
-			out << YAML::Key << "Name" << YAML::Value << m_name;
-			out << YAML::Key << "Type" << YAML::Value << "Scene";
-
-			// Used assets
-			out << YAML::Key << "Assets" << YAML::BeginSeq; // Assets
-
-			for (auto& asset : m_assets) {
-				out << YAML::BeginMap; // Asset
-				out << YAML::Key << "File" << YAML::Value << asset->get_name();
-
-				// No packing for non binary files
-				out << YAML::Key << "Start" << YAML::Value << 0;
-				out << YAML::Key << "Stride" << YAML::Value << 0;
-
-				out << YAML::EndMap; // Asset
-			}
-
-			out << YAML::EndSeq; // Assets
-
-			out << YAML::Key << "Entities" << YAML::BeginSeq; // Entities
+		bool scene::serialize(YAML::Emitter& out) {
+			// Entities
+			out << YAML::Key << "Entities" << YAML::BeginSeq;
 
 			m_registry.each([&](auto entity_id) {
 				entity e = entity(entity_id, this);
@@ -118,52 +226,13 @@ namespace aderite {
 			});
 
 			out << YAML::EndSeq; // Entities
-			out << YAML::EndMap; // Root
-
-			std::ofstream fout(path);
-			fout << out.c_str();
 
 			return true;
 		}
 
-		bool scene::deserialize(const std::string& path) {
-			YAML::Node data = YAML::LoadFile(path);
-
-			// Check version
-			if (!data["Version"]) {
-				LOG_ERROR("Loading scene from {0} failed because there is no version information", path);
-				return false;
-			}
-
-			// Check type
-			if (!data["Type"]) {
-				LOG_ERROR("Loading scene from {0} failed because no type information was given", path);
-				return false;
-			}
-
-			if (data["Type"].as<std::string>() != "Scene") {
-				LOG_ERROR("Trying to load asset of type {0} as a scene. File {1}", data["Type"].as<std::string>(), path);
-				return false;
-			}
-
-			m_name = data["Name"].as<std::string>();
-
-			// Assets
-			for (auto asset : data["Assets"]) {
-				// Ignore Start and Stride cause this is non binary format
-				// Order asset manager to load asset metainfo
-				std::string file = asset["File"].as<std::string>();
-				asset::asset_base* pAsset = engine::get_asset_manager()->read_asset(file);
-
-				if (!pAsset) {
-					LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", m_name, file);
-					return false;
-				}
-
-				m_assets.push_back(pAsset);
-			}
-
+		bool scene::deserialize(YAML::Node& data) {
 			// Entities
+			m_assets.clear();
 			auto entities = data["Entities"];
 			if (entities) {
 				for (auto entity : entities) {
@@ -211,6 +280,27 @@ namespace aderite {
 			}
 
 			return true;
+		}
+
+		bool scene::is_loaded() {
+			for (asset::asset_base* asset : m_assets) {
+				if (!asset->is_loaded()) {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+
+		asset::asset_type scene::type() const {
+			return asset::asset_type::SCENE;
+		}
+
+		bool scene::in_group(asset::asset_group group) const {
+			switch (group) {
+			default:
+				return false;
+			}
 		}
 
 	}

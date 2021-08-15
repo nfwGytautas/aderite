@@ -1,18 +1,22 @@
 #include "gl_renderer.hpp"
 
 #include "aderite/config.hpp"
-#include "aderite/utility/log.hpp"
 
 #if GLFW_BACKEND
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #endif
 
+#include "aderite/aderite.hpp"
+#include "aderite/utility/log.hpp"
+#include "aderite/core/rendering/fbo/fbo.hpp"
+#include "aderite/core/window/window.hpp"
+
 namespace aderite {
 	namespace render_backend {
 		namespace opengl {
 
-			bool gl_renderer::init(relay_ptr<window> wnd) {
+			bool gl_renderer::init(window* wnd) {
 				if (!renderer::init(wnd)) {
 					return false;
 				}
@@ -71,7 +75,7 @@ namespace aderite {
 			}
 
 			void gl_renderer::output_to_default() {
-				if (!m_default_target.valid()) {
+				if (m_default_target != nullptr) {
 					reset_output();
 					return;
 				}

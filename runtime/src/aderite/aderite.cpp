@@ -2,6 +2,12 @@
 
 #include "aderite/utility/log.hpp"
 #include "aderite/core/threading/thread_invoke.hpp"
+#include "aderite/core/window/window_manager.hpp"
+#include "aderite/core/rendering/renderer.hpp"
+#include "aderite/core/threading/threader.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/scene/scene_manager.hpp"
+
 
 #if EDITOR_ENABLED == 1
 #define EDITOR_ACTION(action, ...) m_editor->action(__VA_ARGS__);

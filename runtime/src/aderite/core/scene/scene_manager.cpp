@@ -3,6 +3,8 @@
 #include "aderite/aderite.hpp"
 #include "aderite/utility/random.hpp"
 #include "aderite/utility/macros.hpp"
+#include "aderite/core/threading/threader.hpp"
+#include "aderite/core/scene/scene.hpp"
 
 namespace aderite {
 	namespace scene {
@@ -12,46 +14,37 @@ namespace aderite {
 		}
 
 		void scene_manager::shutdown() {
-			for (scene* scene : m_scenes) {
-				delete scene;
-			}
-		}
 
-		scene* scene_manager::new_scene(const std::string& name) {
-			// Check for conflicts (editor only thing so this will never be called from scripts / runtime so no need to check for binary format)
-			if (std::filesystem::exists(::aderite::engine::get_asset_manager()->get_res_dir() / (name + ".scene"))) {
-				return nullptr;
-			}
-			
-			scene* s = new scene(name);
-			m_scenes.push_back(s);
-			return s;
-		}
-
-		scene* scene_manager::read_scene(const std::string& name) {
-			scene* s = new scene("");
-			if (!s->deserialize((::aderite::engine::get_asset_manager()->get_res_dir() / (name + ".scene")).string())) {
-				LOG_ERROR("Failed to load scene from {0}", name);
-				delete s;
-				return nullptr;
-			}
-			m_scenes.push_back(s);
-			return s;
 		}
 
 		void scene_manager::set_active(scene* scene) {
+			ASSERT_RENDER_THREAD;
+
+			if (scene->is_loaded()) {
+				m_activeScene = scene;
+				return;
+			}
+
+			// Check if it's preparing to be loaded if not then prepare
+			if (!scene->is_preparing()) {
+				scene->prepare_load();
+			}
+
+			// Wait until the scene 
+			while (!scene->ready_to_load()) {
+				// Sleep for 1 second
+				::aderite::engine::get_threader()->sleep_caller(1000);
+			}
+
+			if (!scene->is_loaded()) {
+				scene->load();
+			}
+
 			m_activeScene = scene;
 		}
 
 		scene* scene_manager::current_scene() const {
 			return m_activeScene;
 		}
-
-		void scene_manager::save_scene(scene* scene) {
-			if (!scene->serialize((::aderite::engine::get_asset_manager()->get_res_dir() / (scene->get_name() + ".scene")).string())) {
-				LOG_ERROR("Failed to save scene {0}", scene->get_name());
-			}
-		}
-
 	}
 }

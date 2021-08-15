@@ -2,7 +2,10 @@
 
 #include <glad/glad.h>
 
+#include "aderite/aderite.hpp"
+#include "aderite/utility/log.hpp"
 #include "aderite/utility/macros.hpp"
+#include "aderite/core/threading/threader.hpp"
 
 namespace aderite {
 	namespace render_backend {

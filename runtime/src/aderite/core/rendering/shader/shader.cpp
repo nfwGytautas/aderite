@@ -1,8 +1,10 @@
 #include "shader.hpp"
 
 #include "aderite/config.hpp"
+#include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
 #include "aderite/utility/macros.hpp"
+#include "aderite/core/threading/threader.hpp"
 
 #ifdef GL_BACKEND
 #include "aderite/core/rendering/shader/gl_shader.hpp"

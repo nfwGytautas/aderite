@@ -53,14 +53,19 @@ namespace aderite {
 			operator entt::entity() const { return m_handle; }
 			operator uint32_t() const { return (uint32_t)m_handle; }
 
-			bool operator==(const entity& other) const
-			{
+			bool operator==(const entity& other) const {
 				return m_handle == other.m_handle && m_scene == other.m_scene;
 			}
 
-			bool operator!=(const entity& other) const
-			{
+			bool operator!=(const entity& other) const {
 				return !(*this == other);
+			}
+
+			/**
+			 * @brief Returns the scene that the entity belongs to
+			*/
+			scene* get_scene() const {
+				return m_scene;
 			}
 
 			/**
