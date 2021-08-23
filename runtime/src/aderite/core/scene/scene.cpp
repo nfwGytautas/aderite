@@ -6,8 +6,11 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
-#include "aderite/core/assets/asset_manager.hpp"
 #include "aderite/core/scene/entity.hpp"
+#include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/assets/object/mesh_asset.hpp" 
+#include "aderite/core/assets/object/material_asset.hpp" 
+
 
 // YAML extensions
 namespace YAML {
@@ -170,7 +173,7 @@ namespace aderite {
 
 					scene->use_asset(pAsset);
 
-					mesh_renderer.MeshHandle = pAsset;
+					mesh_renderer.MeshHandle = static_cast<asset::mesh_asset*>(pAsset);
 				}
 
 				if (mr_node["Material"]) {
@@ -184,7 +187,7 @@ namespace aderite {
 
 					scene->use_asset(pAsset);
 
-					mesh_renderer.MaterialHandle = pAsset;
+					mesh_renderer.MaterialHandle = static_cast<asset::material_asset*>(pAsset);
 				}
 			}
 

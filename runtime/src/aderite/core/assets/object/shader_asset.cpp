@@ -8,12 +8,20 @@
 #include "aderite/utility/macros.hpp"
 #include "aderite/core/assets/asset_manager.hpp"
 #include "aderite/core/threading/threader.hpp"
-#include "aderite/core/rendering/shader/shader.hpp"
+#include "aderite/core/rendering/draw_call.hpp"
 
 namespace aderite {
 	namespace asset {
+		bgfx::ShaderHandle load_shader(const std::vector<unsigned char>& source, const std::string& name) {
+			const bgfx::Memory* mem = bgfx::copy(source.data(), source.size() + 1);
+			mem->data[mem->size - 1] = '\0';
+			bgfx::ShaderHandle vsh = bgfx::createShader(mem);
+			bgfx::setName(vsh, name.c_str());
+			return vsh;
+		}
+
 		shader_asset::~shader_asset() {
-			if (m_shader) {
+			if (bgfx::isValid(m_handle)) {
 				LOG_WARN("Deleting a loaded shader asset {0}", get_name());
 			}
 		}
@@ -38,6 +46,10 @@ namespace aderite {
 			return true;
 		}
 
+		void shader_asset::fill_draw_call(rendering::draw_call* dc) {
+			dc->Shader = m_handle;
+		}
+
 		void shader_asset::load() {
 			ASSERT_RENDER_THREAD;
 			if (is_loaded()) {
@@ -45,19 +57,21 @@ namespace aderite {
 				unload();
 			}
 
-			m_shader = shader::create({
-				m_vertexSource,
-				m_fragmentSource
-			});
+			// Load bgfx bin shader
+			bgfx::ShaderHandle vsh = load_shader(m_vertexSource, "vVertex");
+			bgfx::ShaderHandle fsh = load_shader(m_fragmentSource, "fVertex");
+
+			// Create program
+			m_handle = bgfx::createProgram(vsh, fsh, true);
 
 			m_being_prepared = false;
 		}
 
 		void shader_asset::unload() {
 			ASSERT_RENDER_THREAD;
-			if (m_shader) {
-				delete m_shader;
-				m_shader = nullptr;
+			if (bgfx::isValid(m_handle)) {
+				bgfx::destroy(m_handle);
+				m_handle = BGFX_INVALID_HANDLE;
 			}
 		}
 
@@ -66,7 +80,7 @@ namespace aderite {
 		}
 
 		bool shader_asset::is_loaded() {
-			return m_shader != nullptr;
+			return bgfx::isValid(m_handle);
 		}
 
 		shader_asset::shader_asset(const std::string& name)
@@ -91,13 +105,13 @@ namespace aderite {
 		void shader_asset::prepare_load() {
 			// Load sources
 			// TODO: Async
-			m_vertexSource = engine::get_asset_manager()->load_txt_file(m_info.VertexPath);
-			m_fragmentSource = engine::get_asset_manager()->load_txt_file(m_info.FragmentPath);
+			m_vertexSource = engine::get_asset_manager()->load_bin_file(m_info.VertexPath);
+			m_fragmentSource = engine::get_asset_manager()->load_bin_file(m_info.FragmentPath);
 			m_being_prepared = true;
 		}
 
 		bool shader_asset::ready_to_load() {
-			return (m_vertexSource != "" && m_fragmentSource != "");
+			return (m_vertexSource.size() > 0 && m_fragmentSource.size() > 0);
 		}
 
 	}

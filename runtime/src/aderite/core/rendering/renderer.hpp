@@ -1,14 +1,14 @@
 #pragma once
 
 #include <vector>
+#include <bgfx/bgfx.h>
 #include "aderite/interfaces/iframe_object.hpp"
 
 namespace aderite {
 	class window;
-	class fbo;
 
 	/**
-	 * @brief Generic rendering class, automatically configures for a backend
+	 * @brief Generic rendering class
 	*/
 	class renderer : public interfaces::iframe_object {
 	public:
@@ -40,21 +40,9 @@ namespace aderite {
 		void render();
 
 		/**
-		 * @brief Sets the render target, if nullptr then the default target will become active
-		 * @param target New render target
-		*/
-		void set_output(fbo* target);
-
-		/**
 		 * @brief Resets the renderer output to be the window
 		*/
 		virtual void reset_output() = 0;
-
-		/**
-		 * @brief Set the default output target, if nullptr then the default will be the window
-		 * @param target New default target
-		*/
-		void set_default_target(fbo* target);
 
 		/**
 		 * @brief Switches the target to the default target
@@ -65,6 +53,17 @@ namespace aderite {
 		 * @brief Returns true if renderer ready to render
 		*/
 		virtual bool ready() = 0;
+
+		/**
+		 * @brief Returns the final output framebuffer which can then be rendered to texture in editors, call display_frame()
+		 * to render the content of the framebuffer to screen
+		*/
+		bgfx::FrameBufferHandle get_output();
+
+		/**
+		 * @brief Renders output framebuffer to screen
+		*/
+		void display_frame();
 	private:
 		/**
 		 * @brief Creates a instance of the renderer depending on the rendering backend
@@ -76,7 +75,7 @@ namespace aderite {
 		friend class engine;
 
 		window* m_attached_to = nullptr;
-		fbo* m_default_target = nullptr;
+		bgfx::FrameBufferHandle m_output = BGFX_INVALID_HANDLE;
 	};
 
 }

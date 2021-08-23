@@ -8,6 +8,7 @@
 #include "aderite/utility/log.hpp"
 #include "aderite/core/assets/asset_manager.hpp"
 #include "aderite/core/threading/threader.hpp"
+#include "aderite/core/assets/object/shader_asset.hpp"
 
 namespace aderite {
 	namespace asset {
@@ -37,6 +38,10 @@ namespace aderite {
 			}
 
 			return true;
+		}
+
+		void material_asset::fill_draw_call(rendering::draw_call* dc) {
+			static_cast<asset::shader_asset*>(m_info.Shader)->fill_draw_call(dc);
 		}
 
 		void material_asset::load() {

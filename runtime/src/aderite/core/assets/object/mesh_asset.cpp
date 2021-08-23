@@ -8,13 +8,14 @@
 #include "aderite/utility/macros.hpp"
 #include "aderite/core/assets/asset_manager.hpp"
 #include "aderite/core/assets/sources/mesh_source.hpp"
-#include "aderite/core/rendering/vao/vao.hpp"
 #include "aderite/core/threading/threader.hpp"
+#include "aderite/core/rendering/draw_call.hpp"
 
 namespace aderite {
 	namespace asset {
 		mesh_asset::~mesh_asset() {
-			if (m_vao) {
+			// TODO: Check for either handle to be valid
+			if (bgfx::isValid(m_vbh)) {
 				LOG_WARN("Deleting a loaded mesh asset {0}", get_name());
 			}
 		}
@@ -28,15 +29,9 @@ namespace aderite {
 			out << YAML::Key << "Source" << YAML::Value << m_info.SourceFile;
 			
 			// Layout
-			out << YAML::Key << "Layout";
-			out << YAML::BeginMap; // Layout
-
-			out << YAML::Key << "HasPosition" << YAML::Value << m_info.Layout.HasPosition;
-			out << YAML::Key << "IsPositionStatic" << YAML::Value << m_info.Layout.IsPositionStatic;
-			out << YAML::Key << "PositionStart" << YAML::Value << m_info.Layout.PositionStart;
-			out << YAML::Key << "HasIndices" << YAML::Value << m_info.Layout.HasIndices;
-
-			out << YAML::EndMap; // Layout
+			out << YAML::Key << "HasPosition" << YAML::Value << m_info.HasPosition;
+			out << YAML::Key << "IsStatic" << YAML::Value << m_info.IsStatic;
+			out << YAML::Key << "HasIndices" << YAML::Value << m_info.HasIndices;
 
 			return true;
 		}
@@ -48,12 +43,16 @@ namespace aderite {
 				m_info.SourceFile = data["Source"].as<std::string>();
 			}
 
-			m_info.Layout.HasPosition = data["Layout"]["HasPosition"].as<bool>();
-			m_info.Layout.HasIndices = data["Layout"]["HasIndices"].as<bool>();
-			m_info.Layout.IsPositionStatic = data["Layout"]["IsPositionStatic"].as<bool>();
-			m_info.Layout.PositionStart = data["Layout"]["PositionStart"].as<size_t>();
+			m_info.HasPosition = data["HasPosition"].as<bool>();
+			m_info.HasIndices = data["HasIndices"].as<bool>();
+			m_info.IsStatic = data["IsStatic"].as<bool>();
 
 			return true;
+		}
+
+		void mesh_asset::fill_draw_call(rendering::draw_call* dc) {
+			dc->VBO = m_vbh;
+			dc->IBO = m_ibh;
 		}
 
 		void mesh_asset::load() {
@@ -63,23 +62,79 @@ namespace aderite {
 				unload();
 			}
 
-			m_vao = vao::create();
+			// Create layout
+			bgfx::VertexLayout layout;
+			layout.begin();
 
-			m_info.Layout.IndicesData = m_source->indices_data().data();
-			m_info.Layout.IndicesCount = m_source->indices_data().size();
-			m_info.Layout.PositionData = m_source->position_data().data();
-			m_info.Layout.PositionCount = m_source->position_data().size();
+			if (m_info.HasPosition) {
+				layout.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
+			}
 
-			m_vao->change_layout(m_info.Layout);
+			layout.end();
+
+			// Create handles
+			if (m_info.IsStatic) {
+				struct PosColorVertex
+				{
+					float x;
+					float y;
+					float z;
+				};
+
+				static PosColorVertex cubeVertices[] =
+				{
+					{-1.0f,  1.0f,  1.0f },
+					{ 1.0f,  1.0f,  1.0f },
+					{-1.0f, -1.0f,  1.0f },
+					{ 1.0f, -1.0f,  1.0f },
+					{-1.0f,  1.0f, -1.0f },
+					{ 1.0f,  1.0f, -1.0f },
+					{-1.0f, -1.0f, -1.0f },
+					{ 1.0f, -1.0f, -1.0f },
+				};
+
+				static const uint16_t cubeTriList[] =
+				{
+					0, 1, 2,
+					1, 3, 2,
+					4, 6, 5,
+					5, 6, 7,
+					0, 2, 4,
+					4, 2, 6,
+					1, 5, 3,
+					5, 7, 3,
+					0, 4, 1,
+					4, 5, 1,
+					2, 3, 6,
+					6, 3, 7,
+				};
+
+				auto& positionData = m_source->position_data();
+				auto& indicesData = m_source->indices_data();
+				m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(positionData.data(), sizeof(float) * positionData.size()), layout);
+				m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(indicesData.data(), sizeof(unsigned int) * indicesData.size()));
+				//m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), layout);
+				//m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
+			}
+			else {
+				LOG_ERROR("Unimplemented dynamic mesh");
+				m_being_prepared = false;
+				return;
+			}
 
 			m_being_prepared = false;
 		}
 
 		void mesh_asset::unload() {
 			ASSERT_RENDER_THREAD;
-			if (m_vao != nullptr) {
-				delete m_vao;
-				m_vao = nullptr;
+			if (bgfx::isValid(m_vbh)) {
+				bgfx::destroy(m_vbh);
+				m_vbh = BGFX_INVALID_HANDLE;
+			}
+
+			if (bgfx::isValid(m_ibh)) {
+				bgfx::destroy(m_ibh);
+				m_ibh = BGFX_INVALID_HANDLE;
 			}
 
 			if (m_source != nullptr) {
@@ -93,7 +148,7 @@ namespace aderite {
 		}
 
 		bool mesh_asset::is_loaded() {
-			return m_vao != nullptr;
+			return bgfx::isValid(m_vbh);
 		}
 
 		mesh_asset::mesh_asset(const std::string& name)
@@ -118,11 +173,11 @@ namespace aderite {
 		void mesh_asset::prepare_load() {
 			// Load sources
 			engine::get_asset_manager()->load_mesh_source(m_info.SourceFile, [&](asset::mesh_source* source) {
-				if (m_info.Layout.HasPosition) {
+				if (m_info.HasPosition) {
 					source->request_position_data();
 				}
-
-				if (m_info.Layout.HasIndices) {
+				
+				if (m_info.HasIndices) {
 					source->request_indices_data();
 				}
 

@@ -52,6 +52,12 @@ namespace aderite {
 			m_logger->error(std::forward<Args>(args)...);
 		}
 
+		template<typename... Args>
+		void critical(Args &&...args)
+		{
+			m_logger->critical(std::forward<Args>(args)...);
+		}
+
 		// END OF SPDLOG INTERFACE
 	private:
 		logger() {}
@@ -78,3 +84,6 @@ namespace aderite {
 
 // RED
 #define LOG_ERROR(...)       ::aderite::logger::get()->error(__VA_ARGS__)
+
+// FATAL
+#define LOG_FATAL(...)		 ::aderite::logger::get()->critical(__VA_ARGS__)

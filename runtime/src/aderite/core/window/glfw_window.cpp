@@ -1,6 +1,11 @@
 #include "glfw_window.hpp"
 
-#include "GLFW/glfw3.h"
+// TODO: Config
+#define GLFW_EXPOSE_NATIVE_WIN32
+
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+
 #include "aderite/utility/log.hpp"
 
 namespace aderite {
@@ -21,6 +26,10 @@ namespace aderite {
 
 			void glfw_window::set_title(const std::string& title) {
 				glfwSetWindowTitle(m_window, title.c_str());
+			}
+
+			void* glfw_window::get_native_handle() {
+				return glfwGetWin32Window(m_window);
 			}
 
 			void glfw_window::destroy() {

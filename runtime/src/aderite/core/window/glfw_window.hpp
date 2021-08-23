@@ -21,11 +21,11 @@ namespace aderite {
 				void end_frame() override;
 				virtual glm::vec2 get_size() override;
 				virtual void set_title(const std::string& title) override;
+				virtual void* get_native_handle() override;
 
-				GLFWwindow* get_handle() {
+				GLFWwindow* get_glfw_window() {
 					return m_window;
 				}
-
 			private:
 				glfw_window(create_options options);
 				friend class window_manager;

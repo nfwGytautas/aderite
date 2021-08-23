@@ -1,16 +1,16 @@
 #pragma once
 
+#include <bgfx/bgfx.h>
+#include "aderite/interfaces/irenderable.hpp"
 #include "aderite/core/assets/asset.hpp"
 
 namespace aderite {
-	class shader;
-
 	namespace asset {
 
 		/**
 		 * @brief Shader asset implementation
 		*/
-		class shader_asset : public asset_base {
+		class shader_asset : public asset_base, public interfaces::irenderable {
 		public:
 			/**
 			 * @brief Editable fields of the asset, this information is stored inside the asset file
@@ -45,17 +45,9 @@ namespace aderite {
 			fields& get_fields_mutable() {
 				return m_info;
 			}
-			
-			shader* object() {
-				return m_shader;
-			}
 
-			/**
-			 * Returns the underlying asset object
-			 */
-			shader* operator->() const {
-				return m_shader;
-			}
+			// Inherited via irenderable
+			virtual void fill_draw_call(rendering::draw_call* dc) override;
 		protected:
 			shader_asset(const std::string& name);
 			shader_asset(const std::string& name, const fields& info);
@@ -65,11 +57,13 @@ namespace aderite {
 
 			friend class asset_manager;
 		private:
-			shader* m_shader = nullptr;
+			// Handles
+			bgfx::ProgramHandle m_handle = BGFX_INVALID_HANDLE;
+
 			fields m_info = {};
 
-			std::string m_vertexSource = "";
-			std::string m_fragmentSource = "";
+			std::vector<unsigned char> m_vertexSource;
+			std::vector<unsigned char> m_fragmentSource;
 
 			bool m_being_prepared = false;
 		};

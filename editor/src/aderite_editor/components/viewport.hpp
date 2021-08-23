@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bgfx/bgfx.h>
 #include "aderite_editor/components/base_component.hpp"
 
 namespace aderite {
@@ -19,7 +20,8 @@ namespace aderite {
 				virtual void render() override;
 
 			private:
-				fbo* m_viewport;
+				bgfx::FrameBufferHandle m_fbh;
+				bgfx::TextureHandle m_fbth;
 			};
 
 		}

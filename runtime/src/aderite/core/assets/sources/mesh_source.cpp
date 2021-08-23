@@ -3,12 +3,43 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <assimp/Logger.hpp>
+#include <assimp/LogStream.hpp>
+#include <assimp/DefaultLogger.hpp>
 
 #include "aderite/config.hpp"
 #include "aderite/utility/log.hpp"
 
 namespace aderite {
 	namespace asset {
+
+		class AssimpLogSource : public Assimp::Logger
+		{
+			virtual void OnDebug(const char* message) override {
+				LOG_DEBUG("ASSIMP: {0}", message);
+			}
+			virtual void OnInfo(const char* message) override {
+				LOG_TRACE("ASSIMP: {0}", message);
+			}
+			virtual void OnWarn(const char* message) override {
+				LOG_WARN("ASSIMP: {0}", message);
+			}
+			virtual void OnError(const char* message) override {
+				LOG_ERROR("ASSIMP: {0}", message);
+			}
+			virtual bool attachStream(Assimp::LogStream* pStream, unsigned int severity) override {
+				delete pStream;
+				return true;
+			}
+			virtual bool detachStream(Assimp::LogStream* pStream, unsigned int severity = Debugging | Err | Warn | Info) override {
+				return false;
+			}
+			virtual void OnVerboseDebug(const char* message) override {}
+		};
+
+		static AssimpLogSource g_LogSource;
+		static bool g_LoggerSet = false;
+
 		mesh_source::mesh_source(std::filesystem::path file) 
 			: m_file(file)
 		{
@@ -16,6 +47,11 @@ namespace aderite {
 				LOG_WARN("Tried to load {0} but such file doesn't exist", m_file.string());
 				m_error = load_error::BAD_FILE;
 				return;
+			}
+
+			if (!g_LoggerSet) {
+				Assimp::DefaultLogger::set(&g_LogSource);
+				g_LoggerSet = true;
 			}
 		}
 
@@ -28,6 +64,9 @@ namespace aderite {
 		}
 
 		void mesh_source::load() {
+			m_positionBuffer.clear();
+			m_indicesBuffer.clear();
+
 			// Check if there were any errors up until now
 			if (m_error != load_error::NONE) {
 				return;
@@ -37,19 +76,14 @@ namespace aderite {
 			unsigned int flags = 0;
 
 			// Default flags
-			flags = flags |
-				aiProcess_OptimizeGraph |
-				aiProcess_OptimizeMeshes |
-				aiProcess_Triangulate |
-				aiProcess_GenNormals |
-				aiProcess_JoinIdenticalVertices;
-
-			// If the platform is windows then additional processing is needed
-#if DX_BACKEND == 1
-			flags = flags |
-				aiProcess_MakeLeftHanded |
-				aiProcess_FlipWindingOrder;
-#endif
+			flags = aiProcessPreset_TargetRealtime_Quality |                     // some optimizations and safety checks
+				aiProcess_OptimizeMeshes |                                   // minimize number of meshes
+				aiProcess_PreTransformVertices |                             // apply node matrices
+				aiProcess_FixInfacingNormals | aiProcess_TransformUVCoords | // apply UV transformations
+				//aiProcess_FlipWindingOrder   | // we cull clock-wise, keep the default CCW winding order
+				aiProcess_MakeLeftHanded | // we set GLM_FORCE_LEFT_HANDED and use left-handed bx matrix functions
+				aiProcess_FlipUVs |
+				0;
 
 			//if (calculateTangents)
 			//{
@@ -87,11 +121,9 @@ namespace aderite {
 			// Reserve memory for the mesh
 			if (m_willLoadPosition) {
 				m_positionBuffer.reserve(mesh->mNumVertices * 3);
-			}
 
-			// Load vertices
-			for (unsigned int verticeIdx = 0; verticeIdx < mesh->mNumVertices; verticeIdx++) {
-				if (m_willLoadPosition) {
+				// Load vertices
+				for (unsigned int verticeIdx = 0; verticeIdx < mesh->mNumVertices; verticeIdx++) {
 					m_positionBuffer.push_back(mesh->mVertices[verticeIdx].x);
 					m_positionBuffer.push_back(mesh->mVertices[verticeIdx].y);
 					m_positionBuffer.push_back(mesh->mVertices[verticeIdx].z);

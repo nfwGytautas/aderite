@@ -17,20 +17,6 @@ constexpr char* EngineVersion = "0.0.0";
 
 
 // ---------------------------------
-// RENDERING BACKENDS
-// Only one rendering backend can be active at a time
-// 0 - Disabled
-// 1 - Active
-// ---------------------------------
-
-// Is aderite using OpenGL backend (Uses GLAD)
-#define GL_BACKEND 1
-
-// Is aderite using DirectX backend
-#define DX_BACKEND 0
-
-
-// ---------------------------------
 // RESOURCE SAVE TYPE
 // Only one save type can be active at a time
 // 0 - Disabled

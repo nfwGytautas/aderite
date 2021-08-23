@@ -92,6 +92,14 @@ namespace aderite {
 			std::string load_txt_file(const std::string& path);
 
 			/**
+			 * @brief Loads the specified file contents into a buffer, guaranteed by the asset manager to be
+			 * thread safe
+			 * @param path Path to file
+			 * @return Buffer containing the contents of the file
+			*/
+			std::vector<unsigned char> load_bin_file(const std::string& path);
+
+			/**
 			 * @brief Loads a mesh file asynchronously and invokes the callback function once loaded, the caller must 
 			 * take ownership of the mesh_source
 			 * @param path File to load

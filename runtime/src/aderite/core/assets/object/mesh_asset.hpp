@@ -1,25 +1,26 @@
 #pragma once
 
+#include <bgfx/bgfx.h>
+#include "aderite/interfaces/irenderable.hpp"
 #include "aderite/core/assets/asset.hpp"
-#include "aderite/core/rendering/vao/vao_layout.hpp"
 
 namespace aderite {
-	class vao;
-
 	namespace asset {
 		class mesh_source;
 
 		/**
-		 * @brief Mesh asset implementation
+		 * @brief Mesh asset implementation, it just wraps around base mesh object, to provide interface with asset manager
 		*/
-		class mesh_asset : public asset_base {
+		class mesh_asset : public asset_base, public interfaces::irenderable {
 		public:
 			/**
 			 * @brief Editable fields of the asset, this information is stored inside the asset file
 			*/
 			struct fields {
 				std::string SourceFile = "";
-				vao_layout Layout;
+				bool IsStatic = false;
+				bool HasPosition = true;
+				bool HasIndices = true;
 			};
 		public:
 			~mesh_asset();
@@ -48,16 +49,8 @@ namespace aderite {
 				return m_info;
 			}
 
-			vao* object() {
-				return m_vao;
-			}
-
-			/**
-			 * Returns the underlying asset object
-			 */
-			vao* operator->() const {
-				return m_vao;
-			}
+			// Inherited via irenderable
+			virtual void fill_draw_call(rendering::draw_call* dc) override;
 		protected:
 			mesh_asset(const std::string& name);
 			mesh_asset(const std::string& name, const fields& info);
@@ -67,7 +60,10 @@ namespace aderite {
 
 			friend class asset_manager;
 		private:
-			vao* m_vao = nullptr;
+			// BGFX resource handles
+			bgfx::VertexBufferHandle m_vbh = BGFX_INVALID_HANDLE;
+			bgfx::IndexBufferHandle m_ibh = BGFX_INVALID_HANDLE;
+
 			fields m_info = {};
 			asset::mesh_source* m_source = nullptr;
 

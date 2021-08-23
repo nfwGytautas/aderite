@@ -13,6 +13,11 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace aderite {
+	namespace asset {
+		class mesh_asset;
+		class material_asset;
+	}
+
 	namespace scene {
 		namespace components {
 
@@ -56,12 +61,12 @@ namespace aderite {
 			 * @brief Mesh rendering component, this component contains information needed for rendering meshes
 			*/
 			struct mesh_renderer {
-				asset::asset_base* MeshHandle = nullptr;
-				asset::asset_base* MaterialHandle = nullptr;
+				asset::mesh_asset* MeshHandle = nullptr;
+				asset::material_asset* MaterialHandle = nullptr;
 
 				mesh_renderer() = default;
 				mesh_renderer(const mesh_renderer&) = default;
-				mesh_renderer(asset::asset_base* mesh, asset::asset_base* material)
+				mesh_renderer(asset::mesh_asset* mesh, asset::material_asset* material)
 					: MeshHandle(mesh), MaterialHandle(material) {}
 			};
 

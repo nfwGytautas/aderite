@@ -1,11 +1,13 @@
 #include "windows_editor.hpp"
 
-#include <glad/glad.h>
+#include <bgfx/bgfx.h>
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
+//#include <imgui/imgui_impl_opengl3.h>
 #include <pfd/portable-file-dialogs.h>
+
+#include "aderite_editor/backends/bgfx/backend_bgfx.hpp"
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
@@ -102,10 +104,35 @@ namespace aderite {
 
 			// Setup Platform/Renderer backends
 			GLFWwindow* handle = static_cast<aderite::window_backend::glfw::glfw_window*>(
-				aderite::engine::get()->get_window_manager()->get_current_active_window())->get_handle();
+				aderite::engine::get()->get_window_manager()->get_current_active_window())->get_glfw_window();
 
-			ImGui_ImplGlfw_InitForOpenGL(handle, true);
-			ImGui_ImplOpenGL3_Init("#version 150");
+			switch (bgfx::getRendererType()) {
+			case bgfx::RendererType::OpenGL:
+			{
+				ImGui_ImplGlfw_InitForOpenGL(handle, true);
+				break;
+			}
+			case bgfx::RendererType::Vulkan:
+			{
+				ImGui_ImplGlfw_InitForVulkan(handle, true);
+				break;
+			}
+			case bgfx::RendererType::Direct3D11:
+			{
+				ImGui_ImplGlfw_InitForOther(handle, true);
+				break;
+			}
+			case bgfx::RendererType::Direct3D12:
+			{
+				ImGui_ImplGlfw_InitForOther(handle, true);
+				break;
+			}
+			default:
+				LOG_ERROR("Non supported bgfx renderer type {0} for editor", bgfx::getRendererType());
+				engine::get()->request_exit();
+				return;
+			}
+			ImGui_Implbgfx_Init(255);
 
 			// Components
 			m_toolbar->init();
@@ -125,7 +152,7 @@ namespace aderite {
 			ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 			// Start the Dear ImGui frame
-			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_Implbgfx_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 
@@ -210,7 +237,7 @@ namespace aderite {
 			// Clear previous output
 			engine::get_renderer()->clear();
 			// Render to the window
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			ImGui_Implbgfx_RenderDrawLists(ImGui::GetDrawData());
 
 			// Exit
 			auto activeWindow = aderite::engine::get()->get_window_manager()->get_current_active_window();
@@ -237,7 +264,7 @@ namespace aderite {
 			m_asset_editor->shutdown();
 
 			// Shutdown ImGui
-			ImGui_ImplOpenGL3_Shutdown();
+			ImGui_Implbgfx_Shutdown();
 			ImGui_ImplGlfw_Shutdown();
 			ImGui::DestroyContext();
 

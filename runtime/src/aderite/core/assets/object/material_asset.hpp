@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bgfx/bgfx.h>
+#include "aderite/interfaces/irenderable.hpp"
 #include "aderite/core/assets/asset.hpp"
 
 namespace aderite {
@@ -8,7 +10,7 @@ namespace aderite {
 		/**
 		 * @brief Material asset implementation
 		*/
-		class material_asset : public asset_base {
+		class material_asset : public asset_base, public interfaces::irenderable {
 		public:
 			/**
 			 * @brief Editable fields of the asset, this information is stored inside the asset file
@@ -42,6 +44,9 @@ namespace aderite {
 			fields& get_fields_mutable() {
 				return m_info;
 			}
+
+			// Inherited via irenderable
+			virtual void fill_draw_call(rendering::draw_call* r) override;
 		protected:
 			material_asset(const std::string& name);
 			material_asset(const std::string& name, const fields& info);

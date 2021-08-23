@@ -19,14 +19,18 @@ endif()
 target_include_directories(aderite_runtime PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 target_include_directories(aderite_runtime PUBLIC ${PROJECT_SOURCE_DIR}/dependencies/include/)
 
+# BGFX compat include
+# TODO: Add check for compiler and platform
+target_include_directories(aderite_runtime PUBLIC ${PROJECT_SOURCE_DIR}/dependencies/include/compat/msvc/)
+
 set_property(TARGET aderite_runtime PROPERTY CXX_STANDARD 17)
 set_property(TARGET aderite_runtime PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Libraries to link
 if(BUILD_RELEASE)
-    target_link_libraries(aderite_runtime PUBLIC spdlog yaml-cpp assimp-vc142-mt zlibstatic)
+    target_link_libraries(aderite_runtime PUBLIC spdlog yaml-cpp assimp-vc142-mt zlibstatic bgfxRelease bimgRelease bxRelease)
 else()
-	target_link_libraries(aderite_runtime PUBLIC spdlogd yaml-cppd assimp-vc142-mtd zlibstaticd)
+	target_link_libraries(aderite_runtime PUBLIC spdlogd yaml-cppd assimp-vc142-mtd zlibstaticd bgfxDebug bimgDebug bxDebug)
 endif()
 
 # Same name

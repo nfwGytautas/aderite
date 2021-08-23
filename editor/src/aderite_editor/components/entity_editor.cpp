@@ -7,6 +7,8 @@
 #include "aderite/utility/log.hpp"
 #include "aderite/core/scene/scene.hpp"
 #include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/assets/object/mesh_asset.hpp" 
+#include "aderite/core/assets/object/material_asset.hpp" 
 #include "aderite_editor/core/state.hpp"
 #include "aderite_editor/core/config.hpp"
 #include "aderite_editor/core/event_router.hpp"
@@ -229,7 +231,7 @@ namespace aderite {
 								std::string name = static_cast<const char*>(payload->Data);
 								asset::asset_base* asset = engine::get_asset_manager()->get_by_name(name);
 								if (asset) {
-									c.MeshHandle = asset;
+									c.MeshHandle = static_cast<asset::mesh_asset*>(asset);
 								}
 							}
 
@@ -255,7 +257,7 @@ namespace aderite {
 								std::string name = static_cast<const char*>(payload->Data);
 								asset::asset_base* asset = engine::get_asset_manager()->get_by_name(name);
 								if (asset) {
-									c.MaterialHandle = asset;
+									c.MaterialHandle = static_cast<asset::material_asset*>(asset);
 								}
 							}
 

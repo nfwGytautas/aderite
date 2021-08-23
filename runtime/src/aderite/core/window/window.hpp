@@ -43,6 +43,12 @@ namespace aderite {
 		virtual void set_title(const std::string& title) = 0;
 
 		/**
+		 * @brief Returns the native platform window handle
+		 * @return Type depends on the platform for example on windows this will be a HWND
+		*/
+		virtual void* get_native_handle() = 0;
+
+		/**
 		 * @brief Returns the size of the window
 		 * @return GLM vector 2D (width, height)
 		*/

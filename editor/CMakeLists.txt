@@ -20,6 +20,10 @@ target_include_directories(aderite_editor PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
 target_include_directories(aderite_editor PUBLIC ${PROJECT_SOURCE_DIR}/dependencies/include/)
 target_include_directories(aderite_editor PUBLIC ${PROJECT_SOURCE_DIR}/runtime/src/)
 
+# BGFX compat include
+# TODO: Add check for compiler and platform
+target_include_directories(aderite_editor PUBLIC ${PROJECT_SOURCE_DIR}/dependencies/include/compat/msvc/)
+
 set_property(TARGET aderite_editor PROPERTY CXX_STANDARD 17)
 set_property(TARGET aderite_editor PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 

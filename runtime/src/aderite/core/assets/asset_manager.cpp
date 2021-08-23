@@ -101,6 +101,25 @@ namespace aderite {
 			return fstream.str();
 		}
 
+		std::vector<unsigned char> asset_manager::load_bin_file(const std::string& path) {
+			// TODO: Error check
+			std::ifstream file(get_raw_dir() / path, std::ios::binary);
+			file.unsetf(std::ios::skipws);
+
+			std::streampos fileSize;
+			file.seekg(0, std::ios::end);
+			fileSize = file.tellg();
+			file.seekg(0, std::ios::beg);
+
+			std::vector<unsigned char> vec;
+			vec.reserve(fileSize);
+			vec.insert(vec.begin(),
+				std::istream_iterator<unsigned char>(file),
+				std::istream_iterator<unsigned char>());
+
+			return vec;
+		}
+
 		void asset_manager::load_mesh_source(const std::string& path, std::function<void(mesh_source*)> loaded) {
 			LOG_WARN("load_mesh_source not async yet");
 			loaded(new mesh_source(get_raw_dir() / path));
