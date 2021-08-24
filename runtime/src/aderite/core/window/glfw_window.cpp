@@ -29,6 +29,7 @@ namespace aderite {
 			}
 
 			void* glfw_window::get_native_handle() {
+				// TODO: Detect platform
 				return glfwGetWin32Window(m_window);
 			}
 
@@ -37,7 +38,7 @@ namespace aderite {
 			}
 
 			void glfw_window::make_active() {
-				glfwMakeContextCurrent(m_window);
+				//glfwMakeContextCurrent(m_window);
 				window::make_active();
 			}
 
@@ -48,8 +49,10 @@ namespace aderite {
 			void glfw_window::end_frame() {
 				closed = glfwWindowShouldClose(m_window);
 
+				// BGFX should take care of this
+				
 				// Swap buffer
-				glfwSwapBuffers(m_window);
+				//glfwSwapBuffers(m_window);
 			}
 
 			bool init_backend(window_manager* ws) {
@@ -63,17 +66,21 @@ namespace aderite {
 					return false;
 				}
 
-#ifndef __DEBUG
-				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+				glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-				// Debug mode for OpenGL
-				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
-#else
-				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-#endif
-
-				glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-				glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+				// BGFX should take care of the context
+				// 
+//#ifndef __DEBUG
+//				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+//
+//				// Debug mode for OpenGL
+//				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
+//#else
+//				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//#endif
+//
+//				glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+//				glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 				return true;
 			}

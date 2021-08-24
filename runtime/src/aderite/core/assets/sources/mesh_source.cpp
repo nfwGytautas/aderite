@@ -6,6 +6,7 @@
 #include <assimp/Logger.hpp>
 #include <assimp/LogStream.hpp>
 #include <assimp/DefaultLogger.hpp>
+#include <assimp/Exporter.hpp>
 
 #include "aderite/config.hpp"
 #include "aderite/utility/log.hpp"
@@ -134,7 +135,7 @@ namespace aderite {
 			if (m_willLoadIndices) {
 				for (unsigned int faceIdx = 0; faceIdx < mesh->mNumFaces; faceIdx++) {
 					// Get the face
-					aiFace face = mesh->mFaces[faceIdx];
+					aiFace& face = mesh->mFaces[faceIdx];
 
 					// Add the indices of the face to the vector
 					for (unsigned int indiceIdx = 0; indiceIdx < face.mNumIndices; indiceIdx++) {

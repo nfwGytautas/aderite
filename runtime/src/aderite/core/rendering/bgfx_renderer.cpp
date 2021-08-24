@@ -60,7 +60,7 @@ namespace aderite {
 
 			bgfx::Init bgfxInit;
 			bgfxInit.platformData = pd;
-			bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a renderer.
+			bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a backend
 			bgfxInit.resolution.width = wnd->get_size().x;
 			bgfxInit.resolution.height = wnd->get_size().y;
 			bgfxInit.resolution.reset = BGFX_RESET_VSYNC;

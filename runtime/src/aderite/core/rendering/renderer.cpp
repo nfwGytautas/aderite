@@ -143,7 +143,7 @@ namespace aderite {
 			}
 
 			// Default render state
-			bgfx::setState(BGFX_STATE_DEFAULT);
+			//bgfx::setState(BGFX_STATE_DEFAULT);
 
 			// Submit draw call
 			bgfx::submit(0, dc.Shader);

@@ -74,47 +74,10 @@ namespace aderite {
 
 			// Create handles
 			if (m_info.IsStatic) {
-				struct PosColorVertex
-				{
-					float x;
-					float y;
-					float z;
-				};
-
-				static PosColorVertex cubeVertices[] =
-				{
-					{-1.0f,  1.0f,  1.0f },
-					{ 1.0f,  1.0f,  1.0f },
-					{-1.0f, -1.0f,  1.0f },
-					{ 1.0f, -1.0f,  1.0f },
-					{-1.0f,  1.0f, -1.0f },
-					{ 1.0f,  1.0f, -1.0f },
-					{-1.0f, -1.0f, -1.0f },
-					{ 1.0f, -1.0f, -1.0f },
-				};
-
-				static const uint16_t cubeTriList[] =
-				{
-					0, 1, 2,
-					1, 3, 2,
-					4, 6, 5,
-					5, 6, 7,
-					0, 2, 4,
-					4, 2, 6,
-					1, 5, 3,
-					5, 7, 3,
-					0, 4, 1,
-					4, 5, 1,
-					2, 3, 6,
-					6, 3, 7,
-				};
-
 				auto& positionData = m_source->position_data();
 				auto& indicesData = m_source->indices_data();
 				m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(positionData.data(), sizeof(float) * positionData.size()), layout);
-				m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(indicesData.data(), sizeof(unsigned int) * indicesData.size()));
-				//m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(cubeVertices, sizeof(cubeVertices)), layout);
-				//m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(cubeTriList, sizeof(cubeTriList)));
+				m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
 			}
 			else {
 				LOG_ERROR("Unimplemented dynamic mesh");
