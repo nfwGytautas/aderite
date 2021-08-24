@@ -1,27 +1,22 @@
 #pragma once
 
-namespace aderite {
-	class renderer;
+#include "aderite/utility/macros.hpp"
+#include "aderite/rendering/Forward.hpp"
 
-	namespace rendering {
-		class draw_call;
-	}
+ADERITE_INTERFACE_NAMESPACE_BEGIN
 
-	namespace interfaces {
+/**
+ * @brief Generic renderable item interface
+*/
+class IRenderable {
+public:
+	virtual ~IRenderable() {}
 
-		/**
-		 * @brief Generic renderable item interface
-		*/
-		class irenderable {
-		public:
-			virtual ~irenderable() {}
+	/**
+	 * @brief Fills draw call object information from the object state
+	 * @param dc Draw call instance
+	*/
+	virtual void fill_draw_call(rendering::DrawCall* dc) = 0;
+};
 
-			/**
-			 * @brief Fills draw call object information from the object state
-			 * @param dc Draw call instance
-			*/
-			virtual void fill_draw_call(rendering::draw_call* dc) = 0;
-		};
-
-	}
-}
+ADERITE_INTERFACE_NAMESPACE_END

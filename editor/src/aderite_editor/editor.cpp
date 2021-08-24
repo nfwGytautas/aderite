@@ -5,7 +5,7 @@
 
 namespace aderite {
 	namespace editor {
-		interfaces::iaderite_editor* create_editor(int argc, char** argv) {
+		interfaces::IEngineMiddleware* create_editor(int argc, char** argv) {
 #if defined(WIN32) || defined(_WIN32)
 			return new windows_editor(argc, argv);
 #endif

@@ -5,7 +5,7 @@
 
 namespace aderite {
 	namespace asset {
-		class asset_base;
+		class Asset;
 	}
 
 	namespace editor {
@@ -25,7 +25,7 @@ namespace aderite {
 				/**
 				 * @brief Sets the current active asset
 				*/
-				void set_active_asset(asset::asset_base* asset);
+				void set_active_asset(asset::Asset* asset);
 
 			private:
 				/**
@@ -43,7 +43,7 @@ namespace aderite {
 				*/
 				void mesh_render();
 			private:
-				asset::asset_base* m_selected_asset = nullptr;
+				asset::Asset* m_selected_asset = nullptr;
 			};
 
 		}

@@ -5,10 +5,10 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
-#include "aderite/core/scene/scene.hpp"
-#include "aderite/core/assets/asset_manager.hpp"
-#include "aderite/core/assets/object/mesh_asset.hpp" 
-#include "aderite/core/assets/object/material_asset.hpp" 
+#include "aderite/core/scene/Scene.hpp"
+#include "aderite/core/assets/AssetManager.hpp"
+#include "aderite/core/assets/object/MeshAsset.hpp" 
+#include "aderite/core/assets/object/MaterialAsset.hpp" 
 #include "aderite_editor/core/state.hpp"
 #include "aderite_editor/core/config.hpp"
 #include "aderite_editor/core/event_router.hpp"
@@ -19,11 +19,11 @@ namespace aderite {
 		namespace components {
 
 			template<typename Component, typename RenderFn>
-			bool render_component(const std::string& label, ::aderite::scene::entity& entity, RenderFn renderFn) {
+			bool render_component(const std::string& label, ::aderite::scene::Entity& Entity, RenderFn renderFn) {
 				const ImGuiTreeNodeFlags treeNodeFlags = /*ImGuiTreeNodeFlags_DefaultOpen | */ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
 
-				if (entity.has_component<Component>()) {
-					auto& component = entity.get_component<Component>();
+				if (Entity.has_component<Component>()) {
+					auto& component = Entity.get_component<Component>();
 					ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
@@ -53,7 +53,7 @@ namespace aderite {
 					}
 
 					if (removeComponent) {
-						entity.remove_component<Component>();
+						Entity.remove_component<Component>();
 					}
 
 					return true;
@@ -145,28 +145,28 @@ namespace aderite {
 					return;
 				}
 
-				if (m_selected_entity == scene::entity::null()) {
-					ImGui::Text("Select entity from scene view");
+				if (m_selected_entity == scene::Entity::null()) {
+					ImGui::Text("Select Entity from scene view");
 					ImGui::End();
 					return;
 				}
 
 				// Component list
-				if (!m_selected_entity.has_component<::aderite::scene::components::meta>()) {
+				if (!m_selected_entity.has_component<::aderite::scene::components::MetaComponent>()) {
 					// This shouldn't happen
-					LOG_ERROR("Entity without meta information selected");
-					state::Sink->selected_entity_changed(scene::entity::null());
+					LOG_ERROR("Entity without MetaComponent information selected");
+					state::Sink->selected_entity_changed(scene::Entity::null());
 					ImGui::End();
 					return;
 				}
 
 				// Meta
-				auto& meta = m_selected_entity.get_component<::aderite::scene::components::meta>();
+				auto& MetaComponent = m_selected_entity.get_component<::aderite::scene::components::MetaComponent>();
 
 				if (!renaming) {
-					if (ImGui::Selectable(meta.Name.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
+					if (ImGui::Selectable(MetaComponent.Name.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
 						if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-							rename_value = meta.Name;
+							rename_value = MetaComponent.Name;
 							renaming = true;
 							appearing = true;
 						}
@@ -178,7 +178,7 @@ namespace aderite {
 
 						if (!rename_value.empty()) {
 							// TODO: Check for name conflict
-							meta.Name = rename_value;
+							MetaComponent.Name = rename_value;
 						}
 					}
 
@@ -195,8 +195,8 @@ namespace aderite {
 				// Other components as tree nodes that can be collapsed
 				ImGui::Separator();
 
-				bool hasTransform = render_component<::aderite::scene::components::transform>("Transform", m_selected_entity, 
-					[](::aderite::scene::components::transform& c) {
+				bool hasTransform = render_component<::aderite::scene::components::TransformComponent>("Transform", m_selected_entity, 
+					[](::aderite::scene::components::TransformComponent& c) {
 					DrawVec3Control("Position", c.Position);
 					glm::vec3 rotation = glm::degrees(c.Rotation);
 					DrawVec3Control("Rotation", rotation);
@@ -204,8 +204,8 @@ namespace aderite {
 					DrawVec3Control("Scale", c.Scale, 1.0f);
 				});
 
-				bool hasMeshRenderer = render_component<::aderite::scene::components::mesh_renderer>("Mesh renderer", m_selected_entity,
-					[](::aderite::scene::components::mesh_renderer& c) {
+				bool hasMeshRenderer = render_component<::aderite::scene::components::MeshRendererComponent>("Mesh Renderer", m_selected_entity,
+					[](::aderite::scene::components::MeshRendererComponent& c) {
 
 					if (ImGui::BeginTable("MeshRendererTable", 2)) {
 						ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 70.0f);
@@ -220,7 +220,7 @@ namespace aderite {
 						ImGui::PushItemWidth(-FLT_MIN);
 
 						if (c.MeshHandle) {
-							ImGui::Button(c.MeshHandle->get_name().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+							ImGui::Button(c.MeshHandle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
 						}
 						else {
 							ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
@@ -229,9 +229,9 @@ namespace aderite {
 						if (ImGui::BeginDragDropTarget()) {
 							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DDPayloadID_MeshAsset)) {
 								std::string name = static_cast<const char*>(payload->Data);
-								asset::asset_base* asset = engine::get_asset_manager()->get_by_name(name);
+								asset::Asset* asset = engine::get_AssetManager()->get_by_name(name);
 								if (asset) {
-									c.MeshHandle = static_cast<asset::mesh_asset*>(asset);
+									c.MeshHandle = static_cast<asset::MeshAsset*>(asset);
 								}
 							}
 
@@ -246,7 +246,7 @@ namespace aderite {
 						ImGui::PushItemWidth(-FLT_MIN);
 
 						if (c.MaterialHandle) {
-							ImGui::Button(c.MaterialHandle->get_name().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+							ImGui::Button(c.MaterialHandle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
 						}
 						else {
 							ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
@@ -255,9 +255,9 @@ namespace aderite {
 						if (ImGui::BeginDragDropTarget()) {
 							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DDPayloadID_MaterialAsset)) {
 								std::string name = static_cast<const char*>(payload->Data);
-								asset::asset_base* asset = engine::get_asset_manager()->get_by_name(name);
+								asset::Asset* asset = engine::get_AssetManager()->get_by_name(name);
 								if (asset) {
-									c.MaterialHandle = static_cast<asset::material_asset*>(asset);
+									c.MaterialHandle = static_cast<asset::MaterialAsset*>(asset);
 								}
 							}
 
@@ -281,12 +281,12 @@ namespace aderite {
 
 					if (ImGui::BeginPopup("AddComponent")) {
 						if (!hasTransform && ImGui::MenuItem("Transform")) {
-							m_selected_entity.add_component<::aderite::scene::components::transform>();
+							m_selected_entity.add_component<::aderite::scene::components::TransformComponent>();
 							ImGui::CloseCurrentPopup();
 						}
 
-						if (!hasMeshRenderer && ImGui::MenuItem("Mesh renderer")) {
-							m_selected_entity.add_component<::aderite::scene::components::mesh_renderer>();
+						if (!hasMeshRenderer && ImGui::MenuItem("Mesh Renderer")) {
+							m_selected_entity.add_component<::aderite::scene::components::MeshRendererComponent>();
 							ImGui::CloseCurrentPopup();
 						}
 
@@ -297,8 +297,8 @@ namespace aderite {
 				ImGui::End();
 			}
 
-			void entity_editor::set_active_entity(scene::entity& entity) {
-				m_selected_entity = entity;
+			void entity_editor::set_active_entity(scene::Entity& Entity) {
+				m_selected_entity = Entity;
 			}
 
 		}

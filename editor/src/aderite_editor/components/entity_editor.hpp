@@ -1,6 +1,6 @@
 #pragma once
 
-#include "aderite/core/scene/entity.hpp"
+#include "aderite/core/scene/Entity.hpp"
 #include "aderite_editor/components/base_component.hpp"
 
 namespace aderite {
@@ -8,7 +8,7 @@ namespace aderite {
 		namespace components {
 
 			/**
-			 * @brief Entity editor is a component that allows to edit specific selected entity information
+			 * @brief Entity editor is a component that allows to edit specific selected Entity information
 			*/
 			class entity_editor : public base_component {
 			public:
@@ -19,11 +19,11 @@ namespace aderite {
 				virtual void render() override;
 
 				/**
-				 * @brief Sets the current active entity
+				 * @brief Sets the current active Entity
 				*/
-				void set_active_entity(scene::entity& entity);
+				void set_active_entity(scene::Entity& Entity);
 			private:
-				scene::entity m_selected_entity = scene::entity::null();
+				scene::Entity m_selected_entity = scene::Entity::null();
 			};
 
 		}

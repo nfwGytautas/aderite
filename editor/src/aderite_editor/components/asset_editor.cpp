@@ -4,12 +4,12 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
-#include "aderite/core/scene/scene.hpp"
+#include "aderite/core/scene/Scene.hpp"
 #include "aderite/core/assets/asset.hpp"
-#include "aderite/core/assets/asset_manager.hpp"
+#include "aderite/core/assets/AssetManager.hpp"
 #include "aderite/core/assets/object/shader_asset.hpp"
-#include "aderite/core/assets/object/material_asset.hpp"
-#include "aderite/core/assets/object/mesh_asset.hpp"
+#include "aderite/core/assets/object/MaterialAsset.hpp"
+#include "aderite/core/assets/object/MeshAsset.hpp"
 #include "aderite_editor/core/state.hpp"
 #include "aderite_editor/core/config.hpp"
 #include "aderite_editor/components/component_utility.hpp"
@@ -43,9 +43,9 @@ namespace aderite {
 				}
 
 				if (!renaming) {
-					if (ImGui::Selectable(m_selected_asset->get_name().c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
+					if (ImGui::Selectable(m_selected_asset->getName().c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
 						if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-							rename_value = m_selected_asset->get_name();
+							rename_value = m_selected_asset->getName();
 							renaming = true;
 							appearing = true;
 						}
@@ -56,9 +56,9 @@ namespace aderite {
 						renaming = false;
 
 						if (!rename_value.empty()) {
-							if (engine::get_asset_manager()->has(rename_value)) {
-								std::filesystem::rename(engine::get_asset_manager()->get_res_dir() / m_selected_asset->get_name(), engine::get_asset_manager()->get_res_dir() / rename_value);
-								m_selected_asset->set_name(rename_value);
+							if (engine::get_AssetManager()->has(rename_value)) {
+								std::filesystem::rename(engine::get_AssetManager()->get_res_dir() / m_selected_asset->getName(), engine::get_AssetManager()->get_res_dir() / rename_value);
+								m_selected_asset->setName(rename_value);
 							}
 						}
 					}
@@ -78,17 +78,17 @@ namespace aderite {
 
 				// Type switch
 				switch (m_selected_asset->type()) {
-				case asset::asset_type::SHADER:
+				case asset::AssetType::SHADER:
 				{
 					shader_render();
 					break;
 				}
-				case asset::asset_type::MATERIAL:
+				case asset::AssetType::MATERIAL:
 				{
 					material_render();
 					break;
 				}
-				case asset::asset_type::MESH:
+				case asset::AssetType::MESH:
 				{
 					mesh_render();
 					break;
@@ -100,7 +100,7 @@ namespace aderite {
 				ImGui::End();
 			}
 
-			void asset_editor::set_active_asset(asset::asset_base* asset) {
+			void asset_editor::set_active_asset(asset::Asset* asset) {
 				m_selected_asset = asset;
 			}
 			
@@ -143,7 +143,7 @@ namespace aderite {
 						if (!file.empty()) {
 							// Copy file to Raw
 							std::filesystem::path filename = std::filesystem::path(file).filename();
-							std::filesystem::path raw_dst = utility::make_unique_path(engine::get_asset_manager()->get_raw_dir() / filename);
+							std::filesystem::path raw_dst = utility::make_unique_path(engine::get_AssetManager()->get_raw_dir() / filename);
 							std::filesystem::copy_file(file, raw_dst);
 							finfo.VertexPath = raw_dst.filename().string();
 						}
@@ -177,7 +177,7 @@ namespace aderite {
 
 						if (!file.empty()) {
 							std::filesystem::path filename = std::filesystem::path(file).filename();
-							std::filesystem::path raw_dst = utility::make_unique_path(engine::get_asset_manager()->get_raw_dir() / filename);
+							std::filesystem::path raw_dst = utility::make_unique_path(engine::get_AssetManager()->get_raw_dir() / filename);
 							std::filesystem::copy_file(file, raw_dst);
 							finfo.FragmentPath = raw_dst.filename().string();
 						}
@@ -190,8 +190,8 @@ namespace aderite {
 			}
 
 			void asset_editor::material_render() {
-				asset::material_asset* material = static_cast<asset::material_asset*>(m_selected_asset);
-				asset::material_asset::fields& finfo = material->get_fields_mutable();
+				asset::MaterialAsset* material = static_cast<asset::MaterialAsset*>(m_selected_asset);
+				asset::MaterialAsset::fields& finfo = material->get_fields_mutable();
 
 				if (ImGui::BeginTable("MaterialEditTable", 2)) {
 					ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
@@ -206,7 +206,7 @@ namespace aderite {
 					ImGui::PushItemWidth(-FLT_MIN);
 
 					if (finfo.Shader != nullptr) {
-						ImGui::Button(finfo.Shader->get_name().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+						ImGui::Button(finfo.Shader->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
 					}
 					else {
 						ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
@@ -215,7 +215,7 @@ namespace aderite {
 					if (ImGui::BeginDragDropTarget()) {
 						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DDPayloadID_ShaderAsset)) {
 							std::string name = static_cast<const char*>(payload->Data);
-							asset::asset_base* asset = engine::get_asset_manager()->get_by_name(name);
+							asset::Asset* asset = engine::get_AssetManager()->get_by_name(name);
 							if (asset) {
 								finfo.Shader = asset;
 							}
@@ -229,8 +229,8 @@ namespace aderite {
 			}
 
 			void asset_editor::mesh_render() {
-				asset::mesh_asset* mesh = static_cast<asset::mesh_asset*>(m_selected_asset);
-				asset::mesh_asset::fields& finfo = mesh->get_fields_mutable();
+				asset::MeshAsset* mesh = static_cast<asset::MeshAsset*>(m_selected_asset);
+				asset::MeshAsset::fields& finfo = mesh->get_fields_mutable();
 
 				if (ImGui::BeginTable("MeshEditTable", 3)) {
 					ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
@@ -266,7 +266,7 @@ namespace aderite {
 
 						if (!file.empty()) {
 							std::filesystem::path filename = std::filesystem::path(file).filename();
-							std::filesystem::path raw_dst = utility::make_unique_path(engine::get_asset_manager()->get_raw_dir() / filename);
+							std::filesystem::path raw_dst = utility::make_unique_path(engine::get_AssetManager()->get_raw_dir() / filename);
 							std::filesystem::copy_file(file, raw_dst);
 							finfo.SourceFile = raw_dst.filename().string();
 						}

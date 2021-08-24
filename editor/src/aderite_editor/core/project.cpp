@@ -6,8 +6,8 @@
 
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
-#include "aderite/core/scene/scene_manager.hpp"
-#include "aderite/core/scene/scene.hpp"
+#include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/Scene.hpp"
 
 // Previous versions:
 //	- 2021_07_31r1
@@ -43,8 +43,8 @@ namespace aderite {
 			out << YAML::Key << "Type" << YAML::Value << "Project";
 
 			if (engine::get_scene_manager()->current_scene()) {
-				out << YAML::Key << "ActiveScene" << YAML::Value << engine::get_scene_manager()->current_scene()->get_name();
-				m_active_scene = engine::get_scene_manager()->current_scene()->get_name();
+				out << YAML::Key << "ActiveScene" << YAML::Value << engine::get_scene_manager()->current_scene()->getName();
+				m_active_scene = engine::get_scene_manager()->current_scene()->getName();
 			}
 
 			out << YAML::EndMap; // Root
@@ -101,7 +101,7 @@ namespace aderite {
 			if (engine::get_scene_manager()->current_scene() == nullptr && !m_active_scene.empty()) {
 				save();
 			}
-			else if (engine::get_scene_manager()->current_scene()->get_name() != m_active_scene) {
+			else if (engine::get_scene_manager()->current_scene()->getName() != m_active_scene) {
 				save();
 			}
 		}

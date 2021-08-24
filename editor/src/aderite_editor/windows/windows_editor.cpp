@@ -12,11 +12,11 @@
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
 #include "aderite/utility/macros.hpp"
-#include "aderite/core/rendering/renderer.hpp"
-#include "aderite/core/assets/asset_manager.hpp"
-#include "aderite/core/scene/scene_manager.hpp"
+#include "aderite/core/rendering/Renderer.hpp"
+#include "aderite/core/assets/AssetManager.hpp"
+#include "aderite/core/scene/SceneManager.hpp"
 #include "aderite/core/threading/threader.hpp"
-#include "aderite/core/window/window_manager.hpp"
+#include "aderite/core/window/WindowManager.hpp"
 #include "aderite/core/window/window.hpp"
 #include "aderite/core/window/glfw_window.hpp"
 #include "aderite_editor/core/state.hpp"
@@ -128,7 +128,7 @@ namespace aderite {
 				break;
 			}
 			default:
-				LOG_ERROR("Non supported bgfx renderer type {0} for editor", bgfx::getRendererType());
+				LOG_ERROR("Non supported bgfx Renderer type {0} for editor", bgfx::getRendererType());
 				engine::get()->request_exit();
 				return;
 			}
@@ -232,7 +232,7 @@ namespace aderite {
 			ImGui::Render();
 
 
-			// Reset the renderer output, this binds the renderer window and sets the viewport
+			// Reset the Renderer output, this binds the Renderer window and sets the viewport
 			engine::get_renderer()->reset_output();
 			// Clear previous output
 			engine::get_renderer()->clear();
@@ -271,9 +271,9 @@ namespace aderite {
 			delete state::Project;
 		}
 
-		void windows_editor::selected_entity_changed(scene::entity& entity) {
-			m_scene_view->set_active_entity(entity);
-			m_property_editor->set_active_entity(entity);
+		void windows_editor::selected_entity_changed(scene::Entity& Entity) {
+			m_scene_view->set_active_entity(Entity);
+			m_property_editor->set_active_entity(Entity);
 		}
 
 		void windows_editor::new_project(const std::string& dir, const std::string& name) {
@@ -287,7 +287,7 @@ namespace aderite {
 			state::Project = new project(dir, name);
 
 			// Setup asset manager
-			engine::get_asset_manager()->set_root_dir(state::Project->get_root_dir().string());
+			engine::get_AssetManager()->set_root_dir(state::Project->get_root_dir().string());
 		}
 
 		void windows_editor::save_project() {
@@ -297,8 +297,8 @@ namespace aderite {
 			}
 
 			// Save all assets
-			for (asset::asset_base* asset : *engine::get_asset_manager()) {
-				engine::get_asset_manager()->save_asset(asset);
+			for (asset::Asset* asset : *engine::get_AssetManager()) {
+				engine::get_AssetManager()->save_asset(asset);
 			}
 
 			state::Project->save();
@@ -313,7 +313,7 @@ namespace aderite {
 			}
 
 			// Unload all assets
-			engine::get_asset_manager()->unload_all();
+			engine::get_AssetManager()->unload_all();
 
 			// TODO: Verify all assets are in their name directories
 
@@ -322,7 +322,7 @@ namespace aderite {
 			m_editor_window->set_title(state::Project->get_name());
 
 			// Setup asset manager
-			engine::get_asset_manager()->set_root_dir(state::Project->get_root_dir().string());
+			engine::get_AssetManager()->set_root_dir(state::Project->get_root_dir().string());
 
 			// Now load every single asset metadata.
 			// This is done to be able to move and rename them. By loading them on demand it overcomplicates other
@@ -331,7 +331,7 @@ namespace aderite {
 			// rather surprising considering that this isn't a professional game engine. Also note that all these assets are loaded
 			// only in editor configuration in runtime this is optimized out and only those assets that are needed are read.
 
-			for (auto& path : std::filesystem::recursive_directory_iterator(engine::get_asset_manager()->get_res_dir())) {
+			for (auto& path : std::filesystem::recursive_directory_iterator(engine::get_AssetManager()->get_res_dir())) {
 				// Ignore directories
 				if (path.is_directory()) {
 					continue;
@@ -339,21 +339,21 @@ namespace aderite {
 
 				// Make sure to ignore Raw directory, cause it contains not assets, but their actual data, since Raw directory is one
 				// big directory of data, the check is as simple as checking for parent to not be Raw/
-				if (path.path().parent_path() == engine::get_asset_manager()->get_raw_dir()) {
+				if (path.path().parent_path() == engine::get_AssetManager()->get_raw_dir()) {
 					continue;
 				}
 
 				// Now read the asset
-				std::filesystem::path p = std::filesystem::relative(path.path(), engine::get_asset_manager()->get_res_dir());
+				std::filesystem::path p = std::filesystem::relative(path.path(), engine::get_AssetManager()->get_res_dir());
 
 				// get_or_read, because read will log a warning, since some assets might have already been loaded by others
-				engine::get_asset_manager()->get_or_read(p.string());
+				engine::get_AssetManager()->get_or_read(p.string());
 			}
 			
 
 			if (!state::Project->get_active_scene().empty()) {
 				// Should have been read
-				scene::scene* s = static_cast<scene::scene*>(engine::get_asset_manager()->get_by_name(state::Project->get_active_scene()));
+				scene::scene* s = static_cast<scene::scene*>(engine::get_AssetManager()->get_by_name(state::Project->get_active_scene()));
 				engine::get_scene_manager()->set_active(s);
 			}
 		}
@@ -362,21 +362,21 @@ namespace aderite {
 			LOG_TRACE("New scene with name: {0}", name);
 
 			// TODO: Error screen or special naming
-			scene::scene* s = engine::get_asset_manager()->create<scene::scene>(name);
+			scene::scene* s = engine::get_AssetManager()->create<scene::scene>(name);
 			engine::get_scene_manager()->set_active(s);
 		}
 
 		void windows_editor::create_entity(const std::string& name) {
 			scene::scene* s = engine::get_scene_manager()->current_scene();
-			s->create_entity(::aderite::scene::components::meta(name));
+			s->create_entity(::aderite::scene::components::MetaComponent(name));
 		}
 
-		void windows_editor::destroy_entity(const scene::entity& entity) {
+		void windows_editor::destroy_entity(const scene::Entity& Entity) {
 			scene::scene* s = engine::get_scene_manager()->current_scene();
-			s->destroy_entity(entity);
+			s->destroy_entity(Entity);
 		}
 
-		void windows_editor::selected_asset_changed(asset::asset_base* asset) {
+		void windows_editor::selected_asset_changed(asset::Asset* asset) {
 			m_asset_editor->set_active_asset(asset);
 		}
 

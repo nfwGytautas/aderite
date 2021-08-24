@@ -10,6 +10,6 @@ namespace aderite {
 		 * @param argv Console arguments
 		 * @return Editor instance, call delete when done
 		*/
-		interfaces::iaderite_editor* create_editor(int argc, char** argv);
+		interfaces::IEngineMiddleware* create_editor(int argc, char** argv);
 	}
 }

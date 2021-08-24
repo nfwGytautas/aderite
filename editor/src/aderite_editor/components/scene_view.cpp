@@ -6,7 +6,7 @@
 #include "aderite/utility/log.hpp"
 #include "aderite/utility/random.hpp"
 #include "aderite/core/scene/scene.hpp"
-#include "aderite/core/scene/scene_manager.hpp"
+#include "aderite/core/scene/SceneManager.hpp"
 #include "aderite_editor/core/state.hpp"
 #include "aderite_editor/core/event_router.hpp"
 #include "aderite_editor/components/modals.hpp"
@@ -24,8 +24,8 @@ namespace aderite {
 				delete m_text_modal;
 			}
 
-			void scene_view::set_active_entity(scene::entity& entity) {
-				m_selected_entity = entity;
+			void scene_view::set_active_entity(scene::Entity& Entity) {
+				m_selected_entity = Entity;
 			}
 
 			void scene_view::render() {
@@ -47,7 +47,7 @@ namespace aderite {
 				// Context menu
 				if (ImGui::BeginPopupContextWindow())
 				{
-					if (ImGui::Selectable("Create entity")) {
+					if (ImGui::Selectable("Create Entity")) {
 						// TODO: Make sure that this is actually unique
 						state::Sink->create_entity(random::generate_string(16));
 					}
@@ -55,29 +55,29 @@ namespace aderite {
 					ImGui::EndPopup();
 				}
 
-				ImGui::Text("%s", currentScene->get_name().c_str());
+				ImGui::Text("%s", currentScene->getName().c_str());
 
 				// Actual tree
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 2));
-				for (auto [entity, meta] : currentScene->get_entity_registry().view<::aderite::scene::components::meta>().each()) {
-					scene::entity e = scene::entity(entity, currentScene);
+				for (auto [Entity, MetaComponent] : currentScene->get_entity_registry().view<::aderite::scene::components::MetaComponent>().each()) {
+					scene::Entity e = scene::Entity(Entity, currentScene);
 
 					// Tree node
 					bool has_children = false;
 
 					if (has_children) {
-						// If this is a entity with children
+						// If this is a Entity with children
 						// TODO: TreeNodeEx (ImGui Selectable Node example)
 					}
 					else {
-						// If this is a single entity
+						// If this is a single Entity
 						ImGuiTreeNodeFlags node_flags = base_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
-						if (m_selected_entity == entity) {
+						if (m_selected_entity == Entity) {
 							node_flags |= ImGuiTreeNodeFlags_Selected;
 						}
 
-						ImGui::TreeNodeEx((void*)(intptr_t)(uint32_t)entity, node_flags, "%s", meta.Name.c_str());
+						ImGui::TreeNodeEx((void*)(intptr_t)(uint32_t)Entity, node_flags, "%s", MetaComponent.Name.c_str());
 
 						if (ImGui::IsItemClicked()) {
 							state::Sink->selected_entity_changed(e);

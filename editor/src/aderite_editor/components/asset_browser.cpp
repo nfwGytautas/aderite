@@ -5,10 +5,10 @@
 #include "aderite/aderite.hpp"
 #include "aderite/utility/log.hpp"
 #include "aderite/core/assets/object/shader_asset.hpp"
-#include "aderite/core/assets/object/material_asset.hpp"
-#include "aderite/core/assets/object/mesh_asset.hpp"
-#include "aderite/core/assets/asset_manager.hpp"
-#include "aderite/core/scene/scene_manager.hpp"
+#include "aderite/core/assets/object/MaterialAsset.hpp"
+#include "aderite/core/assets/object/MeshAsset.hpp"
+#include "aderite/core/assets/AssetManager.hpp"
+#include "aderite/core/scene/SceneManager.hpp"
 #include "aderite_editor/core/config.hpp"
 #include "aderite_editor/core/state.hpp"
 #include "aderite_editor/core/project.hpp"
@@ -24,11 +24,11 @@ namespace aderite {
 			T* create_item(const std::filesystem::path& root, const std::string& default_name, const std::string& extension) {
 				std::filesystem::path path_name = root / (default_name + extension);
 				int it = 1;
-				while (engine::get_asset_manager()->has(path_name.string())) {
+				while (engine::get_AssetManager()->has(path_name.string())) {
 					path_name = root / (default_name + " " + std::to_string(it) + extension);
 				}
-				T* s = engine::get_asset_manager()->create<T>(path_name.string());
-				engine::get_asset_manager()->save_asset(s);
+				T* s = engine::get_AssetManager()->create<T>(path_name.string());
+				engine::get_AssetManager()->save_asset(s);
 				return s;
 			}
 
@@ -58,23 +58,23 @@ namespace aderite {
 					const char* asset_name = static_cast<const char*>(payload->Data);
 
 					// Get asset from manager and move it to the new directory
-					asset::asset_base* asset = engine::get_asset_manager()->get_by_name(asset_name);
+					asset::Asset* asset = engine::get_AssetManager()->get_by_name(asset_name);
 					if (asset) {
-						std::string oldPath = asset->get_name();
-						std::string newPath = (path / std::filesystem::path(asset->get_name()).filename()).string();
+						std::string oldPath = asset->getName();
+						std::string newPath = (path / std::filesystem::path(asset->getName()).filename()).string();
 
-						if (newPath == asset->get_name()) {
+						if (newPath == asset->getName()) {
 							return false;
 						}
 
-						if (engine::get_asset_manager()->has(newPath)) {
+						if (engine::get_AssetManager()->has(newPath)) {
 							LOG_WARN("Asset {0} already exists", newPath);
 							return false;
 						}
 
-						asset->set_name(newPath);
+						asset->setName(newPath);
 
-						if (asset->type() == asset::asset_type::SCENE) {
+						if (asset->type() == asset::AssetType::SCENE) {
 							if (state::Project->get_active_scene() == asset_name) {
 								state::Sink->save_project();
 							}
@@ -82,8 +82,8 @@ namespace aderite {
 
 						// Move file
 						std::filesystem::rename(
-							engine::get_asset_manager()->get_res_dir() / oldPath, 
-							engine::get_asset_manager()->get_res_dir() / newPath);
+							engine::get_AssetManager()->get_res_dir() / oldPath, 
+							engine::get_AssetManager()->get_res_dir() / newPath);
 
 						return true;
 					}
@@ -121,7 +121,7 @@ namespace aderite {
 					return;
 				}
 
-				auto& res_dir = engine::get_asset_manager()->get_res_dir();
+				auto& res_dir = engine::get_AssetManager()->get_res_dir();
 
 				if (!std::filesystem::exists(res_dir)) {
 					ImGui::End();
@@ -206,15 +206,15 @@ namespace aderite {
 
 						if (ImGui::BeginMenu("New asset")) {
 							if (ImGui::MenuItem("Scene")) {
-								create_item<scene::scene>(m_current_dir, "New scene", ".scene");
+								create_item<scene::Scene>(m_current_dir, "New scene", ".scene");
 							}
 
 							if (ImGui::MenuItem("Mesh")) {
-								create_item<asset::mesh_asset>(m_current_dir, "New mesh", ".mesh");
+								create_item<asset::MeshAsset>(m_current_dir, "New mesh", ".mesh");
 							}
 
 							if (ImGui::MenuItem("Material")) {
-								create_item<asset::material_asset>(m_current_dir, "New material", ".material");
+								create_item<asset::MaterialAsset>(m_current_dir, "New material", ".material");
 							}
 
 							if (ImGui::MenuItem("Shader")) {
@@ -240,7 +240,7 @@ namespace aderite {
 						if (ImGui::BeginPopupContextItem())
 						{
 							std::filesystem::path path = res_dir / node.Name;
-							if (path != engine::get_asset_manager()->get_raw_dir()) {
+							if (path != engine::get_AssetManager()->get_raw_dir()) {
 								if (ImGui::MenuItem("Delete")) {
 									// TODO: Confirmation window
 									delete_item(path);
@@ -315,7 +315,7 @@ namespace aderite {
 							{
 								// TODO: Error check
 								// TODO: Move to editor?
-								scene::scene* scene = static_cast<scene::scene*>(engine::get_asset_manager()->get_by_name(node.Name));
+								scene::Scene* scene = static_cast<scene::Scene*>(engine::get_AssetManager()->get_by_name(node.Name));
 								engine::get_scene_manager()->set_active(scene);
 								break;
 							}
@@ -323,7 +323,7 @@ namespace aderite {
 							case fs_node_type::SHADER:
 							case fs_node_type::MESH:
 							{
-								state::Sink->selected_asset_changed(engine::get_asset_manager()->get_by_name(node.Name));
+								state::Sink->selected_asset_changed(engine::get_AssetManager()->get_by_name(node.Name));
 								break;
 							}
 							}
@@ -368,7 +368,7 @@ namespace aderite {
 
 			void asset_browser::resolve_fs() {
 				// Get all files in the current directory
-				auto& res_dir = engine::get_asset_manager()->get_res_dir();
+				auto& res_dir = engine::get_AssetManager()->get_res_dir();
 				m_it_nodes.clear();
 				m_path_nodes.clear();
 
@@ -410,7 +410,7 @@ namespace aderite {
 			}
 
 			void asset_browser::delete_item(std::filesystem::path path) {
-				if (path == engine::get_asset_manager()->get_raw_dir()) {
+				if (path == engine::get_AssetManager()->get_raw_dir()) {
 					LOG_WARN("Tried to delete Raw directory");
 					return;
 				}
@@ -425,7 +425,7 @@ namespace aderite {
 				else {
 					// Remove from asset manager
 					// No need to check, cause all assets are read on editors
-					engine::get_asset_manager()->unload(std::filesystem::relative(path, engine::get_asset_manager()->get_res_dir()).string());
+					engine::get_AssetManager()->unload(std::filesystem::relative(path, engine::get_AssetManager()->get_res_dir()).string());
 				}
 
 				// TODO: Check error
@@ -433,7 +433,7 @@ namespace aderite {
 			}
 
 			void asset_browser::rename_item(const std::string& prevName, const std::string& newName) {
-				auto& res_dir = engine::get_asset_manager()->get_res_dir();
+				auto& res_dir = engine::get_AssetManager()->get_res_dir();
 				std::filesystem::path parent = std::filesystem::path(prevName).parent_path();
 				std::string fullNewName = (parent / newName).string();
 
@@ -454,9 +454,9 @@ namespace aderite {
 
 					// Rename all assets
 					for (auto& path : entries) {
-						asset::asset_base* asset = engine::get_asset_manager()->get_by_name((prevName / path).string());
+						asset::Asset* asset = engine::get_AssetManager()->get_by_name((prevName / path).string());
 						if (asset != nullptr) {
-							asset->set_name((fullNewName / path).string());
+							asset->setName((fullNewName / path).string());
 
 							// Validate project state
 							state::Project->validate();
@@ -465,10 +465,10 @@ namespace aderite {
 				}
 				else {
 					// This is most likely unnecessary
-					if (!engine::get_asset_manager()->has(fullNewName)) {
-						asset::asset_base* asset = engine::get_asset_manager()->get_by_name(prevName);
+					if (!engine::get_AssetManager()->has(fullNewName)) {
+						asset::Asset* asset = engine::get_AssetManager()->get_by_name(prevName);
 						if (asset != nullptr) {
-							asset->set_name(fullNewName);
+							asset->setName(fullNewName);
 							
 							// Move file
 							std::filesystem::rename(res_dir / prevName, res_dir / fullNewName);

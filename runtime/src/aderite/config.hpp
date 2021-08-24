@@ -12,7 +12,7 @@ constexpr char* EngineVersion = "0.0.0";
 // 1 - Active
 // ---------------------------------
 
-// Is aderite using GLFW backend
+// Is aderite using GLFW backend, for Windows/Linux/MacOS platforms
 #define GLFW_BACKEND 1
 
 

@@ -1,12 +1,10 @@
 #include "aderite.hpp"
 
 #include "aderite/utility/log.hpp"
-#include "aderite/core/threading/thread_invoke.hpp"
-#include "aderite/core/window/window_manager.hpp"
-#include "aderite/core/rendering/renderer.hpp"
-#include "aderite/core/threading/threader.hpp"
-#include "aderite/core/assets/asset_manager.hpp"
-#include "aderite/core/scene/scene_manager.hpp"
+#include "aderite/window/WindowManager.hpp"
+#include "aderite/rendering/Renderer.hpp"
+#include "aderite/asset/AssetManager.hpp"
+#include "aderite/scene/SceneManager.hpp"
 
 
 #if EDITOR_ENABLED == 1
@@ -29,41 +27,34 @@ namespace aderite {
 		LOG_TRACE("Initializing aderite engine");
 		LOG_DEBUG("Version: {0}", EngineVersion);
 
-		// Threader
-		m_threader = new thread::threader();
-		if (!m_threader->init()) {
-			LOG_ERROR("Aborting aderite initialization");
-			return false;
-		}
-
 		// Asset manager
-		m_asset_manager = new asset::asset_manager();
-		if (!m_asset_manager->init()) {
+		m_AssetManager = new asset::AssetManager();
+		if (!m_AssetManager->init()) {
 			LOG_ERROR("Aborting aderite initialization");
 			return false;
 		}
 
 		// Scene manager
-		m_scene_manager = new scene::scene_manager();
+		m_scene_manager = new scene::SceneManager();
 		if (!m_scene_manager->init()) {
 			LOG_ERROR("Aborting aderite initialization");
 			return false;
 		}
 
 		// Window system
-		m_window_manager = new window_manager();
+		m_window_manager = new window::WindowManager();
 		if (!m_window_manager->init()) {
 			LOG_ERROR("Aborting aderite initialization");
 			return false;
 		}
 
 		// Renderer
-		m_renderer = renderer::create_instance(); // Delay init for until there are windows
+		m_renderer = rendering::Renderer::create_instance(); // Delay init for until there are windows
 
 		// At this point there should be an editor if it is enabled
 #if EDITOR_ENABLED == 1
 		if (!m_editor) {
-			attach_editor(new null_editor());
+			attach_editor(new interfaces::null_editor());
 		}
 #endif
 
@@ -76,12 +67,12 @@ namespace aderite {
 		EDITOR_ACTION(on_runtime_shutdown);
 
 		m_scene_manager->shutdown();
-		m_asset_manager->shutdown();
+		m_AssetManager->shutdown();
 		m_renderer->shutdown();
 		m_window_manager->shutdown();
 
 		delete m_scene_manager;
-		delete m_asset_manager;
+		delete m_AssetManager;
 		delete m_renderer;
 		delete m_window_manager;
 		delete m_editor;
@@ -122,7 +113,7 @@ namespace aderite {
 		EDITOR_ACTION(on_renderer_initialized);
 	}
 
-	void engine::attach_editor(interfaces::iaderite_editor* editor) {
+	void engine::attach_editor(interfaces::IEngineMiddleware* editor) {
 		if (m_editor != nullptr) {
 			delete m_editor;
 		}

@@ -32,14 +32,14 @@ namespace aderite {
 			// ============================================================================
 			// Start of event routes, look at ievent_sink interface for more information
 			// ============================================================================
-			virtual void selected_entity_changed(scene::entity& entity) override;
+			virtual void selected_entity_changed(scene::Entity& Entity) override;
 			virtual void new_project(const std::string& dir, const std::string& name) override;
 			virtual void save_project() override;
 			virtual void load_project(const std::string& path) override;
 			virtual void new_scene(const std::string& name) override;
 			virtual void create_entity(const std::string& name) override;
-			virtual void destroy_entity(const scene::entity& entity) override;
-			virtual void selected_asset_changed(asset::asset_base* asset) override;
+			virtual void destroy_entity(const scene::Entity& Entity) override;
+			virtual void selected_asset_changed(asset::Asset* asset) override;
 		private:
 			window* m_editor_window = nullptr;
 
