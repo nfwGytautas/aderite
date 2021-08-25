@@ -1,7 +1,7 @@
 #pragma once
 
 #include <entt/Entity/registry.hpp>
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 #include "aderite/scene/Forward.hpp"
 
 ADERITE_SCENE_NAMESPACE_BEGIN
@@ -20,8 +20,8 @@ public:
 	 * @brief Add component to Entity
 	*/
 	template<typename T, typename... Args>
-	T& add_component(Args&&... args) {
-		T& component = m_scene->get_entity_registry().emplace<T>(m_handle, std::forward<Args>(args)...);
+	T& addComponent(Args&&... args) {
+		T& component = m_scene->getEntityRegistry().emplace<T>(m_handle, std::forward<Args>(args)...);
 		return component;
 	}
 
@@ -29,24 +29,24 @@ public:
 	 * @brief Get component
 	*/
 	template<typename T>
-	T& get_component() {
-		return m_scene->get_entity_registry().get<T>(m_handle);
+	T& getComponent() {
+		return m_scene->getEntityRegistry().get<T>(m_handle);
 	}
 
 	/**
 	 * @brief Check if Entity has component
 	*/
 	template<typename T>
-	bool has_component() {
-		return m_scene->get_entity_registry().try_get<T>(m_handle) != nullptr;
+	bool hasComponent() {
+		return m_scene->getEntityRegistry().try_get<T>(m_handle) != nullptr;
 	}
 
 	/**
 	 * @brief Remove component
 	*/
 	template<typename T>
-	void remove_component() {
-		m_scene->get_entity_registry().remove<T>(m_handle);
+	void removeComponent() {
+		m_scene->getEntityRegistry().remove<T>(m_handle);
 	}
 
 	operator bool() const { return m_handle != entt::null; }
@@ -64,7 +64,7 @@ public:
 	/**
 	 * @brief Returns the Scene that the Entity belongs to
 	*/
-	Scene* get_scene() const {
+	Scene* getScene() const {
 		return m_scene;
 	}
 

@@ -4,7 +4,7 @@
  * @brief This file is used to define forward declarations for all component types
 */
 
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 
 ADERITE_COMPONENTS_NAMESPACE_BEGIN
 

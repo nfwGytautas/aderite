@@ -3,7 +3,7 @@
 #include <functional>
 #include <filesystem>
 #include <vector>
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 
 ADERITE_ASSET_NAMESPACE_BEGIN
 
@@ -15,7 +15,7 @@ public:
 	/**
 	 * @brief Possible load errors
 	*/
-	enum class load_error : size_t {
+	enum class LoadError : size_t {
 		// Loaded successfully
 		NONE,
 
@@ -35,12 +35,12 @@ public:
 	/**
 	 * @brief Will flag the source to load position data
 	*/
-	void request_position_data();
+	void requestPositionData();
 
 	/**
 	 * @brief Will flag the source to load indices data
 	*/
-	void request_indices_data();
+	void requestIndicesData();
 
 	/**
 	 * @brief Loads data into source buffers
@@ -50,23 +50,23 @@ public:
 	/**
 	 * @brief Position data buffer
 	*/
-	std::vector<float>& position_data();
+	std::vector<float>& getPositionData();
 
 	/**
 	 * @brief Indices data buffer
 	*/
-	std::vector<unsigned int>& indices_data();
+	std::vector<unsigned int>& getIndicesData();
 
 	/**
 	 * @brief Return load error
 	*/
-	load_error error() const {
+	LoadError error() const {
 		return m_error;
 	}
 
 private:
 	std::filesystem::path m_file;
-	load_error m_error = load_error::NONE;
+	LoadError m_error = LoadError::NONE;
 
 	bool m_willLoadPosition = false;
 	bool m_willLoadIndices = false;

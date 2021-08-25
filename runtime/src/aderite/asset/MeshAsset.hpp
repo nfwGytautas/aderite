@@ -1,9 +1,9 @@
 #pragma once
 
 #include <bgfx/bgfx.h>
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 #include "aderite/interfaces/IRenderable.hpp"
-#include "aderite/asset/asset.hpp"
+#include "aderite/asset/Asset.hpp"
 #include "aderite/asset/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 
@@ -29,29 +29,29 @@ public:
 	virtual AssetType type() const override;
 	virtual bool isInGroup(AssetGroup group) const override;
 
-	virtual void prepare_load() override;
-	virtual bool ready_to_load() override;
+	virtual void prepareLoad() override;
+	virtual bool isReadyToLoad() override;
 	virtual void load() override;
 	virtual void unload() override;
-	virtual bool is_preparing() override;
-	virtual bool is_loaded() override;
+	virtual bool isPreparing() override;
+	virtual bool isLoaded() override;
 
 	/**
 	 * @brief Returns the info of shader fields
 	*/
-	fields get_fields() const {
+	fields getFields() const {
 		return m_info;
 	}
 
 	/**
 	 * @brief Returns mutable field structure
 	*/
-	fields& get_fields_mutable() {
+	fields& getFieldsMutable() {
 		return m_info;
 	}
 
 	// Inherited via irenderable
-	virtual void fill_draw_call(rendering::DrawCall* dc) override;
+	virtual void fillDrawCall(rendering::DrawCall* dc) override;
 protected:
 	MeshAsset(const std::string& name);
 	MeshAsset(const std::string& name, const fields& info);
@@ -68,7 +68,7 @@ private:
 	fields m_info = {};
 	MeshSource* m_source = nullptr;
 
-	bool m_being_prepared = false;
+	bool m_isBeingPrepared = false;
 };
 
 ADERITE_ASSET_NAMESPACE_END

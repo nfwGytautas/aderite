@@ -3,9 +3,9 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "aderite/aderite.hpp"
-#include "aderite/utility/log.hpp"
-#include "aderite/utility/macros.hpp"
+#include "aderite/Aderite.hpp"
+#include "aderite/utility/Log.hpp"
+#include "aderite/utility/Macros.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/rendering/DrawCall.hpp"
 
@@ -45,12 +45,12 @@ bool ShaderAsset::deserialize(YAML::Node& data) {
 	return true;
 }
 
-void ShaderAsset::fill_draw_call(rendering::DrawCall* dc) {
+void ShaderAsset::fillDrawCall(rendering::DrawCall* dc) {
 	dc->Shader = m_handle;
 }
 
 void ShaderAsset::load() {
-	if (is_loaded()) {
+	if (isLoaded()) {
 		LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);
 		unload();
 	}
@@ -62,7 +62,7 @@ void ShaderAsset::load() {
 	// Create program
 	m_handle = bgfx::createProgram(vsh, fsh, true);
 
-	m_being_prepared = false;
+	m_isBeingPrepared = false;
 }
 
 void ShaderAsset::unload() {
@@ -72,11 +72,11 @@ void ShaderAsset::unload() {
 	}
 }
 
-bool ShaderAsset::is_preparing() {
-	return m_being_prepared;
+bool ShaderAsset::isPreparing() {
+	return m_isBeingPrepared;
 }
 
-bool ShaderAsset::is_loaded() {
+bool ShaderAsset::isLoaded() {
 	return bgfx::isValid(m_handle);
 }
 
@@ -99,15 +99,15 @@ bool ShaderAsset::isInGroup(AssetGroup group) const {
 	}
 }
 
-void ShaderAsset::prepare_load() {
+void ShaderAsset::prepareLoad() {
 	// Load sources
 	// TODO: Async
-	m_vertexSource = engine::get_AssetManager()->load_bin_file(m_info.VertexPath);
-	m_fragmentSource = engine::get_AssetManager()->load_bin_file(m_info.FragmentPath);
-	m_being_prepared = true;
+	m_vertexSource = ::aderite::Engine::getAssetManager()->loadBinFile(m_info.VertexPath);
+	m_fragmentSource = ::aderite::Engine::getAssetManager()->loadBinFile(m_info.FragmentPath);
+	m_isBeingPrepared = true;
 }
 
-bool ShaderAsset::ready_to_load() {
+bool ShaderAsset::isReadyToLoad() {
 	return (m_vertexSource.size() > 0 && m_fragmentSource.size() > 0);
 }
 

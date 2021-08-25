@@ -12,7 +12,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Forward.hpp"
 
 ADERITE_COMPONENTS_NAMESPACE_BEGIN

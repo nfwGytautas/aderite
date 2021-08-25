@@ -3,7 +3,7 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 
 ADERITE_INTERFACE_NAMESPACE_BEGIN
 

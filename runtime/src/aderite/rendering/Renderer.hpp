@@ -26,7 +26,7 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
 		/**
 		 * @brief Enables or disables vsync
 		*/
-		void set_vsync(bool enabled);
+		void setVsync(bool enabled);
 
 		/**
 		 * @brief Clears the current output target
@@ -36,7 +36,7 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
 		/**
 		 * @brief Resets the Renderer output to be the window
 		*/
-		void reset_output();
+		void resetOutput();
 
 		/**
 		 * @brief Executes a single render pass
@@ -49,32 +49,32 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
 		bool isReady();
 
 		// TODO: Rethink this
-		void begin_frame();
-		void end_frame();
+		void beginFrame();
+		void endFrame();
 
 		/**
-		 * @brief Returns the final output framebuffer which can then be rendered to texture in editors, call display_frame()
+		 * @brief Returns the final output framebuffer which can then be rendered to texture in editors, call displayFrame()
 		 * to render the content of the framebuffer to screen
 		*/
-		bgfx::FrameBufferHandle get_output();
+		bgfx::FrameBufferHandle getOutput();
 
 		/**
 		 * @brief Renders output framebuffer to screen
 		*/
-		void display_frame();
+		void displayFrame();
 	private:
 		/**
 		 * @brief Creates a instance of the Renderer depending on the rendering backend
 		*/
-		static Renderer* create_instance();
+		static Renderer* createInstance();
 
 	private:
 		Renderer() {}
-		friend class engine;
+		friend class Engine;
 
 	private:
 		bool m_isInitialized;
-		window::Window* m_attached_to = nullptr;
+		window::Window* m_attachedTo = nullptr;
 		bgfx::FrameBufferHandle m_output = BGFX_INVALID_HANDLE;
 	};
 

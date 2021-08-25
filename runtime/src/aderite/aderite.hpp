@@ -1,7 +1,7 @@
 #pragma once
 
-#include "aderite/config.hpp"
-#include "aderite/utility/macros.hpp"
+#include "aderite/Config.hpp"
+#include "aderite/utility/Macros.hpp"
 #include "aderite/interfaces/IEngineMiddleware.hpp"
 
 #include "aderite/asset/Forward.hpp"
@@ -9,19 +9,19 @@
 #include "aderite/scene/Forward.hpp"
 #include "aderite/window/Forward.hpp"
 
-#define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static class_name* public_name() { return engine::get()->field_name; } private: class_name* field_name = nullptr;
+#define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static class_name* public_name() { return ::aderite::Engine::get()->field_name; } private: class_name* field_name = nullptr;
 
 ADERITE_ROOT_NAMESPACE_BEGIN
 
 /**
  * @brief Main aderite engine instance
 */
-class engine {
+class Engine {
 public:
 	/**
 	 * @brief Engine init options
 	*/
-	struct init_options {
+	struct InitOptions {
 		
 	};
 
@@ -29,13 +29,13 @@ public:
 	/**
 	 * @brief Returns the instance of the engine
 	*/
-	static engine* get();
+	static Engine* get();
 
 	/**
 	 * @brief Initializes the aderite engine
 	 * @param options Initialization options for the engine, some can be changed at runtime
 	*/
-	bool init(init_options options);
+	bool init(InitOptions options);
 
 	/**
 	 * @brief Shutdown aderite engine
@@ -50,41 +50,41 @@ public:
 	/**
 	 * @brief Request the engine to shutdown
 	*/
-	void request_exit();
+	void requestExit();
 
 	/**
 	 * @brief Aborts a requested exit
 	*/
-	void abort_exit();
+	void abortExit();
 
 	// TODO: Rethink this
-	void begin_frame();
-	void end_frame();
+	void beginFrame();
+	void endFrame();
 
 	/**
 	 * @brief Function is invoked when the Renderer was initialized
 	*/
-	void renderer_initialized();
+	void onRendererInitialized();
 
 	/**
 	 * @brief Attaches a aderite editor instance to the runtime, previous one is deleted
 	 * @param editor Editor to attach
 	*/
-	void attach_editor(interfaces::IEngineMiddleware* editor);
+	void attachMiddleware(interfaces::IEngineMiddleware* editor);
 private:
-	engine() {}
-	engine(const engine& o) = delete;
+	Engine() {}
+	Engine(const Engine& o) = delete;
 
 private:
-	bool m_wants_to_shutdown = false;
+	bool m_wantsToShutdown = false;
 private:
-	ADERITE_SYSTEM_PTR(get_window_manager, window::WindowManager, m_window_manager)
-	ADERITE_SYSTEM_PTR(get_renderer, rendering::Renderer, m_renderer)
-	ADERITE_SYSTEM_PTR(get_AssetManager, asset::AssetManager, m_AssetManager)
-	ADERITE_SYSTEM_PTR(get_scene_manager, scene::SceneManager, m_scene_manager)
+	ADERITE_SYSTEM_PTR(getWindowManager, window::WindowManager, m_window_manager)
+	ADERITE_SYSTEM_PTR(getRenderer, rendering::Renderer, m_renderer)
+	ADERITE_SYSTEM_PTR(getAssetManager, asset::AssetManager, m_AssetManager)
+	ADERITE_SYSTEM_PTR(getSceneManager, scene::SceneManager, m_scene_manager)
 
 #if EDITOR_ENABLED == 1
-	ADERITE_SYSTEM_PTR(get_editor, interfaces::IEngineMiddleware, m_editor)
+	ADERITE_SYSTEM_PTR(getMiddleware, interfaces::IEngineMiddleware, m_editor)
 #endif
 };
 

@@ -6,27 +6,27 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
-#include "aderite/utility/log.hpp"
+#include "aderite/utility/Log.hpp"
 
 ADERITE_WINDOW_NAMESPACE_BEGIN
 
-glfw_window::glfw_window(create_options options)
+glfw_window::glfw_window(CreateOptions options)
 	: m_window(nullptr)
 {
 	m_window = glfwCreateWindow(options.width, options.height, options.title, NULL, NULL);
 }
 
-glm::vec2 glfw_window::get_size() {
+glm::vec2 glfw_window::getSize() {
 	int width, height = 0;
 	glfwGetFramebufferSize(m_window, &width, &height);
 	return { width, height };
 }
 
-void glfw_window::set_title(const std::string& title) {
+void glfw_window::setTitle(const std::string& title) {
 	glfwSetWindowTitle(m_window, title.c_str());
 }
 
-void* glfw_window::get_native_handle() {
+void* glfw_window::getNativeHandle() {
 	// TODO: Detect platform
 	return glfwGetWin32Window(m_window);
 }
@@ -35,16 +35,16 @@ void glfw_window::destroy() {
 	glfwDestroyWindow(m_window);
 }
 
-void glfw_window::make_active() {
+void glfw_window::makeActive() {
 	//glfwMakeContextCurrent(m_window);
-	window::make_active();
+	Window::makeActive();
 }
 
-void glfw_window::begin_frame() {
+void glfw_window::beginFrame() {
 
 }
 
-void glfw_window::end_frame() {
+void glfw_window::endFrame() {
 	closed = glfwWindowShouldClose(m_window);
 
 	// BGFX should take care of this

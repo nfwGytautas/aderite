@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bgfx/bgfx.h>
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 

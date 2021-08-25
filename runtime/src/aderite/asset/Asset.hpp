@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 #include "aderite/interfaces/ISerializable.hpp"
 #include "aderite/interfaces/ILoadable.hpp"
 

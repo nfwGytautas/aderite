@@ -12,21 +12,21 @@ ADERITE_WINDOW_NAMESPACE_BEGIN
 /**
  * @brief GLFW implementation of the generic window
 */
-class glfw_window : public window {
+class glfw_window : public Window {
 public:
 	void destroy() override;
-	void make_active() override;
-	void begin_frame() override;
-	void end_frame() override;
-	virtual glm::vec2 get_size() override;
-	virtual void set_title(const std::string& title) override;
-	virtual void* get_native_handle() override;
+	void makeActive() override;
+	void beginFrame() override;
+	void endFrame() override;
+	virtual glm::vec2 getSize() override;
+	virtual void setTitle(const std::string& title) override;
+	virtual void* getNativeHandle() override;
 
 	GLFWwindow* get_glfw_window() {
 		return m_window;
 	}
 private:
-	glfw_window(create_options options);
+	glfw_window(CreateOptions options);
 	friend class WindowManager;
 private:
 	GLFWwindow* m_window;

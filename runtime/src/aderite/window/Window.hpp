@@ -2,19 +2,19 @@
 
 #include <functional>
 #include <glm/glm.hpp>
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 
 ADERITE_WINDOW_NAMESPACE_BEGIN
 
 /**
  * @brief Generic window class
 */
-class window {
+class Window {
 public:
 	/**
-	 * @brief Window create options passed to create_window, most can be changed at runtime
+	 * @brief Window create options passed to createWindow, most can be changed at runtime
 	*/
-	struct create_options {
+	struct CreateOptions {
 		int width = 1280;
 		int height = 720;
 		const char* title = "Window";
@@ -24,8 +24,8 @@ public:
 	bool closed = false;
 
 public:
-	window() {}
-	virtual ~window() {}
+	Window() {}
+	virtual ~Window() {}
 
 	/**
 	 * @brief Destroys the window
@@ -35,30 +35,30 @@ public:
 	/**
 	 * @brief Makes this window the current active one where rendering will be submitted to
 	*/
-	virtual void make_active();
+	virtual void makeActive();
 
 	/**
 	 * @brief Set the title of the window
 	*/
-	virtual void set_title(const std::string& title) = 0;
+	virtual void setTitle(const std::string& title) = 0;
 
 	/**
 	 * @brief Returns the native platform window handle
 	 * @return Type depends on the platform for example on windows this will be a HWND
 	*/
-	virtual void* get_native_handle() = 0;
+	virtual void* getNativeHandle() = 0;
 
 	/**
 	 * @brief Returns the size of the window
 	 * @return GLM vector 2D (width, height)
 	*/
-	virtual glm::vec2 get_size() = 0;
+	virtual glm::vec2 getSize() = 0;
 
 	// TODO: Rethink this
-	virtual void begin_frame() {}
-	virtual void end_frame() {}
+	virtual void beginFrame() {}
+	virtual void endFrame() {}
 private:
-	window(const window& o) = delete;
+	Window(const Window& o) = delete;
 	friend class WindowManager;
 };
 

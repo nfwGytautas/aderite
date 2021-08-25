@@ -1,6 +1,6 @@
 #pragma once
 
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 
 ADERITE_INTERFACE_NAMESPACE_BEGIN
 
@@ -16,13 +16,13 @@ public:
 	 * @brief Prepare the asset to be loaded into memory, this method preferably should not block the caller
 	 * therefor it is advised to use asset manager functions to load inside a thread pool
 	*/
-	virtual void prepare_load() = 0;
+	virtual void prepareLoad() = 0;
 
 	/**
 	 * @brief Is the asset ready to be loaded
 	 * @return True if the asset can be loaded, false otherwise
 	*/
-	virtual bool ready_to_load() = 0;
+	virtual bool isReadyToLoad() = 0;
 
 	/**
 	 * @brief Load the asset from memory into an actual object, this has no effect
@@ -39,12 +39,12 @@ public:
 	/**
 	 * @brief Returns true if the object is being prepared to load, false otherwise
 	*/
-	virtual bool is_preparing() = 0;
+	virtual bool isPreparing() = 0;
 
 	/**
 	 * @brief Returns true if the object is currently loaded into memory, false otherwise
 	*/
-	virtual bool is_loaded() = 0;
+	virtual bool isLoaded() = 0;
 };
 
 ADERITE_INTERFACE_NAMESPACE_END

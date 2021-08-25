@@ -1,12 +1,12 @@
 #include "Window.hpp"
 
-#include "aderite/aderite.hpp"
+#include "aderite/Aderite.hpp"
 #include "aderite/window/WindowManager.hpp"
 
 ADERITE_WINDOW_NAMESPACE_BEGIN
 
-void window::make_active() {
-	engine::get()->get_window_manager()->active_window_changed(this);
+void Window::makeActive() {
+	::aderite::Engine::get()->getWindowManager()->onActiveWindowChanged(this);
 }
 
 ADERITE_WINDOW_NAMESPACE_END

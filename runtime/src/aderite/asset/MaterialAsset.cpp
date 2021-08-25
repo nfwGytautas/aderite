@@ -3,9 +3,9 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "aderite/aderite.hpp"
-#include "aderite/utility/macros.hpp"
-#include "aderite/utility/log.hpp"
+#include "aderite/Aderite.hpp"
+#include "aderite/utility/Macros.hpp"
+#include "aderite/utility/Log.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/rendering/DrawCall.hpp"
@@ -34,36 +34,36 @@ bool MaterialAsset::deserialize(YAML::Node& data) {
 		std::string shaderName = data["Shader"].as<std::string>();
 
 		// TODO: Error check
-		m_info.Shader = engine::get_AssetManager()->get_or_read(shaderName);
+		m_info.Shader = ::aderite::Engine::getAssetManager()->getOrRead(shaderName);
 	}
 
 	return true;
 }
 
-void MaterialAsset::fill_draw_call(rendering::DrawCall* dc) {
-	static_cast<asset::shader_asset*>(m_info.Shader)->fill_draw_call(dc);
+void MaterialAsset::fillDrawCall(rendering::DrawCall* dc) {
+	static_cast<asset::ShaderAsset*>(m_info.Shader)->fillDrawCall(dc);
 }
 
 void MaterialAsset::load() {
-	if (is_loaded()) {
+	if (isLoaded()) {
 		LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);
 		unload();
 	}
 
 	m_info.Shader->load();
-	m_being_prepared = false;
+	m_isBeingPrepared = false;
 }
 
 void MaterialAsset::unload() {
 	m_info.Shader->unload();
 }
 
-bool MaterialAsset::is_preparing() {
-	return m_being_prepared;
+bool MaterialAsset::isPreparing() {
+	return m_isBeingPrepared;
 }
 
-bool MaterialAsset::is_loaded() {
-	return m_info.Shader->is_loaded();
+bool MaterialAsset::isLoaded() {
+	return m_info.Shader->isLoaded();
 }
 
 MaterialAsset::MaterialAsset(const std::string& name)
@@ -81,14 +81,14 @@ bool MaterialAsset::isInGroup(AssetGroup group) const {
 	}
 }
 
-void MaterialAsset::prepare_load() {
+void MaterialAsset::prepareLoad() {
 	// Load sources
-	m_info.Shader->prepare_load();
-	m_being_prepared = true;
+	m_info.Shader->prepareLoad();
+	m_isBeingPrepared = true;
 }
 
-bool MaterialAsset::ready_to_load() {
-	return m_info.Shader->ready_to_load();
+bool MaterialAsset::isReadyToLoad() {
+	return m_info.Shader->isReadyToLoad();
 }
 
 ADERITE_ASSET_NAMESPACE_END

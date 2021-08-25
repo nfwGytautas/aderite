@@ -8,8 +8,8 @@
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/Exporter.hpp>
 
-#include "aderite/config.hpp"
-#include "aderite/utility/log.hpp"
+#include "aderite/Config.hpp"
+#include "aderite/utility/Log.hpp"
 
 ADERITE_ASSET_NAMESPACE_BEGIN
 
@@ -45,7 +45,7 @@ MeshSource::MeshSource(std::filesystem::path file)
 {
 	if (!std::filesystem::exists(m_file)) {
 		LOG_WARN("Tried to load {0} but such file doesn't exist", m_file.string());
-		m_error = load_error::BAD_FILE;
+		m_error = LoadError::BAD_FILE;
 		return;
 	}
 
@@ -55,11 +55,11 @@ MeshSource::MeshSource(std::filesystem::path file)
 	}
 }
 
-void MeshSource::request_position_data() {
+void MeshSource::requestPositionData() {
 	m_willLoadPosition = true;
 }
 
-void MeshSource::request_indices_data() {
+void MeshSource::requestIndicesData() {
 	m_willLoadIndices = true;
 }
 
@@ -68,7 +68,7 @@ void MeshSource::load() {
 	m_indicesBuffer.clear();
 
 	// Check if there were any errors up until now
-	if (m_error != load_error::NONE) {
+	if (m_error != LoadError::NONE) {
 		return;
 	}
 
@@ -98,20 +98,20 @@ void MeshSource::load() {
 
 	// Check if the scene was loaded
 	if (!scene) {
-		m_error = load_error::BAD_FORMAT;
+		m_error = LoadError::BAD_FORMAT;
 		return;
 	}
 
 	// Start filling the data
 	if (scene->mNumMeshes > 1) {
 		LOG_ERROR("Multiple mesh models not supported, first call asset manager mesh split API and then select individual");
-		m_error = load_error::UNSUPPORTED_CONFIGURATION;
+		m_error = LoadError::UNSUPPORTED_CONFIGURATION;
 		return;
 	}
 
 	if (scene->mNumMeshes == 0) {
 		LOG_ERROR("File {0} contains no meshes", m_file.string());
-		m_error = load_error::BAD_FORMAT;
+		m_error = LoadError::BAD_FORMAT;
 		return;
 	}
 
@@ -144,11 +144,11 @@ void MeshSource::load() {
 	}
 }
 
-std::vector<float>& MeshSource::position_data() {
+std::vector<float>& MeshSource::getPositionData() {
 	return m_positionBuffer;
 }
 
-std::vector<unsigned int>& MeshSource::indices_data() {
+std::vector<unsigned int>& MeshSource::getIndicesData() {
 	return m_indicesBuffer;
 }
 

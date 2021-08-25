@@ -1,16 +1,16 @@
-#include "log.hpp"
+#include "Log.hpp"
 
-#include "spdlog/common.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
+#include <spdlog/common.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace aderite {
+ADERITE_ROOT_NAMESPACE_BEGIN
 
-	logger* logger::get() {
-		static logger instance;
+	Logger* Logger::get() {
+		static Logger instance;
 		return &instance;
 	}
 
-	void logger::init() {
+	void Logger::init() {
 		const std::string pattern = "[%T.%e] thread %-5t | %^%v%$";
 
 		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -21,4 +21,4 @@ namespace aderite {
 		m_logger->set_level(spdlog::level::trace);
 	}
 
-}
+ADERITE_ROOT_NAMESPACE_END

@@ -1,6 +1,6 @@
-#include "aderite.hpp"
+#include "Aderite.hpp"
 
-#include "aderite/utility/log.hpp"
+#include "aderite/utility/Log.hpp"
 #include "aderite/window/WindowManager.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/asset/AssetManager.hpp"
@@ -15,14 +15,14 @@
 
 namespace aderite {
 
-	engine* engine::get() {
-		static engine* instance = new engine();
+	Engine* ::aderite::Engine::get() {
+		static Engine* instance = new Engine();
 		return instance;
 	}
 
-	bool engine::init(init_options options) {
+	bool ::aderite::Engine::init(InitOptions options) {
 		// First init logger
-		logger::get()->init();
+		Logger::get()->init();
 
 		LOG_TRACE("Initializing aderite engine");
 		LOG_DEBUG("Version: {0}", EngineVersion);
@@ -49,22 +49,22 @@ namespace aderite {
 		}
 
 		// Renderer
-		m_renderer = rendering::Renderer::create_instance(); // Delay init for until there are windows
+		m_renderer = rendering::Renderer::createInstance(); // Delay init for until there are windows
 
 		// At this point there should be an editor if it is enabled
 #if EDITOR_ENABLED == 1
 		if (!m_editor) {
-			attach_editor(new interfaces::null_editor());
+			attachMiddleware(new interfaces::NullEditor());
 		}
 #endif
 
-		EDITOR_ACTION(on_runtime_initialized);
+		EDITOR_ACTION(onRuntimeInitialized);
 
 		return true;
 	}
 
-	void engine::shutdown() {
-		EDITOR_ACTION(on_runtime_shutdown);
+	void ::aderite::Engine::shutdown() {
+		EDITOR_ACTION(onRuntimeShutdown);
 
 		m_scene_manager->shutdown();
 		m_AssetManager->shutdown();
@@ -78,42 +78,42 @@ namespace aderite {
 		delete m_editor;
 	}
 
-	void engine::loop() {
-		while (!m_wants_to_shutdown) {
-			EDITOR_ACTION(on_begin_frame);
-			begin_frame();
-			EDITOR_ACTION(on_start_render);
+	void ::aderite::Engine::loop() {
+		while (!m_wantsToShutdown) {
+			EDITOR_ACTION(onBeginFrame);
+			beginFrame();
+			EDITOR_ACTION(onStartRender);
 			m_renderer->render();
-			EDITOR_ACTION(on_end_render);
-			end_frame();
-			EDITOR_ACTION(on_end_frame);
+			EDITOR_ACTION(onEndRender);
+			endFrame();
+			EDITOR_ACTION(onEndFrame);
 		}
 	}
 
-	void engine::request_exit() {
-		m_wants_to_shutdown = true;
-		EDITOR_ACTION(on_requested_exit);
+	void ::aderite::Engine::requestExit() {
+		m_wantsToShutdown = true;
+		EDITOR_ACTION(onRequestedExit);
 	}
 
-	void engine::abort_exit() {
-		m_wants_to_shutdown = false;
+	void ::aderite::Engine::abortExit() {
+		m_wantsToShutdown = false;
 	}
 
-	void engine::begin_frame() {
-		m_window_manager->begin_frame();
-		m_renderer->begin_frame();
+	void ::aderite::Engine::beginFrame() {
+		m_window_manager->beginFrame();
+		m_renderer->beginFrame();
 	}
 
-	void engine::end_frame() {
-		m_renderer->end_frame();
-		m_window_manager->end_frame();
+	void ::aderite::Engine::endFrame() {
+		m_renderer->endFrame();
+		m_window_manager->endFrame();
 	}
 
-	void engine::renderer_initialized() {
-		EDITOR_ACTION(on_renderer_initialized);
+	void ::aderite::Engine::onRendererInitialized() {
+		EDITOR_ACTION(onRendererInitialized);
 	}
 
-	void engine::attach_editor(interfaces::IEngineMiddleware* editor) {
+	void ::aderite::Engine::attachMiddleware(interfaces::IEngineMiddleware* editor) {
 		if (m_editor != nullptr) {
 			delete m_editor;
 		}

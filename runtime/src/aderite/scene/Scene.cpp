@@ -5,13 +5,12 @@
 #include <yaml-cpp/yaml.h>
 #include <glm/glm.hpp>
 
-#include "aderite/aderite.hpp"
-#include "aderite/utility/log.hpp"
-#include "aderite/scene/Entity.hpp"
+#include "aderite/Aderite.hpp"
+#include "aderite/utility/Log.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MeshAsset.hpp" 
 #include "aderite/asset/MaterialAsset.hpp" 
-
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/components/Components.hpp"
 
 
@@ -84,11 +83,11 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 	out << YAML::Key << "Entity" << YAML::Value << (entt::id_type)e;
 
 	// Meta component
-	if (e.has_component<components::MetaComponent>()) {
+	if (e.hasComponent<components::MetaComponent>()) {
 		out << YAML::Key << "Meta";
 		out << YAML::BeginMap; // Meta
 
-		components::MetaComponent& MetaComponent = e.get_component<components::MetaComponent>();
+		components::MetaComponent& MetaComponent = e.getComponent<components::MetaComponent>();
 		out << YAML::Key << "Name" << YAML::Value << MetaComponent.Name;
 
 		out << YAML::EndMap; // Meta
@@ -101,11 +100,11 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 	// Serialize rest of components
 
 	// Transform
-	if (e.has_component<components::TransformComponent>()) {
+	if (e.hasComponent<components::TransformComponent>()) {
 		out << YAML::Key << "Transform";
 		out << YAML::BeginMap; // Transform
 
-		components::TransformComponent& TransformComponent = e.get_component<components::TransformComponent>();
+		components::TransformComponent& TransformComponent = e.getComponent<components::TransformComponent>();
 		out << YAML::Key << "Position" << YAML::Value << TransformComponent.Position;
 		out << YAML::Key << "Rotation" << YAML::Value << TransformComponent.Rotation;
 		out << YAML::Key << "Scale" << YAML::Value << TransformComponent.Scale;
@@ -114,11 +113,11 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 	}
 
 	// Mesh Renderer
-	if (e.has_component<components::MeshRendererComponent>()) {
+	if (e.hasComponent<components::MeshRendererComponent>()) {
 		out << YAML::Key << "MeshRenderer";
 		out << YAML::BeginMap; // MeshRenderer
 
-		components::MeshRendererComponent& MeshRendererComponent = e.get_component<components::MeshRendererComponent>();
+		components::MeshRendererComponent& MeshRendererComponent = e.getComponent<components::MeshRendererComponent>();
 
 		if (MeshRendererComponent.MeshHandle) {
 			out << YAML::Key << "Mesh" << MeshRendererComponent.MeshHandle->getName();
@@ -146,14 +145,14 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 	MetaComponent.Name = meta_node["Name"].as<std::string>();
 
 	// Create Entity
-	Entity e = scene->create_entity(MetaComponent);
+	Entity e = scene->createEntity(MetaComponent);
 
 	// Deserialize rest of components
 
 	// Transform
 	auto transform_node = e_node["Transform"];
 	if (transform_node) {
-		auto& TransformComponent = e.add_component<components::TransformComponent>();
+		auto& TransformComponent = e.addComponent<components::TransformComponent>();
 		TransformComponent.Position = transform_node["Position"].as<glm::vec3>();
 		TransformComponent.Rotation = transform_node["Rotation"].as<glm::vec3>();
 		TransformComponent.Scale = transform_node["Scale"].as<glm::vec3>();
@@ -162,32 +161,32 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 	// Mesh Renderer
 	auto mr_node = e_node["MeshRenderer"];
 	if (mr_node) {
-		auto& MeshRendererComponent = e.add_component<components::MeshRendererComponent>();
+		auto& MeshRendererComponent = e.addComponent<components::MeshRendererComponent>();
 		
 		if (mr_node["Mesh"]) {
 			const std::string name = mr_node["Mesh"].as<std::string>();
-			asset::Asset* pAsset = engine::get_AssetManager()->get_or_read(name);
+			asset::Asset* pAsset = ::aderite::Engine::getAssetManager()->getOrRead(name);
 
 			if (!pAsset) {
 				LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", scene->getName(), name);
 				return Entity::null();
 			}
 
-			scene->use_asset(pAsset);
+			scene->useAsset(pAsset);
 
 			MeshRendererComponent.MeshHandle = static_cast<asset::MeshAsset*>(pAsset);
 		}
 
 		if (mr_node["Material"]) {
 			const std::string name = mr_node["Material"].as<std::string>();
-			asset::Asset* pAsset = engine::get_AssetManager()->get_or_read(name);
+			asset::Asset* pAsset = ::aderite::Engine::getAssetManager()->getOrRead(name);
 
 			if (!pAsset) {
 				LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", scene->getName(), name);
 				return Entity::null();
 			}
 
-			scene->use_asset(pAsset);
+			scene->useAsset(pAsset);
 
 			MeshRendererComponent.MaterialHandle = static_cast<asset::MaterialAsset*>(pAsset);
 		}
@@ -196,22 +195,22 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 	return e;
 }
 
-Entity Scene::create_entity(const components::MetaComponent& MetaComponent) {
+Entity Scene::createEntity(const components::MetaComponent& MetaComponent) {
 	// TODO: Check for name conflicts
 	Entity e = Entity(m_registry.create(), this);
-	e.add_component<components::MetaComponent>(MetaComponent);
+	e.addComponent<components::MetaComponent>(MetaComponent);
 	return e;
 }
 
-void Scene::destroy_entity(Entity Entity) {
+void Scene::destroyEntity(Entity Entity) {
 	m_registry.destroy(Entity);
 }
 
-void Scene::use_asset(asset::Asset* asset) {
+void Scene::useAsset(asset::Asset* asset) {
 	m_assets.push_back(asset);
 }
 
-void Scene::remove_asset(asset::Asset* asset) {
+void Scene::removeAsset(asset::Asset* asset) {
 	m_assets.erase(std::find(m_assets.begin(), m_assets.end(), asset));
 }
 
@@ -249,15 +248,15 @@ bool Scene::deserialize(YAML::Node& data) {
 	return true;
 }
 
-void Scene::prepare_load() {
+void Scene::prepareLoad() {
 	for (asset::Asset* asset : m_assets) {
-		asset->prepare_load();
+		asset->prepareLoad();
 	}
 }
 
-bool Scene::ready_to_load() {
+bool Scene::isReadyToLoad() {
 	for (asset::Asset* asset : m_assets) {
-		if (!asset->ready_to_load()) {
+		if (!asset->isReadyToLoad()) {
 			return false;
 		}
 	}
@@ -277,9 +276,9 @@ void Scene::unload() {
 	}
 }
 
-bool Scene::is_preparing() {
+bool Scene::isPreparing() {
 	for (asset::Asset* asset : m_assets) {
-		if (!asset->is_preparing()) {
+		if (!asset->isPreparing()) {
 			return false;
 		}
 	}
@@ -287,9 +286,9 @@ bool Scene::is_preparing() {
 	return true;
 }
 
-bool Scene::is_loaded() {
+bool Scene::isLoaded() {
 	for (asset::Asset* asset : m_assets) {
-		if (!asset->is_loaded()) {
+		if (!asset->isLoaded()) {
 			return false;
 		}
 	}

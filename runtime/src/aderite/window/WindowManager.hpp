@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 #include "aderite/window/Window.hpp"
 
 ADERITE_WINDOW_NAMESPACE_BEGIN
@@ -23,33 +23,33 @@ public:
 	void shutdown();
 
 	// TODO: Rethink this
-	void begin_frame();
-	void end_frame();
+	void beginFrame();
+	void endFrame();
 
 	/**
 	 * @brief Creates a new window with specified options
 	 * @param options Options to create with
 	*/
-	window* create_window(window::create_options options);
+	Window* createWindow(Window::CreateOptions options);
 
 	/**
-	 * @brief Function gets called when the current active window is changed by calling window->make_active
+	 * @brief Function gets called when the current active window is changed by calling window->makeActive
 	*/
-	void active_window_changed(window* window);
+	void onActiveWindowChanged(Window* window);
 
 	/**
 	 * @brief Returns the current active window
 	*/
-	window* get_current_active_window() {
-		return m_current_window;
+	Window* getCurrentActiveWindow() {
+		return m_currentWindow;
 	}
 private:
 	WindowManager() {}
-	friend class engine;
+	friend class Engine;
 
 private:
-	std::vector<window*> m_windows;
-	window* m_current_window = nullptr;
+	std::vector<Window*> m_windows;
+	Window* m_currentWindow = nullptr;
 };
 
 ADERITE_WINDOW_NAMESPACE_END

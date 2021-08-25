@@ -9,9 +9,9 @@
 // TEMPORARY
 #include <bx/math.h>
 
-#include "aderite/config.hpp"
-#include "aderite/aderite.hpp"
-#include "aderite/utility/log.hpp"
+#include "aderite/Config.hpp"
+#include "aderite/Aderite.hpp"
+#include "aderite/utility/Log.hpp"
 #include "aderite/window/Window.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
@@ -115,7 +115,7 @@ namespace impl {
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
-Renderer* Renderer::create_instance() {
+Renderer* Renderer::createInstance() {
 	LOG_TRACE("Creating Renderer instance");
 	return new Renderer();
 }
@@ -125,13 +125,13 @@ bool Renderer::init(window::Window* wnd) {
 
 	// Platform data
 	bgfx::PlatformData pd;
-	pd.nwh = wnd->get_native_handle();
+	pd.nwh = wnd->getNativeHandle();
 
 	bgfx::Init bgfxInit;
 	bgfxInit.platformData = pd;
 	bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a backend
-	bgfxInit.resolution.width = wnd->get_size().x;
-	bgfxInit.resolution.height = wnd->get_size().y;
+	bgfxInit.resolution.width = wnd->getSize().x;
+	bgfxInit.resolution.height = wnd->getSize().y;
 	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
 	bgfxInit.callback = &::impl::g_cb;
 
@@ -140,7 +140,7 @@ bool Renderer::init(window::Window* wnd) {
 	}
 
 	// Setup default render target
-	m_attached_to = wnd;
+	m_attachedTo = wnd;
 
 	// Create default output framebuffer
 	m_output = ::impl::createFrameBuffer();
@@ -150,7 +150,7 @@ bool Renderer::init(window::Window* wnd) {
 	bgfx::frame();
 
 	m_isInitialized = true;
-	engine::get()->renderer_initialized();
+	::aderite::Engine::get()->onRendererInitialized();
 	return true;
 }
 
@@ -158,17 +158,17 @@ void Renderer::shutdown() {
 
 }
 
-void Renderer::set_vsync(bool enabled) {
-	LOG_WARN("set_vsync not implemented");
+void Renderer::setVsync(bool enabled) {
+	LOG_WARN("setVsync not implemented");
 }
 
 void Renderer::clear() {
 	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
 }
 
-void Renderer::reset_output() {
-	// Set viewport
-	glm::vec2 size = m_attached_to->get_size();
+void Renderer::resetOutput() {
+	// Set Viewport
+	glm::vec2 size = m_attachedTo->getSize();
 	bgfx::setViewRect(0, 0, 0, size.x, size.y);
 }
 
@@ -179,19 +179,19 @@ void Renderer::render() {
 
 	DrawCall dc;
 
-	// Default target is Renderer viewport
+	// Default target is Renderer Viewport
 	dc.Target = m_output;
 
 	// TODO: Sorting, batching, output target
 	// TODO: Camera, position, perspective matrix
 
-	// Bind state
+	// Bind shared::State::
 	bgfx::setViewFrameBuffer(0, dc.Target);
 	bgfx::touch(0);
 
 	// Render entities
-	scene::scene* scene = engine::get_scene_manager()->current_scene();
-	auto group = scene->get_entity_registry().group<scene::components::TransformComponent>(entt::get<scene::components::MeshRendererComponent>);
+	scene::Scene* scene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+	auto group = scene->getEntityRegistry().group<scene::components::TransformComponent>(entt::get<scene::components::MeshRendererComponent>);
 	for (auto entity : group) {
 		// TODO: Layers
 		auto [TransformComponent, mr] = group.get<scene::components::TransformComponent, scene::components::MeshRendererComponent>(entity);
@@ -200,8 +200,8 @@ void Renderer::render() {
 			continue;
 		}
 
-		mr.MeshHandle->fill_draw_call(&dc);
-		mr.MaterialHandle->fill_draw_call(&dc);
+		mr.MeshHandle->fillDrawCall(&dc);
+		mr.MaterialHandle->fillDrawCall(&dc);
 
 		glm::mat4 tmat = scene::components::TransformComponent::compute_transform(TransformComponent);
 
@@ -211,7 +211,7 @@ void Renderer::render() {
 		float view[16];
 		bx::mtxLookAt(view, eye, at);
 		float proj[16];
-		glm::vec2 wsize = m_attached_to->get_size();
+		glm::vec2 wsize = m_attachedTo->getSize();
 		bx::mtxProj(proj, 60.0f, float(wsize.x) / float(wsize.y), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 		bgfx::setViewTransform(0, view, proj);
 		float model[16];
@@ -224,7 +224,7 @@ void Renderer::render() {
 			bgfx::setIndexBuffer(dc.IBO);
 		}
 
-		// Default render state
+		// Default render shared::State::
 		//bgfx::setState(BGFX_STATE_DEFAULT);
 
 		// Submit draw call
@@ -241,14 +241,14 @@ bool Renderer::isReady() {
 	return m_isInitialized;
 }
 
-void Renderer::begin_frame() {
+void Renderer::beginFrame() {
 	if (!isReady()) {
 		return;
 	}
 
 }
 
-void Renderer::end_frame() {
+void Renderer::endFrame() {
 	if (!isReady()) {
 		return;
 	}
@@ -256,12 +256,12 @@ void Renderer::end_frame() {
 	bgfx::frame(false);
 }
 
-bgfx::FrameBufferHandle Renderer::get_output() {
+bgfx::FrameBufferHandle Renderer::getOutput() {
 	return m_output;
 }
 
-void Renderer::display_frame() {
-	LOG_ERROR("display_frame() not implemented yet");
+void Renderer::displayFrame() {
+	LOG_ERROR("displayFrame() not implemented yet");
 }
 
 ADERITE_RENDERING_NAMESPACE_END

@@ -3,9 +3,9 @@
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
-#include "aderite/aderite.hpp"
-#include "aderite/utility/log.hpp"
-#include "aderite/utility/macros.hpp"
+#include "aderite/Aderite.hpp"
+#include "aderite/utility/Log.hpp"
+#include "aderite/utility/Macros.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MeshSource.hpp"
 #include "aderite/rendering/DrawCall.hpp"
@@ -49,13 +49,13 @@ bool MeshAsset::deserialize(YAML::Node& data) {
 	return true;
 }
 
-void MeshAsset::fill_draw_call(rendering::DrawCall* dc) {
+void MeshAsset::fillDrawCall(rendering::DrawCall* dc) {
 	dc->VBO = m_vbh;
 	dc->IBO = m_ibh;
 }
 
 void MeshAsset::load() {
-	if (is_loaded()) {
+	if (isLoaded()) {
 		LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);
 		unload();
 	}
@@ -72,18 +72,18 @@ void MeshAsset::load() {
 
 	// Create handles
 	if (m_info.IsStatic) {
-		auto& positionData = m_source->position_data();
-		auto& indicesData = m_source->indices_data();
+		auto& positionData = m_source->getPositionData();
+		auto& indicesData = m_source->getIndicesData();
 		m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(positionData.data(), sizeof(float) * positionData.size()), layout);
 		m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
 	}
 	else {
 		LOG_ERROR("Unimplemented dynamic mesh");
-		m_being_prepared = false;
+		m_isBeingPrepared = false;
 		return;
 	}
 
-	m_being_prepared = false;
+	m_isBeingPrepared = false;
 }
 
 void MeshAsset::unload() {
@@ -103,11 +103,11 @@ void MeshAsset::unload() {
 	}
 }
 
-bool MeshAsset::is_preparing() {
-	return m_being_prepared;
+bool MeshAsset::isPreparing() {
+	return m_isBeingPrepared;
 }
 
-bool MeshAsset::is_loaded() {
+bool MeshAsset::isLoaded() {
 	return bgfx::isValid(m_vbh);
 }
 
@@ -130,15 +130,15 @@ bool MeshAsset::isInGroup(AssetGroup group) const {
 	}
 }
 
-void MeshAsset::prepare_load() {
+void MeshAsset::prepareLoad() {
 	// Load sources
-	engine::get_AssetManager()->load_MeshSource(m_info.SourceFile, [&](asset::MeshSource* source) {
+	::aderite::Engine::getAssetManager()->loadMeshSource(m_info.SourceFile, [&](asset::MeshSource* source) {
 		if (m_info.HasPosition) {
-			source->request_position_data();
+			source->requestPositionData();
 		}
 		
 		if (m_info.HasIndices) {
-			source->request_indices_data();
+			source->requestIndicesData();
 		}
 
 		// Start loading the data
@@ -150,11 +150,11 @@ void MeshAsset::prepare_load() {
 
 		m_source = source;
 	});
-	m_being_prepared = true;
+	m_isBeingPrepared = true;
 }
 
-bool MeshAsset::ready_to_load() {
-	return m_source != nullptr && (m_source->error() == asset::MeshSource::load_error::NONE);
+bool MeshAsset::isReadyToLoad() {
+	return m_source != nullptr && (m_source->error() == asset::MeshSource::LoadError::NONE);
 }
 
 ADERITE_ASSET_NAMESPACE_END

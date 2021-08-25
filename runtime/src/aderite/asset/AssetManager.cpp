@@ -4,9 +4,9 @@
 #include <filesystem>
 #include <yaml-cpp/yaml.h>
 
-#include "aderite/config.hpp"
-#include "aderite/utility/log.hpp"
-#include "aderite/utility/random.hpp"
+#include "aderite/Config.hpp"
+#include "aderite/utility/Log.hpp"
+#include "aderite/utility/Random.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
@@ -42,13 +42,13 @@ namespace aderite {
 		}
 
 		void AssetManager::shutdown() {
-			unload_all();
+			unloadAll();
 		}
 
-		void AssetManager::set_root_dir(const std::string& path) {
+		void AssetManager::setRootDir(const std::string& path) {
 			m_rootDir = std::filesystem::path(path);
-			std::filesystem::path res_dir = get_res_dir();
-			std::filesystem::path raw_dir = get_raw_dir();
+			std::filesystem::path res_dir = getResDir();
+			std::filesystem::path raw_dir = getRawDir();
 
 			LOG_TRACE("Setting root directory to {0}", m_rootDir.string());
 
@@ -62,7 +62,7 @@ namespace aderite {
 			}
 		}
 		
-		Asset* AssetManager::get_by_name(const std::string& name) {
+		Asset* AssetManager::getByName(const std::string& name) {
 			auto it = std::find_if(m_assets.begin(), m_assets.end(), [&](Asset* asset) {
 				return asset->getName() == name;
 			});
@@ -83,11 +83,11 @@ namespace aderite {
 			return it != m_assets.end();
 		}
 
-		std::string AssetManager::load_txt_file(const std::string& path) {
+		std::string AssetManager::loadTxtFile(const std::string& path) {
 			std::ifstream fin;
 			std::stringstream fstream;
 
-			fin.open(get_raw_dir() / path);
+			fin.open(getRawDir() / path);
 
 			if (!fin)
 			{
@@ -101,9 +101,9 @@ namespace aderite {
 			return fstream.str();
 		}
 
-		std::vector<unsigned char> AssetManager::load_bin_file(const std::string& path) {
+		std::vector<unsigned char> AssetManager::loadBinFile(const std::string& path) {
 			// TODO: Error check
-			std::ifstream file(get_raw_dir() / path, std::ios::binary);
+			std::ifstream file(getRawDir() / path, std::ios::binary);
 			file.unsetf(std::ios::skipws);
 
 			std::streampos fileSize;
@@ -120,22 +120,22 @@ namespace aderite {
 			return vec;
 		}
 
-		void AssetManager::load_mesh_source(const std::string& path, std::function<void(mesh_source*)> loaded) {
-			LOG_WARN("load_mesh_source not async yet");
-			loaded(new mesh_source(get_raw_dir() / path));
+		void AssetManager::loadMeshSource(const std::string& path, std::function<void(MeshSource*)> loaded) {
+			LOG_WARN("loadMeshSource not async yet");
+			loaded(new MeshSource(getRawDir() / path));
 		}
 
-		asset::Asset* AssetManager::read_asset(const std::string& path) {
+		asset::Asset* AssetManager::readAsset(const std::string& path) {
 			LOG_TRACE("Asset manager reading {0}", path);
 
 			// Check for duplication
 			if (has(path)) {
 				LOG_WARN("Requested double read");
-				return get_by_name(path);
+				return getByName(path);
 			}
 
 			// Open YAML reader
-			YAML::Node data = YAML::LoadFile((get_res_dir() / path).string());
+			YAML::Node data = YAML::LoadFile((getResDir() / path).string());
 
 			// Check version
 			if (!data["Version"]) {
@@ -170,7 +170,7 @@ namespace aderite {
 				asset = new scene::Scene(name);
 			}
 			else if (type == AssetType::SHADER) {
-				asset = new asset::shader_asset(name);
+				asset = new asset::ShaderAsset(name);
 			}
 			else if (type == AssetType::MATERIAL) {
 				asset = new asset::MaterialAsset(name);
@@ -193,16 +193,16 @@ namespace aderite {
 			return asset;
 		}
 		
-		asset::Asset* AssetManager::get_or_read(const std::string& name) {
+		asset::Asset* AssetManager::getOrRead(const std::string& name) {
 			if (!has(name)) {
-				return read_asset(name);
+				return readAsset(name);
 			}
 			else {
-				return get_by_name(name);
+				return getByName(name);
 			}
 		}
 
-		void AssetManager::save_asset(asset::Asset* asset) {
+		void AssetManager::saveAsset(asset::Asset* asset) {
 			YAML::Emitter out;
 
 			out << YAML::BeginMap;
@@ -219,11 +219,11 @@ namespace aderite {
 
 			out << YAML::EndMap;
 
-			std::ofstream fout(get_res_dir() / asset->getName());
+			std::ofstream fout(getResDir() / asset->getName());
 			fout << out.c_str();
 		}
 
-		void AssetManager::unload_all() {
+		void AssetManager::unloadAll() {
 			// Unload all then delete
 			for (auto& m_asset : m_assets) {
 				m_asset->unload();
@@ -249,9 +249,9 @@ namespace aderite {
 			m_assets.erase(it);
 		}
 
-		bool AssetManager::can_create(const std::string& name) {
+		bool AssetManager::canCreate(const std::string& name) {
 			// Check for conflicts (editor only thing so this will never be called from scripts / runtime so no need to check for binary format)
-			if (std::filesystem::exists(get_res_dir() / name)) {
+			if (std::filesystem::exists(getResDir() / name)) {
 				return false;
 			}
 

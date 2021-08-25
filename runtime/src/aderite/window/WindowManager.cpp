@@ -1,8 +1,8 @@
 #include "WindowManager.hpp"
 
-#include "aderite/config.hpp"
-#include "aderite/aderite.hpp"
-#include "aderite/utility/log.hpp"
+#include "aderite/Config.hpp"
+#include "aderite/Aderite.hpp"
+#include "aderite/utility/Log.hpp"
 #include "aderite/rendering/Renderer.hpp"
 
 #if GLFW_BACKEND
@@ -10,7 +10,7 @@
 
 #define f_init init_backend
 #define f_shutdown shutdown_backend
-#define f_create glfw_window
+#define f_create new glfw_window
 #define f_poll poll_events
 
 #endif
@@ -32,7 +32,7 @@ bool WindowManager::init() {
 }
 
 void WindowManager::shutdown() {
-	for (window* wnd : m_windows) {
+	for (Window* wnd : m_windows) {
 		wnd->destroy();
 		delete wnd;
 	}
@@ -42,34 +42,34 @@ void WindowManager::shutdown() {
 	f_shutdown(this);
 }
 
-window* WindowManager::create_window(window::create_options options) {
-	window* wnd = nullptr;
+Window* WindowManager::createWindow(Window::CreateOptions options) {
+	Window* wnd = nullptr;
 
 	// Initialize rest of the systems on rendering thread
 	wnd = f_create(options);
-	wnd->make_active();
+	wnd->makeActive();
 
 	// Run Renderer init on this window
-	engine::get()->get_renderer()->init(wnd);
+	::aderite::Engine::get()->getRenderer()->init(wnd);
 
 	m_windows.push_back(wnd);
 
 	return wnd;
 }
 
-void WindowManager::active_window_changed(window* window) {
-	m_current_window = window;
+void WindowManager::onActiveWindowChanged(Window* window) {
+	m_currentWindow = window;
 }
 
-void WindowManager::begin_frame() {
+void WindowManager::beginFrame() {
 	for (auto& window : m_windows) {
-		window->begin_frame();
+		window->beginFrame();
 	}
 }
 
-void WindowManager::end_frame() {
+void WindowManager::endFrame() {
 	for (auto& window : m_windows) {
-		window->end_frame();
+		window->endFrame();
 	}
 
 	f_poll(this);

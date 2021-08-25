@@ -1,4 +1,4 @@
-#include "random.hpp"
+#include "Random.hpp"
 
 #include <random>
 
@@ -8,7 +8,7 @@ namespace aderite {
 		static std::random_device dev;
 		static std::mt19937 rng(dev());
 
-		std::string generate_uuid() {
+		std::string generateUuid() {
 			std::uniform_int_distribution<int> dist(0, 15);
 
 			const char* v = "0123456789abcdef";
@@ -23,7 +23,7 @@ namespace aderite {
 			return res;
 		}
 
-		std::string generate_string(const size_t& len) {
+		std::string generateString(const size_t& len) {
 			std::uniform_int_distribution<int> dist(0, 15);
 
 			const char* v = "0123456789abcdef";

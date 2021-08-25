@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <entt/entity/registry.hpp>
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Forward.hpp"
 #include "aderite/asset/Asset.hpp"
 #include "aderite/scene/Forward.hpp"
@@ -22,7 +22,7 @@ public:
 	/**
 	 * @brief Returns entt registry
 	*/
-	entt::registry& get_entity_registry() {
+	entt::registry& getEntityRegistry() {
 		return m_registry;
 	}
 
@@ -30,32 +30,32 @@ public:
 	 * @brief Create Entity with a MetaComponent component
 	 * @return Entity instance
 	*/
-	Entity create_entity(const components::MetaComponent& MetaComponent);
+	Entity createEntity(const components::MetaComponent& MetaComponent);
 
 	/**
 	 * @brief Destroy an Entity
 	*/
-	void destroy_entity(Entity Entity);
+	void destroyEntity(Entity Entity);
 
 	/**
 	 * @brief Marks the asset as being used by the Scene
 	 * @param asset Asset to use
 	*/
-	virtual void use_asset(asset::Asset* asset);
+	virtual void useAsset(asset::Asset* asset);
 
 	/**
 	 * @brief Removes the asset from the Scene
 	 * @param asset Asset to remove
 	*/
-	virtual void remove_asset(asset::Asset* asset);
+	virtual void removeAsset(asset::Asset* asset);
 
 	// Inherited via asset_base
-	virtual void prepare_load() override;
-	virtual bool ready_to_load() override;
+	virtual void prepareLoad() override;
+	virtual bool isReadyToLoad() override;
 	virtual void load() override;
 	virtual void unload() override;
-	virtual bool is_preparing() override;
-	virtual bool is_loaded() override;
+	virtual bool isPreparing() override;
+	virtual bool isLoaded() override;
 
 	virtual asset::AssetType type() const override;
 	virtual bool isInGroup(asset::AssetGroup group) const override;

@@ -5,11 +5,10 @@
 #include <algorithm>
 #include <filesystem>
 #include <functional>
-#include "aderite/utility/macros.hpp"
+#include "aderite/utility/Macros.hpp"
+#include "aderite/asset/Forward.hpp"
 
 ADERITE_ASSET_NAMESPACE_BEGIN
-class Asset;
-class mesh_source;
 
 /**
  * @brief Aderite asset manager. 
@@ -36,19 +35,19 @@ public:
 	/**
 	 * @brief Sets the root directory of the manager to the specified one
 	*/
-	void set_root_dir(const std::string& path);
+	void setRootDir(const std::string& path);
 
 	/**
 	 * @brief Returns the resource directory
 	*/
-	std::filesystem::path get_res_dir() const {
+	std::filesystem::path getResDir() const {
 		return (m_rootDir / ResDir);
 	}
 
 	/**
 	 * @brief Returns the raw directory
 	*/
-	std::filesystem::path get_raw_dir() const {
+	std::filesystem::path getRawDir() const {
 		return (m_rootDir / RawDir);
 	}
 
@@ -59,7 +58,7 @@ public:
 	template<class T, class ...Args>
 	T* create(const std::string& name, Args&&... args) {
 		// Check for conflict
-		if (!can_create(name)) {
+		if (!canCreate(name)) {
 			return nullptr;
 		}
 
@@ -76,7 +75,7 @@ public:
 	 * @param name Name of the asset to get
 	 * @return Asset base instance or nullptr if the asset is not known
 	*/
-	Asset* get_by_name(const std::string& name);
+	Asset* getByName(const std::string& name);
 
 	/**
 	 * @brief Return true if the AssetManager has information or an asset with the specified name
@@ -89,7 +88,7 @@ public:
 	 * @param path Path to file
 	 * @return String containing the contents of the file
 	*/
-	std::string load_txt_file(const std::string& path);
+	std::string loadTxtFile(const std::string& path);
 
 	/**
 	 * @brief Loads the specified file contents into a buffer, guaranteed by the asset manager to be
@@ -97,15 +96,15 @@ public:
 	 * @param path Path to file
 	 * @return Buffer containing the contents of the file
 	*/
-	std::vector<unsigned char> load_bin_file(const std::string& path);
+	std::vector<unsigned char> loadBinFile(const std::string& path);
 
 	/**
 	 * @brief Loads a mesh file asynchronously and invokes the callback function once loaded, the caller must 
-	 * take ownership of the mesh_source
+	 * take ownership of the MeshSource
 	 * @param path File to load
 	 * @param loaded Function to invoke once loaded
 	*/
-	void load_mesh_source(const std::string& path, std::function<void(mesh_source*)> loaded);
+	void loadMeshSource(const std::string& path, std::function<void(MeshSource*)> loaded);
 
 	/**
 	 * @brief Reads asset from file (non binary format), this automatically finds the type and makes the asset
@@ -113,25 +112,25 @@ public:
 	 * @param path Path to asset
 	 * @return Asset pointer or nullptr if reading failed
 	*/
-	asset::Asset* read_asset(const std::string& path);
+	asset::Asset* readAsset(const std::string& path);
 
 	/**
 	 * @brief Gets an asset of the specified name or reads it if it's not known
 	 * @param name Name of the asset
 	 * @return Asset pointer or nullptr if reading failed
 	*/
-	asset::Asset* get_or_read(const std::string& name);
+	asset::Asset* getOrRead(const std::string& name);
 
 	/**
 	 * @brief Saves the asset to device memory
 	 * @param asset Asset to save
 	*/
-	void save_asset(asset::Asset* asset);
+	void saveAsset(asset::Asset* asset);
 
 	/**
 	 * @brief Unloads all assets
 	*/
-	void unload_all();
+	void unloadAll();
 
 	/**
 	 * @brief Removes an asset with the specified name
@@ -156,9 +155,9 @@ public:
 	}
 private:
 	AssetManager() {}
-	friend class engine;
+	friend class Engine;
 
-	bool can_create(const std::string& name);
+	bool canCreate(const std::string& name);
 private:
 	std::vector<Asset*> m_assets;
 	std::filesystem::path m_rootDir = "";

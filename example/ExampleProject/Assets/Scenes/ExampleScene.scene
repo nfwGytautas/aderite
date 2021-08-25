@@ -4,14 +4,14 @@ Type: 1
 Entities:
   - Entity: 1
     Meta:
+      Name: SceneCamera
+  - Entity: 0
+    Meta:
       Name: Cube
     Transform:
       Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
+      Rotation: [0.675442457, 0.600393295, 0]
       Scale: [1, 1, 1]
     MeshRenderer:
       Mesh: Meshes\CubeMesh.mesh
       Material: Materials\ExampleMaterial.material
-  - Entity: 0
-    Meta:
-      Name: SceneCamera

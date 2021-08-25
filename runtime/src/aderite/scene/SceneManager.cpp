@@ -1,10 +1,10 @@
 #include "SceneManager.hpp"
 
 #include <thread>
-#include "aderite/aderite.hpp"
-#include "aderite/utility/random.hpp"
-#include "aderite/utility/macros.hpp"
-#include "aderite/scene/scene.hpp"
+#include "aderite/Aderite.hpp"
+#include "aderite/utility/Random.hpp"
+#include "aderite/utility/Macros.hpp"
+#include "aderite/scene/Scene.hpp"
 
 ADERITE_SCENE_NAMESPACE_BEGIN
 		
@@ -16,32 +16,32 @@ void SceneManager::shutdown() {
 
 }
 
-void SceneManager::set_active(Scene* scene) {
-	if (scene->is_loaded()) {
+void SceneManager::setActive(Scene* scene) {
+	if (scene->isLoaded()) {
 		m_activeScene = scene;
 		return;
 	}
 
 	// Check if it's preparing to be loaded if not then prepare
-	if (!scene->is_preparing()) {
-		scene->prepare_load();
+	if (!scene->isPreparing()) {
+		scene->prepareLoad();
 	}
 
 	// Wait until the scene 
-	while (!scene->ready_to_load()) {
+	while (!scene->isReadyToLoad()) {
 		// TODO: Rethink this
 		// Sleep for 1 second
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 
-	if (!scene->is_loaded()) {
+	if (!scene->isLoaded()) {
 		scene->load();
 	}
 
 	m_activeScene = scene;
 }
 
-Scene* SceneManager::current_scene() const {
+Scene* SceneManager::getCurrentScene() const {
 	return m_activeScene;
 }
 
