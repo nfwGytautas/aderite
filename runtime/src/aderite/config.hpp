@@ -12,22 +12,8 @@ constexpr char* EngineVersion = "0.0.0";
 // 1 - Active
 // ---------------------------------
 
-// Is aderite using GLFW backend
+// Is aderite using GLFW backend, for Windows/Linux/MacOS platforms
 #define GLFW_BACKEND 1
-
-
-// ---------------------------------
-// RENDERING BACKENDS
-// Only one rendering backend can be active at a time
-// 0 - Disabled
-// 1 - Active
-// ---------------------------------
-
-// Is aderite using OpenGL backend (Uses GLAD)
-#define GL_BACKEND 1
-
-// Is aderite using DirectX backend
-#define DX_BACKEND 0
 
 
 // ---------------------------------

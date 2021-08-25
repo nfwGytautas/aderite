@@ -8,11 +8,11 @@ namespace aderite {
 		/**
 		 * @brief Generates a UUID (kinda)
 		*/
-		std::string generate_uuid();
+		std::string generateUuid();
 
 		/**
 		 * @brief Generates a random string of specified length
 		*/
-		std::string generate_string(const size_t& len);
+		std::string generateString(const size_t& len);
 	}
 }
