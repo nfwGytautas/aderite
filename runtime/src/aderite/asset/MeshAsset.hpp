@@ -19,7 +19,7 @@ public:
 	*/
 	struct fields {
 		std::string SourceFile = "";
-		bool IsStatic = false;
+		bool IsStatic = true;
 		bool HasPosition = true;
 		bool HasIndices = true;
 	};

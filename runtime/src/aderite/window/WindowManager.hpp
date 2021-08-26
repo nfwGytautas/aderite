@@ -1,14 +1,15 @@
 #pragma once
 
+#include <string>
 #include <vector>
+#include <glm/glm.hpp>
 #include "aderite/utility/Macros.hpp"
-#include "aderite/window/Window.hpp"
+#include "aderite/input/Forward.hpp"
 
 ADERITE_WINDOW_NAMESPACE_BEGIN
 
 /**
- * @brief Window manager of aderite engine, usually most applications will only use 1 window
- * and as such the window manager is built with that
+ * @brief Window manager of aderite engine, this allows to create and manipulate a SINGLE output window.
 */
 class WindowManager {
 public:
@@ -22,34 +23,51 @@ public:
 	*/
 	void shutdown();
 
-	// TODO: Rethink this
-	void beginFrame();
-	void endFrame();
+	/**
+	 * @brief Set the width and height of the display to the one specified
+	 * @param width New width of the window
+	 * @param height New height of the window
+	*/
+	void setSize(unsigned int width, unsigned int height);
 
 	/**
-	 * @brief Creates a new window with specified options
-	 * @param options Options to create with
+	 * @brief Returns the size of the window
+	 * @return The size of the window
 	*/
-	Window* createWindow(Window::CreateOptions options);
+	glm::i32vec2 getSize();
 
 	/**
-	 * @brief Function gets called when the current active window is changed by calling window->makeActive
+	 * @brief Returns true if the window is closed, false otherwise
 	*/
-	void onActiveWindowChanged(Window* window);
+	bool isClosed();
 
 	/**
-	 * @brief Returns the current active window
+	 * @brief Set the title of the display to the one specified
+	 * @param title New title of the display
 	*/
-	Window* getCurrentActiveWindow() {
-		return m_currentWindow;
-	}
+	void setTitle(const std::string& title);
+
+	/**
+	 * @brief Returns the native system handle of the display, for example on windows this will return HWND
+	*/
+	void* getNativeHandle();
+
+	/**
+	 * @brief Returns the implementation framework of the display, for desktop applications this will be a GLFWwindow
+	*/
+	void* getImplementationHandle();
 private:
 	WindowManager() {}
 	friend class Engine;
 
+	// Following functions are implemented depending on the platform
+	bool backendInit();
+	bool backendCreateWindow();
+	void backendShutdown();
+
 private:
-	std::vector<Window*> m_windows;
-	Window* m_currentWindow = nullptr;
+	class PlatformImpl;
+	PlatformImpl* m_impl = nullptr;
 };
 
 ADERITE_WINDOW_NAMESPACE_END

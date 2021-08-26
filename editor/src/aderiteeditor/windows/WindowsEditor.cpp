@@ -17,8 +17,7 @@
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/window/WindowManager.hpp"
-#include "aderite/window/Window.hpp"
-#include "aderite/window/glfw_window.hpp"
+#include "aderite/input/InputManager.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/windows/component/Toolbar.hpp"
@@ -58,18 +57,12 @@ WindowsEditor::~WindowsEditor() {
 void WindowsEditor::onRuntimeInitialized() {
 	LOG_DEBUG("Using WINDOWS editor");
 
-	// Create window
-	m_editorWindow = ::aderite::Engine::getWindowManager()->createWindow({});
-
 	// Check for pfd
 	if (!pfd::settings::available()) {
 		LOG_ERROR("PFD not available on a WINDOWS editor. Incorrect editor choice? Aborting.");
 		::aderite::Engine::get()->requestExit();
 		return;
 	}
-
-	// Default title
-	m_editorWindow->setTitle("Aderite");
 
 	// TODO: Startup dialog e.g. create new project, load project, etc.
 	this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");
@@ -102,8 +95,7 @@ void WindowsEditor::onRendererInitialized() {
 	}
 
 	// Setup Platform/Renderer backends
-	GLFWwindow* handle = static_cast<aderite::window::glfw_window*>(
-		::aderite::Engine::get()->getWindowManager()->getCurrentActiveWindow())->get_glfw_window();
+	GLFWwindow* handle = static_cast<GLFWwindow*>(::aderite::Engine::get()->getWindowManager()->getImplementationHandle());
 
 	switch (bgfx::getRendererType()) {
 	case bgfx::RendererType::OpenGL:
@@ -239,8 +231,7 @@ void WindowsEditor::onEndRender() {
 	backend::ImGui_Implbgfx_RenderDrawLists(ImGui::GetDrawData());
 
 	// Exit
-	auto activeWindow = ::aderite::Engine::get()->getWindowManager()->getCurrentActiveWindow();
-	if (activeWindow != nullptr && activeWindow->closed) {
+	if (::aderite::Engine::get()->getWindowManager()->isClosed()) {
 		// TODO: Request save
 		m_expected_shutdown = true;
 		onSaveProject();
@@ -250,9 +241,9 @@ void WindowsEditor::onEndRender() {
 
 void WindowsEditor::onRuntimeShutdown() {
 	if (!m_expected_shutdown) {
-		// Try to save
+		// TODO: Try to save some restore information
 		LOG_WARN("Unexpected shutdown trying to save");
-		onSaveProject();
+		//onSaveProject();
 	}
 
 	m_toolbar->shutdown();
@@ -270,6 +261,10 @@ void WindowsEditor::onRuntimeShutdown() {
 	delete shared::State::Project;
 }
 
+void WindowsEditor::onSystemUpdate() {
+
+}
+
 void WindowsEditor::onSelectedEntityChanged(scene::Entity& Entity) {
 	m_sceneView->setActiveEntity(Entity);
 	m_propertyEditor->setActiveEntity(Entity);
@@ -277,7 +272,7 @@ void WindowsEditor::onSelectedEntityChanged(scene::Entity& Entity) {
 
 void WindowsEditor::onNewProject(const std::string& dir, const std::string& name) {
 	LOG_TRACE("New project name: {0} at directory {1}", name, dir);
-	m_editorWindow->setTitle(name);
+	::aderite::Engine::get()->getWindowManager()->setTitle(name);
 	
 	if (shared::State::Project) {
 		delete shared::State::Project;
@@ -317,7 +312,7 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 
 	shared::State::Project = shared::Project::load(path);
 
-	m_editorWindow->setTitle(shared::State::Project->getName());
+	::aderite::Engine::get()->getWindowManager()->setTitle(shared::State::Project->getName());
 
 	// Setup asset manager
 	::aderite::Engine::getAssetManager()->setRootDir(shared::State::Project->getRootDir().string());
@@ -376,6 +371,20 @@ void WindowsEditor::onDestroyEntity(const scene::Entity& Entity) {
 
 void WindowsEditor::onSelectedAssetChanged(asset::Asset* asset) {
 	m_assetEditor->setActiveAsset(asset);
+}
+
+void WindowsEditor::onStopGame() {
+	Engine::get()->startPhysicsUpdates();
+	Engine::get()->startScriptUpdates();
+}
+
+void WindowsEditor::onStartGame() {
+	Engine::get()->stopPhysicsUpdates();
+	Engine::get()->stopScriptUpdates();
+}
+
+void WindowsEditor::onResetGameState() {
+	// TODO: Reset game state, by reloading all scripts or resetting their default parameters
 }
 
 ADERITE_EDITOR_ROOT_NAMESPACE_END

@@ -61,6 +61,21 @@ public:
 	 * @param asset New selected asset
 	*/
 	virtual void onSelectedAssetChanged(asset::Asset* asset) = 0;
+
+	/**
+	 * @brief Invoked when the game should be stopped
+	*/
+	virtual void onStopGame() = 0;
+
+	/**
+	 * @brief Invoked when the game should be started
+	*/
+	virtual void onStartGame() = 0;
+
+	/**
+	 * @brief Invoked when the game state should be reset to that which was when starting the game
+	*/
+	virtual void onResetGameState() = 0;
 };
 
 ADERITE_EDITOR_SHARED_NAMESPACE_END

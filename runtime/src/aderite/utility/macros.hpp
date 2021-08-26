@@ -4,6 +4,26 @@
  * @brief This file contains all macros defined by the aderite engine
  */
 
+ // ---------------------------------
+ // PLATFORM
+ // ---------------------------------
+
+#ifdef _WIN32
+ // Windows (x64 and x86)
+#define ADERITE_PLATFORM_WINDOWS
+#elif __unix__
+ // Unix
+#define ADERITE_PLATFORM_UNIX
+#elif __linux__
+ // linux
+#define ADERITE_PLATFORM_LINUX
+#elif __APPLE__
+ // Mac OS
+#define ADERITE_PLATFORM_MACOS
+#else
+#error "Unsupported platform"
+#endif
+
 // ---------------------------------
 // NAMESPACES
 // ---------------------------------
@@ -39,3 +59,7 @@
 // Components namespace where all entity components are defined in
 #define ADERITE_COMPONENTS_NAMESPACE_BEGIN ADERITE_SCENE_NAMESPACE_BEGIN namespace components {
 #define ADERITE_COMPONENTS_NAMESPACE_END ADERITE_SCENE_NAMESPACE_END }
+
+// Input namespace where all events and input objects are defined in
+#define ADERITE_INPUT_NAMESPACE_BEGIN ADERITE_ROOT_NAMESPACE_BEGIN namespace input {
+#define ADERITE_INPUT_NAMESPACE_END ADERITE_ROOT_NAMESPACE_END }

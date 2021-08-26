@@ -50,6 +50,11 @@ bool MeshAsset::deserialize(YAML::Node& data) {
 }
 
 void MeshAsset::fillDrawCall(rendering::DrawCall* dc) {
+	if (!isLoaded()) {
+		dc->Valid = false;
+		return;
+	}
+
 	dc->VBO = m_vbh;
 	dc->IBO = m_ibh;
 }

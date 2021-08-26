@@ -6,73 +6,143 @@
 #include "aderite/rendering/Renderer.hpp"
 
 #if GLFW_BACKEND
-#include "aderite/window/glfw_window.hpp"
+#ifdef ADERITE_PLATFORM_WINDOWS
+#define GLFW_EXPOSE_NATIVE_WIN32
+#else
+#error "Unsupported platform for glfw backend"
+#endif
 
-#define f_init init_backend
-#define f_shutdown shutdown_backend
-#define f_create new glfw_window
-#define f_poll poll_events
-
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #endif
 
 ADERITE_WINDOW_NAMESPACE_BEGIN
 
-static WindowManager* manager_instance = nullptr;
+// ---------------------------------
+// PIMPL specification
+// ---------------------------------
+
+#if GLFW_BACKEND == 1
+
+/**
+ * @brief GLFW implementation of PlatformImpl
+*/
+class WindowManager::PlatformImpl {
+public:
+#ifdef ADERITE_PLATFORM_WINDOWS
+	HWND NativeWindow;
+#endif
+
+	GLFWwindow* ImplementationWindow;
+};
+
+#endif
+
+
+// ---------------------------------
+// START OF SHARED FUNCTIONALITY
+// ---------------------------------
 
 bool WindowManager::init() {
 	LOG_TRACE("Initializing window manager");
-	manager_instance = this;
+	m_impl = new PlatformImpl();
 
-	if (!f_init(this)) {
+	if (!backendInit()) {
 		LOG_ERROR("Failed to initialize backend");
 		return false;
 	}
 
+	if (!backendCreateWindow()) {
+		LOG_ERROR("Failed to create window");
+		return false;
+	}
+	
 	return true;
 }
 
 void WindowManager::shutdown() {
-	for (Window* wnd : m_windows) {
-		wnd->destroy();
-		delete wnd;
+	backendShutdown();
+	delete m_impl;
+	m_impl = nullptr;
+}
+
+void* WindowManager::getNativeHandle() {
+	return static_cast<void*>(m_impl->NativeWindow);
+}
+
+void* WindowManager::getImplementationHandle() {
+	return static_cast<void*>(m_impl->ImplementationWindow);
+}
+
+// ---------------------------------
+// START OF PLATFORM SPECIFIC FUNCTIONALITY
+// ---------------------------------
+
+#ifdef GLFW_BACKEND = 1
+
+void WindowManager::setSize(unsigned int width, unsigned int height) {
+	glfwSetWindowSize(m_impl->ImplementationWindow, width, height);
+}
+
+glm::i32vec2 WindowManager::getSize() {
+	glm::i32vec2 size = {};
+	glfwGetWindowSize(m_impl->ImplementationWindow, &size.x, &size.y);
+	return size;
+}
+
+bool WindowManager::isClosed() {
+	return glfwWindowShouldClose(m_impl->ImplementationWindow) == 1;
+}
+
+void WindowManager::setTitle(const std::string& title) {
+	glfwSetWindowTitle(m_impl->ImplementationWindow, title.c_str());
+}
+
+bool WindowManager::backendInit() {
+	LOG_DEBUG("GLFW backend");
+
+	glfwSetErrorCallback([](int error, const char* description) {
+		LOG_ERROR("GLFW error: {0}, {1}", error, description);
+	});
+
+	if (!glfwInit()) {
+		return false;
 	}
 
-	m_windows.clear();
+	// BGFX should take care of the context
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-	f_shutdown(this);
+	return true;
 }
 
-Window* WindowManager::createWindow(Window::CreateOptions options) {
-	Window* wnd = nullptr;
-
-	// Initialize rest of the systems on rendering thread
-	wnd = f_create(options);
-	wnd->makeActive();
-
-	// Run Renderer init on this window
-	::aderite::Engine::get()->getRenderer()->init(wnd);
-
-	m_windows.push_back(wnd);
-
-	return wnd;
-}
-
-void WindowManager::onActiveWindowChanged(Window* window) {
-	m_currentWindow = window;
-}
-
-void WindowManager::beginFrame() {
-	for (auto& window : m_windows) {
-		window->beginFrame();
-	}
-}
-
-void WindowManager::endFrame() {
-	for (auto& window : m_windows) {
-		window->endFrame();
+bool WindowManager::backendCreateWindow() {
+	m_impl->ImplementationWindow = glfwCreateWindow(
+		1280,
+		720,
+		"Aderite",
+		NULL, 
+		NULL
+	);
+	
+	if (!m_impl->ImplementationWindow) {
+		LOG_ERROR("Failed to create window");
+		return false;
 	}
 
-	f_poll(this);
+#ifdef ADERITE_PLATFORM_WINDOWS
+	m_impl->NativeWindow = glfwGetWin32Window(m_impl->ImplementationWindow);
+#endif
+
+	return true;
 }
+
+void WindowManager::backendShutdown() {
+	glfwDestroyWindow(m_impl->ImplementationWindow);
+	glfwTerminate();
+}
+
+#endif
 
 ADERITE_WINDOW_NAMESPACE_END
+
+

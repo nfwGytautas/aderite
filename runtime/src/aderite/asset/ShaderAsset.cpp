@@ -46,6 +46,11 @@ bool ShaderAsset::deserialize(YAML::Node& data) {
 }
 
 void ShaderAsset::fillDrawCall(rendering::DrawCall* dc) {
+	if (!isLoaded()) {
+		dc->Valid = false;
+		return;
+	}
+
 	dc->Shader = m_handle;
 }
 

@@ -53,6 +53,21 @@ ADERITE_INTERFACE_NAMESPACE_BEGIN
 		 * @brief Function invoked when a exit was requested from the engine
 		*/
 		virtual void onRequestedExit() {};
+
+		/**
+		 * @brief Function invoked when a system update has happened
+		*/
+		virtual void onSystemUpdate() {};
+
+		/**
+		 * @brief Function invoked when a physics update has happened
+		*/
+		virtual void onPhysicsUpdate() {};
+
+		/**
+		 * @brief Function invoked when a script update has happened
+		*/
+		virtual void onScriptUpdate() {};
 	};
 
 /**

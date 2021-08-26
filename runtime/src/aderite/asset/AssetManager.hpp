@@ -7,6 +7,7 @@
 #include <functional>
 #include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Forward.hpp"
+#include "aderite/asset/Asset.hpp"
 
 ADERITE_ASSET_NAMESPACE_BEGIN
 
@@ -158,6 +159,7 @@ private:
 	friend class Engine;
 
 	bool canCreate(const std::string& name);
+	Asset* createAssetFromType(AssetType type, const std::string& name);
 private:
 	std::vector<Asset*> m_assets;
 	std::filesystem::path m_rootDir = "";

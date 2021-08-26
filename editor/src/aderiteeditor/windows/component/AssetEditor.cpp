@@ -268,6 +268,15 @@ ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 							std::filesystem::path raw_dst = utility::makeUniquePath(::aderite::Engine::getAssetManager()->getRawDir() / filename);
 							std::filesystem::copy_file(file, raw_dst);
 							finfo.SourceFile = raw_dst.filename().string();
+
+							// Load it immediately
+							mesh->prepareLoad();
+
+							while (!mesh->isReadyToLoad()) {
+								// TODO: Show loading screen
+							}
+
+							mesh->load();
 						}
 					}
 
