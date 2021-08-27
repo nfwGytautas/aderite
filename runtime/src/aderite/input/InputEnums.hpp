@@ -28,8 +28,6 @@ enum class KeyModifier {
 /**
  * @brief Enum containing all possible keys
 */
-
-
 enum class Key {
 	// The unknown key
 	UNKNOWN		= 1,
@@ -171,7 +169,28 @@ enum class Key {
 	MENU			= 348,
 
 	// Number of keys
-	COUNT,
+	COUNT = MENU,
+};
+
+/**
+ * @brief Enum containing all possible mouse keys
+*/
+enum class MouseKey {
+	B1,
+	B2,
+	B3,
+	B4,
+	B5,
+	B6,
+	B7,
+	B8,
+
+	COUNT = B8,
+
+	// Helper
+	LEFT = B1,
+	RIGHT = B2,
+	MIDDLE = B3,
 };
 
 ADERITE_INPUT_NAMESPACE_END

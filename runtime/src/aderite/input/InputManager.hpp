@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include "aderite/utility/Macros.hpp"
 #include "aderite/input/InputEnums.hpp"
 
@@ -35,7 +36,7 @@ public:
 	void onWindowResized(unsigned int newWidth, unsigned int newHeight);
 
 	/**
-	 * @brief Function invoked when a key was pressed on the keyboard
+	 * @brief Function invoked when a key was pressed/released on the keyboard
 	 * @param key Key that was pressed
 	 * @param action Action, for more info look at KeyAction enum
 	 * @param modifiers Modifiers applied when the event was submitted
@@ -43,9 +44,44 @@ public:
 	void onKeyStateChange(Key key, KeyAction action, KeyModifier modifiers);
 
 	/**
+	 * @brief Function invoked when a mouse key was pressed/released on the keyboard
+	 * @param key Key that was pressed
+	 * @param action Action, for more info look at KeyAction enum
+	 * @param modifiers Modifiers applied when the event was submitted
+	*/
+	void onMouseKeyStateChange(MouseKey key, KeyAction action, KeyModifier modifiers);
+
+	/**
+	 * @brief Function invoked when a mouse was moved
+	 * @param xPos New x position of the mouse
+	 * @param yPos New y position of the mouse
+	*/
+	void onMouseMove(double xPos, double yPos);
+
+	/**
 	 * @brief Function invoked when the window has been closed by the user
 	*/
 	void onWindowClosed();
+
+	/**
+	 * @brief Returns true if the specified key is pressed, false otherwise
+	*/
+	bool isKeyPressed(Key key) const;
+
+	/**
+	 * @brief Returns true if the specified mouse key is pressed, false otherwise
+	*/
+	bool isMouseKeyPressed(MouseKey key) const;
+
+	/**
+	 * @brief Returns the mouse position relative to top-left corner of the screen
+	*/
+	glm::dvec2 getMousePosition() const;
+
+	/**
+	 * @brief Returns the mouse position change since last frame
+	*/
+	glm::dvec2 getMouseDelta() const;
 private:
 	InputManager() {}
 	friend class Engine;
@@ -56,6 +92,21 @@ private:
 	 * Key enum isn't fully sequential and as such there are gaps
 	*/
 	bool m_keyStates[(size_t)Key::COUNT] = { false };
+
+	/**
+	 * @brief True if key is down, false otherwise
+	*/
+	bool m_mouseKeyStates[(size_t)MouseKey::COUNT] = { false };
+
+	/**
+	 * @brief Mouse position
+	*/
+	glm::dvec2 m_mousePosition;
+
+	/**
+	 * @brief Delta move between frames
+	*/
+	glm::dvec2 m_mouseDelta;
 };
 
 ADERITE_INPUT_NAMESPACE_END
