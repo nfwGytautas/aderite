@@ -134,6 +134,12 @@ namespace aderite {
 				return getByName(path);
 			}
 
+			// Check if the path is valid
+			if (!std::filesystem::exists(getResDir() / path)) {
+				LOG_WARN("Tried to load a deleted asset");
+				return nullptr;
+			}
+
 			// Open YAML reader
 			YAML::Node data = YAML::LoadFile((getResDir() / path).string());
 
@@ -164,22 +170,10 @@ namespace aderite {
 
 			// Now deserialize
 			AssetType type = (AssetType)(data["Type"].as<size_t>());
-			asset::Asset* asset = nullptr;
+			asset::Asset* asset = createAssetFromType(type, name);
 
-			if (type == AssetType::SCENE) {
-				asset = new scene::Scene(name);
-			}
-			else if (type == AssetType::SHADER) {
-				asset = new asset::ShaderAsset(name);
-			}
-			else if (type == AssetType::MATERIAL) {
-				asset = new asset::MaterialAsset(name);
-			}
-			else if (type == AssetType::MESH) {
-				asset = new asset::MeshAsset(name);
-			}
-			else {
-				LOG_ERROR("Unknown asset type {0}", type);
+			// Failed to create just return
+			if (asset == nullptr) {
 				return nullptr;
 			}
 
@@ -256,6 +250,27 @@ namespace aderite {
 			}
 
 			return true;
+		}
+
+		Asset* AssetManager::createAssetFromType(AssetType type, const std::string& name) {
+			switch (type) {
+			case AssetType::SCENE: {
+				return new scene::Scene(name);
+			}
+			case AssetType::SHADER: {
+				return new asset::ShaderAsset(name);
+			}
+			case AssetType::MATERIAL: {
+				return new asset::MaterialAsset(name);
+			}
+			case AssetType::MESH: {
+				return new asset::MeshAsset(name);
+			}
+			default: {
+				LOG_ERROR("Unknown asset type {0}", type);
+				return nullptr;
+			}
+			}
 		}
 	}
 }

@@ -10,8 +10,7 @@ Entities:
       Name: Cube
     Transform:
       Position: [0, 0, 0]
-      Rotation: [0.675442457, 0.600393295, 0]
+      Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshRenderer:
-      Mesh: Meshes\CubeMesh.mesh
       Material: Materials\ExampleMaterial.material

@@ -20,6 +20,7 @@ public:
 	virtual void onRendererInitialized() override;
 	virtual void onEndRender() override;
 	virtual void onRuntimeShutdown() override;
+	virtual void onSystemUpdate() override;;
 
 	// ============================================================================
 	// Start of event routes, look at IEventSink interface for more information
@@ -32,9 +33,11 @@ public:
 	virtual void onCreateEntity(const std::string& name) override;
 	virtual void onDestroyEntity(const scene::Entity& Entity) override;
 	virtual void onSelectedAssetChanged(asset::Asset* asset) override;
-private:
-	window::Window* m_editorWindow = nullptr;
+	virtual void onStopGame() override;
+	virtual void onStartGame() override;
+	virtual void onResetGameState() override;
 
+private:
 	// Components
 	component::Toolbar* m_toolbar = nullptr;
 	component::Viewport* m_viewport = nullptr;

@@ -167,28 +167,26 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 			const std::string name = mr_node["Mesh"].as<std::string>();
 			asset::Asset* pAsset = ::aderite::Engine::getAssetManager()->getOrRead(name);
 
-			if (!pAsset) {
-				LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", scene->getName(), name);
-				return Entity::null();
+			if (pAsset) {
+				scene->useAsset(pAsset);
+				MeshRendererComponent.MeshHandle = static_cast<asset::MeshAsset*>(pAsset);
 			}
-
-			scene->useAsset(pAsset);
-
-			MeshRendererComponent.MeshHandle = static_cast<asset::MeshAsset*>(pAsset);
+			else {
+				LOG_WARN("Invalid asset handle received for mesh, probably the file {0} was deleted or moved externally", name);
+			}
 		}
 
 		if (mr_node["Material"]) {
 			const std::string name = mr_node["Material"].as<std::string>();
 			asset::Asset* pAsset = ::aderite::Engine::getAssetManager()->getOrRead(name);
 
-			if (!pAsset) {
-				LOG_ERROR("Failed to load scene {0} cause asset {1} failed to be read", scene->getName(), name);
-				return Entity::null();
+			if (pAsset) {
+				scene->useAsset(pAsset);
+				MeshRendererComponent.MaterialHandle = static_cast<asset::MaterialAsset*>(pAsset);
 			}
-
-			scene->useAsset(pAsset);
-
-			MeshRendererComponent.MaterialHandle = static_cast<asset::MaterialAsset*>(pAsset);
+			else {
+				LOG_WARN("Invalid asset handle received for material, probably the file {0} was deleted or moved externally", name);
+			}
 		}
 	}
 

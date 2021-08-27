@@ -9,6 +9,5 @@
 ADERITE_WINDOW_NAMESPACE_BEGIN
 
 class WindowManager;
-class Window;
 
 ADERITE_WINDOW_NAMESPACE_END

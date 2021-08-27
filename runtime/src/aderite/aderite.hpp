@@ -5,6 +5,7 @@
 #include "aderite/interfaces/IEngineMiddleware.hpp"
 
 #include "aderite/asset/Forward.hpp"
+#include "aderite/input/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/window/Forward.hpp"
@@ -67,24 +68,51 @@ public:
 	void onRendererInitialized();
 
 	/**
-	 * @brief Attaches a aderite editor instance to the runtime, previous one is deleted
-	 * @param editor Editor to attach
+	 * @brief Attaches a aderite middleware instance to the runtime, previous one is deleted
+	 * @param middleware Middleware to attach
 	*/
-	void attachMiddleware(interfaces::IEngineMiddleware* editor);
+	void attachMiddleware(interfaces::IEngineMiddleware* middleware);
+
+	/**
+	 * @brief Starts physics updates
+	*/
+	void startPhysicsUpdates();
+
+	/**
+	 * @brief Stops physics updates
+	*/
+	void stopPhysicsUpdates();
+
+	/**
+	 * @brief Starts scripts updates
+	*/
+	void startScriptUpdates();
+
+	/**
+	 * @brief Stops scripts updates
+	*/
+	void stopScriptUpdates();
 private:
 	Engine() {}
 	Engine(const Engine& o) = delete;
 
+	void updateSystem(float delta);
+	void updatePhysics(float delta);
+	void updateScripts(float delta);
 private:
 	bool m_wantsToShutdown = false;
-private:
-	ADERITE_SYSTEM_PTR(getWindowManager, window::WindowManager, m_window_manager)
-	ADERITE_SYSTEM_PTR(getRenderer, rendering::Renderer, m_renderer)
-	ADERITE_SYSTEM_PTR(getAssetManager, asset::AssetManager, m_AssetManager)
-	ADERITE_SYSTEM_PTR(getSceneManager, scene::SceneManager, m_scene_manager)
+	bool m_willUpdatePhysics = true;
+	bool m_willUpdateScripts = true;
 
-#if EDITOR_ENABLED == 1
-	ADERITE_SYSTEM_PTR(getMiddleware, interfaces::IEngineMiddleware, m_editor)
+private:
+	ADERITE_SYSTEM_PTR(getWindowManager, window::WindowManager, m_windowManager)
+	ADERITE_SYSTEM_PTR(getRenderer, rendering::Renderer, m_renderer)
+	ADERITE_SYSTEM_PTR(getAssetManager, asset::AssetManager, m_assetManager)
+	ADERITE_SYSTEM_PTR(getSceneManager, scene::SceneManager, m_sceneManager)
+	ADERITE_SYSTEM_PTR(getInputManager, input::InputManager, m_inputManager)
+
+#if MIDDLEWARE_ENABLED == 1
+	ADERITE_SYSTEM_PTR(getMiddleware, interfaces::IEngineMiddleware, m_middleware)
 #endif
 };
 

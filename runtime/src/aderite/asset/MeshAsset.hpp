@@ -2,7 +2,7 @@
 
 #include <bgfx/bgfx.h>
 #include "aderite/utility/Macros.hpp"
-#include "aderite/interfaces/IRenderable.hpp"
+#include "aderite/rendering/IRenderable.hpp"
 #include "aderite/asset/Asset.hpp"
 #include "aderite/asset/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
@@ -19,7 +19,7 @@ public:
 	*/
 	struct fields {
 		std::string SourceFile = "";
-		bool IsStatic = false;
+		bool IsStatic = true;
 		bool HasPosition = true;
 		bool HasIndices = true;
 	};

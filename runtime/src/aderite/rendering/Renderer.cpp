@@ -12,7 +12,7 @@
 #include "aderite/Config.hpp"
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/window/Window.hpp"
+#include "aderite/window/WindowManager.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/ShaderAsset.hpp"
@@ -115,32 +115,29 @@ namespace impl {
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
-Renderer* Renderer::createInstance() {
-	LOG_TRACE("Creating Renderer instance");
-	return new Renderer();
-}
-
-bool Renderer::init(window::Window* wnd) {
+bool Renderer::init() {
 	LOG_DEBUG("BGFX Renderer");
+
+	auto windowManager = ::aderite::Engine::getWindowManager();
+	glm::i32vec2 size = windowManager->getSize();
 
 	// Platform data
 	bgfx::PlatformData pd;
-	pd.nwh = wnd->getNativeHandle();
+	pd.nwh = windowManager->getNativeHandle();
 
 	bgfx::Init bgfxInit;
 	bgfxInit.platformData = pd;
 	bgfxInit.type = bgfx::RendererType::Count; // Automatically choose a backend
-	bgfxInit.resolution.width = wnd->getSize().x;
-	bgfxInit.resolution.height = wnd->getSize().y;
+	bgfxInit.resolution.width = size.x;
+	bgfxInit.resolution.height = size.y;
 	bgfxInit.resolution.reset = BGFX_RESET_VSYNC;
 	bgfxInit.callback = &::impl::g_cb;
+
+	// TODO: Add multi threaded
 
 	if (!bgfx::init(bgfxInit)) {
 		LOG_ERROR("Failed to initialize BGFX");
 	}
-
-	// Setup default render target
-	m_attachedTo = wnd;
 
 	// Create default output framebuffer
 	m_output = ::impl::createFrameBuffer();
@@ -168,7 +165,7 @@ void Renderer::clear() {
 
 void Renderer::resetOutput() {
 	// Set Viewport
-	glm::vec2 size = m_attachedTo->getSize();
+	glm::i32vec2 size = ::aderite::Engine::getWindowManager()->getSize();
 	bgfx::setViewRect(0, 0, 0, size.x, size.y);
 }
 
@@ -203,6 +200,11 @@ void Renderer::render() {
 		mr.MeshHandle->fillDrawCall(&dc);
 		mr.MaterialHandle->fillDrawCall(&dc);
 
+		// Check if valid draw call
+		if (!dc.Valid) {
+			continue;
+		}
+
 		glm::mat4 tmat = scene::components::TransformComponent::compute_transform(TransformComponent);
 
 		// Matrices
@@ -211,8 +213,10 @@ void Renderer::render() {
 		float view[16];
 		bx::mtxLookAt(view, eye, at);
 		float proj[16];
-		glm::vec2 wsize = m_attachedTo->getSize();
-		bx::mtxProj(proj, 60.0f, float(wsize.x) / float(wsize.y), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+
+		// TODO: Move this
+		glm::i32vec2 size = ::aderite::Engine::getWindowManager()->getSize();
+		bx::mtxProj(proj, 60.0f, float(size.x) / float(size.y), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 		bgfx::setViewTransform(0, view, proj);
 		float model[16];
 		bgfx::setTransform(glm::value_ptr(tmat));

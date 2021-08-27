@@ -31,9 +31,24 @@ constexpr char* EngineVersion = "0.0.0";
 
 
 // ---------------------------------
-// EDITOR ENABLED
+// MIDDLEWARE ENABLED
 // 0 - Disabled
 // 1 - Enabled
 // ---------------------------------
 
-#define EDITOR_ENABLED 1
+#define MIDDLEWARE_ENABLED 1
+
+
+// ---------------------------------
+// Error checks
+// ---------------------------------
+
+#if GLFW_BACKEND == 0
+#error "No backend specified"
+#endif
+
+#if BINARY_SAVE_TYPE == 1 && HUMAN_READABLE_SAVE_TYPE == 1
+#error "Both binary and human readable save type enabled, only one can be enabled at a given time"
+#elif BINARY_SAVE_TYPE == 0 && HUMAN_READABLE_SAVE_TYPE == 0
+#error "Save type not specified"
+#endif
