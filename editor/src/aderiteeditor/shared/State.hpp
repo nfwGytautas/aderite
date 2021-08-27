@@ -12,6 +12,12 @@ class State {
 public:
 	static IEventSink* Sink;
 	static Project* Project;
+	static EditorCamera* EditorCamera;
+
+	/**
+	 * @brief True if currently in game mode, false otherwise
+	*/
+	static bool IsGameMode;
 };
 
 ADERITE_EDITOR_SHARED_NAMESPACE_END

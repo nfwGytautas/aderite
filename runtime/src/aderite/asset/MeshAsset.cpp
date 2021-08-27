@@ -116,6 +116,10 @@ bool MeshAsset::isLoaded() {
 	return bgfx::isValid(m_vbh);
 }
 
+size_t MeshAsset::hash() const {
+	return std::hash<std::string>{}(p_name);
+}
+
 MeshAsset::MeshAsset(const std::string& name)
 	: Asset(name)
 {}

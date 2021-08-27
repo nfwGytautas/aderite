@@ -29,7 +29,7 @@ void SceneManager::setActive(Scene* scene) {
 
 	// Wait until the scene 
 	while (!scene->isReadyToLoad()) {
-		// TODO: Rethink this
+		// TODO: Rethink this, cause there should be some sort of loading screen probably
 		// Sleep for 1 second
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
@@ -38,6 +38,8 @@ void SceneManager::setActive(Scene* scene) {
 		scene->load();
 	}
 
+	// Notify engine
+	::aderite::Engine::get()->onSceneChanged(scene);
 	m_activeScene = scene;
 }
 

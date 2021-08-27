@@ -1,17 +1,17 @@
 #include "Renderer.hpp"
 
+#include <unordered_map>
+
 #include <glm/gtc/type_ptr.hpp>
 
 #include <bgfx/bgfx.h>
 #include <bx/string.h>
 
-// TODO: Move to glm
-// TEMPORARY
-#include <bx/math.h>
-
 #include "aderite/Config.hpp"
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/bgfx.hpp"
+#include "aderite/utility/Utility.hpp"
 #include "aderite/window/WindowManager.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
@@ -64,52 +64,6 @@ namespace impl {
 		virtual void screenShot(const char*, uint32_t, uint32_t, uint32_t, const void*, uint32_t, bool yflip) override { }
 	};
 
-	bgfx::TextureFormat::Enum findDepthFormat(uint64_t textureFlags, bool stencil = false) {
-		const bgfx::TextureFormat::Enum depthFormats[] = { bgfx::TextureFormat::D16, bgfx::TextureFormat::D32 };
-		const bgfx::TextureFormat::Enum depthStencilFormats[] = { bgfx::TextureFormat::D24S8 };
-
-		const bgfx::TextureFormat::Enum* formats = stencil ? depthStencilFormats : depthFormats;
-		size_t count = stencil ? BX_COUNTOF(depthStencilFormats) : BX_COUNTOF(depthFormats);
-
-		bgfx::TextureFormat::Enum depthFormat = bgfx::TextureFormat::Count;
-		for (size_t i = 0; i < count; i++) {
-			if (bgfx::isTextureValid(0, false, 1, formats[i], textureFlags)) {
-				depthFormat = formats[i];
-				break;
-			}
-		}
-
-		assert(depthFormat != bgfx::TextureFormat::Enum::Count);
-		return depthFormat;
-	}
-
-	bgfx::FrameBufferHandle createFrameBuffer(bool hdr = true, bool depth = true) {
-		bgfx::TextureHandle textures[2];
-		uint8_t attachments = 0;
-
-		const uint64_t samplerFlags = BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT |
-			BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
-
-		// BGRA is often faster (internal GPU format)
-		bgfx::TextureFormat::Enum format = hdr ? bgfx::TextureFormat::RGBA16F : bgfx::TextureFormat::BGRA8;
-		assert(bgfx::isTextureValid(0, false, 1, format, BGFX_TEXTURE_RT | samplerFlags));
-		textures[attachments++] = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, format, BGFX_TEXTURE_RT | samplerFlags);
-
-		if (depth) {
-			bgfx::TextureFormat::Enum depthFormat = findDepthFormat(BGFX_TEXTURE_RT_WRITE_ONLY | samplerFlags);
-			assert(depthFormat != bgfx::TextureFormat::Enum::Count);
-			textures[attachments++] = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, depthFormat, BGFX_TEXTURE_RT_WRITE_ONLY | samplerFlags);
-		}
-
-		bgfx::FrameBufferHandle fb = bgfx::createFrameBuffer(attachments, textures, true);
-
-		if (!bgfx::isValid(fb)) {
-			LOG_WARN("Failed to create framebuffer");
-		}
-
-		return fb;
-	}
-
 	static bgfxCallback g_cb;
 }
 
@@ -139,10 +93,6 @@ bool Renderer::init() {
 		LOG_ERROR("Failed to initialize BGFX");
 	}
 
-	// Create default output framebuffer
-	m_output = ::impl::createFrameBuffer();
-	bgfx::setName(m_output, "Renderer output framebuffer (pre-postprocessing)");
-
 	// Finish any queued operations
 	bgfx::frame();
 
@@ -156,7 +106,7 @@ void Renderer::shutdown() {
 }
 
 void Renderer::setVsync(bool enabled) {
-	LOG_WARN("setVsync not implemented");
+	ADERITE_UNIMPLEMENTED;
 }
 
 void Renderer::clear() {
@@ -164,30 +114,25 @@ void Renderer::clear() {
 }
 
 void Renderer::resetOutput() {
-	// Set Viewport
+	// Set SceneView
 	glm::i32vec2 size = ::aderite::Engine::getWindowManager()->getSize();
 	bgfx::setViewRect(0, 0, 0, size.x, size.y);
 }
 
-void Renderer::render() {
+void Renderer::renderScene(scene::Scene* scene) {
+	// TODO: Sorting
+
 	if (!isReady()) {
 		return;
 	}
 
-	DrawCall dc;
+	std::unordered_map<size_t, DrawCall> drawCalls;
+	size_t drawCallIdx = 0;
 
-	// Default target is Renderer Viewport
-	dc.Target = m_output;
+	// Resize
+	drawCalls.reserve(m_lastRenderDrawCalls);
 
-	// TODO: Sorting, batching, output target
-	// TODO: Camera, position, perspective matrix
-
-	// Bind shared::State::
-	bgfx::setViewFrameBuffer(0, dc.Target);
-	bgfx::touch(0);
-
-	// Render entities
-	scene::Scene* scene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+	// Construct draw calls
 	auto group = scene->getEntityRegistry().group<scene::components::TransformComponent>(entt::get<scene::components::MeshRendererComponent>);
 	for (auto entity : group) {
 		// TODO: Layers
@@ -197,75 +142,92 @@ void Renderer::render() {
 			continue;
 		}
 
-		mr.MeshHandle->fillDrawCall(&dc);
-		mr.MaterialHandle->fillDrawCall(&dc);
+		// Check if draw call already exists
+		size_t hash = utility::combineHash(mr.MeshHandle->hash(), mr.MaterialHandle->hash());
+		DrawCall& dc = drawCalls[hash];
 
-		// Check if valid draw call
-		if (!dc.Valid) {
-			continue;
+		if (!bgfx::isValid(dc.VBO) || !bgfx::isValid(dc.Shader)) {
+			mr.MeshHandle->fillDrawCall(&dc);
+			mr.MaterialHandle->fillDrawCall(&dc);
 		}
 
 		glm::mat4 tmat = scene::components::TransformComponent::compute_transform(TransformComponent);
-
-		// Matrices
-		const bx::Vec3 at = { 0.0f, 0.0f,  0.0f };
-		const bx::Vec3 eye = { 0.0f, 0.0f, -5.0f };
-		float view[16];
-		bx::mtxLookAt(view, eye, at);
-		float proj[16];
-
-		// TODO: Move this
-		glm::i32vec2 size = ::aderite::Engine::getWindowManager()->getSize();
-		bx::mtxProj(proj, 60.0f, float(size.x) / float(size.y), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
-		bgfx::setViewTransform(0, view, proj);
-		float model[16];
-		bgfx::setTransform(glm::value_ptr(tmat));
-
-		// Bind buffers
-		bgfx::setVertexBuffer(0, dc.VBO);
-
-		if (bgfx::isValid(dc.IBO)) {
-			bgfx::setIndexBuffer(dc.IBO);
-		}
-
-		// Default render shared::State::
-		//bgfx::setState(BGFX_STATE_DEFAULT);
-
-		// Submit draw call
-		bgfx::submit(0, dc.Shader);
+		dc.Transformations.push_back(tmat);
 	}
 
-	//bgfx::discard();
+	// View 0 clear
+	bgfx::touch(0);
 
-	// Reset to default
-	//bgfx::setViewFrameBuffer(0, BGFX_INVALID_HANDLE);
+	// Skip rendering if there are no draw calls
+	if (drawCalls.size() > 0) {
+		// Execute draw calls for all cameras
+		for (interfaces::ICamera* camera : scene->getCameras()) {
+			if (!camera->isEnabled()) {
+				// Skip disabled cameras
+				continue;
+			}
+
+			auto& outputHandle = camera->getOutputHandle();
+			if (!bgfx::isValid(outputHandle)) {
+				// Skip invalid handles
+				continue;
+			}
+
+			// Set persistent matrices
+			bgfx::setViewTransform(0, glm::value_ptr(camera->computeViewMatrix()), glm::value_ptr(camera->computeProjectionMatrix()));
+
+			// Bind state
+			bgfx::setViewFrameBuffer(0, camera->getOutputHandle());
+			bgfx::touch(0);
+
+			for (auto& dc : drawCalls) {
+				executeDrawCall(dc.second);
+			}
+		}
+	}	
+
+	// Commit
+	bgfx::frame(false);
+
+	m_lastRenderDrawCalls = drawCalls.size();
 }
 
 bool Renderer::isReady() {
 	return m_isInitialized;
 }
 
-void Renderer::beginFrame() {
-	if (!isReady()) {
-		return;
-	}
-
+void Renderer::setResolution(const glm::uvec2& size) {
+	bgfx::setViewRect(0, 0, 0, size.x, size.y);
 }
 
-void Renderer::endFrame() {
-	if (!isReady()) {
-		return;
-	}
-
-	bgfx::frame(false);
-}
-
-bgfx::FrameBufferHandle Renderer::getOutput() {
-	return m_output;
-}
-
-void Renderer::displayFrame() {
+void Renderer::displayFrame(bgfx::FrameBufferHandle image) {
 	LOG_ERROR("displayFrame() not implemented yet");
+}
+
+void Renderer::executeDrawCall(DrawCall& dc) {
+	// Check if valid draw call
+	if (!dc.Valid) {
+		return;
+	}
+
+	// Bind buffers
+	bgfx::setVertexBuffer(0, dc.VBO);
+
+	if (bgfx::isValid(dc.IBO)) {
+		bgfx::setIndexBuffer(dc.IBO);
+	}
+
+	if (dc.Instanced) {
+		LOG_WARN("Instanced rendering not implemented yet");
+	}
+	else {
+		for (auto& transform : dc.Transformations) {
+			bgfx::setTransform(glm::value_ptr(transform));
+
+			// Submit draw call
+			bgfx::submit(0, dc.Shader);
+		}
+	}
 }
 
 ADERITE_RENDERING_NAMESPACE_END

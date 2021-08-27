@@ -24,6 +24,13 @@
 #error "Unsupported platform"
 #endif
 
+ // ---------------------------------
+ // HELPERS
+ // ---------------------------------
+
+// Helper define for logging when a unimplemented method is called
+#define ADERITE_UNIMPLEMENTED LOG_WARN("Function {0} in {1}, on line {2} not yet implemented", __func__, __FILE__, __LINE__);
+
 // ---------------------------------
 // NAMESPACES
 // ---------------------------------

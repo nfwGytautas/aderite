@@ -12,5 +12,7 @@ class BaseComponent;
 class IEventSink;
 class Project;
 class State;
+class EditorCamera;
+class Settings;
 
 ADERITE_EDITOR_SHARED_NAMESPACE_END

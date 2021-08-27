@@ -58,14 +58,15 @@ public:
 	*/
 	void abortExit();
 
-	// TODO: Rethink this
-	void beginFrame();
-	void endFrame();
-
 	/**
 	 * @brief Function is invoked when the Renderer was initialized
 	*/
 	void onRendererInitialized();
+
+	/**
+	 * @brief Function is invoked when the active scene was changed
+	*/
+	void onSceneChanged(scene::Scene* scene);
 
 	/**
 	 * @brief Attaches a aderite middleware instance to the runtime, previous one is deleted
@@ -92,18 +93,29 @@ public:
 	 * @brief Stops scripts updates
 	*/
 	void stopScriptUpdates();
+
+	/**
+	 * @brief Starts scene updates
+	*/
+	void startSceneUpdates();
+
+	/**
+	 * @brief Stops scene updates
+	*/
+	void stopSceneUpdates();
 private:
 	Engine() {}
 	Engine(const Engine& o) = delete;
 
 	void updateSystem(float delta);
+	void updateScenes(float delta);
 	void updatePhysics(float delta);
 	void updateScripts(float delta);
 private:
 	bool m_wantsToShutdown = false;
+	bool m_willUpdateScenes = true;
 	bool m_willUpdatePhysics = true;
 	bool m_willUpdateScripts = true;
-
 private:
 	ADERITE_SYSTEM_PTR(getWindowManager, window::WindowManager, m_windowManager)
 	ADERITE_SYSTEM_PTR(getRenderer, rendering::Renderer, m_renderer)

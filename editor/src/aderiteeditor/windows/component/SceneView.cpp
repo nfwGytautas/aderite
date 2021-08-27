@@ -1,101 +1,53 @@
 #include "SceneView.hpp"
 
 #include <imgui/imgui.h>
+#include <bgfx/bgfx.h>
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/utility/Random.hpp"
-#include "aderite/scene/Scene.hpp"
-#include "aderite/scene/SceneManager.hpp"
+#include "aderite/rendering/Renderer.hpp"
 #include "aderiteeditor/shared/State.hpp"
-#include "aderiteeditor/shared/IEventSink.hpp"
-#include "aderiteeditor/windows/component/Modals.hpp"
-#include "aderiteeditor/windows/component/ComponentUtility.hpp"
+#include "aderiteeditor/shared/EditorCamera.hpp"
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
-			
-			SceneView::SceneView() {
-				m_textModal = new TextInputModal();
-			}
 
-			SceneView::~SceneView() {
-				delete m_textModal;
-			}
+void SceneView::init() {
+}
 
-			void SceneView::setActiveEntity(scene::Entity& Entity) {
-				m_selectedEntity = Entity;
-			}
+void SceneView::shutdown() {
+}
 
-			void SceneView::render() {
-				static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+void SceneView::render() {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
+	//ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	if (!ImGui::Begin("Scene view")) {
+		ImGui::End();
+		ImGui::PopStyleVar();
+		return;
+	}
 
-				if (!ImGui::Begin("Scene hierarchy")) {
-					ImGui::End();
-					return;
-				}				
+	if (!bgfx::isValid(m_fbth)) {
+		ImGui::End();
+		ImGui::PopStyleVar();
+		return;
+	}
 
-				// Root node name is the scene name
-				scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+	ImVec2 viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+	m_size.x = viewportPanelSize.x;
+	m_size.y = viewportPanelSize.y;
+	shared::State::EditorCamera->onViewportResize(m_size);
+	
+	ImGui::Image((void*)(intptr_t)m_fbth.idx, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
-				if (!currentScene) {
-					ImGui::End();
-					return;
-				}
+	ImGui::End();
+	ImGui::PopStyleVar();
+}
 
-				// Context menu
-				if (ImGui::BeginPopupContextWindow())
-				{
-					if (ImGui::Selectable("Create Entity")) {
-						// TODO: Make sure that this is actually unique
-						shared::State::Sink->onCreateEntity(random::generateString(16));
-					}
-
-					ImGui::EndPopup();
-				}
-
-				ImGui::Text("%s", currentScene->getName().c_str());
-
-				// Actual tree
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 2));
-				for (auto [Entity, MetaComponent] : currentScene->getEntityRegistry().view<::aderite::scene::components::MetaComponent>().each()) {
-					scene::Entity e = scene::Entity(Entity, currentScene);
-
-					// Tree node
-					bool has_children = false;
-
-					if (has_children) {
-						// If this is a Entity with children
-						// TODO: TreeNodeEx (ImGui Selectable Node example)
-					}
-					else {
-						// If this is a single Entity
-						ImGuiTreeNodeFlags node_flags = base_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-
-						if (m_selectedEntity == Entity) {
-							node_flags |= ImGuiTreeNodeFlags_Selected;
-						}
-
-						ImGui::TreeNodeEx((void*)(intptr_t)(uint32_t)Entity, node_flags, "%s", MetaComponent.Name.c_str());
-
-						if (ImGui::IsItemClicked()) {
-							shared::State::Sink->onSelectedEntityChanged(e);
-						}
-					}
-
-					// Context menu
-					if (ImGui::BeginPopupContextItem()) {
-						shared::State::Sink->onSelectedEntityChanged(e);
-
-						if (ImGui::Selectable("Delete")) {
-							shared::State::Sink->onDestroyEntity(e);
-						}
-
-						ImGui::EndPopup();
-					}
-				}
-				ImGui::PopStyleVar();
-
-				ImGui::End();
-			}
+void SceneView::onSceneChanged(scene::Scene* scene) {
+	// TODO: Error check
+	m_fbth = bgfx::getTexture(shared::State::EditorCamera->getOutputHandle(), 0);
+	shared::State::EditorCamera->onViewportResize(m_size);
+}
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_END

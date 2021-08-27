@@ -11,5 +11,6 @@ ADERITE_SCENE_NAMESPACE_BEGIN
 class SceneManager;
 class Scene;
 class Entity;
+class EntityCamera;
 
 ADERITE_SCENE_NAMESPACE_END

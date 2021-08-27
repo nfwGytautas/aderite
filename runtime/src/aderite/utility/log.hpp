@@ -22,40 +22,34 @@ public:
 	void init();
 
 	// START OF SPDLOG INTERFACE
-
+	
 	template<typename... Args>
-	void debug(Args &&...args)
-	{
+	void debug(Args&&...args) {
 		m_logger->debug(std::forward<Args>(args)...);
 	}
 
 	template<typename... Args>
-	void trace(Args &&...args)
-	{
+	void trace(Args&&...args) {
 		m_logger->trace(std::forward<Args>(args)...);
 	}
 
 	template<typename... Args>
-	void info(Args &&...args)
-	{
+	void info(Args&&...args) {
 		m_logger->info(std::forward<Args>(args)...);
 	}
 
 	template<typename... Args>
-	void warn(Args &&...args)
-	{
+	void warn(Args&&...args) {
 		m_logger->warn(std::forward<Args>(args)...);
 	}
 
 	template<typename... Args>
-	void error(Args &&...args)
-	{
+	void error(Args&&...args) {
 		m_logger->error(std::forward<Args>(args)...);
 	}
 
 	template<typename... Args>
-	void critical(Args &&...args)
-	{
+	void critical(Args&&...args) {
 		m_logger->critical(std::forward<Args>(args)...);
 	}
 

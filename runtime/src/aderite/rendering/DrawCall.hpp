@@ -1,6 +1,8 @@
 #pragma once
 
 #include <bgfx/bgfx.h>
+#include <glm/glm.hpp>
+#include <vector>
 #include "aderite/utility/Macros.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
@@ -19,11 +21,14 @@ public:
 	// Shader with which to render
 	bgfx::ProgramHandle Shader = BGFX_INVALID_HANDLE;
 
-	// Target where to render to
-	bgfx::FrameBufferHandle Target = BGFX_INVALID_HANDLE;
-
 	// If this value is false the renderer will abort the draw call
 	bool Valid = true;
+
+	// Should the draw call be instanced or not, default false
+	bool Instanced = false;
+
+	// Vector containing transformations, for instanced rendering
+	std::vector<glm::mat4> Transformations;
 };
 
 ADERITE_RENDERING_NAMESPACE_END

@@ -3,6 +3,7 @@
 #include "aderite/interfaces/IEngineMiddleware.hpp"
 #include "aderite/window/Forward.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
+#include "aderiteeditor/shared/Forward.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
 #include "aderiteeditor/windows/component/Forward.hpp"
 
@@ -20,7 +21,8 @@ public:
 	virtual void onRendererInitialized() override;
 	virtual void onEndRender() override;
 	virtual void onRuntimeShutdown() override;
-	virtual void onSystemUpdate() override;;
+	virtual void onSceneChanged(scene::Scene* scene) override;
+	virtual void onSystemUpdate(float delta);
 
 	// ============================================================================
 	// Start of event routes, look at IEventSink interface for more information
@@ -38,10 +40,13 @@ public:
 	virtual void onResetGameState() override;
 
 private:
+	shared::EditorCamera* createEditorCamera();
+
+private:
 	// Components
 	component::Toolbar* m_toolbar = nullptr;
-	component::Viewport* m_viewport = nullptr;
 	component::SceneView* m_sceneView = nullptr;
+	component::SceneHierarchy* m_sceneHierarchy = nullptr;
 	component::EntityEditor* m_propertyEditor = nullptr;
 	component::AssetBrowser* m_assetBrowser = nullptr;
 	component::AssetEditor* m_assetEditor = nullptr;

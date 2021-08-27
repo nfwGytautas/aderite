@@ -6,6 +6,7 @@
 #include "aderite/asset/Forward.hpp"
 #include "aderite/asset/Asset.hpp"
 #include "aderite/scene/Forward.hpp"
+#include "aderite/scene/ICamera.hpp"
 #include "aderite/scene/components/Components.hpp"
 
 
@@ -19,12 +20,20 @@ ADERITE_SCENE_NAMESPACE_BEGIN
 */
 class Scene : public asset::Asset {
 public:
+	virtual ~Scene();
+
 	/**
 	 * @brief Returns entt registry
 	*/
 	entt::registry& getEntityRegistry() {
 		return m_registry;
 	}
+
+	/**
+	 * @brief Update scene
+	 * @param delta Delta time between frames
+	*/
+	void update(float delta);
 
 	/**
 	 * @brief Create Entity with a MetaComponent component
@@ -35,7 +44,7 @@ public:
 	/**
 	 * @brief Destroy an Entity
 	*/
-	void destroyEntity(Entity Entity);
+	void destroyEntity(Entity entity);
 
 	/**
 	 * @brief Marks the asset as being used by the Scene
@@ -49,6 +58,19 @@ public:
 	*/
 	virtual void removeAsset(asset::Asset* asset);
 
+	/**
+	 * @brief Returns the cameras that are in the scene
+	 * @return Vector containing cameras in the scene
+	*/
+	std::vector<interfaces::ICamera*> getCameras();
+
+	/**
+	 * @brief Attach a camera to the scene, this will force the renderer to render a scene to this camera output
+	 * if it is enabled
+	 * @param camera Camera to attach
+	*/
+	void attachCamera(interfaces::ICamera* camera);
+
 	// Inherited via asset_base
 	virtual void prepareLoad() override;
 	virtual bool isReadyToLoad() override;
@@ -56,6 +78,7 @@ public:
 	virtual void unload() override;
 	virtual bool isPreparing() override;
 	virtual bool isLoaded() override;
+	virtual size_t hash() const override;
 
 	virtual asset::AssetType type() const override;
 	virtual bool isInGroup(asset::AssetGroup group) const override;
@@ -73,6 +96,7 @@ private:
 	// Assets that the Scene uses
 	std::vector<asset::Asset*> m_assets;
 	entt::registry m_registry;
+	std::vector<interfaces::ICamera*> m_cameras;
 };
 
 ADERITE_SCENE_NAMESPACE_END

@@ -2,7 +2,10 @@
 
 #include <vector>
 #include <bgfx/bgfx.h>
+#include <glm/glm.hpp>
 #include "aderite/window/Forward.hpp"
+#include "aderite/scene/Forward.hpp"
+#include "aderite/rendering/Forward.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
@@ -39,36 +42,35 @@ public:
 	void resetOutput();
 
 	/**
-	 * @brief Executes a single render pass
+	 * @brief Submit a scene to be rendered
+	 * @param scene Scene to render
 	*/
-	void render();
+	void renderScene(scene::Scene* scene);
 
 	/**
 	 * @brief Returns true if Renderer ready to render
 	*/
 	bool isReady();
 
-	// TODO: Rethink this
-	void beginFrame();
-	void endFrame();
+	/**
+	 * @brief Sets the resolution of the renderer
+	 * @param size The new resolution
+	*/
+	void setResolution(const glm::uvec2& size);
 
 	/**
-	 * @brief Returns the final output framebuffer which can then be rendered to texture in editors, call displayFrame()
-	 * to render the content of the framebuffer to screen
+	 * @brief Renders output of a framebuffer to screen
+	 * @param image Image to display
 	*/
-	bgfx::FrameBufferHandle getOutput();
-
-	/**
-	 * @brief Renders output framebuffer to screen
-	*/
-	void displayFrame();
+	void displayFrame(bgfx::FrameBufferHandle image);
 private:
 	Renderer() {}
 	friend class Engine;
 
+	void executeDrawCall(DrawCall& dc);
 private:
 	bool m_isInitialized = false;
-	bgfx::FrameBufferHandle m_output = BGFX_INVALID_HANDLE;
+	size_t m_lastRenderDrawCalls = 0;
 };
 
 ADERITE_RENDERING_NAMESPACE_END

@@ -11,6 +11,7 @@
 #include "aderite/asset/MeshAsset.hpp" 
 #include "aderite/asset/MaterialAsset.hpp" 
 #include "aderite/scene/Entity.hpp"
+#include "aderite/scene/EntityCamera.hpp"
 #include "aderite/scene/components/Components.hpp"
 
 
@@ -130,6 +131,17 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 		out << YAML::EndMap; // MeshRenderer
 	}
 
+	// Camera
+	if (e.hasComponent<components::CameraComponent>()) {
+		out << YAML::Key << "Camera";
+		out << YAML::BeginMap; // Camera
+
+		components::CameraComponent& cameraComponent = e.getComponent<components::CameraComponent>();
+		cameraComponent.Camera->serialize(out);
+
+		out << YAML::EndMap; // Camera
+	}
+
 	out << YAML::EndMap; // Entity
 }
 
@@ -190,7 +202,28 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 		}
 	}
 
+	// Camera
+	auto cam_node = e_node["Camera"];
+	if (cam_node) {
+		auto& cameraComponent = e.addComponent<components::CameraComponent>();
+		cameraComponent.Camera = new EntityCamera(e);
+		cameraComponent.Camera->deserialize(cam_node);
+		scene->attachCamera(cameraComponent.Camera);
+	}
+
 	return e;
+}
+
+Scene::~Scene() {
+	for (auto& camera : m_cameras) {
+		delete camera;
+	}
+}
+
+void Scene::update(float delta) {
+	for (auto& camera : m_cameras) {
+		camera->update(delta);
+	}
 }
 
 Entity Scene::createEntity(const components::MetaComponent& MetaComponent) {
@@ -200,8 +233,8 @@ Entity Scene::createEntity(const components::MetaComponent& MetaComponent) {
 	return e;
 }
 
-void Scene::destroyEntity(Entity Entity) {
-	m_registry.destroy(Entity);
+void Scene::destroyEntity(Entity entity) {
+	m_registry.destroy(entity);
 }
 
 void Scene::useAsset(asset::Asset* asset) {
@@ -244,6 +277,14 @@ bool Scene::deserialize(YAML::Node& data) {
 	}
 
 	return true;
+}
+
+std::vector<interfaces::ICamera*> Scene::getCameras() {
+	return m_cameras;
+}
+
+void Scene::attachCamera(interfaces::ICamera* camera) {
+	m_cameras.push_back(camera);
 }
 
 void Scene::prepareLoad() {
@@ -292,6 +333,10 @@ bool Scene::isLoaded() {
 	}
 	
 	return true;
+}
+
+size_t Scene::hash() const {
+	return std::hash<std::string>{}(p_name);
 }
 
 asset::AssetType Scene::type() const {

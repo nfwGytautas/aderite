@@ -6,6 +6,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Macros.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/Utility.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/rendering/DrawCall.hpp"
@@ -64,6 +65,16 @@ bool MaterialAsset::isPreparing() {
 
 bool MaterialAsset::isLoaded() {
 	return m_info.Shader->isLoaded();
+}
+
+size_t MaterialAsset::hash() const {
+	size_t thisHash = std::hash<std::string>{}(p_name);
+	if (m_info.Shader) {
+		size_t shaderHash = m_info.Shader->hash();
+		return utility::combineHash(shaderHash, thisHash);
+	}
+
+	return thisHash;
 }
 
 MaterialAsset::MaterialAsset(const std::string& name)

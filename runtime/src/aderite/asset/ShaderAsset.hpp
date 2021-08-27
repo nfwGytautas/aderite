@@ -31,6 +31,7 @@ public:
 	virtual void unload() override;
 	virtual bool isPreparing() override;
 	virtual bool isLoaded() override;
+	virtual size_t hash() const override;
 
 	/**
 	 * @brief Returns the info of shader fields

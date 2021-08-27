@@ -52,6 +52,11 @@ public:
 	 * @brief Returns true if the asset is in group
 	*/
 	virtual bool isInGroup(AssetGroup group) const = 0;
+
+	/**
+	 * @brief Returns the hash of the asset
+	*/
+	virtual size_t hash() const = 0;
 protected:
 	Asset(const std::string& name)
 		: p_name(name)

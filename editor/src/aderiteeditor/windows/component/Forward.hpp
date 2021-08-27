@@ -11,9 +11,9 @@ ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 class AssetBrowser;
 class AssetEditor;
 class EntityEditor;
-class SceneView;
+class SceneHierarchy;
 class Toolbar;
-class Viewport;
+class SceneView;
 
 class TextInputModal;
 

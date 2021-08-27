@@ -20,9 +20,10 @@
 #include "aderite/input/InputManager.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Project.hpp"
+#include "aderiteeditor/shared/EditorCamera.hpp"
 #include "aderiteeditor/windows/component/Toolbar.hpp"
-#include "aderiteeditor/windows/component/Viewport.hpp"
 #include "aderiteeditor/windows/component/SceneView.hpp"
+#include "aderiteeditor/windows/component/SceneHierarchy.hpp"
 #include "aderiteeditor/windows/component/EntityEditor.hpp"
 #include "aderiteeditor/windows/component/AssetBrowser.hpp"
 #include "aderiteeditor/windows/component/AssetEditor.hpp"
@@ -34,8 +35,8 @@ ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN
 
 WindowsEditor::WindowsEditor(int argc, char** argv) {
 	m_toolbar = new component::Toolbar();
-	m_viewport = new component::Viewport();
 	m_sceneView = new component::SceneView();
+	m_sceneHierarchy = new component::SceneHierarchy();
 	m_propertyEditor = new component::EntityEditor();
 	m_assetBrowser = new component::AssetBrowser();
 	m_assetEditor = new component::AssetEditor();
@@ -47,8 +48,8 @@ WindowsEditor::WindowsEditor(int argc, char** argv) {
 
 WindowsEditor::~WindowsEditor() {
 	delete m_toolbar;
-	delete m_viewport;
 	delete m_sceneView;
+	delete m_sceneHierarchy;
 	delete m_propertyEditor;
 	delete m_assetBrowser;
 	delete m_assetEditor;
@@ -63,6 +64,9 @@ void WindowsEditor::onRuntimeInitialized() {
 		::aderite::Engine::get()->requestExit();
 		return;
 	}
+
+	// By default disable game updates
+	onStopGame();
 
 	// TODO: Startup dialog e.g. create new project, load project, etc.
 	this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");
@@ -79,7 +83,7 @@ void WindowsEditor::onRendererInitialized() {
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-SceneView / Platform Windows
 	//io.ConfigViewportsNoAutoMerge = true;
 	//io.ConfigViewportsNoTaskBarIcon = true;
 
@@ -127,8 +131,8 @@ void WindowsEditor::onRendererInitialized() {
 
 	// Components
 	m_toolbar->init();
-	m_viewport->init();
 	m_sceneView->init();
+	m_sceneHierarchy->init();
 	m_propertyEditor->init();
 	m_assetBrowser->init();
 	m_assetEditor->init();
@@ -158,10 +162,10 @@ void WindowsEditor::onEndRender() {
 	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 	if (opt_fullscreen)
 	{
-		ImGuiViewport* Viewport = ImGui::GetMainViewport();
-		ImGui::SetNextWindowPos(Viewport->Pos);
-		ImGui::SetNextWindowSize(Viewport->Size);
-		ImGui::SetNextWindowViewport(Viewport->ID);
+		ImGuiViewport* SceneView = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(SceneView->Pos);
+		ImGui::SetNextWindowSize(SceneView->Size);
+		ImGui::SetNextWindowViewport(SceneView->ID);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
@@ -204,8 +208,8 @@ void WindowsEditor::onEndRender() {
 
 	// Components
 	m_toolbar->render();
-	m_viewport->render();
 	m_sceneView->render();
+	m_sceneHierarchy->render();
 	m_propertyEditor->render();
 	m_assetBrowser->render();
 	m_assetEditor->render();
@@ -223,7 +227,7 @@ void WindowsEditor::onEndRender() {
 	ImGui::Render();
 
 
-	// Reset the Renderer output, this binds the Renderer window and sets the Viewport
+	// Reset the Renderer output, this binds the Renderer window and sets the SceneView
 	::aderite::Engine::getRenderer()->resetOutput();
 	// Clear previous output
 	::aderite::Engine::getRenderer()->clear();
@@ -247,8 +251,8 @@ void WindowsEditor::onRuntimeShutdown() {
 	}
 
 	m_toolbar->shutdown();
-	m_viewport->shutdown();
 	m_sceneView->shutdown();
+	m_sceneHierarchy->shutdown();
 	m_propertyEditor->shutdown();
 	m_assetBrowser->shutdown();
 	m_assetEditor->shutdown();
@@ -261,12 +265,8 @@ void WindowsEditor::onRuntimeShutdown() {
 	delete shared::State::Project;
 }
 
-void WindowsEditor::onSystemUpdate() {
-
-}
-
 void WindowsEditor::onSelectedEntityChanged(scene::Entity& Entity) {
-	m_sceneView->setActiveEntity(Entity);
+	m_sceneHierarchy->setActiveEntity(Entity);
 	m_propertyEditor->setActiveEntity(Entity);
 }
 
@@ -323,7 +323,6 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 	// about 20 million of them can be loaded. If someone is using this engine with more assets than that then it's
 	// rather surprising considering that this isn't a professional game engine. Also note that all these assets are loaded
 	// only in editor configuration in runtime this is optimized out and only those assets that are needed are read.
-
 	for (auto& path : std::filesystem::recursive_directory_iterator(::aderite::Engine::getAssetManager()->getResDir())) {
 		// Ignore directories
 		if (path.is_directory()) {
@@ -351,6 +350,17 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 	}
 }
 
+void WindowsEditor::onSceneChanged(scene::Scene* scene) {
+	// Attach editor camera
+	shared::State::EditorCamera = createEditorCamera();
+	scene->attachCamera(shared::State::EditorCamera);
+	m_sceneView->onSceneChanged(scene);
+}
+
+void WindowsEditor::onSystemUpdate(float delta) {
+	shared::State::EditorCamera->update(delta);
+}
+
 void WindowsEditor::onNewScene(const std::string& name) {
 	LOG_TRACE("New scene with name: {0}", name);
 
@@ -374,17 +384,29 @@ void WindowsEditor::onSelectedAssetChanged(asset::Asset* asset) {
 }
 
 void WindowsEditor::onStopGame() {
-	Engine::get()->startPhysicsUpdates();
-	Engine::get()->startScriptUpdates();
+	Engine::get()->stopPhysicsUpdates();
+	Engine::get()->stopScriptUpdates();
+	Engine::get()->stopSceneUpdates();
+	shared::State::IsGameMode = false;
+
+	// TODO: Disable all cameras in scene
 }
 
 void WindowsEditor::onStartGame() {
-	Engine::get()->stopPhysicsUpdates();
-	Engine::get()->stopScriptUpdates();
+	Engine::get()->startPhysicsUpdates();
+	Engine::get()->startScriptUpdates();
+	Engine::get()->startSceneUpdates();
+	shared::State::IsGameMode = true;
+
+	// TODO: Enable all cameras in scene
 }
 
 void WindowsEditor::onResetGameState() {
 	// TODO: Reset game state, by reloading all scripts or resetting their default parameters
+}
+
+shared::EditorCamera* WindowsEditor::createEditorCamera() {
+	return new shared::EditorCamera();
 }
 
 ADERITE_EDITOR_ROOT_NAMESPACE_END

@@ -85,6 +85,10 @@ bool ShaderAsset::isLoaded() {
 	return bgfx::isValid(m_handle);
 }
 
+size_t ShaderAsset::hash() const {
+	return std::hash<std::string>{}(p_name);
+}
+
 ShaderAsset::ShaderAsset(const std::string& name)
 	: Asset(name)
 {}

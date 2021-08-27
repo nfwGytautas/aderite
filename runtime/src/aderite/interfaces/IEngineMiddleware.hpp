@@ -1,6 +1,7 @@
 #pragma once
 
 #include "aderite/utility/Macros.hpp"
+#include "aderite/scene/Forward.hpp"
 
 ADERITE_INTERFACE_NAMESPACE_BEGIN
 
@@ -40,16 +41,6 @@ ADERITE_INTERFACE_NAMESPACE_BEGIN
 		virtual void onEndRender() {};
 
 		/**
-		 * @brief Function invoked when a new frame is about to be started
-		*/
-		virtual void onBeginFrame() {};
-
-		/**
-		 * @brief Function invoked when a frame has been ended
-		*/
-		virtual void onEndFrame() {};
-
-		/**
 		 * @brief Function invoked when a exit was requested from the engine
 		*/
 		virtual void onRequestedExit() {};
@@ -57,17 +48,28 @@ ADERITE_INTERFACE_NAMESPACE_BEGIN
 		/**
 		 * @brief Function invoked when a system update has happened
 		*/
-		virtual void onSystemUpdate() {};
+		virtual void onSystemUpdate(float delta) {};
+
+		/**
+		 * @brief Function invoked when a scene update has happened
+		*/
+		virtual void onSceneUpdate(float delta) {};
 
 		/**
 		 * @brief Function invoked when a physics update has happened
 		*/
-		virtual void onPhysicsUpdate() {};
+		virtual void onPhysicsUpdate(float delta) {};
 
 		/**
 		 * @brief Function invoked when a script update has happened
 		*/
-		virtual void onScriptUpdate() {};
+		virtual void onScriptUpdate(float delta) {};
+
+		/**
+		 * @brief Function invoked when a new scene was made active
+		 * @param scene The scene that was made active
+		*/
+		virtual void onSceneChanged(scene::Scene* scene) {};
 	};
 
 /**

@@ -1,30 +1,31 @@
 #pragma once
 
-#include "aderite/scene/Entity.hpp"
+#include <bgfx/bgfx.h>
+#include <glm/glm.hpp>
+#include "aderite/scene/Forward.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/shared/BaseComponent.hpp"
-#include "aderiteeditor/windows/component/Forward.hpp"
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 
 /**
- * @brief Scene view is a component that displays all scene entities in a tree
+ * @brief SceneView of the editor, this is the window where the game is actually rendered to
 */
 class SceneView : public shared::BaseComponent {
 public:
-	SceneView();
-	virtual ~SceneView();
-
 	// Inherited via BaseComponent
+	virtual void init() override;
+	virtual void shutdown() override;
 	virtual void render() override;
 
 	/**
-	 * @brief Sets the current active Entity (used to identify which is active)
+	 * @brief Function invoked when the current active scene was changed
+	 * @param scene New active scene
 	*/
-	void setActiveEntity(scene::Entity& Entity);
+	void onSceneChanged(scene::Scene* scene);
 private:
-	scene::Entity m_selectedEntity = scene::Entity::null();
-	TextInputModal* m_textModal = nullptr;
+	bgfx::TextureHandle m_fbth = BGFX_INVALID_HANDLE;
+	glm::uvec2 m_size = {};
 };
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_END

@@ -7,6 +7,7 @@
 #include "aderite/input/InputManager.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/Scene.hpp"
 #include "aderite/window/WindowManager.hpp"
 
 
@@ -105,20 +106,16 @@ void Engine::loop() {
 		const double freq = double(bx::getHPFrequency());
 		const float deltaTimeSec = float(double(frameTime) / freq);
 
-		MIDDLEWARE_ACTION(onBeginFrame);
-		beginFrame();
-
 		// Updates
 		updateSystem(deltaTimeSec);
 		updatePhysics(deltaTimeSec);
 		updateScripts(deltaTimeSec);
 
+		// Rendering
+		scene::Scene* currentScene = m_sceneManager->getCurrentScene();
 		MIDDLEWARE_ACTION(onStartRender);
-		m_renderer->render();
+		m_renderer->renderScene(currentScene);
 		MIDDLEWARE_ACTION(onEndRender);
-
-		endFrame();
-		MIDDLEWARE_ACTION(onEndFrame);
 	}
 }
 
@@ -131,16 +128,12 @@ void Engine::abortExit() {
 	m_wantsToShutdown = false;
 }
 
-void Engine::beginFrame() {
-	m_renderer->beginFrame();
-}
-
-void Engine::endFrame() {
-	m_renderer->endFrame();
-}
-
 void Engine::onRendererInitialized() {
 	MIDDLEWARE_ACTION(onRendererInitialized);
+}
+
+void Engine::onSceneChanged(scene::Scene* scene) {
+	MIDDLEWARE_ACTION(onSceneChanged, scene);
 }
 
 void Engine::attachMiddleware(interfaces::IEngineMiddleware* middleware) {
@@ -167,11 +160,30 @@ void Engine::stopScriptUpdates() {
 	m_willUpdateScripts = false;
 }
 
+void Engine::startSceneUpdates() {
+	m_willUpdateScenes = true;
+}
+
+void Engine::stopSceneUpdates() {
+	m_willUpdateScenes = false;
+}
+
 void Engine::updateSystem(float delta) {
 	// Query events
 	m_inputManager->update();
 
-	MIDDLEWARE_ACTION(onSystemUpdate);
+	MIDDLEWARE_ACTION(onSystemUpdate, delta);
+}
+
+void Engine::updateScenes(float delta) {
+	if (!m_willUpdateScenes) {
+		return;
+	}
+
+	scene::Scene* currentScene = m_sceneManager->getCurrentScene();
+	currentScene->update(delta);
+
+	MIDDLEWARE_ACTION(onSceneUpdate, delta);
 }
 
 void Engine::updatePhysics(float delta) {
@@ -179,7 +191,7 @@ void Engine::updatePhysics(float delta) {
 		return;
 	}
 
-	MIDDLEWARE_ACTION(onPhysicsUpdate);
+	MIDDLEWARE_ACTION(onPhysicsUpdate, delta);
 }
 
 void Engine::updateScripts(float delta) {
@@ -187,7 +199,7 @@ void Engine::updateScripts(float delta) {
 		return;
 	}
 
-	MIDDLEWARE_ACTION(onScriptUpdate);
+	MIDDLEWARE_ACTION(onScriptUpdate, delta);
 }
 
 ADERITE_ROOT_NAMESPACE_END

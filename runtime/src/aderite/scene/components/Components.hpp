@@ -14,6 +14,7 @@
 
 #include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Forward.hpp"
+#include "aderite/scene/Forward.hpp"
 
 ADERITE_COMPONENTS_NAMESPACE_BEGIN
 
@@ -67,10 +68,10 @@ struct MeshRendererComponent {
 };
 
 /**
- * @brief Camera component, which basically references a specific CameraComponent settings asset
+ * @brief Camera component, which references ICamera object
 */
 struct CameraComponent {
-	glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
+	EntityCamera* Camera = nullptr;
 
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent&) = default;
