@@ -35,6 +35,8 @@ private:
 
 	void updateViewMatrix();
 
+	float zoomSpeed() const;
+	glm::vec2 panSpeed() const;
 private:
 	bgfx::FrameBufferHandle m_target = BGFX_INVALID_HANDLE;
 	glm::uvec2 m_viewportSize = {};

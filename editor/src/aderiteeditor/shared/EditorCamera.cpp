@@ -51,18 +51,47 @@ glm::mat4 EditorCamera::computeProjectionMatrix() {
 }
 
 void EditorCamera::update(float delta) {
-	// TODO: Moving, zoom
 	bool wasUpdated = false;
 
-	if (::aderite::Engine::getInputManager()->isMouseKeyPressed(input::MouseKey::MIDDLE)) {
+	auto inputManager = ::aderite::Engine::getInputManager();
+
+	if (inputManager->isKeyPressed(input::Key::LEFT_ALT)) {
+		// Zoom
+		double scrollDelta = inputManager->getScrollDelta();
+
+		if (scrollDelta != 0.0) {
+			m_distance -= delta * scrollDelta * zoomSpeed();
+			if (m_distance < 1.0f)
+			{
+				m_focalpoint += getForwardDirection();
+				m_distance = 1.0f;
+			}
+
+			wasUpdated = true;
+		}
+
+		// Pan
+		if (inputManager->isMouseKeyPressed(input::MouseKey::MIDDLE)) {
+			glm::vec2 mouseDelta = inputManager->getMouseDelta();
+
+			glm::vec2 speed = panSpeed();
+			m_focalpoint += -getRightDirection() * mouseDelta.x * speed.x * m_distance * delta;
+			m_focalpoint += getUpDirection() * mouseDelta.y * speed.y * m_distance * delta;
+
+			wasUpdated = true;
+		}
+	} 
+	else {
 		// Rotate
-		glm::vec2 mouseDelta = ::aderite::Engine::getInputManager()->getMouseDelta();
+		if (inputManager->isMouseKeyPressed(input::MouseKey::MIDDLE)) {
+			glm::vec2 mouseDelta = inputManager->getMouseDelta();
 
-		float yawSign = getUpDirection().y < 0 ? -1.0f : 1.0f;
-		m_yaw += delta * yawSign * mouseDelta.x * 0.8f;
-		m_pitch += delta * mouseDelta.y * 0.8f;
+			float yawSign = getUpDirection().y < 0 ? -1.0f : 1.0f;
+			m_yaw += delta * yawSign * mouseDelta.x * Settings::EditorCameraRotationSpeed;
+			m_pitch += delta * mouseDelta.y * Settings::EditorCameraRotationSpeed;
 
-		wasUpdated = true;
+			wasUpdated = true;
+		}
 	}
 
 	if (wasUpdated) {
@@ -98,6 +127,24 @@ void EditorCamera::updateViewMatrix() {
 	glm::quat orientation = getOrientation();
 	m_viewMatrix = glm::translate(glm::mat4(1.0f), calculatePosition()) * glm::toMat4(orientation);
 	m_viewMatrix = glm::inverse(m_viewMatrix);
+}
+
+float EditorCamera::zoomSpeed() const {
+	float distance = m_distance * Settings::EditorCameraZoomSpeed;
+	distance = std::max(distance, 0.0f);
+	float speed = distance * distance;
+	speed = std::min(speed, 100.0f); // max speed = 100
+	return speed;
+}
+
+glm::vec2 EditorCamera::panSpeed() const {
+	float x = std::min(m_viewportSize.x / 1000.0f, 2.4f); // max = 2.4f
+	float xFactor = 0.0366f * (x * x) - 0.1778f * x + 0.3021f;
+
+	float y = std::min(m_viewportSize.y / 1000.0f, 2.4f); // max = 2.4f
+	float yFactor = 0.0366f * (y * y) - 0.1778f * y + 0.3021f;
+
+	return { xFactor, yFactor };
 }
 
 ADERITE_EDITOR_SHARED_NAMESPACE_END

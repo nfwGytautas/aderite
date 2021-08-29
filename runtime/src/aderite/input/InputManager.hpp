@@ -59,6 +59,12 @@ public:
 	void onMouseMove(double xPos, double yPos);
 
 	/**
+	 * @brief Function invoked when a mouse was scrolled
+	 * @param yOffset New y offset of the scroll wheel
+	*/
+	void onMouseScrolled(double yOffset);
+
+	/**
 	 * @brief Function invoked when the window has been closed by the user
 	*/
 	void onWindowClosed();
@@ -82,6 +88,11 @@ public:
 	 * @brief Returns the mouse position change since last frame
 	*/
 	glm::dvec2 getMouseDelta() const;
+
+	/**
+	 * @brief Returns the mouse scroll change since last frame
+	*/
+	double getScrollDelta() const;
 private:
 	InputManager() {}
 	friend class Engine;
@@ -107,6 +118,11 @@ private:
 	 * @brief Delta move between frames
 	*/
 	glm::dvec2 m_mouseDelta;
+
+	/**
+	 * @brief Mouse scroll delta between frames
+	*/
+	double m_mouseScrollDelta = 0.0;
 };
 
 ADERITE_INPUT_NAMESPACE_END

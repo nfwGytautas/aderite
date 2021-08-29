@@ -55,6 +55,12 @@ bool InputManager::init() {
 		im->onMouseKeyStateChange(static_cast<MouseKey>(button), static_cast<KeyAction>(action), static_cast<KeyModifier>(mods));
 	});
 
+	glfwSetScrollCallback(glfwWindow, [](GLFWwindow* window, double xpos, double ypos)
+	{
+		InputManager* im = static_cast<InputManager*>(glfwGetWindowUserPointer(window));
+		im->onMouseScrolled(ypos);
+});
+
 #else
 #error "Unsupported backend for input manager"
 #endif
@@ -69,6 +75,7 @@ void InputManager::shutdown() {
 void InputManager::update() {
 	// Reset delta
 	m_mouseDelta = {};
+	m_mouseScrollDelta = 0.0;
 
 #if GLFW_BACKEND == 1
 	glfwPollEvents();
@@ -114,6 +121,10 @@ void InputManager::onMouseMove(double xPos, double yPos) {
 	m_mousePosition.y = yPos;
 }
 
+void InputManager::onMouseScrolled(double yOffset) {
+	m_mouseScrollDelta = yOffset;
+}
+
 void InputManager::onWindowClosed() {
 	::aderite::Engine::get()->requestExit();
 }
@@ -134,6 +145,10 @@ glm::dvec2 InputManager::getMousePosition() const {
 
 glm::dvec2 InputManager::getMouseDelta() const {
 	return m_mouseDelta;
+}
+
+double InputManager::getScrollDelta() const {
+	return m_mouseScrollDelta;
 }
 
 ADERITE_INPUT_NAMESPACE_END
