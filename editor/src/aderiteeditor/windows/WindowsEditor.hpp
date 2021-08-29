@@ -44,12 +44,13 @@ private:
 
 private:
 	// Components
-	component::Toolbar* m_toolbar = nullptr;
+	component::Menubar* m_menubar = nullptr;
 	component::SceneView* m_sceneView = nullptr;
 	component::SceneHierarchy* m_sceneHierarchy = nullptr;
 	component::EntityEditor* m_propertyEditor = nullptr;
 	component::AssetBrowser* m_assetBrowser = nullptr;
 	component::AssetEditor* m_assetEditor = nullptr;
+	component::Toolbar* m_toolbar = nullptr;
 
 	/**
 	 * @brief Flag that is true when the user requests to exit the editor otherwise the

@@ -1,0 +1,52 @@
+General:
+Thread pool asset loading
+Thread rework
+Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
+Asset manager load caching
+Shader tool
+All shaders in one source
+Animations
+More defined pipeline for rendering (Frustum culling, etc.)
+Rethink scene useAsset and removeAsset functions
+Scripting
+Audio
+Include BGFX stats to ImGui
+Textures
+Fix dependencies folder and CMake
+
+Physics:
+Multithreading
+Physics material asset
+Debug rendering
+Rotation
+Sync transform outer change
+Fix gravity switch not doing anything after already running simulation
+Rethink collider and collider list architecture (Split colliders into specialized types)
+
+Editor:
+Internal system UI windows (loaded assets, asset manager, etc.)
+Unexpected exit or corrupted save restoration
+Fix modal architecture
+Doube click edit component
+Raw folder browser with filtering
+Log window
+Window resize for viewport
+Drag drop files from system
+Double clicking drag drop target show in asset browser
+3D gizmo
+Create build command, to build entire game
+Limit toolbar height
+Mass slider fill entire range
+
+
+Code:
+Add consts where no modifications are done
+Add final to classes
+Utility operators for types
+Asserts
+Error checking
+Check memory leaks
+Case surround with braces
+Mesh loading API optmization
+Move enums to files
+Move logger to engine system

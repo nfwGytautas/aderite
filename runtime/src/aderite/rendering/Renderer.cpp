@@ -184,7 +184,9 @@ void Renderer::renderScene(scene::Scene* scene) {
 				executeDrawCall(dc.second);
 			}
 		}
-	}	
+	}
+
+	bgfx::discard(BGFX_DISCARD_ALL);
 
 	// Commit
 	bgfx::frame(false);
@@ -225,7 +227,8 @@ void Renderer::executeDrawCall(DrawCall& dc) {
 			bgfx::setTransform(glm::value_ptr(transform));
 
 			// Submit draw call
-			bgfx::submit(0, dc.Shader);
+			uint8_t flags = BGFX_DISCARD_ALL & ~(BGFX_DISCARD_BINDINGS | BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS);
+			bgfx::submit(0, dc.Shader, 0, flags);
 		}
 	}
 }

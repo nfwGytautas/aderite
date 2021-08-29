@@ -9,6 +9,9 @@
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MeshAsset.hpp" 
 #include "aderite/asset/MaterialAsset.hpp" 
+#include "aderite/physics/PhysicsController.hpp"
+#include "aderite/physics/Rigidbody.hpp"
+#include "aderite/physics/ColliderList.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
@@ -266,7 +269,42 @@ void EntityEditor::render() {
 		}
 	});
 
-	bool hasAll = hasTransform && hasMeshRenderer;
+	bool hasRigidbody = render_component<::aderite::scene::components::RigidbodyComponent>("Rigid body", m_selectedEntity,
+		[](::aderite::scene::components::RigidbodyComponent& c) {
+		bool hasGravity = c.Body->hasGravity();
+		float mass = c.Body->getMass();
+		if (ImGui::Checkbox("Has gravity", &hasGravity)) {
+			c.Body->setGravity(hasGravity);
+		}
+
+		ImGui::Text("Mass");
+		ImGui::SameLine();
+		if (ImGui::DragFloat("##X", &mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+			c.Body->setMass(mass);
+		}
+	});
+
+	bool hasColliders = render_component<::aderite::scene::components::CollidersComponent>("Colliders", m_selectedEntity,
+		[](::aderite::scene::components::CollidersComponent& c) {
+		
+		float width = ImGui::GetContentRegionAvail().x * 0.4855f;
+		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
+		if (ImGui::Button("Add collider", ImVec2(width, 0.0f))) {
+			ImGui::OpenPopup("AddCollider");
+		}
+
+		if (ImGui::BeginPopup("AddCollider")) {
+			if (ImGui::MenuItem("Box")) {
+				c.Colliders->addBoxCollider(glm::vec3(1.0f));
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+
+	});
+
+	bool hasAll = hasTransform && hasMeshRenderer && hasRigidbody && hasColliders;
 
 	if (!hasAll) {
 		ImGui::Separator();
@@ -285,6 +323,18 @@ void EntityEditor::render() {
 
 			if (!hasMeshRenderer && ImGui::MenuItem("Mesh Renderer")) {
 				m_selectedEntity.addComponent<::aderite::scene::components::MeshRendererComponent>();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (!hasRigidbody && ImGui::MenuItem("Rigid body")) {
+				m_selectedEntity.addComponent<::aderite::scene::components::RigidbodyComponent>();
+				::aderite::Engine::getPhysicsController()->attachRigidBody(m_selectedEntity);
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (!hasColliders && ImGui::MenuItem("Colliders")) {
+				auto& collidersComponent = m_selectedEntity.addComponent<::aderite::scene::components::CollidersComponent>();
+				collidersComponent.Colliders = ::aderite::Engine::getPhysicsController()->beginNewColliderList();
 				ImGui::CloseCurrentPopup();
 			}
 

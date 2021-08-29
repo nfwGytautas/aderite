@@ -12,8 +12,9 @@ class AssetBrowser;
 class AssetEditor;
 class EntityEditor;
 class SceneHierarchy;
-class Toolbar;
+class Menubar;
 class SceneView;
+class Toolbar;
 
 class TextInputModal;
 

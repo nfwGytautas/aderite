@@ -6,6 +6,7 @@
 
 #include "aderite/asset/Forward.hpp"
 #include "aderite/input/Forward.hpp"
+#include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/window/Forward.hpp"
@@ -122,6 +123,7 @@ private:
 	ADERITE_SYSTEM_PTR(getAssetManager, asset::AssetManager, m_assetManager)
 	ADERITE_SYSTEM_PTR(getSceneManager, scene::SceneManager, m_sceneManager)
 	ADERITE_SYSTEM_PTR(getInputManager, input::InputManager, m_inputManager)
+	ADERITE_SYSTEM_PTR(getPhysicsController, physics::PhysicsController, m_physicsController)
 
 #if MIDDLEWARE_ENABLED == 1
 	ADERITE_SYSTEM_PTR(getMiddleware, interfaces::IEngineMiddleware, m_middleware)

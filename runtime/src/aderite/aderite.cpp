@@ -4,6 +4,7 @@
 
 #include "aderite/utility/Log.hpp"
 #include "aderite/asset/AssetManager.hpp"
+#include "aderite/physics/PhysicsController.hpp"
 #include "aderite/input/InputManager.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/SceneManager.hpp"
@@ -59,8 +60,15 @@ bool Engine::init(InitOptions options) {
 		return false;
 	}
 
+	// Physics controller
+	m_physicsController = new physics::PhysicsController();
+	if (!m_physicsController->init()) {
+		LOG_ERROR("Aborting aderite initialization");
+		return false;
+	}
+
 	// Renderer
-	m_renderer = new  rendering::Renderer();
+	m_renderer = new rendering::Renderer();
 	if (!m_renderer->init()) {
 		LOG_ERROR("Aborting aderite initialization");
 		return false;
@@ -83,12 +91,14 @@ void Engine::shutdown() {
 
 	m_sceneManager->shutdown();
 	m_assetManager->shutdown();
+	m_physicsController->shutdown();
 	m_renderer->shutdown();
 	m_windowManager->shutdown();
 	m_inputManager->shutdown();
 
 	delete m_sceneManager;
 	delete m_assetManager;
+	delete m_physicsController;
 	delete m_renderer;
 	delete m_windowManager;
 	delete m_inputManager;
@@ -190,6 +200,8 @@ void Engine::updatePhysics(float delta) {
 	if (!m_willUpdatePhysics) {
 		return;
 	}
+
+	m_physicsController->update(delta);
 
 	MIDDLEWARE_ACTION(onPhysicsUpdate, delta);
 }

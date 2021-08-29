@@ -7,76 +7,18 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/YAML.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MeshAsset.hpp" 
 #include "aderite/asset/MaterialAsset.hpp" 
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/EntityCamera.hpp"
 #include "aderite/scene/components/Components.hpp"
-
-
-// YAML extensions
-namespace YAML {
-	template<>
-	struct convert<glm::vec3> {
-		static Node encode(const glm::vec3& rhs) {
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec3& rhs) {
-			if (!node.IsSequence() || node.size() != 3)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec4> {
-		static Node encode(const glm::vec4& rhs) {
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.push_back(rhs.w);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec4& rhs) {
-			if (!node.IsSequence() || node.size() != 4)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			rhs.w = node[3].as<float>();
-			return true;
-		}
-	};
-}
+#include "aderite/physics/PhysicsController.hpp"
+#include "aderite/physics/Rigidbody.hpp"
+#include "aderite/physics/ColliderList.hpp"
 
 ADERITE_SCENE_NAMESPACE_BEGIN
-
-YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
-	return out;
-}
-
-YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-	return out;
-}
 
 void serialize_entity(YAML::Emitter& out, Entity e) {
 	out << YAML::BeginMap; // Entity
@@ -137,9 +79,37 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 		out << YAML::BeginMap; // Camera
 
 		components::CameraComponent& cameraComponent = e.getComponent<components::CameraComponent>();
+		
+		// TODO: Error check
 		cameraComponent.Camera->serialize(out);
 
 		out << YAML::EndMap; // Camera
+	}
+
+	// Rigid body
+	if (e.hasComponent<components::RigidbodyComponent>()) {
+		out << YAML::Key << "Rigidbody";
+		out << YAML::BeginMap; // Rigidbody
+
+		components::RigidbodyComponent& rigidbodyComponent = e.getComponent<components::RigidbodyComponent>();
+
+		// TODO: Error check
+		rigidbodyComponent.Body->serialize(out);
+
+		out << YAML::EndMap; // Rigidbody
+	}
+
+	// Colliders
+	if (e.hasComponent<components::CollidersComponent>()) {
+		out << YAML::Key << "Colliders";
+		out << YAML::BeginSeq; // Colliders
+
+		components::CollidersComponent& collidersComponent = e.getComponent<components::CollidersComponent>();
+
+		// TODO: Error check
+		collidersComponent.Colliders->serialize(out);
+
+		out << YAML::EndSeq; // Colliders
 	}
 
 	out << YAML::EndMap; // Entity
@@ -211,6 +181,32 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 		scene->attachCamera(cameraComponent.Camera);
 	}
 
+	// Rigid body
+	auto rb_node = e_node["Rigidbody"];
+	if (rb_node) {
+		auto& rbodyComponent = e.addComponent<components::RigidbodyComponent>();
+		aderite::Engine::getPhysicsController()->attachRigidBody(e);
+
+		// TODO: Error check
+		rbodyComponent.Body->deserialize(rb_node);
+	}
+
+	// Colliders
+	auto colliders = e_node["Colliders"];
+	if (colliders) {
+		auto& collidersComponent = e.addComponent<components::CollidersComponent>();
+		collidersComponent.Colliders = aderite::Engine::getPhysicsController()->beginNewColliderList();
+
+		// TODO: Error check
+		collidersComponent.Colliders->deserialize(colliders);
+
+		// TODO: Rethink this
+		if (e.hasComponent<components::RigidbodyComponent>()) {
+			auto& rbodyComponent = e.getComponent<components::RigidbodyComponent>();
+			collidersComponent.Colliders->assignToRigidbody(rbodyComponent.Body);
+		}
+	}
+
 	return e;
 }
 
@@ -238,6 +234,13 @@ void Scene::destroyEntity(Entity entity) {
 }
 
 void Scene::useAsset(asset::Asset* asset) {
+	// Check if this asset is not duplicate
+	for (auto usedAssets : m_assets) {
+		if (usedAssets == asset) {
+			return;
+		}
+	}
+
 	m_assets.push_back(asset);
 }
 

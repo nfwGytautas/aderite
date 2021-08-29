@@ -70,3 +70,7 @@
 // Input namespace where all events and input objects are defined in
 #define ADERITE_INPUT_NAMESPACE_BEGIN ADERITE_ROOT_NAMESPACE_BEGIN namespace input {
 #define ADERITE_INPUT_NAMESPACE_END ADERITE_ROOT_NAMESPACE_END }
+
+// Physics namespace where all physics related functionality defined in
+#define ADERITE_PHYSICS_NAMESPACE_BEGIN ADERITE_ROOT_NAMESPACE_BEGIN namespace physics {
+#define ADERITE_PHYSICS_NAMESPACE_END ADERITE_ROOT_NAMESPACE_END }

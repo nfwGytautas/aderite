@@ -3,6 +3,7 @@
 #include <entt/Entity/registry.hpp>
 #include "aderite/utility/Macros.hpp"
 #include "aderite/scene/Forward.hpp"
+#include "aderite/scene/Scene.hpp"
 
 ADERITE_SCENE_NAMESPACE_BEGIN
 

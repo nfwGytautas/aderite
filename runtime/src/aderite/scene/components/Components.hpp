@@ -15,6 +15,7 @@
 #include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
+#include "aderite/physics/Forward.hpp"
 
 ADERITE_COMPONENTS_NAMESPACE_BEGIN
 
@@ -75,6 +76,26 @@ struct CameraComponent {
 
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent&) = default;
+};
+
+/**
+ * @brief Rigid body component used for physics
+*/
+struct RigidbodyComponent {
+	physics::Rigidbody* Body = nullptr;
+
+	RigidbodyComponent() = default;
+	RigidbodyComponent(const RigidbodyComponent&) = default;
+};
+
+/**
+ * @brief Component containing all colliders attached to this object
+*/
+struct CollidersComponent {
+	physics::ColliderList* Colliders = nullptr;
+
+	CollidersComponent() = default;
+	CollidersComponent(const CollidersComponent&) = default;
 };
 
 ADERITE_COMPONENTS_NAMESPACE_END
