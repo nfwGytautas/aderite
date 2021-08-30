@@ -15,7 +15,6 @@
 #include "aderite/scene/EntityCamera.hpp"
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/physics/PhysicsController.hpp"
-#include "aderite/physics/Rigidbody.hpp"
 #include "aderite/physics/ColliderList.hpp"
 
 ADERITE_SCENE_NAMESPACE_BEGIN
@@ -93,8 +92,9 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 
 		components::RigidbodyComponent& rigidbodyComponent = e.getComponent<components::RigidbodyComponent>();
 
-		// TODO: Error check
-		rigidbodyComponent.Body->serialize(out);
+		out << YAML::Key << "IsStatic" << rigidbodyComponent.IsStatic;
+		out << YAML::Key << "HasGravity" << rigidbodyComponent.HasGravity;
+		out << YAML::Key << "Mass" << rigidbodyComponent.Mass;
 
 		out << YAML::EndMap; // Rigidbody
 	}
@@ -136,7 +136,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 	if (transform_node) {
 		auto& TransformComponent = e.addComponent<components::TransformComponent>();
 		TransformComponent.Position = transform_node["Position"].as<glm::vec3>();
-		TransformComponent.Rotation = transform_node["Rotation"].as<glm::vec3>();
+		TransformComponent.Rotation = transform_node["Rotation"].as<glm::quat>();
 		TransformComponent.Scale = transform_node["Scale"].as<glm::vec3>();
 	}
 
@@ -185,26 +185,21 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 	auto rb_node = e_node["Rigidbody"];
 	if (rb_node) {
 		auto& rbodyComponent = e.addComponent<components::RigidbodyComponent>();
-		aderite::Engine::getPhysicsController()->attachRigidBody(e);
 
 		// TODO: Error check
-		rbodyComponent.Body->deserialize(rb_node);
+		rbodyComponent.IsStatic = rb_node["IsStatic"].as<bool>();
+		rbodyComponent.HasGravity = rb_node["HasGravity"].as<bool>();
+		rbodyComponent.Mass = rb_node["Mass"].as<float>();
 	}
 
 	// Colliders
 	auto colliders = e_node["Colliders"];
 	if (colliders) {
 		auto& collidersComponent = e.addComponent<components::CollidersComponent>();
-		collidersComponent.Colliders = aderite::Engine::getPhysicsController()->beginNewColliderList();
+		collidersComponent.Colliders = aderite::Engine::getPhysicsController()->newColliderList();
 
 		// TODO: Error check
 		collidersComponent.Colliders->deserialize(colliders);
-
-		// TODO: Rethink this
-		if (e.hasComponent<components::RigidbodyComponent>()) {
-			auto& rbodyComponent = e.getComponent<components::RigidbodyComponent>();
-			collidersComponent.Colliders->assignToRigidbody(rbodyComponent.Body);
-		}
 	}
 
 	return e;

@@ -243,7 +243,6 @@ void WindowsEditor::onEndRender() {
 	if (::aderite::Engine::get()->getWindowManager()->isClosed()) {
 		// TODO: Request save
 		m_expected_shutdown = true;
-		onSaveProject();
 		::aderite::Engine::get()->requestExit();
 	}
 }

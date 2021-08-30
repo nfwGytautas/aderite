@@ -10,7 +10,7 @@
 ADERITE_PHYSICS_NAMESPACE_BEGIN
 
 class PhysicsController;
-class Rigidbody;
 class ColliderList;
+class Collider;
 
 ADERITE_PHYSICS_NAMESPACE_END

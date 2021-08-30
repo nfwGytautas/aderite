@@ -36,12 +36,17 @@ struct MetaComponent {
 */
 struct TransformComponent {
 	glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
+	glm::quat Rotation = glm::quat({ 1.0f, 0.0f, 0.0f, 0.0f });
 	glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
+
+	/**
+	 * @brief Flag specifying if the transform component was update in this cycle
+	*/
+	bool WasAltered = false;
 
 	TransformComponent() = default;
 	TransformComponent(const TransformComponent&) = default;
-	TransformComponent(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
+	TransformComponent(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale)
 		: Position(position), Rotation(rotation), Scale(scale) {}
 
 	/**
@@ -50,7 +55,7 @@ struct TransformComponent {
 	 * @return Computed transformation matrix
 	*/
 	static glm::mat4 compute_transform(const TransformComponent& t) {
-		glm::mat4 rotation = glm::toMat4(glm::quat(t.Rotation));
+		glm::mat4 rotation = glm::toMat4(t.Rotation);
 		return glm::translate(glm::mat4(1.0f), t.Position) * rotation * glm::scale(glm::mat4(1.0f), t.Scale);
 	}
 };
@@ -82,7 +87,12 @@ struct CameraComponent {
  * @brief Rigid body component used for physics
 */
 struct RigidbodyComponent {
-	physics::Rigidbody* Body = nullptr;
+	bool IsStatic = false;
+	bool HasGravity = true;
+	float Mass = 1.0f;
+
+	// Runtime variable set by physics controller
+	void* Actor = nullptr;
 
 	RigidbodyComponent() = default;
 	RigidbodyComponent(const RigidbodyComponent&) = default;

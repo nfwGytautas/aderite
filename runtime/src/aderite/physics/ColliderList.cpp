@@ -4,59 +4,30 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/YAML.hpp"
-#include "aderite/physics/Rigidbody.hpp"
+#include "aderite/physics/Collider.hpp"
 #include "aderite/physics/PhysicsController.hpp"
+#include "aderite/physics/collider/BoxCollider.hpp"
 
 ADERITE_PHYSICS_NAMESPACE_BEGIN
 
 ColliderList::~ColliderList() {
-	for (physx::PxShape* c : m_colliders) {
-		c->release();
+	for (Collider* c : m_colliders) {
+		delete c;
 	}
 }
 
-void ColliderList::addBoxCollider(const glm::vec3& halfExtents) {
-	physx::PxShape* shape = ::aderite::Engine::getPhysicsController()->getPhysics()->createShape(
-		physx::PxBoxGeometry(halfExtents.x, halfExtents.y, halfExtents.z),
-		*::aderite::Engine::getPhysicsController()->getDefaultMaterial(),
-		true);
-
-	m_colliders.push_back(shape);
-}
-
-void ColliderList::assignToRigidbody(Rigidbody* rbody) {
-	for (physx::PxShape* c : m_colliders) {
-		rbody->getHandle()->attachShape(*c);
-	}
+void ColliderList::addCollider(Collider* collider) {
+	m_colliders.push_back(collider);
 }
 
 bool ColliderList::serialize(YAML::Emitter& out) {
-	for (physx::PxShape* c : m_colliders) {
+	for (Collider* c : m_colliders) {
 		out << YAML::BeginMap;
-
-		out << YAML::Key << "Type" << YAML::Value << static_cast<size_t>(c->getGeometryType());
-
-		switch (c->getGeometryType()) {
-		case physx::PxGeometryType::eBOX: {
-			physx::PxBoxGeometry box;
-			if (!c->getBoxGeometry(box)) {
-				LOG_ERROR("Failed to get geometry of collider, aborting");
-				return false;
-			}
-
-			glm::vec3 v = { box.halfExtents.x, box.halfExtents.y, box.halfExtents.z };
-			out << YAML::Key << "HalfExtents" << YAML::Value << v;
-			break;
-		}
-		default: {
-			LOG_ERROR("Unsupported collider, aborting");
-			return false;
-		}
-		}
-
+		out << YAML::Key << "Type" << YAML::Value << static_cast<size_t>(c->getType());
+		c->serialize(out);
 		out << YAML::EndMap;
 	}
-
+	
 	return true;
 }
 
@@ -67,11 +38,13 @@ bool ColliderList::deserialize(YAML::Node& data) {
 
 	for (auto colliderEntry : data) {
 		YAML::Node& colliderNode = colliderEntry;
-		physx::PxGeometryType::Enum type = (physx::PxGeometryType::Enum)(colliderNode["Type"].as<size_t>());
+
+		// Resolve type
+		ColliderType type = static_cast<physics::ColliderType>((colliderNode["Type"].as<size_t>()));
+		Collider* collider = nullptr;
 		switch (type) {
-		case physx::PxGeometryType::eBOX: {
-			glm::vec3 halfExtents = colliderNode["HalfExtents"].as<glm::vec3>();
-			addBoxCollider(halfExtents);
+		case ColliderType::BOX: {
+			collider = new collider::BoxCollider();
 			break;
 		}
 		default: {
@@ -79,6 +52,10 @@ bool ColliderList::deserialize(YAML::Node& data) {
 			return false;
 		}
 		}
+
+		// Load it
+		collider->deserialize(colliderNode);
+		addCollider(collider);
 	}
 
 	return true;

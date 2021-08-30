@@ -7,17 +7,19 @@ Entities:
       Name: Ground
     Transform:
       Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
+      Rotation: [1, 0, 0, 0]
       Scale: [10, 0.5, 10]
     MeshRenderer:
       Mesh: Meshes\CubeMesh.mesh
       Material: Materials\ExampleMaterial.material
     Rigidbody:
+      IsStatic: true
       HasGravity: false
       Mass: 0
     Colliders:
-      - Type: 3
-        HalfExtents: [1, 0.5, 1]
+      - Type: 0
+        IsTrigger: false
+        Size: [10, 0.5, 10]
   - Entity: 1
     Meta:
       Name: SceneCamera
@@ -25,15 +27,17 @@ Entities:
     Meta:
       Name: Cube
     Transform:
-      Position: [3.36236517e-05, 1.99999893, -4.71102248e-05]
-      Rotation: [0, 0, 0]
+      Position: [0, 7.9000001, 0]
+      Rotation: [1, 0, 0, 0]
       Scale: [1, 1, 1]
     MeshRenderer:
       Mesh: Meshes\CubeMesh.mesh
       Material: Materials\ExampleMaterial.material
     Rigidbody:
+      IsStatic: false
       HasGravity: true
       Mass: 1
     Colliders:
-      - Type: 3
-        HalfExtents: [1, 1, 1]
+      - Type: 0
+        IsTrigger: false
+        Size: [1, 1, 1]

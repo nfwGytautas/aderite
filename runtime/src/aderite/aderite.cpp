@@ -155,6 +155,8 @@ void Engine::attachMiddleware(interfaces::IEngineMiddleware* middleware) {
 }
 
 void Engine::startPhysicsUpdates() {
+	// Before starting physics updates reset the engine
+	m_physicsController->reset();
 	m_willUpdatePhysics = true;
 }
 

@@ -74,3 +74,7 @@
 // Physics namespace where all physics related functionality defined in
 #define ADERITE_PHYSICS_NAMESPACE_BEGIN ADERITE_ROOT_NAMESPACE_BEGIN namespace physics {
 #define ADERITE_PHYSICS_NAMESPACE_END ADERITE_ROOT_NAMESPACE_END }
+
+// Collider namespace where all colliders are defined in
+#define ADERITE_COLLIDER_NAMESPACE_BEGIN ADERITE_PHYSICS_NAMESPACE_BEGIN namespace collider {
+#define ADERITE_COLLIDER_NAMESPACE_END ADERITE_PHYSICS_NAMESPACE_END }

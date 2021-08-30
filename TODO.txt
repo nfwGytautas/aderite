@@ -18,10 +18,8 @@ Physics:
 Multithreading
 Physics material asset
 Debug rendering
-Rotation
-Sync transform outer change
-Fix gravity switch not doing anything after already running simulation
 Rethink collider and collider list architecture (Split colliders into specialized types)
+Apply scale to half extents
 
 Editor:
 Internal system UI windows (loaded assets, asset manager, etc.)
@@ -37,7 +35,8 @@ Double clicking drag drop target show in asset browser
 Create build command, to build entire game
 Limit toolbar height
 Mass slider fill entire range
-
+Block edit on when in game mode
+Reset game state on game mode switch
 
 Code:
 Add consts where no modifications are done

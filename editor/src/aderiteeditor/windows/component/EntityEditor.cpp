@@ -10,8 +10,8 @@
 #include "aderite/asset/MeshAsset.hpp" 
 #include "aderite/asset/MaterialAsset.hpp" 
 #include "aderite/physics/PhysicsController.hpp"
-#include "aderite/physics/Rigidbody.hpp"
 #include "aderite/physics/ColliderList.hpp"
+#include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
@@ -63,8 +63,10 @@ bool render_component(const std::string& label, ::aderite::scene::Entity& Entity
 	return false;
 }
 
-static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+static bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
 {
+	bool altered = false;
+
 	ImGuiIO& io = ImGui::GetIO();
 	auto boldFont = io.Fonts->Fonts[0];
 
@@ -85,13 +87,17 @@ static void DrawVec3Control(const std::string& label, glm::vec3& values, float r
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
 	ImGui::PushFont(boldFont);
-	if (ImGui::Button("X", buttonSize))
+	if (ImGui::Button("X", buttonSize)) {
 		values.x = resetValue;
+		altered = true;
+	}
 	ImGui::PopFont();
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();
-	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+	if (ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f")) {
+		altered = true;
+	}
 	ImGui::PopItemWidth();
 	ImGui::SameLine();
 
@@ -99,13 +105,17 @@ static void DrawVec3Control(const std::string& label, glm::vec3& values, float r
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
 	ImGui::PushFont(boldFont);
-	if (ImGui::Button("Y", buttonSize))
+	if (ImGui::Button("Y", buttonSize)) {
 		values.y = resetValue;
+		altered = true;
+	}
 	ImGui::PopFont();
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();
-	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+	if (ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f")) {
+		altered = true;
+	}
 	ImGui::PopItemWidth();
 	ImGui::SameLine();
 
@@ -113,13 +123,17 @@ static void DrawVec3Control(const std::string& label, glm::vec3& values, float r
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
 	ImGui::PushFont(boldFont);
-	if (ImGui::Button("Z", buttonSize))
+	if (ImGui::Button("Z", buttonSize)) {
 		values.z = resetValue;
+		altered = true;
+	}
 	ImGui::PopFont();
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();
-	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+	if (ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f")) {
+		altered = true;
+	}
 	ImGui::PopItemWidth();
 
 	ImGui::PopStyleVar();
@@ -127,6 +141,8 @@ static void DrawVec3Control(const std::string& label, glm::vec3& values, float r
 	ImGui::Columns(1);
 
 	ImGui::PopID();
+
+	return altered;
 }
 
 EntityEditor::EntityEditor()
@@ -197,12 +213,24 @@ void EntityEditor::render() {
 	ImGui::Separator();
 
 	bool hasTransform = render_component<::aderite::scene::components::TransformComponent>("Transform", m_selectedEntity, 
-		[](::aderite::scene::components::TransformComponent& c) {
-		DrawVec3Control("Position", c.Position);
-		glm::vec3 rotation = glm::degrees(c.Rotation);
-		DrawVec3Control("Rotation", rotation);
+		[&](::aderite::scene::components::TransformComponent& c) {
+		if (DrawVec3Control("Position", c.Position)) {
+			c.WasAltered = true;
+		}
+
+		glm::vec3 euler = glm::eulerAngles(c.Rotation);
+		glm::vec3 rotation = glm::degrees(euler);
+		if (DrawVec3Control("Rotation", rotation)) {
+			c.Rotation = glm::quat(rotation);
+			c.WasAltered = true;
+		}
+
 		c.Rotation = glm::radians(rotation);
-		DrawVec3Control("Scale", c.Scale, 1.0f);
+		if (DrawVec3Control("Scale", c.Scale, 1.0f)) {
+			c.WasAltered = true;
+		}
+
+		ImGui::Dummy(ImVec2(0.0f, 2.5f));
 	});
 
 	bool hasMeshRenderer = render_component<::aderite::scene::components::MeshRendererComponent>("Mesh Renderer", m_selectedEntity,
@@ -271,22 +299,31 @@ void EntityEditor::render() {
 
 	bool hasRigidbody = render_component<::aderite::scene::components::RigidbodyComponent>("Rigid body", m_selectedEntity,
 		[](::aderite::scene::components::RigidbodyComponent& c) {
-		bool hasGravity = c.Body->hasGravity();
-		float mass = c.Body->getMass();
-		if (ImGui::Checkbox("Has gravity", &hasGravity)) {
-			c.Body->setGravity(hasGravity);
-		}
+		ImGui::Checkbox("Has gravity", &c.HasGravity);
+		ImGui::Checkbox("Is static", &c.IsStatic);
 
 		ImGui::Text("Mass");
 		ImGui::SameLine();
-		if (ImGui::DragFloat("##X", &mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
-			c.Body->setMass(mass);
-		}
+		ImGui::DragFloat("##X", &c.Mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 	});
 
 	bool hasColliders = render_component<::aderite::scene::components::CollidersComponent>("Colliders", m_selectedEntity,
 		[](::aderite::scene::components::CollidersComponent& c) {
 		
+		for (physics::Collider* collider : *c.Colliders) {
+			switch (collider->getType()) {
+			case physics::ColliderType::BOX: {
+				auto typeCollider = static_cast<physics::collider::BoxCollider*>(collider);
+				glm::vec3 size = typeCollider->getSize();
+				if (DrawVec3Control("Size", size, 1.0f)) {
+					typeCollider->setSize(size);
+				}
+				ImGui::Dummy(ImVec2(0.0f, 2.5f));
+				break;
+			}
+			}
+		}
+
 		float width = ImGui::GetContentRegionAvail().x * 0.4855f;
 		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
 		if (ImGui::Button("Add collider", ImVec2(width, 0.0f))) {
@@ -295,7 +332,9 @@ void EntityEditor::render() {
 
 		if (ImGui::BeginPopup("AddCollider")) {
 			if (ImGui::MenuItem("Box")) {
-				c.Colliders->addBoxCollider(glm::vec3(1.0f));
+				physics::collider::BoxCollider* collider = new physics::collider::BoxCollider();
+				collider->setSize(glm::vec3(1.0f));
+				c.Colliders->addCollider(collider);
 				ImGui::CloseCurrentPopup();
 			}
 
@@ -328,13 +367,12 @@ void EntityEditor::render() {
 
 			if (!hasRigidbody && ImGui::MenuItem("Rigid body")) {
 				m_selectedEntity.addComponent<::aderite::scene::components::RigidbodyComponent>();
-				::aderite::Engine::getPhysicsController()->attachRigidBody(m_selectedEntity);
 				ImGui::CloseCurrentPopup();
 			}
 
 			if (!hasColliders && ImGui::MenuItem("Colliders")) {
 				auto& collidersComponent = m_selectedEntity.addComponent<::aderite::scene::components::CollidersComponent>();
-				collidersComponent.Colliders = ::aderite::Engine::getPhysicsController()->beginNewColliderList();
+				collidersComponent.Colliders = ::aderite::Engine::getPhysicsController()->newColliderList();
 				ImGui::CloseCurrentPopup();
 			}
 

@@ -32,15 +32,14 @@ public:
 	void update(float delta);
 
 	/**
-	 * @brief Creates and attaches a rigid body to an entity
-	 * @param on Entity the rigidbody is attached to
+	 * @brief Completely resets the physics scene
 	*/
-	void attachRigidBody(scene::Entity on);
+	void reset();
 
 	/**
-	 * @brief Creates a new collider list and returns it
+	 * @brief Creates new collider list and returns it
 	*/
-	ColliderList* beginNewColliderList();
+	ColliderList* newColliderList();
 
 	/**
 	 * @brief Returns the PhysX physics object instance
@@ -55,6 +54,67 @@ private:
 	PhysicsController() {}
 	friend class Engine;
 
+	/**
+	 * @brief Creates a rigid body from a component and adds it to the physics scene
+	 * @param rbody Component to create from
+	 * @param colliders Object colliders
+	 * @param transform Transform component of the entity
+	*/
+	void createRigidbody(
+		scene::components::RigidbodyComponent& rbody, 
+		const scene::components::CollidersComponent& colliders, 
+		const scene::components::TransformComponent& transform);
+
+	/**
+	 * @brief Creates a static body from a component and adds it to the physics scene
+	 * @param rbody Component to create from
+	 * @param colliders Object colliders
+	 * @param transform Transform component of the entity
+	*/
+	void createStaticbody(
+		scene::components::RigidbodyComponent& rbody,
+		const scene::components::CollidersComponent& colliders,
+		const scene::components::TransformComponent& transform);
+
+	/**
+	 * @brief Sets up a rigid body from it's components
+	 * @param actor The PhysX actor
+	 * @param rbody Body settings
+	 * @param colliders Object colliders
+	 * @param transform Transform component of the entity
+	*/
+	void setupBody(
+		physx::PxRigidActor* actor,
+		const scene::components::RigidbodyComponent& rbody,
+		const scene::components::CollidersComponent& colliders,
+		const scene::components::TransformComponent& transform);
+
+	/**
+	 * @brief Creates a trigger from component information
+	 * @param colliders Collider information of the entity
+	 * @param transform Transformation information of the entity
+	*/
+	void createTrigger(
+		const scene::components::CollidersComponent& colliders,
+		const scene::components::TransformComponent& transform);
+
+	/**
+	 * @brief Syncs PhysX actor to ECS entity state
+	 * @param actor Actor to sync
+	 * @param transform Entity transform to sync with
+	*/
+	void syncActor(
+		const scene::components::RigidbodyComponent& rbody,
+		const scene::components::TransformComponent& transform);
+
+	/**
+	 * @brief Syncs ECS entity state to PhysX actor state
+	 * @param rbody Actor to sync
+	 * @param transform Entity transform to sync to
+	*/
+	void syncTransform(
+		const scene::components::RigidbodyComponent& rbody,
+		scene::components::TransformComponent& transform);
 private:
 	physx::PxFoundation* m_foundation = nullptr;
 	physx::PxPhysics* m_physics = nullptr;
@@ -62,11 +122,13 @@ private:
 	physx::PxDefaultCpuDispatcher* m_dispatcher = nullptr;
 	physx::PxScene* m_scene = nullptr;
 	physx::PxMaterial* m_defaultMaterial = nullptr;
+	physx::PxPvd* m_pvd = nullptr;
 
-	std::vector<Rigidbody*> m_bodies;
+	std::vector<physx::PxShape*> m_triggers;
 	std::vector<ColliderList*> m_colliderLists;
 
 	bool m_recordMemoryAllocations = true;
+	bool m_isCreating = false;
 	size_t m_numThreads = 2;
 
 	float m_defaultStaticFriction = 0.5f;
