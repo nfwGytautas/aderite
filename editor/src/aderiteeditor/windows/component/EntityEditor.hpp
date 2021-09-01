@@ -1,7 +1,8 @@
 #pragma once
 
-#include "aderiteeditor/utility/Macros.hpp"
 #include "aderite/scene/Entity.hpp"
+#include "aderite/physics/Forward.hpp"
+#include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/shared/BaseComponent.hpp"
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
@@ -21,6 +22,13 @@ public:
 	 * @brief Sets the current active Entity
 	*/
 	void setActiveEntity(scene::Entity& Entity);
+
+private:
+	void renderTransform();
+	void renderMeshrenderer();
+	void renderRigidbody();
+
+	void renderBoxCollider(size_t idx, physics::Collider* collider, bool& remove);
 private:
 	scene::Entity m_selectedEntity = scene::Entity::null();
 };

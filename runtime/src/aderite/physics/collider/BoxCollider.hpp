@@ -10,7 +10,11 @@ ADERITE_COLLIDER_NAMESPACE_BEGIN
 */
 class BoxCollider : public Collider {
 public:
+	BoxCollider();
 	virtual ~BoxCollider() {}
+
+	// Inherited via Collider
+	virtual void setScale(const glm::vec3& scale) override;
 
 	/**
 	 * @brief Returns the size of the box collider
@@ -28,10 +32,8 @@ public:
 	virtual bool serialize(YAML::Emitter& out) override;
 	virtual bool deserialize(YAML::Node& data) override;
 	virtual ColliderType getType() const override;
-	virtual physx::PxShape* construct(physx::PxPhysics* physics, physx::PxMaterial* material) override;
 private:
-	bool m_isTrigger = false;
-	glm::vec3 m_size;
+	glm::vec3 m_size = glm::vec3(1.0f);
 };
 
 ADERITE_COLLIDER_NAMESPACE_END

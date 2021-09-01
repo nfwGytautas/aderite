@@ -12,14 +12,10 @@ Entities:
     MeshRenderer:
       Mesh: Meshes\CubeMesh.mesh
       Material: Materials\ExampleMaterial.material
-    Rigidbody:
-      IsStatic: true
-      HasGravity: false
-      Mass: 0
     Colliders:
       - Type: 0
         IsTrigger: false
-        Size: [10, 0.5, 10]
+        Size: [1, 1, 1]
   - Entity: 1
     Meta:
       Name: SceneCamera
@@ -34,7 +30,7 @@ Entities:
       Mesh: Meshes\CubeMesh.mesh
       Material: Materials\ExampleMaterial.material
     Rigidbody:
-      IsStatic: false
+      IsKinematic: false
       HasGravity: true
       Mass: 1
     Colliders:

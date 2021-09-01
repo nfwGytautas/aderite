@@ -7,6 +7,7 @@
 #include <PxSceneDesc.h>
 #include <PxRigidDynamic.h>
 #include <PxRigidStatic.h>
+#include <PxMaterial.h>
 #include <PxActor.h>
 #include <pvd/PxPvd.h>
 #include <pvd/PxPvdTransport.h>
@@ -20,8 +21,8 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/physics/ColliderList.hpp"
 #include "aderite/physics/Collider.hpp"
+#include "aderite/physics/ColliderList.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 
@@ -115,22 +116,13 @@ bool PhysicsController::init() {
     // Create default material
     m_defaultMaterial = m_physics->createMaterial(m_defaultStaticFriction, m_defaultDynamicFriction, m_defaultRestitution);
 
+    // Configure collision filter
+    physx::PxSetGroupCollisionFlag(0, 0, true);
+
 	return true;
 }
 
 void PhysicsController::shutdown() {
-    for (auto trigger : m_triggers) {
-        trigger->release();
-    }
-
-    for (auto cl : m_colliderLists) {
-        delete cl;
-    }
-
-    if (m_scene) {
-        m_scene->release();
-    }
-
     m_cooking->release();
     m_dispatcher->release();
     m_physics->release();
@@ -140,187 +132,52 @@ void PhysicsController::shutdown() {
 }
 
 void PhysicsController::update(float delta) {
-    // Sync changes to transforms
-    auto group = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry()
-        .group<scene::components::RigidbodyComponent>(entt::get<scene::components::TransformComponent, scene::components::CollidersComponent>);
-    for (auto entity : group) {
-        auto [rigidbody, transform] = group.get<scene::components::RigidbodyComponent, scene::components::TransformComponent>(entity);
-
-        if (transform.WasAltered) {
-            // Sync ECS -> PhysX
-            syncActor(rigidbody, transform);
-            transform.WasAltered = false;
-        }
-        else if (!rigidbody.IsStatic) {
-            // Sync ECS <- PhysX
-            syncTransform(rigidbody, transform);
-        }
-    }
+    auto currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 
     // Simulate a step
-    m_scene->simulate(delta);
-    m_scene->fetchResults(true);
-
-    //// Retrieve array of actors that moved
-    //physx::PxU32 nbActiveActors;
-    //physx::PxActor** activeActors = m_scene->getActiveActors(nbActiveActors);
-    //
-    //// Update each render object with the new transform
-    //for (physx::PxU32 i = 0; i < nbActiveActors; ++i)
-    //{
-    //    // Sync PhysX -> ECS
-    //    Rigidbody* rbody = static_cast<Rigidbody*>(activeActors[i]->userData);
-    //    rbody->syncTransform();
-    //}
+    if (currentScene != nullptr) {
+        // TODO: Substep
+        currentScene->fixedUpdate(delta);
+    }
 }
 
-void PhysicsController::reset() {
-    m_isCreating = true;
-
-    // Free last scene
-    if (m_scene != nullptr) {
-        m_scene->release();
-        m_scene = nullptr;
-    }
-
-    for (auto trigger : m_triggers) {
-        trigger->release();
-    }
-    m_triggers.clear();
-
-    // Create scene now
-    physx::PxSceneDesc sceneDesc(m_physics->getTolerancesScale());
-    sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
-    sceneDesc.cpuDispatcher = m_dispatcher;
-    sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-    sceneDesc.flags = physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
-    m_scene = m_physics->createScene(sceneDesc);
-
-    if (m_scene == nullptr) {
-        LOG_ERROR("Failed to create a PhysX scene");
-        return;
-    }
-
-    // Add all objects (Rigidbody, transform and colliders)
-    auto objectGroup = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry()
-        .group<scene::components::RigidbodyComponent>(entt::get<scene::components::TransformComponent, scene::components::CollidersComponent>);
-    for (auto entity : objectGroup) {
-        auto [rigidbody, colliders, transform] = objectGroup.get<
-            scene::components::RigidbodyComponent, 
-            scene::components::CollidersComponent, 
-            scene::components::TransformComponent>(entity);
-
-        if (rigidbody.IsStatic) {
-            createStaticbody(rigidbody, colliders, transform);
-        }
-        else {
-            createRigidbody(rigidbody, colliders, transform);
-        }
-    }
-
-    // Add all triggers (transform and colliders)
-    auto triggerGroup = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry()
-        .group<scene::components::CollidersComponent>(
-            entt::get<scene::components::TransformComponent>, 
-            entt::exclude<scene::components::RigidbodyComponent>);
-    for (auto entity : triggerGroup) {
-        auto [colliders, transform] = triggerGroup.get<scene::components::CollidersComponent, scene::components::TransformComponent>(entity);
-        createTrigger(colliders, transform);
-    }
-
-    m_isCreating = false;
+physx::PxRigidStatic* PhysicsController::createStaticBody() {
+    return m_physics->createRigidStatic(physx::PxTransform(physx::PxVec3(0)));
 }
 
-ColliderList* PhysicsController::newColliderList() {
-    ColliderList* cl = new ColliderList();
-    m_colliderLists.push_back(cl);
-    return cl;
+physx::PxRigidDynamic* PhysicsController::createDynamicBody() {
+    return m_physics->createRigidDynamic(physx::PxTransform(physx::PxVec3(0)));;
 }
 
 physx::PxPhysics* PhysicsController::getPhysics() {
     return m_physics;
 }
 
+physx::PxCpuDispatcher* PhysicsController::getDispatcher() {
+    return m_dispatcher;
+}
+
 physx::PxMaterial* PhysicsController::getDefaultMaterial() {
     return m_defaultMaterial;
 }
 
-void PhysicsController::createRigidbody(
-    scene::components::RigidbodyComponent& rbody, 
-    const scene::components::CollidersComponent& colliders, 
-    const scene::components::TransformComponent& transform) 
+physx::PxFilterFlags PhysicsController::filterShader(
+    physx::PxFilterObjectAttributes attributes0, physx::PxFilterData filterData0,
+    physx::PxFilterObjectAttributes attributes1, physx::PxFilterData filterData1,
+    physx::PxPairFlags& pairFlags, const void* constantBlock, physx::PxU32 constantBlockSize)
 {
-    physx::PxRigidDynamic* actor = m_physics->createRigidDynamic(physx::PxTransform(physx::PxVec3(0)));
-    actor->setMass(rbody.Mass);
-    rbody.Actor = actor;
-    setupBody(actor, rbody, colliders, transform);
-}
-
-void PhysicsController::createStaticbody(
-    scene::components::RigidbodyComponent& rbody,
-    const scene::components::CollidersComponent& colliders,
-    const scene::components::TransformComponent& transform)
-{
-    physx::PxRigidStatic* actor = m_physics->createRigidStatic(physx::PxTransform(physx::PxVec3(0)));
-    rbody.Actor = actor;
-    setupBody(actor, rbody, colliders, transform);
-}
-
-void PhysicsController::setupBody(
-    physx::PxRigidActor* actor,
-    const scene::components::RigidbodyComponent& rbody, 
-    const scene::components::CollidersComponent& colliders, 
-    const scene::components::TransformComponent& transform) 
-{
-    // TODO: Material
-    actor->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, !rbody.HasGravity);
-    m_scene->addActor(*actor);
-
-    // Set transform
-    syncActor(rbody, transform);
-
-    // Create colliders and attach them
-    for (Collider* c : *colliders.Colliders) {
-        physx::PxShape* shape = c->construct(m_physics, m_defaultMaterial);
-        if (c->isTrigger()) {
-            m_triggers.push_back(shape);
-        }
-        else {
-            actor->attachShape(*shape);
-        }
-    }
-}
-
-void PhysicsController::createTrigger(
-    const scene::components::CollidersComponent& colliders, 
-    const scene::components::TransformComponent& transform) 
-{
-    ADERITE_UNIMPLEMENTED;
-}
-
-void PhysicsController::syncActor(
-    const scene::components::RigidbodyComponent& rbody, 
-    const scene::components::TransformComponent& transform) 
-{
-    physx::PxRigidBody* actor = static_cast<physx::PxRigidBody*>(rbody.Actor);
-
-    // Suppress if currently creating the scene
-    if (rbody.IsStatic && !m_isCreating) {
-        LOG_WARN("syncActor called on a static body, consider removing IsStatic flag");
+    // Let triggers through
+    if (physx::PxFilterObjectIsTrigger(attributes0) || physx::PxFilterObjectIsTrigger(attributes1))
+    {
+        pairFlags = physx::PxPairFlag::eTRIGGER_DEFAULT;
+        return physx::PxFilterFlag::eDEFAULT;
     }
 
-    actor->setGlobalPose(
-        physx::PxTransform(
-            physx::PxVec3{ transform.Position.x, transform.Position.y, transform.Position.z },
-            physx::PxQuat{ transform.Rotation.x, transform.Rotation.y, transform.Rotation.z, transform.Rotation.w }
-    ));
-}
+    // Generate contacts for all that were not filtered above
+    pairFlags = physx::PxPairFlag::eCONTACT_DEFAULT;
+    pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND | physx::PxPairFlag::eNOTIFY_TOUCH_LOST;
 
-void PhysicsController::syncTransform(const scene::components::RigidbodyComponent& rbody, scene::components::TransformComponent& transform) {
-    physx::PxRigidBody* actor = static_cast<physx::PxRigidBody*>(rbody.Actor);
-    physx::PxTransform pxt = actor->getGlobalPose();
-    transform.Position = { pxt.p.x, pxt.p.y, pxt.p.z };
-    transform.Rotation = { pxt.q.w,  pxt.q.x, pxt.q.y, pxt.q.z };
+    return physx::PxFilterFlag::eDEFAULT;
 }
 
 ADERITE_PHYSICS_NAMESPACE_END

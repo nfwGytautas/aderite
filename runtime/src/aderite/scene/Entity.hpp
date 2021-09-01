@@ -23,6 +23,7 @@ public:
 	template<typename T, typename... Args>
 	T& addComponent(Args&&... args) {
 		T& component = m_scene->getEntityRegistry().emplace<T>(m_handle, std::forward<Args>(args)...);
+		m_scene->onComponentAdded<T>(*this, component);
 		return component;
 	}
 
@@ -47,6 +48,7 @@ public:
 	*/
 	template<typename T>
 	void removeComponent() {
+		m_scene->onComponentRemoved<T>(*this, getComponent<T>());
 		m_scene->getEntityRegistry().remove<T>(m_handle);
 	}
 

@@ -11,6 +11,7 @@
 #include "aderite/asset/MaterialAsset.hpp" 
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/ColliderList.hpp"
+#include "aderite/physics/Collider.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Config.hpp"
@@ -19,48 +20,32 @@
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 
-template<typename Component, typename RenderFn>
-bool render_component(const std::string& label, ::aderite::scene::Entity& Entity, RenderFn renderFn) {
+void render_component_shared(const std::string& id, const std::string& label, bool& open, bool& remove) {
 	const ImGuiTreeNodeFlags treeNodeFlags = /*ImGuiTreeNodeFlags_DefaultOpen | */ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
 
-	if (Entity.hasComponent<Component>()) {
-		auto& component = Entity.getComponent<Component>();
-		ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+	ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		
-		//ImGui::Separator();
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
 
-		bool open = ImGui::TreeNodeEx((void*)typeid(Component).hash_code(), treeNodeFlags, label.c_str());
-		ImGui::PopStyleVar();
+	//ImGui::Separator();
 
-		ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-		if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight })) {
-			ImGui::OpenPopup("ComponentSettings");
-		}
+	open = ImGui::TreeNodeEx(id.c_str(), treeNodeFlags, label.c_str());
+	ImGui::PopStyleVar();
 
-		bool removeComponent = false;
-		if (ImGui::BeginPopup("ComponentSettings")) {
-			if (ImGui::MenuItem("Remove component"))
-				removeComponent = true;
-
-			ImGui::EndPopup();
-		}
-
-		if (open) {
-			renderFn(component);
-			ImGui::TreePop();
-		}
-
-		if (removeComponent) {
-			Entity.removeComponent<Component>();
-		}
-
-		return true;
+	ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+	if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight })) {
+		ImGui::OpenPopup("ComponentSettings");
 	}
 
-	return false;
+	remove = false;
+	if (ImGui::BeginPopup("ComponentSettings")) {
+		if (ImGui::MenuItem("Remove component")) {
+			remove = true;
+		}
+
+		ImGui::EndPopup();
+	}
 }
 
 static bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
@@ -142,6 +127,8 @@ static bool DrawVec3Control(const std::string& label, glm::vec3& values, float r
 
 	ImGui::PopID();
 
+	ImGui::Dummy(ImVec2(0.0f, 2.5f));
+
 	return altered;
 }
 
@@ -212,8 +199,105 @@ void EntityEditor::render() {
 	// Other components as tree nodes that can be collapsed
 	ImGui::Separator();
 
-	bool hasTransform = render_component<::aderite::scene::components::TransformComponent>("Transform", m_selectedEntity, 
-		[&](::aderite::scene::components::TransformComponent& c) {
+	bool hasTransform = m_selectedEntity.hasComponent<scene::components::TransformComponent>();
+	if (hasTransform) {
+		renderTransform();
+	}
+
+	bool hasMeshRenderer = m_selectedEntity.hasComponent<scene::components::MeshRendererComponent>();
+	if (hasMeshRenderer) {
+		renderMeshrenderer();
+	}
+
+	bool hasRigidbody = m_selectedEntity.hasComponent<scene::components::RigidbodyComponent>();
+	if (hasRigidbody) {
+		renderRigidbody();
+	}
+
+	if (m_selectedEntity.hasComponent<scene::components::CollidersComponent>()) {
+		auto& colliders = m_selectedEntity.getComponent<scene::components::CollidersComponent>();
+		std::vector<physics::Collider*> toRemove;
+
+		// Colliders
+		size_t i = 0;
+		for (physics::Collider* c : *colliders.Colliders) {
+			bool remove = false;
+
+			switch (c->getType()) {
+			case physics::ColliderType::BOX: {
+				renderBoxCollider(i, c, remove);
+				break;
+			}
+			default: {
+				LOG_WARN("Unknown collider type");
+				continue;
+			}
+			}
+
+			if (remove) {
+				toRemove.push_back(c);
+			}
+
+			i++;
+		}
+
+		for (physics::Collider* c : toRemove) {
+			colliders.Colliders->removeCollider(c);
+		}
+	}
+
+	ImGui::Separator();
+
+	float width = ImGui::GetContentRegionAvail().x * 0.4855f;
+	ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
+	if (ImGui::Button("Add component", ImVec2(width, 0.0f))) {
+		ImGui::OpenPopup("AddComponent");
+	}
+
+	if (ImGui::BeginPopup("AddComponent")) {
+		if (!hasTransform && ImGui::MenuItem("Transform")) {
+			m_selectedEntity.addComponent<::aderite::scene::components::TransformComponent>();
+			ImGui::CloseCurrentPopup();
+		}
+
+		if (!hasMeshRenderer && ImGui::MenuItem("Mesh Renderer")) {
+			m_selectedEntity.addComponent<::aderite::scene::components::MeshRendererComponent>();
+			ImGui::CloseCurrentPopup();
+		}
+
+		if (!hasRigidbody && ImGui::MenuItem("Rigid body")) {
+			m_selectedEntity.addComponent<::aderite::scene::components::RigidbodyComponent>();
+			ImGui::CloseCurrentPopup();
+		}
+
+		if (ImGui::MenuItem("Box collider")) {
+			if (!m_selectedEntity.hasComponent<::aderite::scene::components::CollidersComponent>()) {
+				auto& collidersComponent = m_selectedEntity.addComponent<::aderite::scene::components::CollidersComponent>();
+			}
+
+			auto& collidersComponent = m_selectedEntity.getComponent<::aderite::scene::components::CollidersComponent>();
+			collidersComponent.Colliders->addCollider(new physics::collider::BoxCollider());
+
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+
+	ImGui::End();
+}
+
+void EntityEditor::setActiveEntity(scene::Entity& Entity) {
+	m_selectedEntity = Entity;
+}
+
+void EntityEditor::renderTransform() {
+	bool open, remove = false;
+	render_component_shared("Transform", "Transform", open, remove);
+
+	if (open) {
+		auto& c = m_selectedEntity.getComponent<scene::components::TransformComponent>();
+
 		if (DrawVec3Control("Position", c.Position)) {
 			c.WasAltered = true;
 		}
@@ -230,11 +314,20 @@ void EntityEditor::render() {
 			c.WasAltered = true;
 		}
 
-		ImGui::Dummy(ImVec2(0.0f, 2.5f));
-	});
+		ImGui::TreePop();
+	}
 
-	bool hasMeshRenderer = render_component<::aderite::scene::components::MeshRendererComponent>("Mesh Renderer", m_selectedEntity,
-		[](::aderite::scene::components::MeshRendererComponent& c) {
+	if (remove) {
+		m_selectedEntity.removeComponent<scene::components::TransformComponent>();
+	}
+}
+
+void EntityEditor::renderMeshrenderer() {
+	bool open, remove = false;
+	render_component_shared("Mesh renderer", "Mesh renderer", open, remove);
+
+	if (open) {
+		auto& c = m_selectedEntity.getComponent<scene::components::MeshRendererComponent>();
 
 		if (ImGui::BeginTable("MeshRendererTable", 2)) {
 			ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 70.0f);
@@ -295,96 +388,62 @@ void EntityEditor::render() {
 
 			ImGui::EndTable();
 		}
-	});
 
-	bool hasRigidbody = render_component<::aderite::scene::components::RigidbodyComponent>("Rigid body", m_selectedEntity,
-		[](::aderite::scene::components::RigidbodyComponent& c) {
-		ImGui::Checkbox("Has gravity", &c.HasGravity);
-		ImGui::Checkbox("Is static", &c.IsStatic);
+		ImGui::TreePop();
+	}
+
+	if (remove) {
+		m_selectedEntity.removeComponent<scene::components::MeshRendererComponent>();
+	}
+}
+
+void EntityEditor::renderRigidbody() {
+	bool open, remove = false;
+	render_component_shared("Rigidbody", "Rigidbody", open, remove);
+
+	if (open) {
+		auto& c = m_selectedEntity.getComponent<scene::components::RigidbodyComponent>();
+
+		if (ImGui::Checkbox("Has gravity", &c.HasGravity)) {
+			c.WasAltered = true;
+		}
+		if (ImGui::Checkbox("Is kinematic", &c.IsKinematic)) {
+			c.WasAltered = true;
+		}
 
 		ImGui::Text("Mass");
 		ImGui::SameLine();
-		ImGui::DragFloat("##X", &c.Mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp);
-	});
-
-	bool hasColliders = render_component<::aderite::scene::components::CollidersComponent>("Colliders", m_selectedEntity,
-		[](::aderite::scene::components::CollidersComponent& c) {
-		
-		for (physics::Collider* collider : *c.Colliders) {
-			switch (collider->getType()) {
-			case physics::ColliderType::BOX: {
-				auto typeCollider = static_cast<physics::collider::BoxCollider*>(collider);
-				glm::vec3 size = typeCollider->getSize();
-				if (DrawVec3Control("Size", size, 1.0f)) {
-					typeCollider->setSize(size);
-				}
-				ImGui::Dummy(ImVec2(0.0f, 2.5f));
-				break;
-			}
-			}
+		if (ImGui::DragFloat("##X", &c.Mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+			c.WasAltered = true;
 		}
 
-		float width = ImGui::GetContentRegionAvail().x * 0.4855f;
-		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
-		if (ImGui::Button("Add collider", ImVec2(width, 0.0f))) {
-			ImGui::OpenPopup("AddCollider");
-		}
-
-		if (ImGui::BeginPopup("AddCollider")) {
-			if (ImGui::MenuItem("Box")) {
-				physics::collider::BoxCollider* collider = new physics::collider::BoxCollider();
-				collider->setSize(glm::vec3(1.0f));
-				c.Colliders->addCollider(collider);
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::EndPopup();
-		}
-
-	});
-
-	bool hasAll = hasTransform && hasMeshRenderer && hasRigidbody && hasColliders;
-
-	if (!hasAll) {
-		ImGui::Separator();
-
-		float width = ImGui::GetContentRegionAvail().x * 0.4855f;
-		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
-		if (ImGui::Button("Add component", ImVec2(width, 0.0f))) {
-			ImGui::OpenPopup("AddComponent");
-		}
-
-		if (ImGui::BeginPopup("AddComponent")) {
-			if (!hasTransform && ImGui::MenuItem("Transform")) {
-				m_selectedEntity.addComponent<::aderite::scene::components::TransformComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (!hasMeshRenderer && ImGui::MenuItem("Mesh Renderer")) {
-				m_selectedEntity.addComponent<::aderite::scene::components::MeshRendererComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (!hasRigidbody && ImGui::MenuItem("Rigid body")) {
-				m_selectedEntity.addComponent<::aderite::scene::components::RigidbodyComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-
-			if (!hasColliders && ImGui::MenuItem("Colliders")) {
-				auto& collidersComponent = m_selectedEntity.addComponent<::aderite::scene::components::CollidersComponent>();
-				collidersComponent.Colliders = ::aderite::Engine::getPhysicsController()->newColliderList();
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::EndPopup();
-		}
+		ImGui::TreePop();
 	}
 
-	ImGui::End();
+	if (remove) {
+		m_selectedEntity.removeComponent<scene::components::RigidbodyComponent>();
+	}
 }
 
-void EntityEditor::setActiveEntity(scene::Entity& Entity) {
-	m_selectedEntity = Entity;
+void EntityEditor::renderBoxCollider(size_t idx, physics::Collider* collider, bool& remove) {
+	bool open = false;
+	render_component_shared("Box collider " + std::to_string(idx), "Box collider", open, remove);
+	
+	if (open) {
+		auto typeCollider = static_cast<physics::collider::BoxCollider*>(collider);
+		bool isTrigger = typeCollider->isTrigger();
+		glm::vec3 size = typeCollider->getSize();
+
+		if (ImGui::Checkbox("Is trigger", &isTrigger)) {
+			typeCollider->setTrigger(isTrigger);
+		}
+
+		if (DrawVec3Control("Size", size, 1.0f)) {
+			typeCollider->setSize(size);
+		}
+
+		ImGui::TreePop();
+	}
 }
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_END

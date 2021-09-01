@@ -40,9 +40,9 @@ struct TransformComponent {
 	glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
 
 	/**
-	 * @brief Flag specifying if the transform component was update in this cycle
+	 * @brief Flag specifying if the transform component was updated in this cycle
 	*/
-	bool WasAltered = false;
+	bool WasAltered = true;
 
 	TransformComponent() = default;
 	TransformComponent(const TransformComponent&) = default;
@@ -87,12 +87,14 @@ struct CameraComponent {
  * @brief Rigid body component used for physics
 */
 struct RigidbodyComponent {
-	bool IsStatic = false;
+	bool IsKinematic = false;
 	bool HasGravity = true;
 	float Mass = 1.0f;
 
-	// Runtime variable set by physics controller
-	void* Actor = nullptr;
+	/**
+	 * @brief Flag specifying if the transform component was updated in this cycle
+	*/
+	bool WasAltered = true;
 
 	RigidbodyComponent() = default;
 	RigidbodyComponent(const RigidbodyComponent&) = default;

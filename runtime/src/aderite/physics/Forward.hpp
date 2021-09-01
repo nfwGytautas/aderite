@@ -10,6 +10,7 @@
 ADERITE_PHYSICS_NAMESPACE_BEGIN
 
 class PhysicsController;
+struct PhysicsEntity;
 class ColliderList;
 class Collider;
 

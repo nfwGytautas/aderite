@@ -13,13 +13,23 @@ Audio
 Include BGFX stats to ImGui
 Textures
 Fix dependencies folder and CMake
+Optimize component include
+Memory manager
+Propogate physics events
+
+Rendering:
+Clustered
+Textures
+Debug rendering (Physics)
 
 Physics:
 Multithreading
+Substeps
 Physics material asset
-Debug rendering
-Rethink collider and collider list architecture (Split colliders into specialized types)
-Apply scale to half extents
+Disable/enable actors at runtime
+Disable/enable colliders at runtime
+Broad-Phase callbacks
+Collision layers
 
 Editor:
 Internal system UI windows (loaded assets, asset manager, etc.)

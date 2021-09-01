@@ -5,6 +5,7 @@
 #include <PxShape.h>
 #include "aderite/utility/Macros.hpp"
 #include "aderite/physics/Forward.hpp"
+#include "aderite/asset/Forward.hpp"
 #include "aderite/interfaces/ISerializable.hpp"
 
 ADERITE_PHYSICS_NAMESPACE_BEGIN
@@ -14,7 +15,13 @@ ADERITE_PHYSICS_NAMESPACE_BEGIN
 */
 class Collider : public interfaces::ISerializable {
 public:
-	virtual ~Collider() {}
+	/**
+	 * @brief Creates a collider from geometry
+	 * @param geometry Geometry of the collider (will be deleted)
+	*/
+	Collider(physx::PxGeometry* geometry);
+
+	virtual ~Collider();
 
 	/**
 	 * @brief Returns the type of the collider
@@ -27,18 +34,42 @@ public:
 	bool isTrigger() const;
 
 	/**
-	 * @brief Create a PhysX shape from collider
-	 * @param physics PxPhysics instance
-	 * @param material PxMaterial instance
-	 * @return Created PhysX shape
+	 * @brief Converts the collider to a trigger if true, if false converts to collider
 	*/
-	virtual physx::PxShape* construct(physx::PxPhysics* physics, physx::PxMaterial* material) = 0;
+	void setTrigger(bool value);
+
+	/**
+	 * @brief Sets the physics material for the collider
+	*/
+	void setMaterial(asset::Asset* material);
+
+	/**
+	 * @brief Sets the actor of the collider, this will remove the collider from previous actor
+	 * @param actor New actor of the collider
+	*/
+	void setActor(physx::PxRigidActor* actor);
+
+	/**
+	 * @brief Returns the physics material of the collider, nullptr if not set
+	*/
+	asset::Asset* getMaterial() const;
+
+	/**
+	 * @brief Sets the scale of the collider
+	 * @param scale New scale of the collider
+	*/
+	virtual void setScale(const glm::vec3& scale) = 0;
 
 	// Inherited via ISerializable
 	virtual bool serialize(YAML::Emitter& out) override;
 	virtual bool deserialize(YAML::Node& data) override;
+
 protected:
-	bool p_isTrigger = false;
+	// Not serialized
+	physx::PxShape* p_shape = nullptr;
+
+private:
+	asset::Asset* m_material = nullptr;
 };
 
 ADERITE_PHYSICS_NAMESPACE_END

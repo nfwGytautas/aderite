@@ -97,8 +97,8 @@ void Engine::shutdown() {
 	m_inputManager->shutdown();
 
 	delete m_sceneManager;
-	delete m_assetManager;
 	delete m_physicsController;
+	delete m_assetManager;
 	delete m_renderer;
 	delete m_windowManager;
 	delete m_inputManager;
@@ -156,7 +156,6 @@ void Engine::attachMiddleware(interfaces::IEngineMiddleware* middleware) {
 
 void Engine::startPhysicsUpdates() {
 	// Before starting physics updates reset the engine
-	m_physicsController->reset();
 	m_willUpdatePhysics = true;
 }
 
