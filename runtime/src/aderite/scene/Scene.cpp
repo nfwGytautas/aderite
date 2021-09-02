@@ -5,78 +5,23 @@
 #include <yaml-cpp/yaml.h>
 #include <glm/glm.hpp>
 
+#include <PxRigidActor.h>
+#include <PxRigidDynamic.h>
+#include <PxRigidStatic.h>
+
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/YAML.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MeshAsset.hpp" 
 #include "aderite/asset/MaterialAsset.hpp" 
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/EntityCamera.hpp"
 #include "aderite/scene/components/Components.hpp"
-
-
-// YAML extensions
-namespace YAML {
-	template<>
-	struct convert<glm::vec3> {
-		static Node encode(const glm::vec3& rhs) {
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec3& rhs) {
-			if (!node.IsSequence() || node.size() != 3)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec4> {
-		static Node encode(const glm::vec4& rhs) {
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.push_back(rhs.w);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec4& rhs) {
-			if (!node.IsSequence() || node.size() != 4)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			rhs.w = node[3].as<float>();
-			return true;
-		}
-	};
-}
+#include "aderite/physics/PhysicsController.hpp"
+#include "aderite/physics/ColliderList.hpp"
 
 ADERITE_SCENE_NAMESPACE_BEGIN
-
-YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
-	return out;
-}
-
-YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
-	out << YAML::Flow;
-	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-	return out;
-}
 
 void serialize_entity(YAML::Emitter& out, Entity e) {
 	out << YAML::BeginMap; // Entity
@@ -137,9 +82,38 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 		out << YAML::BeginMap; // Camera
 
 		components::CameraComponent& cameraComponent = e.getComponent<components::CameraComponent>();
+		
+		// TODO: Error check
 		cameraComponent.Camera->serialize(out);
 
 		out << YAML::EndMap; // Camera
+	}
+
+	// Rigid body
+	if (e.hasComponent<components::RigidbodyComponent>()) {
+		out << YAML::Key << "Rigidbody";
+		out << YAML::BeginMap; // Rigidbody
+
+		components::RigidbodyComponent& rigidbodyComponent = e.getComponent<components::RigidbodyComponent>();
+
+		out << YAML::Key << "IsKinematic" << rigidbodyComponent.IsKinematic;
+		out << YAML::Key << "HasGravity" << rigidbodyComponent.HasGravity;
+		out << YAML::Key << "Mass" << rigidbodyComponent.Mass;
+
+		out << YAML::EndMap; // Rigidbody
+	}
+
+	// Colliders
+	if (e.hasComponent<components::CollidersComponent>()) {
+		out << YAML::Key << "Colliders";
+		out << YAML::BeginSeq; // Colliders
+
+		components::CollidersComponent& collidersComponent = e.getComponent<components::CollidersComponent>();
+
+		// TODO: Error check
+		collidersComponent.Colliders->serialize(out);
+
+		out << YAML::EndSeq; // Colliders
 	}
 
 	out << YAML::EndMap; // Entity
@@ -166,7 +140,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 	if (transform_node) {
 		auto& TransformComponent = e.addComponent<components::TransformComponent>();
 		TransformComponent.Position = transform_node["Position"].as<glm::vec3>();
-		TransformComponent.Rotation = transform_node["Rotation"].as<glm::vec3>();
+		TransformComponent.Rotation = transform_node["Rotation"].as<glm::quat>();
 		TransformComponent.Scale = transform_node["Scale"].as<glm::vec3>();
 	}
 
@@ -211,6 +185,30 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 		scene->attachCamera(cameraComponent.Camera);
 	}
 
+	// Rigid body
+	auto rb_node = e_node["Rigidbody"];
+	if (rb_node) {
+		auto& rbodyComponent = e.addComponent<components::RigidbodyComponent>();
+
+		// TODO: Error check
+		rbodyComponent.IsKinematic = rb_node["IsKinematic"].as<bool>();
+		rbodyComponent.HasGravity = rb_node["HasGravity"].as<bool>();
+		rbodyComponent.Mass = rb_node["Mass"].as<float>();
+	}
+
+	// Colliders
+	auto colliders = e_node["Colliders"];
+	if (colliders) {
+		if (!e.hasComponent<components::CollidersComponent>()) {
+			e.addComponent<components::CollidersComponent>();
+		}
+
+		auto& collidersComponent = e.getComponent<components::CollidersComponent>();
+
+		// TODO: Error check
+		collidersComponent.Colliders->deserialize(colliders);
+	}
+
 	return e;
 }
 
@@ -218,12 +216,28 @@ Scene::~Scene() {
 	for (auto& camera : m_cameras) {
 		delete camera;
 	}
+
+	auto entities = m_registry.view<scene::components::CollidersComponent>();
+	for (auto entity : entities) {
+		auto [colliders] = entities.get(entity);
+		delete colliders.Colliders;
+	}
+
+	m_physicsScene->release();
 }
 
 void Scene::update(float delta) {
 	for (auto& camera : m_cameras) {
 		camera->update(delta);
 	}
+}
+
+void Scene::fixedUpdate(float step) {
+	// Sync ECS to physics
+	syncEcsToPhysics();
+	m_physicsScene->simulate(step);
+	m_physicsScene->fetchResults(true);
+	syncPhysicsToEcs();
 }
 
 Entity Scene::createEntity(const components::MetaComponent& MetaComponent) {
@@ -238,6 +252,13 @@ void Scene::destroyEntity(Entity entity) {
 }
 
 void Scene::useAsset(asset::Asset* asset) {
+	// Check if this asset is not duplicate
+	for (auto usedAssets : m_assets) {
+		if (usedAssets == asset) {
+			return;
+		}
+	}
+
 	m_assets.push_back(asset);
 }
 
@@ -279,12 +300,35 @@ bool Scene::deserialize(YAML::Node& data) {
 	return true;
 }
 
+Scene::Scene(const std::string& name)
+	: Asset(name)
+{
+	auto physics = ::aderite::Engine::getPhysicsController()->getPhysics();
+
+	physx::PxSceneDesc sceneDesc(physics->getTolerancesScale());
+	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
+	sceneDesc.cpuDispatcher = ::aderite::Engine::getPhysicsController()->getDispatcher();
+	sceneDesc.filterShader = physics::PhysicsController::filterShader;
+	sceneDesc.simulationEventCallback = this;
+	//sceneDesc.flags = physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
+	m_physicsScene = physics->createScene(sceneDesc);
+
+	if (m_physicsScene == nullptr) {
+		LOG_ERROR("Failed to create a PhysX scene");
+		return;
+	}
+}
+
 std::vector<interfaces::ICamera*> Scene::getCameras() {
 	return m_cameras;
 }
 
 void Scene::attachCamera(interfaces::ICamera* camera) {
 	m_cameras.push_back(camera);
+}
+
+physx::PxScene* Scene::getPhysicsScene() const {
+	return m_physicsScene;
 }
 
 void Scene::prepareLoad() {
@@ -347,6 +391,202 @@ bool Scene::isInGroup(asset::AssetGroup group) const {
 	switch (group) {
 	default:
 		return false;
+	}
+}
+
+template<typename T>
+void Scene::onComponentAdded(Entity entity, T& component) {}
+
+template<>
+void Scene::onComponentAdded<components::RigidbodyComponent>(Entity entity, components::RigidbodyComponent& component) {
+	// Can't have rigidbody without colliders
+	if (!entity.hasComponent<components::CollidersComponent>()) {
+		entity.addComponent<components::CollidersComponent>();
+	}
+
+	// Convert to static
+	auto& colliders = entity.getComponent<components::CollidersComponent>();
+
+	// Convert to dynamic
+	physx::PxRigidDynamic* actor = ::aderite::Engine::getPhysicsController()->createDynamicBody();
+
+	// Switch
+	m_physicsScene->removeActor(*colliders.Colliders->getActor());
+	colliders.Colliders->setActor(actor);
+	m_physicsScene->addActor(*actor);
+}
+
+template<>
+void Scene::onComponentAdded<components::CollidersComponent>(Entity entity, components::CollidersComponent& component) {
+	component.Colliders = new physics::ColliderList(entity);
+	physx::PxRigidStatic* actor = ::aderite::Engine::getPhysicsController()->createStaticBody();
+	component.Colliders->setActor(actor);
+	m_physicsScene->addActor(*actor);
+}
+
+template<typename T>
+void Scene::onComponentRemoved(Entity entity, T& component) {}
+
+template<>
+void Scene::onComponentRemoved(Entity entity, components::TransformComponent& component) {}
+
+template<>
+void Scene::onComponentRemoved(Entity entity, components::MeshRendererComponent& component) {}
+
+template<>
+void Scene::onComponentRemoved<components::RigidbodyComponent>(Entity entity, components::RigidbodyComponent& component) {
+	// Convert to static
+	auto& colliders = entity.getComponent<components::CollidersComponent>();
+
+	// Make static
+	physx::PxRigidStatic* actor = ::aderite::Engine::getPhysicsController()->createStaticBody();
+
+	// Switch
+	m_physicsScene->removeActor(*colliders.Colliders->getActor());
+	colliders.Colliders->setActor(actor);
+	m_physicsScene->addActor(*actor);
+}
+
+template<>
+void Scene::onComponentRemoved<components::CollidersComponent>(Entity entity, components::CollidersComponent& component) {
+	if (entity.hasComponent<components::RigidbodyComponent>()) {
+		entity.removeComponent<components::RigidbodyComponent>();
+	}
+	m_physicsScene->removeActor(*component.Colliders->getActor());
+	delete component.Colliders;
+}
+
+void Scene::onContact(
+	const physx::PxContactPairHeader& pairHeader,
+	const physx::PxContactPair* pairs,
+	physx::PxU32 nbPairs)
+{
+	for (physx::PxU32 i = 0; i < nbPairs; i++) {
+		const physx::PxContactPair& cp = pairs[i];
+
+		physx::PxRigidActor* actor1 = pairHeader.actors[0];
+		physx::PxRigidActor* actor2 = pairHeader.actors[1];
+
+		Entity* e1 = static_cast<Entity*>(actor1->userData);
+		Entity* e2 = static_cast<Entity*>(actor2->userData);
+
+		auto& metaE1 = e1->getComponent<components::MetaComponent>();
+		auto& metaE2 = e2->getComponent<components::MetaComponent>();
+
+		if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
+			// Collision enter
+			LOG_INFO("{0} colliding with {1}", metaE1.Name, metaE2.Name);
+		}
+		else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
+			// Collision leave
+			LOG_INFO("{0} no longer colliding with {1}", metaE1.Name, metaE2.Name);
+		}
+	}
+}
+
+void Scene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) {
+	for (physx::PxU32 i = 0; i < nbPairs; i++) {
+		const physx::PxTriggerPair& cp = pairs[i];
+
+		physx::PxRigidActor* actor = cp.otherActor;
+		physx::PxRigidActor* trigger = cp.triggerActor;
+
+		Entity* actorEntity = static_cast<Entity*>(actor->userData);
+		Entity* triggerEntity = static_cast<Entity*>(trigger->userData);
+
+		auto& metaActor = actorEntity->getComponent<components::MetaComponent>();
+		auto& metaTrigger = triggerEntity->getComponent<components::MetaComponent>();
+
+		if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
+			LOG_WARN("{0} entered {1} trigger", metaActor.Name, metaTrigger.Name);
+		}
+		else if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
+			LOG_WARN("{0} left {1} trigger", metaActor.Name, metaTrigger.Name);
+		}
+	}
+}
+
+void Scene::syncActorToEcs(
+	physx::PxRigidActor* actor,
+	const scene::components::CollidersComponent& colliders,
+	const scene::components::TransformComponent& transform)
+{
+	// Transform
+	actor->setGlobalPose(
+		physx::PxTransform(
+			physx::PxVec3{ transform.Position.x, transform.Position.y, transform.Position.z },
+			physx::PxQuat{ transform.Rotation.x, transform.Rotation.y, transform.Rotation.z, transform.Rotation.w }
+	));
+
+	// Scale
+	colliders.Colliders->setScale(transform.Scale);
+
+	// Collision group
+	physx::PxSetGroup(*actor, 0);
+}
+
+void Scene::syncEcsToPhysics() {
+	// Sync changes with ECS
+	auto dynamicGroup = m_registry.group<scene::components::RigidbodyComponent>(
+			entt::get<scene::components::CollidersComponent, scene::components::TransformComponent>);
+	for (auto entity : dynamicGroup) {
+		auto [rigidbody, colliders, transform] = dynamicGroup.get<
+			scene::components::RigidbodyComponent,
+			scene::components::CollidersComponent,
+			scene::components::TransformComponent>(entity);
+
+		physx::PxRigidDynamic* actor = static_cast<physx::PxRigidDynamic*>(colliders.Colliders->getActor());
+		if (transform.WasAltered || rigidbody.WasAltered) {
+			// Sync ECS -> PhysX
+			syncActorToEcs(actor, colliders, transform);
+
+			// Settings
+			actor->setMass(rigidbody.Mass);
+			actor->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, !rigidbody.HasGravity);
+			actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, rigidbody.IsKinematic);
+
+			// Reset flags
+			transform.WasAltered = false;
+			rigidbody.WasAltered = false;
+		}
+	}
+
+	auto staticGroup = m_registry.group<scene::components::CollidersComponent>(
+			entt::get<scene::components::TransformComponent>,
+			entt::exclude<scene::components::RigidbodyComponent>);
+	for (auto entity : staticGroup) {
+		auto [colliders, transform] = staticGroup.get<
+			scene::components::CollidersComponent,
+			scene::components::TransformComponent>(entity);
+
+		physx::PxRigidStatic* actor = static_cast<physx::PxRigidStatic*>(colliders.Colliders->getActor());
+		if (transform.WasAltered) {
+			LOG_WARN("Altered position of static physics entity");
+
+			// Sync ECS -> PhysX
+			syncActorToEcs(actor, colliders, transform);
+
+			// Reset flags
+			transform.WasAltered = false;
+		}
+	}
+}
+
+void Scene::syncPhysicsToEcs() {
+	// Sync changes with physics
+	auto physicsGroup = m_registry.group<scene::components::CollidersComponent>(
+		entt::get<scene::components::TransformComponent>);
+	for (auto entity : physicsGroup) {
+		auto [colliders, transform] = physicsGroup.get<
+			scene::components::CollidersComponent,
+			scene::components::TransformComponent>(entity);
+
+		physx::PxRigidActor* actor = static_cast<physx::PxRigidActor*>(colliders.Colliders->getActor());
+		
+		// Transform
+		physx::PxTransform pxt = actor->getGlobalPose();
+		transform.Position = { pxt.p.x, pxt.p.y, pxt.p.z };
+		transform.Rotation = { pxt.q.w,  pxt.q.x, pxt.q.y, pxt.q.z };
 	}
 }
 

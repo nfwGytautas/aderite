@@ -12,5 +12,7 @@ struct MetaComponent;
 struct TransformComponent;
 struct MeshRendererComponent;
 struct CameraComponent;
+struct RigidbodyComponent;
+struct CollidersComponent;
 
 ADERITE_COMPONENTS_NAMESPACE_END

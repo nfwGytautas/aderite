@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bgfx/bgfx.h>
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/shared/Forward.hpp"
 
@@ -13,6 +14,7 @@ public:
 	static IEventSink* Sink;
 	static Project* Project;
 	static EditorCamera* EditorCamera;
+	static bgfx::FrameBufferHandle DebugRenderHandle;
 
 	/**
 	 * @brief True if currently in game mode, false otherwise

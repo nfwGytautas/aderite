@@ -31,12 +31,16 @@ constexpr char* EngineVersion = "0.0.0";
 
 
 // ---------------------------------
-// MIDDLEWARE ENABLED
+// Other settings
 // 0 - Disabled
-// 1 - Enabled
+// 1 - Active
 // ---------------------------------
 
+// Does the runtime get built with middleware capabilities
 #define MIDDLEWARE_ENABLED 1
+
+// Will the renderer support debug rendering
+#define DEBUG_RENDER 1
 
 
 // ---------------------------------

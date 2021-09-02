@@ -15,6 +15,7 @@
 #include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
+#include "aderite/physics/Forward.hpp"
 
 ADERITE_COMPONENTS_NAMESPACE_BEGIN
 
@@ -35,12 +36,17 @@ struct MetaComponent {
 */
 struct TransformComponent {
 	glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
+	glm::quat Rotation = glm::quat({ 1.0f, 0.0f, 0.0f, 0.0f });
 	glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
+
+	/**
+	 * @brief Flag specifying if the transform component was updated in this cycle
+	*/
+	bool WasAltered = true;
 
 	TransformComponent() = default;
 	TransformComponent(const TransformComponent&) = default;
-	TransformComponent(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale)
+	TransformComponent(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale)
 		: Position(position), Rotation(rotation), Scale(scale) {}
 
 	/**
@@ -48,8 +54,8 @@ struct TransformComponent {
 	 * @param t Transform component
 	 * @return Computed transformation matrix
 	*/
-	static glm::mat4 compute_transform(const TransformComponent& t) {
-		glm::mat4 rotation = glm::toMat4(glm::quat(t.Rotation));
+	static glm::mat4 computeTransform(const TransformComponent& t) {
+		glm::mat4 rotation = glm::toMat4(t.Rotation);
 		return glm::translate(glm::mat4(1.0f), t.Position) * rotation * glm::scale(glm::mat4(1.0f), t.Scale);
 	}
 };
@@ -75,6 +81,33 @@ struct CameraComponent {
 
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent&) = default;
+};
+
+/**
+ * @brief Rigid body component used for physics
+*/
+struct RigidbodyComponent {
+	bool IsKinematic = false;
+	bool HasGravity = true;
+	float Mass = 1.0f;
+
+	/**
+	 * @brief Flag specifying if the transform component was updated in this cycle
+	*/
+	bool WasAltered = true;
+
+	RigidbodyComponent() = default;
+	RigidbodyComponent(const RigidbodyComponent&) = default;
+};
+
+/**
+ * @brief Component containing all colliders attached to this object
+*/
+struct CollidersComponent {
+	physics::ColliderList* Colliders = nullptr;
+
+	CollidersComponent() = default;
+	CollidersComponent(const CollidersComponent&) = default;
 };
 
 ADERITE_COMPONENTS_NAMESPACE_END

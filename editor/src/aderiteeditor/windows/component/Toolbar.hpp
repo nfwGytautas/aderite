@@ -7,7 +7,7 @@
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 
 /**
- * @brief Toolbar of the editor, the bar that goes at the top of the window
+ * @brief Toolbar of the editor, this bar contains play, pause buttons etc.
 */
 class Toolbar : public shared::BaseComponent {
 public:
@@ -16,8 +16,6 @@ public:
 
 	// Inherited via BaseComponent
 	virtual void render() override;
-private:
-	TextInputModal* m_textModal = nullptr;
 };
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_END

@@ -4,6 +4,7 @@
 
 #include "aderite/utility/Log.hpp"
 #include "aderite/asset/AssetManager.hpp"
+#include "aderite/physics/PhysicsController.hpp"
 #include "aderite/input/InputManager.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/SceneManager.hpp"
@@ -59,8 +60,15 @@ bool Engine::init(InitOptions options) {
 		return false;
 	}
 
+	// Physics controller
+	m_physicsController = new physics::PhysicsController();
+	if (!m_physicsController->init()) {
+		LOG_ERROR("Aborting aderite initialization");
+		return false;
+	}
+
 	// Renderer
-	m_renderer = new  rendering::Renderer();
+	m_renderer = new rendering::Renderer();
 	if (!m_renderer->init()) {
 		LOG_ERROR("Aborting aderite initialization");
 		return false;
@@ -83,11 +91,13 @@ void Engine::shutdown() {
 
 	m_sceneManager->shutdown();
 	m_assetManager->shutdown();
+	m_physicsController->shutdown();
 	m_renderer->shutdown();
 	m_windowManager->shutdown();
 	m_inputManager->shutdown();
 
 	delete m_sceneManager;
+	delete m_physicsController;
 	delete m_assetManager;
 	delete m_renderer;
 	delete m_windowManager;
@@ -115,6 +125,8 @@ void Engine::loop() {
 		scene::Scene* currentScene = m_sceneManager->getCurrentScene();
 		MIDDLEWARE_ACTION(onStartRender);
 		m_renderer->renderScene(currentScene);
+		MIDDLEWARE_ACTION(onPreRenderCommit);
+		m_renderer->commit();
 		MIDDLEWARE_ACTION(onEndRender);
 	}
 }
@@ -136,6 +148,11 @@ void Engine::onSceneChanged(scene::Scene* scene) {
 	MIDDLEWARE_ACTION(onSceneChanged, scene);
 }
 
+void Engine::onWindowResized(unsigned int newWidth, unsigned int newHeight) {
+	// TODO: Event system?
+	m_renderer->onWindowResized(newWidth, newHeight);
+}
+
 void Engine::attachMiddleware(interfaces::IEngineMiddleware* middleware) {
 	if (m_middleware != nullptr) {
 		delete m_middleware;
@@ -145,6 +162,7 @@ void Engine::attachMiddleware(interfaces::IEngineMiddleware* middleware) {
 }
 
 void Engine::startPhysicsUpdates() {
+	// Before starting physics updates reset the engine
 	m_willUpdatePhysics = true;
 }
 
@@ -190,6 +208,8 @@ void Engine::updatePhysics(float delta) {
 	if (!m_willUpdatePhysics) {
 		return;
 	}
+
+	m_physicsController->update(delta);
 
 	MIDDLEWARE_ACTION(onPhysicsUpdate, delta);
 }

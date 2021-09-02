@@ -50,7 +50,7 @@ void ImGui_Implbgfx_RenderDrawLists(::ImDrawData* draw_data)
 
     draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 
-    // Setup render shared::State::: alpha-blending enabled, no face culling,
+    // Setup render state alpha-blending enabled, no face culling,
     // no depth testing, scissor enabled
     uint64_t state =
         BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA |

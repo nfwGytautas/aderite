@@ -100,7 +100,8 @@ void EditorCamera::update(float delta) {
 }
 
 bool EditorCamera::isEnabled() {
-	return !State::IsGameMode;
+	//return !State::IsGameMode;
+	return true;
 }
 
 glm::vec3 EditorCamera::getUpDirection() const {
@@ -120,7 +121,7 @@ glm::vec3 EditorCamera::calculatePosition() const {
 }
 
 glm::quat EditorCamera::getOrientation() const {
-	return glm::quat(glm::vec3(-m_pitch, -m_yaw, 0.0f));
+	return glm::quat(glm::vec3(m_pitch, m_yaw, 0.0f));
 }
 
 void EditorCamera::updateViewMatrix() {

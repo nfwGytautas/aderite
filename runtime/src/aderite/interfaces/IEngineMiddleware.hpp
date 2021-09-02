@@ -70,6 +70,12 @@ ADERITE_INTERFACE_NAMESPACE_BEGIN
 		 * @param scene The scene that was made active
 		*/
 		virtual void onSceneChanged(scene::Scene* scene) {};
+
+		/**
+		 * @brief Function invoked right before all rendering is commited, this is usually the step where
+		 * multiple outputs should be combined
+		*/
+		virtual void onPreRenderCommit() {};
 	};
 
 /**

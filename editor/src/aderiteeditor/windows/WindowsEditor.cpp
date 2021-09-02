@@ -12,6 +12,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
+#include "aderite/utility/bgfx.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/scene/Scene.hpp"
@@ -21,6 +22,7 @@
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
+#include "aderiteeditor/windows/component/Menubar.hpp"
 #include "aderiteeditor/windows/component/Toolbar.hpp"
 #include "aderiteeditor/windows/component/SceneView.hpp"
 #include "aderiteeditor/windows/component/SceneHierarchy.hpp"
@@ -34,6 +36,7 @@
 ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN
 
 WindowsEditor::WindowsEditor(int argc, char** argv) {
+	m_menubar = new component::Menubar();
 	m_toolbar = new component::Toolbar();
 	m_sceneView = new component::SceneView();
 	m_sceneHierarchy = new component::SceneHierarchy();
@@ -47,6 +50,7 @@ WindowsEditor::WindowsEditor(int argc, char** argv) {
 }
 
 WindowsEditor::~WindowsEditor() {
+	delete m_menubar;
 	delete m_toolbar;
 	delete m_sceneView;
 	delete m_sceneHierarchy;
@@ -129,13 +133,28 @@ void WindowsEditor::onRendererInitialized() {
 	}
 	backend::ImGui_Implbgfx_Init(255);
 
+	// Init debug render output
+	shared::State::DebugRenderHandle = utility::createFrameBuffer();
+
 	// Components
+	m_menubar->init();
 	m_toolbar->init();
 	m_sceneView->init();
 	m_sceneHierarchy->init();
 	m_propertyEditor->init();
 	m_assetBrowser->init();
 	m_assetEditor->init();
+}
+
+void WindowsEditor::onStartRender() {
+	// Render all colliders and triggers
+	//::aderite::Engine::getRenderer()->debugRenderCollidersAndTriggers(shared::State::EditorCamera->getOutputHandle());
+}
+
+void WindowsEditor::onPreRenderCommit() {
+	// Render all colliders and triggers
+	//::aderite::Engine::getRenderer()->debugRenderCollidersAndTriggers(shared::State::EditorCamera->getOutputHandle());
+	//::aderite::Engine::getRenderer()->combineOutputs(shared::State::DebugRenderHandle, {shared::State::EditorCamera->getOutputHandle()}, false);
 }
 
 void WindowsEditor::onEndRender() {
@@ -207,6 +226,7 @@ void WindowsEditor::onEndRender() {
 	// Dockspace components start here
 
 	// Components
+	m_menubar->render();
 	m_toolbar->render();
 	m_sceneView->render();
 	m_sceneHierarchy->render();
@@ -226,11 +246,6 @@ void WindowsEditor::onEndRender() {
 	// Rendering ImGui
 	ImGui::Render();
 
-
-	// Reset the Renderer output, this binds the Renderer window and sets the SceneView
-	::aderite::Engine::getRenderer()->resetOutput();
-	// Clear previous output
-	::aderite::Engine::getRenderer()->clear();
 	// Render to the window
 	backend::ImGui_Implbgfx_RenderDrawLists(ImGui::GetDrawData());
 
@@ -238,7 +253,6 @@ void WindowsEditor::onEndRender() {
 	if (::aderite::Engine::get()->getWindowManager()->isClosed()) {
 		// TODO: Request save
 		m_expected_shutdown = true;
-		onSaveProject();
 		::aderite::Engine::get()->requestExit();
 	}
 }
@@ -250,6 +264,7 @@ void WindowsEditor::onRuntimeShutdown() {
 		//onSaveProject();
 	}
 
+	m_menubar->shutdown();
 	m_toolbar->shutdown();
 	m_sceneView->shutdown();
 	m_sceneHierarchy->shutdown();
