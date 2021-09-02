@@ -125,6 +125,8 @@ void Engine::loop() {
 		scene::Scene* currentScene = m_sceneManager->getCurrentScene();
 		MIDDLEWARE_ACTION(onStartRender);
 		m_renderer->renderScene(currentScene);
+		MIDDLEWARE_ACTION(onPreRenderCommit);
+		m_renderer->commit();
 		MIDDLEWARE_ACTION(onEndRender);
 	}
 }
@@ -144,6 +146,11 @@ void Engine::onRendererInitialized() {
 
 void Engine::onSceneChanged(scene::Scene* scene) {
 	MIDDLEWARE_ACTION(onSceneChanged, scene);
+}
+
+void Engine::onWindowResized(unsigned int newWidth, unsigned int newHeight) {
+	// TODO: Event system?
+	m_renderer->onWindowResized(newWidth, newHeight);
 }
 
 void Engine::attachMiddleware(interfaces::IEngineMiddleware* middleware) {

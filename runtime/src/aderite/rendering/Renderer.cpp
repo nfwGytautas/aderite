@@ -21,6 +21,12 @@
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/rendering/DrawCall.hpp"
 
+#include "aderite/rendering/InlineShaders.hpp"
+
+#if DEBUG_RENDER == 1
+#include "aderite/rendering/debug/DebugRenderer.hpp"
+#endif
+
 namespace impl {
 
 	/**
@@ -93,6 +99,18 @@ bool Renderer::init() {
 		LOG_ERROR("Failed to initialize BGFX");
 	}
 
+	// Now create some defaults
+#if DEBUG_RENDER == 1
+	m_debugRenderer = new DebugRenderer();
+#endif
+
+	// Clear color
+	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
+
+	// Initial view rect
+	auto windowSize = ::aderite::Engine::getWindowManager()->getSize();
+	onWindowResized(windowSize.x, windowSize.y);
+
 	// Finish any queued operations
 	bgfx::frame();
 
@@ -102,21 +120,26 @@ bool Renderer::init() {
 }
 
 void Renderer::shutdown() {
+#if DEBUG_RENDER == 1
+	delete m_debugRenderer;
+#endif
 
+	bgfx::shutdown();
 }
 
 void Renderer::setVsync(bool enabled) {
 	ADERITE_UNIMPLEMENTED;
 }
 
-void Renderer::clear() {
-	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
-}
+void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight) {
+	bgfx::setViewRect(0, 0, 0, newWidth, newHeight);
 
-void Renderer::resetOutput() {
-	// Set SceneView
-	glm::i32vec2 size = ::aderite::Engine::getWindowManager()->getSize();
-	bgfx::setViewRect(0, 0, 0, size.x, size.y);
+#if DEBUG_RENDER == 1
+	// TODO: Event system?
+	m_debugRenderer->onWindowResized(newWidth, newHeight);
+#endif
+
+	bgfx::reset(newWidth, newHeight);
 }
 
 void Renderer::renderScene(scene::Scene* scene) {
@@ -130,7 +153,7 @@ void Renderer::renderScene(scene::Scene* scene) {
 	size_t drawCallIdx = 0;
 
 	// Resize
-	drawCalls.reserve(m_lastRenderDrawCalls);
+	//drawCalls.reserve(m_lastRenderDrawCalls);
 
 	// Construct draw calls
 	auto group = scene->getEntityRegistry().group<scene::components::TransformComponent>(entt::get<scene::components::MeshRendererComponent>);
@@ -151,7 +174,7 @@ void Renderer::renderScene(scene::Scene* scene) {
 			mr.MaterialHandle->fillDrawCall(&dc);
 		}
 
-		glm::mat4 tmat = scene::components::TransformComponent::compute_transform(TransformComponent);
+		glm::mat4 tmat = scene::components::TransformComponent::computeTransform(TransformComponent);
 		dc.Transformations.push_back(tmat);
 	}
 
@@ -175,23 +198,27 @@ void Renderer::renderScene(scene::Scene* scene) {
 
 			// Set persistent matrices
 			bgfx::setViewTransform(0, glm::value_ptr(camera->computeViewMatrix()), glm::value_ptr(camera->computeProjectionMatrix()));
-
+			
 			// Bind state
 			bgfx::setViewFrameBuffer(0, camera->getOutputHandle());
-			bgfx::touch(0);
-
+			
 			for (auto& dc : drawCalls) {
 				executeDrawCall(dc.second);
 			}
+			
+			// Discard this draw call information
+			bgfx::discard(BGFX_DISCARD_ALL);
+
+			// TODO: Move this
+			bgfx::setViewTransform(200, glm::value_ptr(camera->computeViewMatrix()), glm::value_ptr(camera->computeProjectionMatrix()));
+			m_debugRenderer->setTarget(outputHandle);
+			m_debugRenderer->begin();
+			m_debugRenderer->drawCollidersAndTriggers();
+			m_debugRenderer->end();
 		}
 	}
 
 	bgfx::discard(BGFX_DISCARD_ALL);
-
-	// Commit
-	bgfx::frame(false);
-
-	m_lastRenderDrawCalls = drawCalls.size();
 }
 
 bool Renderer::isReady() {
@@ -204,6 +231,13 @@ void Renderer::setResolution(const glm::uvec2& size) {
 
 void Renderer::displayFrame(bgfx::FrameBufferHandle image) {
 	LOG_ERROR("displayFrame() not implemented yet");
+}
+
+void Renderer::commit() {
+	// Commit
+	bgfx::frame(false);
+	//const bgfx::Stats* stats = bgfx::getStats();
+	//LOG_INFO("Commiting {0} draw calls", stats->numDraw);
 }
 
 void Renderer::executeDrawCall(DrawCall& dc) {

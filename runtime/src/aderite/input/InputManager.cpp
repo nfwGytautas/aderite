@@ -85,7 +85,7 @@ void InputManager::update() {
 }
 
 void InputManager::onWindowResized(unsigned int newWidth, unsigned int newHeight) {
-	
+	::aderite::Engine::get()->onWindowResized(newWidth, newHeight);
 }
 
 void InputManager::onKeyStateChange(Key key, KeyAction action, KeyModifier modifiers) {

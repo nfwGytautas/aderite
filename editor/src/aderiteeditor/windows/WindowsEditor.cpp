@@ -12,6 +12,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
+#include "aderite/utility/bgfx.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/scene/Scene.hpp"
@@ -132,6 +133,9 @@ void WindowsEditor::onRendererInitialized() {
 	}
 	backend::ImGui_Implbgfx_Init(255);
 
+	// Init debug render output
+	shared::State::DebugRenderHandle = utility::createFrameBuffer();
+
 	// Components
 	m_menubar->init();
 	m_toolbar->init();
@@ -140,6 +144,17 @@ void WindowsEditor::onRendererInitialized() {
 	m_propertyEditor->init();
 	m_assetBrowser->init();
 	m_assetEditor->init();
+}
+
+void WindowsEditor::onStartRender() {
+	// Render all colliders and triggers
+	//::aderite::Engine::getRenderer()->debugRenderCollidersAndTriggers(shared::State::EditorCamera->getOutputHandle());
+}
+
+void WindowsEditor::onPreRenderCommit() {
+	// Render all colliders and triggers
+	//::aderite::Engine::getRenderer()->debugRenderCollidersAndTriggers(shared::State::EditorCamera->getOutputHandle());
+	//::aderite::Engine::getRenderer()->combineOutputs(shared::State::DebugRenderHandle, {shared::State::EditorCamera->getOutputHandle()}, false);
 }
 
 void WindowsEditor::onEndRender() {
@@ -231,11 +246,6 @@ void WindowsEditor::onEndRender() {
 	// Rendering ImGui
 	ImGui::Render();
 
-
-	// Reset the Renderer output, this binds the Renderer window and sets the SceneView
-	::aderite::Engine::getRenderer()->resetOutput();
-	// Clear previous output
-	::aderite::Engine::getRenderer()->clear();
 	// Render to the window
 	backend::ImGui_Implbgfx_RenderDrawLists(ImGui::GetDrawData());
 

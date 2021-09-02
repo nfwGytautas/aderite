@@ -70,6 +70,13 @@ public:
 	void onSceneChanged(scene::Scene* scene);
 
 	/**
+	 * @brief Function invoked by input manager when the windows has been resized
+	 * @param newWidth New width of the window
+	 * @param newHeight New height of the window
+	*/
+	void onWindowResized(unsigned int newWidth, unsigned int newHeight);
+
+	/**
 	 * @brief Attaches a aderite middleware instance to the runtime, previous one is deleted
 	 * @param middleware Middleware to attach
 	*/

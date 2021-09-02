@@ -16,11 +16,15 @@ Fix dependencies folder and CMake
 Optimize component include
 Memory manager
 Propogate physics events
+BGFX leaks
+Event system?
 
 Rendering:
 Clustered
 Textures
-Debug rendering (Physics)
+View names
+Blending
+BGFX multithread encoder
 
 Physics:
 Multithreading

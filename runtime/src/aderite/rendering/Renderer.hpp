@@ -3,6 +3,7 @@
 #include <vector>
 #include <bgfx/bgfx.h>
 #include <glm/glm.hpp>
+#include "aderite/config.hpp"
 #include "aderite/window/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
@@ -32,14 +33,11 @@ public:
 	void setVsync(bool enabled);
 
 	/**
-	 * @brief Clears the current output target
+	 * @brief Function invoked when the window has been resized
+	 * @param newWidth New width of the window
+	 * @param newHeight New height of the window
 	*/
-	void clear();
-
-	/**
-	 * @brief Resets the Renderer output to be the window
-	*/
-	void resetOutput();
+	void onWindowResized(unsigned int newWidth, unsigned int newHeight);
 
 	/**
 	 * @brief Submit a scene to be rendered
@@ -63,6 +61,20 @@ public:
 	 * @param image Image to display
 	*/
 	void displayFrame(bgfx::FrameBufferHandle image);
+
+	/**
+	 * @brief Advances to next frame
+	*/
+	void commit();
+
+#if DEBUG_RENDER == 1
+	/**
+	 * @brief Returns the debug renderer instance
+	*/
+	DebugRenderer* getDebugRenderer() {
+		return m_debugRenderer;
+	}
+#endif
 private:
 	Renderer() {}
 	friend class Engine;
@@ -70,7 +82,10 @@ private:
 	void executeDrawCall(DrawCall& dc);
 private:
 	bool m_isInitialized = false;
-	size_t m_lastRenderDrawCalls = 0;
+
+#if DEBUG_RENDER == 1
+	DebugRenderer* m_debugRenderer = nullptr;
+#endif
 };
 
 ADERITE_RENDERING_NAMESPACE_END

@@ -19,6 +19,8 @@ public:
 
 	virtual void onRuntimeInitialized() override;
 	virtual void onRendererInitialized() override;
+	virtual void onStartRender() override;
+	virtual void onPreRenderCommit() override;
 	virtual void onEndRender() override;
 	virtual void onRuntimeShutdown() override;
 	virtual void onSceneChanged(scene::Scene* scene) override;

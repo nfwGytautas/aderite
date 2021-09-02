@@ -54,7 +54,7 @@ struct TransformComponent {
 	 * @param t Transform component
 	 * @return Computed transformation matrix
 	*/
-	static glm::mat4 compute_transform(const TransformComponent& t) {
+	static glm::mat4 computeTransform(const TransformComponent& t) {
 		glm::mat4 rotation = glm::toMat4(t.Rotation);
 		return glm::translate(glm::mat4(1.0f), t.Position) * rotation * glm::scale(glm::mat4(1.0f), t.Scale);
 	}
