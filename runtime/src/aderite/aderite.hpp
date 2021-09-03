@@ -5,6 +5,7 @@
 #include "aderite/interfaces/IEngineMiddleware.hpp"
 
 #include "aderite/asset/Forward.hpp"
+#include "aderite/audio/Forward.hpp"
 #include "aderite/input/Forward.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
@@ -131,6 +132,7 @@ private:
 	ADERITE_SYSTEM_PTR(getSceneManager, scene::SceneManager, m_sceneManager)
 	ADERITE_SYSTEM_PTR(getInputManager, input::InputManager, m_inputManager)
 	ADERITE_SYSTEM_PTR(getPhysicsController, physics::PhysicsController, m_physicsController)
+	ADERITE_SYSTEM_PTR(getAudioController, audio::AudioController, m_audioController)
 
 #if MIDDLEWARE_ENABLED == 1
 	ADERITE_SYSTEM_PTR(getMiddleware, interfaces::IEngineMiddleware, m_middleware)

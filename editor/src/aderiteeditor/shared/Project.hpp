@@ -46,6 +46,16 @@ public:
 	std::string getActiveScene() const;
 
 	/**
+	 * @brief Returns the directory to master banks
+	*/
+	std::string getMasterBanksDir() const;
+
+	/**
+	 * @brief Sets the master banks dir
+	*/
+	void setMasterBanksDir(const std::string& masterBanksDir);
+
+	/**
 	 * @brief Validates project information, for example if the current scene name changed the project 
 	 * will automatically update it self to reflect these changes
 	*/
@@ -54,6 +64,7 @@ private:
 	std::filesystem::path m_directory;
 	std::string m_name;
 	std::string m_activeScene;
+	std::string m_masterBanksDir;
 };
 
 ADERITE_EDITOR_SHARED_NAMESPACE_END

@@ -46,6 +46,8 @@ bool Project::save() {
 		m_activeScene = ::aderite::Engine::getSceneManager()->getCurrentScene()->getName();
 	}
 
+	out << YAML::Key << "MasterBanksDirectory" << YAML::Value << m_masterBanksDir;
+
 	out << YAML::EndMap; // Root
 
 	std::ofstream fout(root.append(m_name + ".aproj"));
@@ -81,6 +83,10 @@ Project* Project::load(const std::string& path) {
 		p->m_activeScene = data["ActiveScene"].as<std::string>();
 	}
 
+	if (data["MasterBanksDirectory"]) {
+		p->m_masterBanksDir = data["MasterBanksDirectory"].as<std::string>();
+	}
+
 	return p;
 }
 
@@ -94,6 +100,14 @@ std::filesystem::path Project::getRootDir() const {
 
 std::string Project::getActiveScene() const {
 	return m_activeScene;
+}
+
+std::string Project::getMasterBanksDir() const {
+	return m_masterBanksDir;
+}
+
+void Project::setMasterBanksDir(const std::string& masterBanksDir) {
+	m_masterBanksDir = masterBanksDir;
 }
 
 void Project::validate() {

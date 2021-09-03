@@ -78,3 +78,8 @@
 // Collider namespace where all colliders are defined in
 #define ADERITE_COLLIDER_NAMESPACE_BEGIN ADERITE_PHYSICS_NAMESPACE_BEGIN namespace collider {
 #define ADERITE_COLLIDER_NAMESPACE_END ADERITE_PHYSICS_NAMESPACE_END }
+
+// Audio namespace where all audio related functionality is stored in
+#define ADERITE_AUDIO_NAMESPACE_BEGIN ADERITE_ROOT_NAMESPACE_BEGIN namespace audio {
+#define ADERITE_AUDIO_NAMESPACE_END ADERITE_ROOT_NAMESPACE_END }
+

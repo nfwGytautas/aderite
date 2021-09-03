@@ -275,6 +275,11 @@ void AssetBrowser::render(){
 					target = shared::DDPayloadID__MeshAsset;
 					break;
 				}
+				case FsNodeType::BANK:
+				{
+					target = shared::DDPayloadID__AudioBank;
+					break;
+				}
 				case FsNodeType::DIRECTORY:
 				{
 					target = shared::DDPayloadID__Directory;
@@ -401,6 +406,9 @@ void AssetBrowser::resolveFs() {
 			}
 			else if (ext == ".material") {
 				type = FsNodeType::MATERIAL;
+			}
+			else if (ext == ".bank") {
+				type = FsNodeType::BANK;
 			}
 		}
 

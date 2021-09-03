@@ -5,6 +5,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "aderite/Config.hpp"
+#include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 #include "aderite/scene/Scene.hpp"

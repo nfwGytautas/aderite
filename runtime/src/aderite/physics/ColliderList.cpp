@@ -99,7 +99,9 @@ bool ColliderList::deserialize(YAML::Node& data) {
 		}
 
 		// Load it
-		collider->deserialize(colliderNode);
+		if (!collider->deserialize(colliderNode)) {
+			return false;
+		}
 		addCollider(collider);
 	}
 

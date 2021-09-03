@@ -2,3 +2,4 @@ Version: 2021_07_31r1
 Name: ExampleProject
 Type: Project
 ActiveScene: Scenes\ExampleScene.scene
+MasterBanksDirectory: Audio\

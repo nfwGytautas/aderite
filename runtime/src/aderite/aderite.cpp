@@ -4,6 +4,7 @@
 
 #include "aderite/utility/Log.hpp"
 #include "aderite/asset/AssetManager.hpp"
+#include "aderite/audio/AudioController.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/input/InputManager.hpp"
 #include "aderite/rendering/Renderer.hpp"
@@ -67,6 +68,13 @@ bool Engine::init(InitOptions options) {
 		return false;
 	}
 
+	// Audio controller
+	m_audioController = new audio::AudioController();
+	if (!m_audioController->init()) {
+		LOG_ERROR("Aborting aderite initialization");
+		return false;
+	}
+
 	// Renderer
 	m_renderer = new rendering::Renderer();
 	if (!m_renderer->init()) {
@@ -92,12 +100,14 @@ void Engine::shutdown() {
 	m_sceneManager->shutdown();
 	m_assetManager->shutdown();
 	m_physicsController->shutdown();
+	m_audioController->shutdown();
 	m_renderer->shutdown();
 	m_windowManager->shutdown();
 	m_inputManager->shutdown();
 
 	delete m_sceneManager;
 	delete m_physicsController;
+	delete m_audioController;
 	delete m_assetManager;
 	delete m_renderer;
 	delete m_windowManager;
@@ -189,6 +199,9 @@ void Engine::stopSceneUpdates() {
 void Engine::updateSystem(float delta) {
 	// Query events
 	m_inputManager->update();
+
+	// Update audio and flush queued audio commands to controller (FMOD should always update)
+	m_audioController->update();
 
 	MIDDLEWARE_ACTION(onSystemUpdate, delta);
 }

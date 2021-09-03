@@ -1,5 +1,6 @@
 #pragma once
 
+#include "aderite/audio/Forward.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
@@ -27,7 +28,9 @@ private:
 	void renderTransform();
 	void renderMeshrenderer();
 	void renderRigidbody();
+	void renderAudioListener();
 
+	void renderAudioSource(size_t idx, audio::AudioInstance* instance, bool& remove);
 	void renderBoxCollider(size_t idx, physics::Collider* collider, bool& remove);
 private:
 	scene::Entity m_selectedEntity = scene::Entity::null();
