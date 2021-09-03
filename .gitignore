@@ -1,5 +1,5 @@
 # Dependencies
-#dependencies/include/
+dependencies/include/
 dependencies/glad/build/
 dependencies/imgui/build/
 
