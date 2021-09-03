@@ -16,12 +16,12 @@ ADERITE_PHYSICS_NAMESPACE_BEGIN
 class PhysicsController {
 public:
 	/**
-	 * @brief Initializes the window manager
+	 * @brief Initializes the physics controller
 	*/
 	bool init();
 
 	/**
-	 * @brief Shutdown the window manager
+	 * @brief Shutdown the physics controller
 	*/
 	void shutdown();
 

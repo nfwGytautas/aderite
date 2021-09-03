@@ -10,6 +10,9 @@
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/ShaderAsset.hpp"
+#include "aderite/audio/AudioController.hpp"
+#include "aderite/audio/Bank.hpp"
+#include "aderite/audio/AudioEvent.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
 #include "aderiteeditor/windows/component/FileDialog.hpp"
@@ -116,6 +119,20 @@ void Menubar::render() {
 			if (ImGui::MenuItem("Recompile shaders")) {
 				// Get all currently used shaders and then complete a unload/load cycle
 				LOG_WARN("Not implemented feature called 'Recompile shaders'");
+			}
+
+			if (ImGui::MenuItem("Reload FMOD audio banks")) {
+				::aderite::Engine::getAudioController()->loadMasterBank(::aderite::Engine::getAssetManager()->getRawDir());
+
+				for (audio::Bank* bank : *::aderite::Engine::getAudioController()) {
+					for (audio::AudioEvent* e : *bank) {
+						if (e->isLoaded()) {
+							// Unload and load
+							e->unload();
+							e->load();
+						}
+					}
+				}
 			}
 			
 			ImGui::EndMenu();

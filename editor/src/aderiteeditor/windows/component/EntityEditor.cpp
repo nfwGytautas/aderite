@@ -9,6 +9,11 @@
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MeshAsset.hpp" 
 #include "aderite/asset/MaterialAsset.hpp" 
+#include "aderite/audio/AudioInstanceList.hpp"
+#include "aderite/audio/AudioInstance.hpp"
+#include "aderite/audio/Bank.hpp"
+#include "aderite/audio/AudioEvent.hpp"
+#include "aderite/audio/AudioController.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/ColliderList.hpp"
 #include "aderite/physics/Collider.hpp"
@@ -214,6 +219,11 @@ void EntityEditor::render() {
 		renderRigidbody();
 	}
 
+	bool hasAudioListener = m_selectedEntity.hasComponent<scene::components::AudioListenerComponent>();
+	if (hasAudioListener) {
+		renderAudioListener();
+	}
+
 	if (m_selectedEntity.hasComponent<scene::components::CollidersComponent>()) {
 		auto& colliders = m_selectedEntity.getComponent<scene::components::CollidersComponent>();
 		std::vector<physics::Collider*> toRemove;
@@ -246,6 +256,29 @@ void EntityEditor::render() {
 		}
 	}
 
+	if (m_selectedEntity.hasComponent<scene::components::AudioSourcesComponent>()) {
+		auto& sources = m_selectedEntity.getComponent<scene::components::AudioSourcesComponent>();
+		std::vector<audio::AudioInstance*> toRemove;
+
+		// Sources
+		size_t i = 0;
+		for (audio::AudioInstance* ai : *sources.Instances) {
+			bool remove = false;
+
+			renderAudioSource(i, ai, remove);
+
+			if (remove) {
+				toRemove.push_back(ai);
+			}
+
+			i++;
+		}
+
+		for (audio::AudioInstance* ai : toRemove) {
+			sources.Instances->removeInstance(ai);
+		}
+	}
+
 	ImGui::Separator();
 
 	float width = ImGui::GetContentRegionAvail().x * 0.4855f;
@@ -265,8 +298,13 @@ void EntityEditor::render() {
 			ImGui::CloseCurrentPopup();
 		}
 
-		if (!hasRigidbody && ImGui::MenuItem("Rigid body")) {
+		if (!hasRigidbody && ImGui::MenuItem("Rigidbody")) {
 			m_selectedEntity.addComponent<::aderite::scene::components::RigidbodyComponent>();
+			ImGui::CloseCurrentPopup();
+		}
+
+		if (!hasAudioListener && ImGui::MenuItem("Audio Listener")) {
+			m_selectedEntity.addComponent<::aderite::scene::components::AudioListenerComponent>();
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -277,6 +315,17 @@ void EntityEditor::render() {
 
 			auto& collidersComponent = m_selectedEntity.getComponent<::aderite::scene::components::CollidersComponent>();
 			collidersComponent.Colliders->addCollider(new physics::collider::BoxCollider());
+
+			ImGui::CloseCurrentPopup();
+		}
+
+		if (ImGui::MenuItem("Audio source")) {
+			if (!m_selectedEntity.hasComponent<::aderite::scene::components::AudioSourcesComponent>()) {
+				auto& audioSourcesComponent = m_selectedEntity.addComponent<::aderite::scene::components::AudioSourcesComponent>();
+			}
+
+			auto& audioSourcesComponent = m_selectedEntity.getComponent<::aderite::scene::components::AudioSourcesComponent>();
+			audioSourcesComponent.Instances->addInstance(new audio::AudioInstance());
 
 			ImGui::CloseCurrentPopup();
 		}
@@ -425,9 +474,104 @@ void EntityEditor::renderRigidbody() {
 	}
 }
 
+void EntityEditor::renderAudioListener() {
+	bool open, remove = false;
+	render_component_shared("Audio Listener", "Audio Listener", open, remove);
+
+	if (open) {
+		auto& c = m_selectedEntity.getComponent<scene::components::AudioListenerComponent>();
+
+		ImGui::Checkbox("Enabled", &c.IsEnabled);
+
+		ImGui::TreePop();
+	}
+
+	if (remove) {
+		m_selectedEntity.removeComponent<scene::components::RigidbodyComponent>();
+	}
+}
+
+void EntityEditor::renderAudioSource(size_t idx, audio::AudioInstance* instance, bool& remove) {
+	bool open = false;
+	render_component_shared("Audio source " + std::to_string(idx), "Audio Source", open, remove);
+
+	if (open) {
+		// Get all loaded banks
+		audio::Bank* currentBank = instance->getBank();
+
+		// TODO: Rework to detect unloaded banks
+		if (ImGui::BeginCombo("Bank", currentBank != nullptr ? currentBank->getName().c_str() : "None", 0))
+		{
+			for (audio::Bank* bank : *::aderite::Engine::getAudioController()) {
+				const bool is_selected = (bank == currentBank);
+				if (ImGui::Selectable(bank->getName().c_str(), is_selected)) {
+					currentBank = bank;
+					instance->setBank(currentBank);
+				}
+
+				// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+				if (is_selected) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+
+			ImGui::EndCombo();
+		}
+
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__AudioBank)) {
+				std::string name = static_cast<const char*>(payload->Data);
+				currentBank = ::aderite::Engine::getAudioController()->getOrRead(name);
+				instance->setBank(currentBank);
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		if (currentBank != nullptr) {
+			audio::AudioEvent* currentEvent = instance->getEvent();
+			if (ImGui::BeginCombo("Event", currentEvent != nullptr ? currentEvent->getName().c_str() : "None", 0)) {
+				for (audio::AudioEvent* e : *currentBank) {
+					const bool is_selected = (e == currentEvent);
+					if (ImGui::Selectable(e->getName().c_str(), is_selected)) {
+						instance->setEvent(e);
+						currentEvent = e;
+					}
+
+					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+					if (is_selected) {
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+
+			if (currentEvent != nullptr) {
+				// Event parameters
+
+			}
+		}
+		else {
+			// Empty
+			if (ImGui::BeginCombo("Event", "Select bank first")) {
+				ImGui::EndCombo();
+			}
+		}
+
+		// Shared
+		bool playOnStart = instance->getPlayOnStart();
+		if (ImGui::Checkbox("Play on start", &playOnStart)) {
+			instance->setPlayOnStart(playOnStart);
+		}
+
+		ImGui::TreePop();
+	}
+}
+
 void EntityEditor::renderBoxCollider(size_t idx, physics::Collider* collider, bool& remove) {
 	bool open = false;
-	render_component_shared("Box collider " + std::to_string(idx), "Box collider", open, remove);
+	render_component_shared("Box collider " + std::to_string(idx), "Box Collider", open, remove);
 	
 	if (open) {
 		auto typeCollider = static_cast<physics::collider::BoxCollider*>(collider);

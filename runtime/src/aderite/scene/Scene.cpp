@@ -14,10 +14,11 @@
 #include "aderite/utility/YAML.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MeshAsset.hpp" 
-#include "aderite/asset/MaterialAsset.hpp" 
+#include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/EntityCamera.hpp"
 #include "aderite/scene/components/Components.hpp"
+#include "aderite/audio/AudioInstanceList.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/ColliderList.hpp"
 
@@ -116,6 +117,31 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 		out << YAML::EndSeq; // Colliders
 	}
 
+	// Audio sources
+	if (e.hasComponent<components::AudioSourcesComponent>()) {
+		out << YAML::Key << "AudioSources";
+		out << YAML::BeginSeq; // AudioSources
+
+		components::AudioSourcesComponent& audioSourcesComponent = e.getComponent<components::AudioSourcesComponent>();
+
+		// TODO: Error check
+		audioSourcesComponent.Instances->serialize(out);
+
+		out << YAML::EndSeq; // AudioSources
+	}
+
+	// Audio listener
+	if (e.hasComponent<components::AudioListenerComponent>()) {
+		out << YAML::Key << "AudioListener";
+		out << YAML::BeginMap; // AudioListener
+
+		components::AudioListenerComponent& audioListenerComponent = e.getComponent<components::AudioListenerComponent>();
+
+		out << YAML::Key << "IsEnabled" << audioListenerComponent.IsEnabled;
+
+		out << YAML::EndMap; // AudioListener
+	}
+
 	out << YAML::EndMap; // Entity
 }
 
@@ -209,6 +235,22 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 		collidersComponent.Colliders->deserialize(colliders);
 	}
 
+	// Audio sources
+	auto audioSources = e_node["AudioSources"];
+	if (audioSources) {
+		auto& audioSourcesComponent = e.addComponent<components::AudioSourcesComponent>();
+		audioSourcesComponent.Instances->deserialize(audioSources);
+	}
+
+	// Audio listener
+	auto al_node = e_node["AudioListener"];
+	if (al_node) {
+		auto& rbodyComponent = e.addComponent<components::AudioListenerComponent>();
+
+		// TODO: Error check
+		rbodyComponent.IsEnabled = al_node["IsEnabled"].as<bool>();
+	}
+
 	return e;
 }
 
@@ -221,6 +263,12 @@ Scene::~Scene() {
 	for (auto entity : entities) {
 		auto [colliders] = entities.get(entity);
 		delete colliders.Colliders;
+	}
+
+	auto entities2 = m_registry.view<scene::components::AudioSourcesComponent>();
+	for (auto entity : entities2) {
+		auto [sources] = entities2.get(entity);
+		delete sources.Instances;
 	}
 
 	m_physicsScene->release();
@@ -248,6 +296,14 @@ Entity Scene::createEntity(const components::MetaComponent& MetaComponent) {
 }
 
 void Scene::destroyEntity(Entity entity) {
+	if (entity.hasComponent<components::AudioSourcesComponent>()) {
+		delete entity.getComponent<components::AudioSourcesComponent>().Instances;
+	}
+
+	if (entity.hasComponent<components::CollidersComponent>()) {
+		delete entity.getComponent<components::CollidersComponent>().Colliders;
+	}
+
 	m_registry.destroy(entity);
 }
 
@@ -424,6 +480,19 @@ void Scene::onComponentAdded<components::CollidersComponent>(Entity entity, comp
 	m_physicsScene->addActor(*actor);
 }
 
+template<>
+void Scene::onComponentAdded<components::AudioSourcesComponent>(Entity entity, components::AudioSourcesComponent& component) {
+	component.Instances = new audio::AudioInstanceList();
+}	
+
+template<>
+void Scene::onComponentAdded<components::AudioListenerComponent>(Entity entity, components::AudioListenerComponent& component) {
+	// Add transform if don't have already
+	if (!entity.hasComponent<components::TransformComponent>()) {
+		entity.addComponent<components::TransformComponent>();
+	}
+}
+
 template<typename T>
 void Scene::onComponentRemoved(Entity entity, T& component) {}
 
@@ -454,6 +523,11 @@ void Scene::onComponentRemoved<components::CollidersComponent>(Entity entity, co
 	}
 	m_physicsScene->removeActor(*component.Colliders->getActor());
 	delete component.Colliders;
+}
+
+template<>
+void Scene::onComponentRemoved<components::AudioSourcesComponent>(Entity entity, components::AudioSourcesComponent& component) {
+	delete component.Instances;
 }
 
 void Scene::onContact(

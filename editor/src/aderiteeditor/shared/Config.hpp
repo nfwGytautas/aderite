@@ -34,6 +34,11 @@ constexpr char* DDPayloadID__GenericAsset = "DDPayloadID__GenericAsset";
 constexpr char* DDPayloadID__SceneAsset = "DDPayloadID__SceneAsset";
 
 /**
+ * @brief Drag and drop id passed when the object that is being dragged is a audio bank
+*/
+constexpr char* DDPayloadID__AudioBank = "DDPayloadID__AudioBank";
+
+/**
  * @brief Drag and drop id passed when the object that is being dragged is a directory
 */
 constexpr char* DDPayloadID__Directory = "DDPayloadID__Directory";

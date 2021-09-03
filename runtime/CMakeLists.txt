@@ -28,9 +28,9 @@ set_property(TARGET aderite_runtime PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CM
 
 # Libraries to link
 if(BUILD_RELEASE)
-    target_link_libraries(aderite_runtime PUBLIC ${PHYSX_LIBS} spdlog yaml-cpp assimp-vc142-mt zlibstatic bgfxRelease bimgRelease bxRelease)
+    target_link_libraries(aderite_runtime PUBLIC ${PHYSX_LIBS} fmodstudio fmod spdlog yaml-cpp assimp-vc142-mt zlibstatic bgfxRelease bimgRelease bxRelease)
 else()
-	target_link_libraries(aderite_runtime PUBLIC ${PHYSX_LIBS} spdlogd yaml-cppd assimp-vc142-mtd zlibstaticd bgfxDebug bimgDebug bxDebug)
+	target_link_libraries(aderite_runtime PUBLIC ${PHYSX_LIBS} fmodstudioL fmodL spdlogd yaml-cppd assimp-vc142-mtd zlibstaticd bgfxDebug bimgDebug bxDebug)
 endif()
 
 # Same name

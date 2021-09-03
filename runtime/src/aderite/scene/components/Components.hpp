@@ -14,6 +14,7 @@
 
 #include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Forward.hpp"
+#include "aderite/audio/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/physics/Forward.hpp"
 
@@ -108,6 +109,26 @@ struct CollidersComponent {
 
 	CollidersComponent() = default;
 	CollidersComponent(const CollidersComponent&) = default;
+};
+
+/**
+ * @brief Component containing information about audio sources on an entity
+*/
+struct AudioSourcesComponent {
+	audio::AudioInstanceList* Instances = nullptr;
+
+	AudioSourcesComponent() = default;
+	AudioSourcesComponent(const AudioSourcesComponent&) = default;
+};
+
+/**
+ * @brief Component used to specify that this entity is listening to audio inputs
+*/
+struct AudioListenerComponent {
+	bool IsEnabled = false;
+
+	AudioListenerComponent() = default;
+	AudioListenerComponent(const AudioListenerComponent&) = default;
 };
 
 ADERITE_COMPONENTS_NAMESPACE_END

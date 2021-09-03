@@ -1,0 +1,6 @@
+{a35eddbb-440e-4d47-afbe-9fc697190ff8} bank:/Master
+{3b43fd6f-3575-0105-29f7-153866ea0960} bank:/Master.strings
+{4fd45c2d-c2e4-4aa8-9767-58a19b956d42} bank:/Scene
+{f3d06f59-ab64-4601-9814-d701ad862fc1} bus:/
+{49264ec9-49f6-4d44-8680-a334a427d4b6} bus:/Reverb
+{e9966ab3-f2e5-408e-93c8-8d413b31af63} event:/Fire

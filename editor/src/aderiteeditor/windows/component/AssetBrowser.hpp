@@ -17,7 +17,8 @@ public:
 		SCENE = 1,
 		SHADER = 2,
 		MESH = 3,
-		MATERIAL = 4
+		MATERIAL = 4,
+		BANK = 5,
 	};
 
 	struct FsNode {

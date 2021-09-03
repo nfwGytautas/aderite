@@ -15,6 +15,7 @@
 #include "aderite/utility/bgfx.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/asset/AssetManager.hpp"
+#include "aderite/audio/AudioController.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/window/WindowManager.hpp"
@@ -332,36 +333,23 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 	// Setup asset manager
 	::aderite::Engine::getAssetManager()->setRootDir(shared::State::Project->getRootDir().string());
 
-	// Now load every single asset metadata.
-	// This is done to be able to move and rename them. By loading them on demand it overcomplicates other
-	// parts of the program. Since asset metadata is pretty small (400 bytes at most) at one time in 4GB of RAM
-	// about 20 million of them can be loaded. If someone is using this engine with more assets than that then it's
-	// rather surprising considering that this isn't a professional game engine. Also note that all these assets are loaded
-	// only in editor configuration in runtime this is optimized out and only those assets that are needed are read.
-	for (auto& path : std::filesystem::recursive_directory_iterator(::aderite::Engine::getAssetManager()->getResDir())) {
-		// Ignore directories
-		if (path.is_directory()) {
-			continue;
-		}
-
-		// Make sure to ignore Raw directory, cause it contains not assets, but their actual data, since Raw directory is one
-		// big directory of data, the check is as simple as checking for parent to not be Raw/
-		if (path.path().parent_path() == ::aderite::Engine::getAssetManager()->getRawDir()) {
-			continue;
-		}
-
-		// Now read the asset
-		std::filesystem::path p = std::filesystem::relative(path.path(), ::aderite::Engine::getAssetManager()->getResDir());
-
-		// getOrRead, because read will log a warning, since some assets might have already been loaded by others
-		::aderite::Engine::getAssetManager()->getOrRead(p.string());
+	// Setup audio controller
+	if (!shared::State::Project->getMasterBanksDir().empty()) {
+		::aderite::Engine::getAudioController()->loadMasterBank(shared::State::Project->getMasterBanksDir());
 	}
-	
 
-	if (!shared::State::Project->getActiveScene().empty()) {
-		// Should have been read
-		scene::Scene* s = static_cast<scene::Scene*>(::aderite::Engine::getAssetManager()->getByName(shared::State::Project->getActiveScene()));
-		::aderite::Engine::getSceneManager()->setActive(s);
+	if (shared::State::Project->getActiveScene().empty()) {
+		onNewScene("Untitled 1");
+	}
+	else {
+		// Read scene
+		::aderite::Engine::getAssetManager()->getOrRead(shared::State::Project->getActiveScene());
+
+		if (!shared::State::Project->getActiveScene().empty()) {
+			// Should have been read
+			scene::Scene* s = static_cast<scene::Scene*>(::aderite::Engine::getAssetManager()->getByName(shared::State::Project->getActiveScene()));
+			::aderite::Engine::getSceneManager()->setActive(s);
+		}
 	}
 }
 
@@ -402,6 +390,7 @@ void WindowsEditor::onStopGame() {
 	Engine::get()->stopPhysicsUpdates();
 	Engine::get()->stopScriptUpdates();
 	Engine::get()->stopSceneUpdates();
+	Engine::getAudioController()->disable(true);
 	shared::State::IsGameMode = false;
 
 	// TODO: Disable all cameras in scene
@@ -411,6 +400,7 @@ void WindowsEditor::onStartGame() {
 	Engine::get()->startPhysicsUpdates();
 	Engine::get()->startScriptUpdates();
 	Engine::get()->startSceneUpdates();
+	Engine::getAudioController()->disable(false);
 	shared::State::IsGameMode = true;
 
 	// TODO: Enable all cameras in scene
