@@ -18,13 +18,14 @@
 #include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/Scene.hpp"
+#include "aderite/scene/EntityCamera.hpp"
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/rendering/DrawCall.hpp"
 
 #include "aderite/rendering/InlineShaders.hpp"
 
 #if DEBUG_RENDER == 1
-#include "aderite/rendering/debug/DebugRenderer.hpp"
+#include "aderite/rendering/DebugRenderer.hpp"
 #endif
 
 namespace impl {
@@ -109,7 +110,7 @@ bool Renderer::init() {
 
 	// Initial view rect
 	auto windowSize = ::aderite::Engine::getWindowManager()->getSize();
-	onWindowResized(windowSize.x, windowSize.y);
+	onWindowResized(windowSize.x, windowSize.y, false);
 
 	// Finish any queued operations
 	bgfx::frame();
@@ -131,7 +132,7 @@ void Renderer::setVsync(bool enabled) {
 	ADERITE_UNIMPLEMENTED;
 }
 
-void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight) {
+void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight, bool reset) {
 	bgfx::setViewRect(0, 0, 0, newWidth, newHeight);
 
 #if DEBUG_RENDER == 1
@@ -139,7 +140,9 @@ void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight) {
 	m_debugRenderer->onWindowResized(newWidth, newHeight);
 #endif
 
-	bgfx::reset(newWidth, newHeight);
+	if (reset) {
+		bgfx::reset(newWidth, newHeight);
+	}
 }
 
 void Renderer::renderScene(scene::Scene* scene) {
@@ -183,38 +186,31 @@ void Renderer::renderScene(scene::Scene* scene) {
 
 	// Skip rendering if there are no draw calls
 	if (drawCalls.size() > 0) {
+#if MIDDLEWARE_ENABLED == 1
+		interfaces::ICamera* middlewareCamera = scene->getMiddlewareCamera();
+		if (middlewareCamera && middlewareCamera->isEnabled()) {
+			renderFrom(middlewareCamera, drawCalls);
+
+#if DEBUG_RENDER == 1
+			m_debugRenderer->setCamera(middlewareCamera);
+			m_debugRenderer->render();
+			bgfx::discard(BGFX_DISCARD_ALL);
+#endif
+		}
+#endif
+
 		// Execute draw calls for all cameras
-		for (interfaces::ICamera* camera : scene->getCameras()) {
-			if (!camera->isEnabled()) {
+		auto cameraGroup = scene->getEntityRegistry()
+			.group<scene::components::CameraComponent>(
+				entt::get<scene::components::TransformComponent>);
+		for (auto entity : cameraGroup) {
+			auto [camera, transform] = cameraGroup.get(entity);
+			if (!camera.Camera->isEnabled()) {
 				// Skip disabled cameras
 				continue;
 			}
 
-			auto& outputHandle = camera->getOutputHandle();
-			if (!bgfx::isValid(outputHandle)) {
-				// Skip invalid handles
-				continue;
-			}
-
-			// Set persistent matrices
-			bgfx::setViewTransform(0, glm::value_ptr(camera->computeViewMatrix()), glm::value_ptr(camera->computeProjectionMatrix()));
-			
-			// Bind state
-			bgfx::setViewFrameBuffer(0, camera->getOutputHandle());
-			
-			for (auto& dc : drawCalls) {
-				executeDrawCall(dc.second);
-			}
-			
-			// Discard this draw call information
-			bgfx::discard(BGFX_DISCARD_ALL);
-
-			// TODO: Move this
-			bgfx::setViewTransform(200, glm::value_ptr(camera->computeViewMatrix()), glm::value_ptr(camera->computeProjectionMatrix()));
-			m_debugRenderer->setTarget(outputHandle);
-			m_debugRenderer->begin();
-			m_debugRenderer->drawCollidersAndTriggers();
-			m_debugRenderer->end();
+			renderFrom(camera.Camera, drawCalls);
 		}
 	}
 
@@ -240,7 +236,22 @@ void Renderer::commit() {
 	//LOG_INFO("Commiting {0} draw calls", stats->numDraw);
 }
 
-void Renderer::executeDrawCall(DrawCall& dc) {
+void Renderer::renderFrom(interfaces::ICamera* eye, const std::unordered_map<size_t, DrawCall>& dcs) {
+	// Set persistent matrices
+	bgfx::setViewTransform(0, glm::value_ptr(eye->computeViewMatrix()), glm::value_ptr(eye->computeProjectionMatrix()));
+
+	// Bind state
+	bgfx::setViewFrameBuffer(0, eye->getOutputHandle());
+
+	for (auto& dc : dcs) {
+		executeDrawCall(dc.second);
+	}
+
+	// Discard this draw call information
+	bgfx::discard(BGFX_DISCARD_ALL);
+}
+
+void Renderer::executeDrawCall(const DrawCall& dc) {
 	// Check if valid draw call
 	if (!dc.Valid) {
 		return;

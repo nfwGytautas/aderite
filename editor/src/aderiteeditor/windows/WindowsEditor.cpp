@@ -70,6 +70,8 @@ void WindowsEditor::onRuntimeInitialized() {
 		return;
 	}
 
+	shared::State::EditorCamera = new shared::EditorCamera();
+
 	// By default disable game updates
 	onStopGame();
 
@@ -162,7 +164,7 @@ void WindowsEditor::onEndRender() {
 	// Render ImGui
 
 	// State
-	bool show_demo_window = true;
+	bool show_demo_window = false;
 	bool show_another_window = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -355,8 +357,7 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 
 void WindowsEditor::onSceneChanged(scene::Scene* scene) {
 	// Attach editor camera
-	shared::State::EditorCamera = createEditorCamera();
-	scene->attachCamera(shared::State::EditorCamera);
+	scene->attachMiddlewareCamera(shared::State::EditorCamera);
 	m_sceneView->onSceneChanged(scene);
 }
 
@@ -408,10 +409,6 @@ void WindowsEditor::onStartGame() {
 
 void WindowsEditor::onResetGameState() {
 	// TODO: Reset game state, by reloading all scripts or resetting their default parameters
-}
-
-shared::EditorCamera* WindowsEditor::createEditorCamera() {
-	return new shared::EditorCamera();
 }
 
 ADERITE_EDITOR_ROOT_NAMESPACE_END

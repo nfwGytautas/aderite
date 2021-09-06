@@ -3,6 +3,7 @@
 #include <vector>
 #include <PxSimulationEventCallback.h>
 #include <entt/entity/registry.hpp>
+#include "aderite/Config.hpp"
 #include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Forward.hpp"
 #include "aderite/asset/Asset.hpp"
@@ -67,19 +68,6 @@ public:
 	virtual void removeAsset(asset::Asset* asset);
 
 	/**
-	 * @brief Returns the cameras that are in the scene
-	 * @return Vector containing cameras in the scene
-	*/
-	std::vector<interfaces::ICamera*> getCameras();
-
-	/**
-	 * @brief Attach a camera to the scene, this will force the renderer to render a scene to this camera output
-	 * if it is enabled
-	 * @param camera Camera to attach
-	*/
-	void attachCamera(interfaces::ICamera* camera);
-
-	/**
 	 * @brief Returns the physics scene
 	*/
 	physx::PxScene* getPhysicsScene() const;
@@ -95,6 +83,27 @@ public:
 
 	virtual asset::AssetType type() const override;
 	virtual bool isInGroup(asset::AssetGroup group) const override;
+
+#if MIDDLEWARE_ENABLED == 1
+	/**
+	 * @brief Attach a middleware camera
+	 * @param camera Middleware camera
+	*/
+	void attachMiddlewareCamera(interfaces::ICamera* camera) {
+		m_middlewareCamera = camera;
+	}
+
+	/**
+	 * @brief Returns the attached middleware camera or nullptr
+	*/
+	interfaces::ICamera* getMiddlewareCamera() const {
+		return m_middlewareCamera;
+	}
+
+private:
+	interfaces::ICamera* m_middlewareCamera = nullptr;
+public:
+#endif
 protected:
 	virtual bool serialize(YAML::Emitter& out) override;
 	virtual bool deserialize(YAML::Node& data) override;
@@ -149,7 +158,6 @@ private:
 	// Assets that the Scene uses
 	std::vector<asset::Asset*> m_assets;
 	entt::registry m_registry;
-	std::vector<interfaces::ICamera*> m_cameras;
 	physx::PxScene* m_physicsScene = nullptr;
 };
 

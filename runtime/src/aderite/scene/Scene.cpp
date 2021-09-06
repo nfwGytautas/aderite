@@ -206,9 +206,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 	auto cam_node = e_node["Camera"];
 	if (cam_node) {
 		auto& cameraComponent = e.addComponent<components::CameraComponent>();
-		cameraComponent.Camera = new EntityCamera(e);
 		cameraComponent.Camera->deserialize(cam_node);
-		scene->attachCamera(cameraComponent.Camera);
 	}
 
 	// Rigid body
@@ -255,10 +253,6 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 }
 
 Scene::~Scene() {
-	for (auto& camera : m_cameras) {
-		delete camera;
-	}
-
 	auto entities = m_registry.view<scene::components::CollidersComponent>();
 	for (auto entity : entities) {
 		auto [colliders] = entities.get(entity);
@@ -271,12 +265,22 @@ Scene::~Scene() {
 		delete sources.Instances;
 	}
 
+	auto entities3 = m_registry.view<scene::components::CameraComponent>();
+	for (auto entity : entities3) {
+		auto [camera] = entities3.get(entity);
+		delete camera.Camera;
+	}
+
 	m_physicsScene->release();
 }
 
 void Scene::update(float delta) {
-	for (auto& camera : m_cameras) {
-		camera->update(delta);
+	auto cameraGroup = m_registry
+		.group<scene::components::CameraComponent>(
+			entt::get<scene::components::TransformComponent>);
+	for (auto entity : cameraGroup) {
+		auto [camera, transform] = cameraGroup.get(entity);
+		camera.Camera->update(delta);
 	}
 }
 
@@ -373,14 +377,6 @@ Scene::Scene(const std::string& name)
 		LOG_ERROR("Failed to create a PhysX scene");
 		return;
 	}
-}
-
-std::vector<interfaces::ICamera*> Scene::getCameras() {
-	return m_cameras;
-}
-
-void Scene::attachCamera(interfaces::ICamera* camera) {
-	m_cameras.push_back(camera);
 }
 
 physx::PxScene* Scene::getPhysicsScene() const {
@@ -493,6 +489,16 @@ void Scene::onComponentAdded<components::AudioListenerComponent>(Entity entity, 
 	}
 }
 
+template<>
+void Scene::onComponentAdded<components::CameraComponent>(Entity entity, components::CameraComponent& component) {
+	// Add transform if don't have already
+	if (!entity.hasComponent<components::TransformComponent>()) {
+		entity.addComponent<components::TransformComponent>();
+	}
+
+	component.Camera = new EntityCamera(entity);
+}
+
 template<typename T>
 void Scene::onComponentRemoved(Entity entity, T& component) {}
 
@@ -528,6 +534,11 @@ void Scene::onComponentRemoved<components::CollidersComponent>(Entity entity, co
 template<>
 void Scene::onComponentRemoved<components::AudioSourcesComponent>(Entity entity, components::AudioSourcesComponent& component) {
 	delete component.Instances;
+}
+
+template<>
+void Scene::onComponentRemoved<components::CameraComponent>(Entity entity, components::CameraComponent& component) {
+	delete component.Camera;
 }
 
 void Scene::onContact(

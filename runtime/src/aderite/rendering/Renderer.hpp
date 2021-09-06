@@ -1,12 +1,14 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 #include <bgfx/bgfx.h>
 #include <glm/glm.hpp>
 #include "aderite/config.hpp"
 #include "aderite/window/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
+#include "aderite/scene/ICamera.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
@@ -37,7 +39,7 @@ public:
 	 * @param newWidth New width of the window
 	 * @param newHeight New height of the window
 	*/
-	void onWindowResized(unsigned int newWidth, unsigned int newHeight);
+	void onWindowResized(unsigned int newWidth, unsigned int newHeight, bool reset = true);
 
 	/**
 	 * @brief Submit a scene to be rendered
@@ -79,7 +81,8 @@ private:
 	Renderer() {}
 	friend class Engine;
 
-	void executeDrawCall(DrawCall& dc);
+	void renderFrom(interfaces::ICamera* eye, const std::unordered_map<size_t, DrawCall>& dcs);
+	void executeDrawCall(const DrawCall& dc);
 private:
 	bool m_isInitialized = false;
 

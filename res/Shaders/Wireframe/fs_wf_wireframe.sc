@@ -20,6 +20,10 @@ void main()
 	vec3 val = smoothstep(vec3_splat(0.0), fw*thickness, v_bc);
 	float edge = min(min(val.x, val.y), val.z); // Gets to 0.0 around the edges.
 
+	if (1.0 - edge < 0.1) {
+		discard;
+	}
+
 	vec4 rgba = vec4(color, (1.0-edge)*opacity);
 	gl_FragColor = rgba;
 }
