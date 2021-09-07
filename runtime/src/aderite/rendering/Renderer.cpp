@@ -22,11 +22,16 @@
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/rendering/DrawCall.hpp"
 
-#include "aderite/rendering/InlineShaders.hpp"
+// Passes
+#include "aderite/rendering/pass/SkyPass.hpp"
+#include "aderite/rendering/pass/IblPass.hpp"
 
 #if DEBUG_RENDER == 1
-#include "aderite/rendering/DebugRenderer.hpp"
+#include "aderite/rendering/pass/DebugPass.hpp"
 #endif
+
+// Uniforms
+#include "aderite/rendering/uniform/UniformManager.hpp"
 
 namespace impl {
 
@@ -101,10 +106,27 @@ bool Renderer::init() {
 	}
 
 	// Now create some defaults
+
+
+	// Create uniforms
+	m_uManager = new uniform::UniformManager();
+
+	// TODO: Error check
+	m_uManager->init();
+
+	// Create passes
+	m_passes[0] = new pass::SkyPass();
+	m_passes[1] = new pass::IblPass();
+
 #if DEBUG_RENDER == 1
-	m_debugRenderer = new DebugRenderer();
+	m_debugPass = new pass::DebugPass();
+	m_debugPass->init(m_uManager);
 #endif
 
+	for (uint8_t i = 0; i < c_NumPasses; i++) {
+		m_passes[i]->init(m_uManager);
+	}
+		
 	// Clear color
 	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
 
@@ -122,8 +144,17 @@ bool Renderer::init() {
 
 void Renderer::shutdown() {
 #if DEBUG_RENDER == 1
-	delete m_debugRenderer;
+	m_debugPass->shutdown();
+	delete m_debugPass;
 #endif
+
+	for (uint8_t i = 0; i < c_NumPasses; i++) {
+		m_passes[i]->shutdown();
+		delete m_passes[i];
+	}
+
+	m_uManager->shutdown();
+	delete m_uManager;
 
 	bgfx::shutdown();
 }
@@ -133,12 +164,14 @@ void Renderer::setVsync(bool enabled) {
 }
 
 void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight, bool reset) {
-	bgfx::setViewRect(0, 0, 0, newWidth, newHeight);
-
 #if DEBUG_RENDER == 1
 	// TODO: Event system?
-	m_debugRenderer->onWindowResized(newWidth, newHeight);
+	m_debugPass->onWindowResized(newWidth, newHeight);
 #endif
+
+	for (uint8_t i = 0; i < c_NumPasses; i++) {
+		m_passes[i]->onWindowResized(newWidth, newHeight);
+	}
 
 	if (reset) {
 		bgfx::reset(newWidth, newHeight);
@@ -152,66 +185,31 @@ void Renderer::renderScene(scene::Scene* scene) {
 		return;
 	}
 
-	std::unordered_map<size_t, DrawCall> drawCalls;
-	size_t drawCallIdx = 0;
+	// Skip rendering if there are no draw calls
+#if MIDDLEWARE_ENABLED == 1
+	interfaces::ICamera* middlewareCamera = scene->getMiddlewareCamera();
+	if (middlewareCamera && middlewareCamera->isEnabled()) {
+		renderFrom(middlewareCamera);
 
-	// Resize
-	//drawCalls.reserve(m_lastRenderDrawCalls);
+#if DEBUG_RENDER == 1
+		m_debugPass->pass(middlewareCamera);
+		bgfx::discard(BGFX_DISCARD_ALL);
+#endif
+	}
+#endif
 
-	// Construct draw calls
-	auto group = scene->getEntityRegistry().group<scene::components::TransformComponent>(entt::get<scene::components::MeshRendererComponent>);
-	for (auto entity : group) {
-		// TODO: Layers
-		auto [TransformComponent, mr] = group.get<scene::components::TransformComponent, scene::components::MeshRendererComponent>(entity);
-
-		if (mr.MeshHandle == nullptr || mr.MaterialHandle == nullptr) {
+	// Execute draw calls for all cameras
+	auto cameraGroup = scene->getEntityRegistry()
+		.group<scene::components::CameraComponent>(
+			entt::get<scene::components::TransformComponent>);
+	for (auto entity : cameraGroup) {
+		auto [camera, transform] = cameraGroup.get(entity);
+		if (!camera.Camera->isEnabled()) {
+			// Skip disabled cameras
 			continue;
 		}
 
-		// Check if draw call already exists
-		size_t hash = utility::combineHash(mr.MeshHandle->hash(), mr.MaterialHandle->hash());
-		DrawCall& dc = drawCalls[hash];
-
-		if (!bgfx::isValid(dc.VBO) || !bgfx::isValid(dc.Shader)) {
-			mr.MeshHandle->fillDrawCall(&dc);
-			mr.MaterialHandle->fillDrawCall(&dc);
-		}
-
-		glm::mat4 tmat = scene::components::TransformComponent::computeTransform(TransformComponent);
-		dc.Transformations.push_back(tmat);
-	}
-
-	// View 0 clear
-	bgfx::touch(0);
-
-	// Skip rendering if there are no draw calls
-	if (drawCalls.size() > 0) {
-#if MIDDLEWARE_ENABLED == 1
-		interfaces::ICamera* middlewareCamera = scene->getMiddlewareCamera();
-		if (middlewareCamera && middlewareCamera->isEnabled()) {
-			renderFrom(middlewareCamera, drawCalls);
-
-#if DEBUG_RENDER == 1
-			m_debugRenderer->setCamera(middlewareCamera);
-			m_debugRenderer->render();
-			bgfx::discard(BGFX_DISCARD_ALL);
-#endif
-		}
-#endif
-
-		// Execute draw calls for all cameras
-		auto cameraGroup = scene->getEntityRegistry()
-			.group<scene::components::CameraComponent>(
-				entt::get<scene::components::TransformComponent>);
-		for (auto entity : cameraGroup) {
-			auto [camera, transform] = cameraGroup.get(entity);
-			if (!camera.Camera->isEnabled()) {
-				// Skip disabled cameras
-				continue;
-			}
-
-			renderFrom(camera.Camera, drawCalls);
-		}
+		renderFrom(camera.Camera);
 	}
 
 	bgfx::discard(BGFX_DISCARD_ALL);
@@ -223,6 +221,8 @@ bool Renderer::isReady() {
 
 void Renderer::setResolution(const glm::uvec2& size) {
 	bgfx::setViewRect(0, 0, 0, size.x, size.y);
+
+	// TODO: Forward to render passes	
 }
 
 void Renderer::displayFrame(bgfx::FrameBufferHandle image) {
@@ -236,46 +236,18 @@ void Renderer::commit() {
 	//LOG_INFO("Commiting {0} draw calls", stats->numDraw);
 }
 
-void Renderer::renderFrom(interfaces::ICamera* eye, const std::unordered_map<size_t, DrawCall>& dcs) {
-	// Set persistent matrices
-	bgfx::setViewTransform(0, glm::value_ptr(eye->computeViewMatrix()), glm::value_ptr(eye->computeProjectionMatrix()));
+uniform::UniformManager* Renderer::getUniformManager() const {
+	return m_uManager;
+}
 
-	// Bind state
-	bgfx::setViewFrameBuffer(0, eye->getOutputHandle());
-
-	for (auto& dc : dcs) {
-		executeDrawCall(dc.second);
+void Renderer::renderFrom(interfaces::ICamera* eye) {
+	// TODO: Construct draw calls, and pass previous
+	for (uint8_t i = 0; i < c_NumPasses; i++) {
+		m_passes[i]->pass(eye);
 	}
 
 	// Discard this draw call information
 	bgfx::discard(BGFX_DISCARD_ALL);
-}
-
-void Renderer::executeDrawCall(const DrawCall& dc) {
-	// Check if valid draw call
-	if (!dc.Valid) {
-		return;
-	}
-
-	// Bind buffers
-	bgfx::setVertexBuffer(0, dc.VBO);
-
-	if (bgfx::isValid(dc.IBO)) {
-		bgfx::setIndexBuffer(dc.IBO);
-	}
-
-	if (dc.Instanced) {
-		LOG_WARN("Instanced rendering not implemented yet");
-	}
-	else {
-		for (auto& transform : dc.Transformations) {
-			bgfx::setTransform(glm::value_ptr(transform));
-
-			// Submit draw call
-			uint8_t flags = BGFX_DISCARD_ALL & ~(BGFX_DISCARD_BINDINGS | BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS);
-			bgfx::submit(0, dc.Shader, 0, flags);
-		}
-	}
 }
 
 ADERITE_RENDERING_NAMESPACE_END

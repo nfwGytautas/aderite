@@ -361,7 +361,7 @@ bool Scene::deserialize(YAML::Node& data) {
 }
 
 Scene::Scene(const std::string& name)
-	: Asset(name)
+	: Asset(name + ".scene")
 {
 	auto physics = ::aderite::Engine::getPhysicsController()->getPhysics();
 
@@ -401,7 +401,9 @@ bool Scene::isReadyToLoad() {
 
 void Scene::load() {
 	for (asset::Asset* asset : m_assets) {
-		asset->load();
+		if (!asset->isLoaded()) {
+			asset->load();
+		}
 	}
 }
 

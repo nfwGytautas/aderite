@@ -48,9 +48,9 @@ public:
 	void load();
 
 	/**
-	 * @brief Position data buffer
+	 * @brief Data buffer
 	*/
-	std::vector<float>& getPositionData();
+	std::vector<float>& getData();
 
 	/**
 	 * @brief Indices data buffer
@@ -71,7 +71,7 @@ private:
 	bool m_willLoadPosition = false;
 	bool m_willLoadIndices = false;
 
-	std::vector<float> m_positionBuffer;
+	std::vector<float> m_buffer;
 	std::vector<unsigned int> m_indicesBuffer;
 };
 

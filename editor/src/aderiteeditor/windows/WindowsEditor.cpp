@@ -76,7 +76,8 @@ void WindowsEditor::onRuntimeInitialized() {
 	onStopGame();
 
 	// TODO: Startup dialog e.g. create new project, load project, etc.
-	this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");
+	//this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");
+	this->onLoadProject("../example/IBL/IBL.aproj");
 }
 
 void WindowsEditor::onRendererInitialized() {

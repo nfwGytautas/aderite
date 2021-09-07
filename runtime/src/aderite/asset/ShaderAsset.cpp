@@ -90,11 +90,11 @@ size_t ShaderAsset::hash() const {
 }
 
 ShaderAsset::ShaderAsset(const std::string& name)
-	: Asset(name)
+	: Asset(name + ".shader")
 {}
 
 ShaderAsset::ShaderAsset(const std::string& name, const fields& info)
-	: Asset(name), m_info(info)
+	: Asset(name + ".shader"), m_info(info)
 {}
 
 bool ShaderAsset::isInGroup(AssetGroup group) const {

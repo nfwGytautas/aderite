@@ -22,10 +22,10 @@ AssetType MaterialAsset::type() const {
 }
 
 bool MaterialAsset::serialize(YAML::Emitter& out) {
-	// Material
-	if (m_info.Shader != nullptr) {
-		out << YAML::Key << "Shader" << YAML::Value << m_info.Shader->getName();
-	}
+	//// Material
+	//if (m_info.Shader != nullptr) {
+	//	out << YAML::Key << "Shader" << YAML::Value << m_info.Shader->getName();
+	//}
 
 	return true;
 }
@@ -35,14 +35,14 @@ bool MaterialAsset::deserialize(YAML::Node& data) {
 		std::string shaderName = data["Shader"].as<std::string>();
 
 		// TODO: Error check
-		m_info.Shader = ::aderite::Engine::getAssetManager()->getOrRead(shaderName);
+		//m_info.Shader = ::aderite::Engine::getAssetManager()->getOrRead(shaderName);
 	}
 
 	return true;
 }
 
 void MaterialAsset::fillDrawCall(rendering::DrawCall* dc) {
-	static_cast<asset::ShaderAsset*>(m_info.Shader)->fillDrawCall(dc);
+	//static_cast<asset::ShaderAsset*>(m_info.Shader)->fillDrawCall(dc);
 }
 
 void MaterialAsset::load() {
@@ -51,12 +51,12 @@ void MaterialAsset::load() {
 		unload();
 	}
 
-	m_info.Shader->load();
+	//m_info.Shader->load();
 	m_isBeingPrepared = false;
 }
 
 void MaterialAsset::unload() {
-	m_info.Shader->unload();
+	//m_info.Shader->unload();
 }
 
 bool MaterialAsset::isPreparing() {
@@ -64,25 +64,26 @@ bool MaterialAsset::isPreparing() {
 }
 
 bool MaterialAsset::isLoaded() {
-	return m_info.Shader->isLoaded();
+	//return m_info.Shader->isLoaded();
+	return true;
 }
 
 size_t MaterialAsset::hash() const {
 	size_t thisHash = std::hash<std::string>{}(p_name);
-	if (m_info.Shader) {
-		size_t shaderHash = m_info.Shader->hash();
-		return utility::combineHash(shaderHash, thisHash);
-	}
+	//if (m_info.Shader) {
+	//	size_t shaderHash = m_info.Shader->hash();
+	//	return utility::combineHash(shaderHash, thisHash);
+	//}
 
 	return thisHash;
 }
 
 MaterialAsset::MaterialAsset(const std::string& name)
-	: Asset(name)
+	: Asset(name + ".material")
 {}
 
 MaterialAsset::MaterialAsset(const std::string& name, const fields& info)
-	: Asset(name), m_info(info)
+	: Asset(name + ".material"), m_info(info)
 {}
 
 bool MaterialAsset::isInGroup(AssetGroup group) const {
@@ -94,12 +95,13 @@ bool MaterialAsset::isInGroup(AssetGroup group) const {
 
 void MaterialAsset::prepareLoad() {
 	// Load sources
-	m_info.Shader->prepareLoad();
+	//m_info.Shader->prepareLoad();
 	m_isBeingPrepared = true;
 }
 
 bool MaterialAsset::isReadyToLoad() {
-	return m_info.Shader->isReadyToLoad();
+	//return m_info.Shader->isReadyToLoad();
+	return true;
 }
 
 ADERITE_ASSET_NAMESPACE_END

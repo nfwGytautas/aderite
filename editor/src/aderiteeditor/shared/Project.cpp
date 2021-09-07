@@ -18,9 +18,7 @@ ADERITE_EDITOR_SHARED_NAMESPACE_BEGIN
 
 Project::Project(const std::string& dir, const std::string& name)
 	: m_directory(dir), m_name(name)
-{
-	m_directory.append(m_name);
-}
+{}
 
 Project::~Project() {
 }
@@ -77,7 +75,7 @@ Project* Project::load(const std::string& path) {
 	}
 
 	std::filesystem::path fs_path = std::filesystem::path(path);
-	Project* p = new Project(fs_path.parent_path().parent_path().string(), fs_path.stem().string());
+	Project* p = new Project(fs_path.parent_path().string(), fs_path.stem().string());
 
 	if (data["ActiveScene"]) {
 		p->m_activeScene = data["ActiveScene"].as<std::string>();

@@ -50,6 +50,12 @@ void SceneHierarchy::render() {
 			shared::State::Sink->onCreateEntity(utility::generateString(16));
 		}
 
+		ImGui::Separator();
+
+		if (ImGui::Selectable("Edit")) {
+			shared::State::Sink->onSelectedAssetChanged(currentScene);
+		}
+
 		ImGui::EndPopup();
 	}
 

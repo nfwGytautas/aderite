@@ -37,6 +37,11 @@ private:
 	 * @brief UI for mesh asset
 	*/
 	void meshRender();
+
+	/**
+	 * @brief UI for scene asset
+	*/
+	void sceneRender();
 private:
 	asset::Asset* m_selectedAsset = nullptr;
 };

@@ -21,11 +21,11 @@ ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 constexpr int c_status_button_height = 20.0f;
 
 template<typename T>
-T* createItem(const std::filesystem::path& root, const std::string& default_name, const std::string& extension) {
-	std::filesystem::path path_name = root / (default_name + extension);
+T* createItem(const std::filesystem::path& root, const std::string& default_name) {
+	std::filesystem::path path_name = root / (default_name);
 	int it = 1;
 	while (::aderite::Engine::getAssetManager()->has(path_name.string())) {
-		path_name = root / (default_name + " " + std::to_string(it) + extension);
+		path_name = root / (default_name + " " + std::to_string(it));
 	}
 	T* s = ::aderite::Engine::getAssetManager()->create<T>(path_name.string());
 	::aderite::Engine::getAssetManager()->saveAsset(s);
@@ -206,19 +206,19 @@ void AssetBrowser::render(){
 
 			if (ImGui::BeginMenu("New asset")) {
 				if (ImGui::MenuItem("Scene")) {
-					createItem<scene::Scene>(m_currentDir, "New scene", ".scene");
+					createItem<scene::Scene>(m_currentDir, "New scene");
 				}
 
 				if (ImGui::MenuItem("Mesh")) {
-					createItem<asset::MeshAsset>(m_currentDir, "New mesh", ".mesh");
+					createItem<asset::MeshAsset>(m_currentDir, "New mesh");
 				}
 
 				if (ImGui::MenuItem("Material")) {
-					createItem<asset::MaterialAsset>(m_currentDir, "New material", ".material");
+					createItem<asset::MaterialAsset>(m_currentDir, "New material");
 				}
 
 				if (ImGui::MenuItem("Shader")) {
-					createItem<asset::ShaderAsset>(m_currentDir, "New shader", ".shader");
+					createItem<asset::ShaderAsset>(m_currentDir, "New shader");
 				}
 
 				ImGui::EndMenu();
@@ -320,7 +320,7 @@ void AssetBrowser::render(){
 				{
 					// TODO: Error check
 					// TODO: Move to editor?
-					scene::Scene* scene = static_cast<scene::Scene*>(::aderite::Engine::getAssetManager()->getByName(node.Name));
+					scene::Scene* scene = static_cast<scene::Scene*>(::aderite::Engine::getAssetManager()->getOrRead(node.Name));
 					::aderite::Engine::getSceneManager()->setActive(scene);
 					break;
 				}
@@ -328,7 +328,7 @@ void AssetBrowser::render(){
 				case FsNodeType::SHADER:
 				case FsNodeType::MESH:
 				{
-					shared::State::Sink->onSelectedAssetChanged(::aderite::Engine::getAssetManager()->getByName(node.Name));
+					shared::State::Sink->onSelectedAssetChanged(::aderite::Engine::getAssetManager()->getOrRead(node.Name));
 					break;
 				}
 				}

@@ -30,6 +30,7 @@ Textures
 View names
 Blending
 BGFX multithread encoder
+Optimize camera view and projection setting
 
 Audio:
 3D audio
@@ -62,6 +63,7 @@ Reset game state on game mode switch
 Master banks dir
 Link studio Build dir with editor
 Detect unloaded bank files
+Free scene on new project create
 
 Code:
 Add consts where no modifications are done
@@ -74,3 +76,4 @@ Case surround with braces
 Mesh loading API optmization
 Move enums to files
 Move logger to engine system
+Add final to methods and classes

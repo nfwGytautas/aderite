@@ -1,4 +1,4 @@
-$input v_view, v_bc
+$input v_bc
 
 /*
  * Copyright 2016 Dario Manesku. All rights reserved.

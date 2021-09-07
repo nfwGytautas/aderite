@@ -44,7 +44,7 @@ void AssetEditor::render() {
 	if (!renaming) {
 		if (ImGui::Selectable(m_selectedAsset->getName().c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
 			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-				rename_value = m_selectedAsset->getName();
+				rename_value = std::filesystem::path(m_selectedAsset->getName()).stem().string();
 				renaming = true;
 				appearing = true;
 			}
@@ -55,7 +55,8 @@ void AssetEditor::render() {
 			renaming = false;
 
 			if (!rename_value.empty()) {
-				if (::aderite::Engine::getAssetManager()->has(rename_value)) {
+				if (!::aderite::Engine::getAssetManager()->has(rename_value)) {
+					rename_value = rename_value + std::filesystem::path(m_selectedAsset->getName()).extension().string();
 					std::filesystem::rename(::aderite::Engine::getAssetManager()->getResDir() / m_selectedAsset->getName(), ::aderite::Engine::getAssetManager()->getResDir() / rename_value);
 					m_selectedAsset->setName(rename_value);
 				}
@@ -77,19 +78,20 @@ void AssetEditor::render() {
 
 	// Type switch
 	switch (m_selectedAsset->type()) {
-	case asset::AssetType::SHADER:
-	{
+	case asset::AssetType::SHADER: {
 		shaderRender();
 		break;
 	}
-	case asset::AssetType::MATERIAL:
-	{
+	case asset::AssetType::MATERIAL: {
 		materialRender();
 		break;
 	}
-	case asset::AssetType::MESH:
-	{
+	case asset::AssetType::MESH: {
 		meshRender();
+		break;
+	}
+	case asset::AssetType::SCENE: {
+		sceneRender();
 		break;
 	}
 	default:
@@ -204,19 +206,19 @@ void AssetEditor::materialRender() {
 		ImGui::TableSetColumnIndex(1);
 		ImGui::PushItemWidth(-FLT_MIN);
 
-		if (finfo.Shader != nullptr) {
-			ImGui::Button(finfo.Shader->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-		}
-		else {
+		//if (finfo.Shader != nullptr) {
+		//	ImGui::Button(finfo.Shader->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+		//}
+		//else {
 			ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-		}
+		//}
 
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__ShaderAsset)) {
 				std::string name = static_cast<const char*>(payload->Data);
 				asset::Asset* asset = ::aderite::Engine::getAssetManager()->getByName(name);
 				if (asset) {
-					finfo.Shader = asset;
+					//finfo.Shader = asset;
 				}
 			}
 
@@ -282,6 +284,12 @@ void AssetEditor::meshRender() {
 
 		ImGui::EndTable();
 	}
+}
+
+void AssetEditor::sceneRender() {
+	scene::Scene* scene = static_cast<scene::Scene*>(m_selectedAsset);
+
+
 }
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_END

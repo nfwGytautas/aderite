@@ -71,13 +71,15 @@ void MeshAsset::load() {
 
 	if (m_info.HasPosition) {
 		layout.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
+		layout.add(bgfx::Attrib::Normal, 2, bgfx::AttribType::Float);
+		layout.add(bgfx::Attrib::TexCoord0, 3, bgfx::AttribType::Float);
 	}
 
 	layout.end();
 
 	// Create handles
 	if (m_info.IsStatic) {
-		auto& positionData = m_source->getPositionData();
+		auto& positionData = m_source->getData();
 		auto& indicesData = m_source->getIndicesData();
 		m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(positionData.data(), sizeof(float) * positionData.size()), layout);
 		m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
@@ -121,11 +123,11 @@ size_t MeshAsset::hash() const {
 }
 
 MeshAsset::MeshAsset(const std::string& name)
-	: Asset(name)
+	: Asset(name + ".mesh")
 {}
 
 MeshAsset::MeshAsset(const std::string& name, const fields& info)
-	: Asset(name), m_info(info)
+	: Asset(name + ".mesh"), m_info(info)
 {}
 
 bool MeshAsset::isInGroup(AssetGroup group) const {

@@ -40,17 +40,17 @@ FMOD_RESULT debugCallback(
 	msg.pop_back();
 
 	if (flags & FMOD_DEBUG_LEVEL_ERROR) {
-		LOG_ERROR("FMOD: {0} in function {1}", msg, func);
+		LOG_ERROR("FMOD {0} in function {1}", msg, func);
 	} 
 	else if (flags & FMOD_DEBUG_LEVEL_WARNING) {
-		LOG_WARN("FMOD: {0} in function {1}", msg, func);
+		LOG_WARN("FMOD {0} in function {1}", msg, func);
 	}
 	else if (flags & (FMOD_DEBUG_TYPE_TRACE | FMOD_DEBUG_LEVEL_LOG)) {
-		LOG_TRACE("FMOD: {0}", msg);
+		LOG_TRACE("FMOD {0}", msg);
 	}
 	else {
 		if (flags & FMOD_DEBUG_TYPE_MEMORY) {
-			LOG_TRACE("FMOD (memory): {0}", msg);
+			LOG_TRACE("FMOD (memory) {0}", msg);
 		}
 	}
 

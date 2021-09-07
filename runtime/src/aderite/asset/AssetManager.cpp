@@ -22,6 +22,25 @@ constexpr const char* current_version = "2021_07_31r1";
 namespace aderite {
 	namespace asset {
 
+		std::string getAssetExtension(Asset* asset) {
+			switch (asset->type()) {
+			case AssetType::MATERIAL: {
+				return ".material";
+			}
+			case AssetType::SCENE: {
+				return ".scene";
+			}
+			case AssetType::SHADER: {
+				return ".shader";
+			}
+			case AssetType::MESH: {
+				return ".mesh";
+			}
+			}
+
+			return "";
+		}
+
 		bool AssetManager::init() {
 			// Setup depending on the resource save type
 
@@ -127,8 +146,6 @@ namespace aderite {
 		}
 
 		asset::Asset* AssetManager::readAsset(const std::string& path) {
-			LOG_TRACE("Asset manager reading {0}", path);
-
 			// Check for duplication
 			if (has(path)) {
 				LOG_WARN("Requested double read");
@@ -140,6 +157,8 @@ namespace aderite {
 				LOG_WARN("Tried to load a deleted asset");
 				return nullptr;
 			}
+
+			LOG_TRACE("Asset manager reading {0}", path);
 
 			// Open YAML reader
 			YAML::Node data = YAML::LoadFile((getResDir() / path).string());
@@ -156,18 +175,14 @@ namespace aderite {
 				return nullptr;
 			}
 
-			// Check that the name is the same
-			if (!data["Name"]) {
-				LOG_ERROR("Loading asset from {0} failed because no name information was given", path);
-				return nullptr;
-			}
+			//// Check that the name is the same
+			//std::string name = data["Name"].as<std::string>();
+			//if (name != path) {
+			//	LOG_WARN("Asset {0} was previously moved incorrectly, cause recorded name is {1}", path, name);
+			//	return nullptr;
+			//}
 
-			// Check that the name is the same
-			std::string name = data["Name"].as<std::string>();
-			if (name != path) {
-				LOG_WARN("Asset {0} was previously moved incorrectly, cause recorded name is {1}", path, name);
-				return nullptr;
-			}
+			std::string name = std::filesystem::path(path).replace_extension().string();
 
 			// Now deserialize
 			AssetType type = (AssetType)(data["Type"].as<size_t>());
@@ -204,7 +219,7 @@ namespace aderite {
 
 			// Common
 			out << YAML::Key << "Version" << YAML::Value << current_version;
-			out << YAML::Key << "Name" << YAML::Value << asset->getName();
+			//out << YAML::Key << "Name" << YAML::Value << asset->getName();
 			out << YAML::Key << "Type" << YAML::Value << (size_t)asset->type();
 
 			if (!asset->serialize(out)) {

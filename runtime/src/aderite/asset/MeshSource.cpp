@@ -16,16 +16,16 @@ ADERITE_ASSET_NAMESPACE_BEGIN
 class AssimpLogSource : public Assimp::Logger
 {
 	virtual void OnDebug(const char* message) override {
-		LOG_DEBUG("ASSIMP: {0}", message);
+		LOG_DEBUG("ASSIMP {0}", message);
 	}
 	virtual void OnInfo(const char* message) override {
-		LOG_TRACE("ASSIMP: {0}", message);
+		LOG_TRACE("ASSIMP {0}", message);
 	}
 	virtual void OnWarn(const char* message) override {
-		LOG_WARN("ASSIMP: {0}", message);
+		LOG_WARN("ASSIMP {0}", message);
 	}
 	virtual void OnError(const char* message) override {
-		LOG_ERROR("ASSIMP: {0}", message);
+		LOG_ERROR("ASSIMP {0}", message);
 	}
 	virtual bool attachStream(Assimp::LogStream* pStream, unsigned int severity) override {
 		delete pStream;
@@ -64,7 +64,7 @@ void MeshSource::requestIndicesData() {
 }
 
 void MeshSource::load() {
-	m_positionBuffer.clear();
+	m_buffer.clear();
 	m_indicesBuffer.clear();
 
 	// Check if there were any errors up until now
@@ -83,6 +83,7 @@ void MeshSource::load() {
 		//aiProcess_FlipWindingOrder   | // we cull clock-wise, keep the default CCW winding order
 		aiProcess_MakeLeftHanded | // we set GLM_FORCE_LEFT_HANDED and use left-handed bx matrix functions
 		aiProcess_FlipUVs |
+		//aiProcess_GenNormals |
 		0;
 
 	//if (calculateTangents)
@@ -120,13 +121,23 @@ void MeshSource::load() {
 
 	// Reserve memory for the mesh
 	if (m_willLoadPosition) {
-		m_positionBuffer.reserve(mesh->mNumVertices * 3);
+		m_buffer.reserve(mesh->mNumVertices * 3 * 3 * 2);
 
 		// Load vertices
 		for (unsigned int verticeIdx = 0; verticeIdx < mesh->mNumVertices; verticeIdx++) {
-			m_positionBuffer.push_back(mesh->mVertices[verticeIdx].x);
-			m_positionBuffer.push_back(mesh->mVertices[verticeIdx].y);
-			m_positionBuffer.push_back(mesh->mVertices[verticeIdx].z);
+			// Position
+			m_buffer.push_back(mesh->mVertices[verticeIdx].x);
+			m_buffer.push_back(mesh->mVertices[verticeIdx].y);
+			m_buffer.push_back(mesh->mVertices[verticeIdx].z);
+
+			// Normal
+			m_buffer.push_back(mesh->mNormals[verticeIdx].x);
+			m_buffer.push_back(mesh->mNormals[verticeIdx].y);
+			m_buffer.push_back(mesh->mNormals[verticeIdx].z);
+
+			// UV
+			m_buffer.push_back(mesh->mTextureCoords[0][verticeIdx].x);
+			m_buffer.push_back(mesh->mTextureCoords[0][verticeIdx].y);
 		}
 	}
 
@@ -144,8 +155,8 @@ void MeshSource::load() {
 	}
 }
 
-std::vector<float>& MeshSource::getPositionData() {
-	return m_positionBuffer;
+std::vector<float>& MeshSource::getData() {
+	return m_buffer;
 }
 
 std::vector<unsigned int>& MeshSource::getIndicesData() {

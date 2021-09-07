@@ -1,14 +1,18 @@
 #pragma once
 
 #include <vector>
+#include <array>
 #include <unordered_map>
 #include <bgfx/bgfx.h>
 #include <glm/glm.hpp>
 #include "aderite/config.hpp"
+#include "aderite/scene/ICamera.hpp"
+#include "aderite/rendering/pass/IPass.hpp"
 #include "aderite/window/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
-#include "aderite/scene/ICamera.hpp"
+#include "aderite/rendering/pass/Forward.hpp"
+#include "aderite/rendering/uniform/Forward.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
@@ -69,25 +73,34 @@ public:
 	*/
 	void commit();
 
+	/**
+	 * @brief Returns the uniform manager for the renderer
+	*/
+	uniform::UniformManager* getUniformManager() const;
+
 #if DEBUG_RENDER == 1
 	/**
-	 * @brief Returns the debug renderer instance
+	 * @brief Returns the debug pass instance
 	*/
-	DebugRenderer* getDebugRenderer() {
-		return m_debugRenderer;
+	pass::DebugPass* getDebugPass() {
+		return m_debugPass;
 	}
 #endif
 private:
 	Renderer() {}
 	friend class Engine;
 
-	void renderFrom(interfaces::ICamera* eye, const std::unordered_map<size_t, DrawCall>& dcs);
-	void executeDrawCall(const DrawCall& dc);
+	void renderFrom(interfaces::ICamera* eye);
 private:
+	static constexpr uint8_t c_NumPasses = 2;
+	std::array<interfaces::IPass*, c_NumPasses> m_passes;
+
+	uniform::UniformManager* m_uManager = nullptr;
+
 	bool m_isInitialized = false;
 
 #if DEBUG_RENDER == 1
-	DebugRenderer* m_debugRenderer = nullptr;
+	pass::DebugPass* m_debugPass = nullptr;
 #endif
 };
 
