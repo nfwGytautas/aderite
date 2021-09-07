@@ -1,6 +1,6 @@
 Version: 2021_07_31r1
-Name: Scenes\ExampleScene.scene
 Type: 1
+SkyColor: [0.5300001, 0.8100001, 0.9800001]
 Entities:
   - Entity: 5
     Meta:

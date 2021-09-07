@@ -26,6 +26,7 @@ enum class AssetType : size_t {
 	SCENE		= 1,
 	MATERIAL	= 2,
 	MESH		= 3,
+	TEXTURE		= 4,
 };
 
 /**

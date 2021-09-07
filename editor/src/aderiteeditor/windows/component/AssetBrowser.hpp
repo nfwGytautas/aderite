@@ -19,6 +19,7 @@ public:
 		MESH = 3,
 		MATERIAL = 4,
 		BANK = 5,
+		TEXTURE = 6,
 	};
 
 	struct FsNode {

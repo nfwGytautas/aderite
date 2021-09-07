@@ -31,6 +31,7 @@ View names
 Blending
 BGFX multithread encoder
 Optimize camera view and projection setting
+Hook scene skycolor to clear color
 
 Audio:
 3D audio

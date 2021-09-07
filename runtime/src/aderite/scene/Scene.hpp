@@ -159,6 +159,10 @@ private:
 	std::vector<asset::Asset*> m_assets;
 	entt::registry m_registry;
 	physx::PxScene* m_physicsScene = nullptr;
+
+	// Properties
+	asset::TextureAsset* m_skybox = nullptr;
+	glm::vec3 m_skyColor = { 0.53f, 0.81f, 0.98f }; // Only used if m_skybox is nullptr
 };
 
 ADERITE_SCENE_NAMESPACE_END

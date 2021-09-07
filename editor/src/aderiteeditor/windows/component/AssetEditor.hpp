@@ -42,6 +42,11 @@ private:
 	 * @brief UI for scene asset
 	*/
 	void sceneRender();
+
+	/**
+	 * @brief UI for texture asset
+	*/
+	void textureRender();
 private:
 	asset::Asset* m_selectedAsset = nullptr;
 };

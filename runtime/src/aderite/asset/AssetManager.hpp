@@ -108,6 +108,14 @@ public:
 	void loadMeshSource(const std::string& path, std::function<void(MeshSource*)> loaded);
 
 	/**
+	 * @brief Loads a texture file asynchronously and invokes the callback function once loaded, the caller must
+	 * take ownership of the TextureSource
+	 * @param path File to load
+	 * @param loaded Function to invoke once loaded
+	*/
+	void loadTextureSource(const std::string& path, std::function<void(TextureSource*)> loaded);
+
+	/**
 	 * @brief Reads asset from file (non binary format), this automatically finds the type and makes the asset
 	 * known by the manager.
 	 * @param path Path to asset

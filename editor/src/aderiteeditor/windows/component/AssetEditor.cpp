@@ -10,6 +10,7 @@
 #include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
+#include "aderite/asset/TextureAsset.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/utility/Utility.hpp"
@@ -92,6 +93,10 @@ void AssetEditor::render() {
 	}
 	case asset::AssetType::SCENE: {
 		sceneRender();
+		break;
+	}
+	case asset::AssetType::TEXTURE: {
+		textureRender();
 		break;
 	}
 	default:
@@ -290,6 +295,95 @@ void AssetEditor::sceneRender() {
 	scene::Scene* scene = static_cast<scene::Scene*>(m_selectedAsset);
 
 
+}
+
+void AssetEditor::textureRender() {
+	asset::TextureAsset* texture = static_cast<asset::TextureAsset*>(m_selectedAsset);
+	asset::TextureAsset::fields& finfo = texture->getFieldsMutable();
+
+	// Needed for preview
+	if (!texture->isLoaded() && !finfo.SourceFile.empty()) {
+		texture->prepareLoad();
+		texture->load();
+	}
+
+	if (ImGui::Checkbox("Is HDR", &finfo.IsHDR)) {
+		// Unload previous
+		texture->unload();
+	}
+
+	if (ImGui::BeginTable("TextureEditTable", 3)) {
+		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+		ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+		ImGui::TableSetupColumn("Add", ImGuiTableColumnFlags_WidthFixed, 20.0f);
+
+		ImGui::TableNextRow();
+
+		ImGui::TableSetColumnIndex(0);
+		ImGui::Text("Source");
+
+		ImGui::TableSetColumnIndex(1);
+		ImGui::PushItemWidth(-FLT_MIN);
+
+		if (!finfo.SourceFile.empty()) {
+			ImGui::Button(finfo.SourceFile.c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+		}
+		else {
+			ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+		}
+
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__RawData)) {
+
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		ImGui::TableSetColumnIndex(2);
+		if (ImGui::Button("+###TextureSelect")) {
+			std::string file = FileDialog::selectFile("Select texture file");
+
+			if (!file.empty()) {
+				std::filesystem::path filename = std::filesystem::path(file).filename();
+				std::filesystem::path raw_dst = utility::makeUniquePath(::aderite::Engine::getAssetManager()->getRawDir() / filename);
+				std::filesystem::copy_file(file, raw_dst);
+				finfo.SourceFile = raw_dst.filename().string();
+
+				// Load it immediately
+				texture->prepareLoad();
+
+				while (!texture->isReadyToLoad()) {
+					// TODO: Show loading screen
+				}
+
+				texture->load();
+			}
+		}
+
+		ImGui::EndTable();
+	}
+
+	ImGui::Spacing();
+
+	if (ImGui::BeginTable("TexturePreviewTable", 2)) {
+		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+		ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+		ImGui::TableNextRow();
+
+		ImGui::TableSetColumnIndex(1);
+		ImGui::Image(
+			(void*)(intptr_t)texture->getHandle().idx,
+			ImVec2(96.0f, 96.0f),
+			ImVec2(1, 0),
+			ImVec2(0, 1),
+			ImVec4(1, 1, 1, 1),
+			ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+		ImGui::Text("Preview");
+
+		ImGui::EndTable();
+	}
 }
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_END

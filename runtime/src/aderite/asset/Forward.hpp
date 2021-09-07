@@ -14,5 +14,7 @@ class MaterialAsset;
 class MeshAsset;
 class MeshSource;
 class ShaderAsset;
+class TextureAsset;
+class TextureSource;
 
 ADERITE_ASSET_NAMESPACE_END

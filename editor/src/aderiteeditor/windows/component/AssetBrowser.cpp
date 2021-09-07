@@ -7,6 +7,7 @@
 #include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
+#include "aderite/asset/TextureAsset.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
@@ -221,6 +222,10 @@ void AssetBrowser::render(){
 					createItem<asset::ShaderAsset>(m_currentDir, "New shader");
 				}
 
+				if (ImGui::MenuItem("Texture")) {
+					createItem<asset::TextureAsset>(m_currentDir, "New texture");
+				}
+
 				ImGui::EndMenu();
 			}
 
@@ -255,38 +260,35 @@ void AssetBrowser::render(){
 				// Typed
 				std::string target = "";
 				switch (node.Type) {
-				case FsNodeType::SCENE:
-				{
+				case FsNodeType::SCENE: {
 					target = shared::DDPayloadID__SceneAsset;
 					break;
 				}
-				case FsNodeType::SHADER:
-				{
+				case FsNodeType::SHADER: {
 					target = shared::DDPayloadID__ShaderAsset;
 					break;
 				}
-				case FsNodeType::MATERIAL:
-				{
+				case FsNodeType::MATERIAL: {
 					target = shared::DDPayloadID__MaterialAsset;
 					break;
 				}
-				case FsNodeType::MESH:
-				{
+				case FsNodeType::MESH: {
 					target = shared::DDPayloadID__MeshAsset;
 					break;
 				}
-				case FsNodeType::BANK:
-				{
+				case FsNodeType::BANK: {
 					target = shared::DDPayloadID__AudioBank;
 					break;
 				}
-				case FsNodeType::DIRECTORY:
-				{
+				case FsNodeType::TEXTURE: {
+					target = shared::DDPayloadID__TextureAsset;
+					break;
+				}
+				case FsNodeType::DIRECTORY: {
 					target = shared::DDPayloadID__Directory;
 					break;
 				}
-				default:
-				{
+				default: {
 					target = shared::DDPayloadID__GenericAsset;
 				}
 				}
@@ -327,6 +329,7 @@ void AssetBrowser::render(){
 				case FsNodeType::MATERIAL:
 				case FsNodeType::SHADER:
 				case FsNodeType::MESH:
+				case FsNodeType::TEXTURE:
 				{
 					shared::State::Sink->onSelectedAssetChanged(::aderite::Engine::getAssetManager()->getOrRead(node.Name));
 					break;
@@ -409,6 +412,9 @@ void AssetBrowser::resolveFs() {
 			}
 			else if (ext == ".bank") {
 				type = FsNodeType::BANK;
+			}
+			else if (ext == ".texture") {
+				type = FsNodeType::TEXTURE;
 			}
 		}
 
