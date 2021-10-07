@@ -53,6 +53,7 @@ private:
 	component::AssetBrowser* m_assetBrowser = nullptr;
 	component::AssetEditor* m_assetEditor = nullptr;
 	component::Toolbar* m_toolbar = nullptr;
+	component::NodeEditor* m_nodeEditor = nullptr;
 
 	/**
 	 * @brief Flag that is true when the user requests to exit the editor otherwise the

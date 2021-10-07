@@ -15,6 +15,7 @@ class SceneHierarchy;
 class Menubar;
 class SceneView;
 class Toolbar;
+class NodeEditor;
 
 class TextInputModal;
 

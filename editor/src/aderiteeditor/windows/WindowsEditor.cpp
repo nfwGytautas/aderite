@@ -30,6 +30,7 @@
 #include "aderiteeditor/windows/component/EntityEditor.hpp"
 #include "aderiteeditor/windows/component/AssetBrowser.hpp"
 #include "aderiteeditor/windows/component/AssetEditor.hpp"
+#include "aderiteeditor/windows/component/NodeEditor.hpp"
 
 
 #define EVENT_ROUTE(e, dst) event_router::e = std::bind(&WindowsEditor::dst, this, std::placeholders::_1)
@@ -44,6 +45,7 @@ WindowsEditor::WindowsEditor(int argc, char** argv) {
 	m_propertyEditor = new component::EntityEditor();
 	m_assetBrowser = new component::AssetBrowser();
 	m_assetEditor = new component::AssetEditor();
+	m_nodeEditor = new component::NodeEditor();
 
 	// Setup event router
 	shared::State::Sink = this;
@@ -58,6 +60,7 @@ WindowsEditor::~WindowsEditor() {
 	delete m_propertyEditor;
 	delete m_assetBrowser;
 	delete m_assetEditor;
+	delete m_nodeEditor;
 }
 
 void WindowsEditor::onRuntimeInitialized() {
@@ -76,8 +79,8 @@ void WindowsEditor::onRuntimeInitialized() {
 	onStopGame();
 
 	// TODO: Startup dialog e.g. create new project, load project, etc.
-	//this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");
-	this->onLoadProject("../example/IBL/IBL.aproj");
+	this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");
+	//this->onLoadProject("../example/FPRP/FPRP.aproj");
 }
 
 void WindowsEditor::onRendererInitialized() {
@@ -148,6 +151,7 @@ void WindowsEditor::onRendererInitialized() {
 	m_propertyEditor->init();
 	m_assetBrowser->init();
 	m_assetEditor->init();
+	m_nodeEditor->init();
 }
 
 void WindowsEditor::onStartRender() {
@@ -237,6 +241,7 @@ void WindowsEditor::onEndRender() {
 	m_propertyEditor->render();
 	m_assetBrowser->render();
 	m_assetEditor->render();
+	m_nodeEditor->render();
 
 	// DEMO WINDOW
 	if (show_demo_window) {
@@ -275,6 +280,7 @@ void WindowsEditor::onRuntimeShutdown() {
 	m_propertyEditor->shutdown();
 	m_assetBrowser->shutdown();
 	m_assetEditor->shutdown();
+	m_nodeEditor->shutdown();
 
 	// Shutdown ImGui
 	backend::ImGui_Implbgfx_Shutdown();
