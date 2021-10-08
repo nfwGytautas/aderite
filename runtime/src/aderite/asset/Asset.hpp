@@ -12,21 +12,22 @@ ADERITE_ASSET_NAMESPACE_BEGIN
 */
 enum class AssetGroup : size_t {
 	// Is the asset a system type asset
-	SYSTEMIC = 0,
+	SYSTEMIC		= 0,
 
 	// Does the asset depend on some external resource from Raw/ directory
-	DEPENDS_ON_RAW = 1,
+	DEPENDS_ON_RAW	= 1,
 };
 
 /**
  * @brief The asset type
 */
 enum class AssetType : size_t {
-	SHADER		= 0,
-	SCENE		= 1,
-	MATERIAL	= 2,
-	MESH		= 3,
-	TEXTURE		= 4,
+	SHADER			= 0,
+	SCENE			= 1,
+	MATERIAL		= 2,
+	MESH			= 3,
+	TEXTURE			= 4,
+	MATERIAL_TYPE	= 5,
 };
 
 /**

@@ -20,6 +20,7 @@ public:
 		MATERIAL = 4,
 		BANK = 5,
 		TEXTURE = 6,
+		MATERIAL_TYPE = 7,
 	};
 
 	struct FsNode {

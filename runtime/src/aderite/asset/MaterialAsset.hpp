@@ -2,21 +2,22 @@
 
 #include <bgfx/bgfx.h>
 #include "aderite/utility/Macros.hpp"
-#include "aderite/rendering/IRenderable.hpp"
 #include "aderite/asset/Asset.hpp"
+#include "aderite/asset/Forward.hpp"
+#include "aderite/asset/property/Forward.hpp"
 
 ADERITE_ASSET_NAMESPACE_BEGIN
 
 /**
  * @brief Material asset implementation
 */
-class MaterialAsset : public Asset, public interfaces::IRenderable {
+class MaterialAsset : public Asset {
 public:
 	/**
 	 * @brief Editable fields of the asset, this information is stored inside the asset file
 	*/
 	struct fields {
-		//Asset* Shader;
+		MaterialTypeAsset* Type; // Material type
 	};
 public:
 	~MaterialAsset();
@@ -33,6 +34,12 @@ public:
 	virtual size_t hash() const override;
 
 	/**
+	 * @brief Sets the type of the material
+	 * @param type New type
+	*/
+	void setType(MaterialTypeAsset* type);
+
+	/**
 	 * @brief Returns the info of shader fields
 	*/
 	fields getFields() const {
@@ -46,8 +53,9 @@ public:
 		return m_info;
 	}
 
-	// Inherited via IRenderable
-	virtual void fillDrawCall(rendering::DrawCall* r) override;
+	float* getPropertyData() const {
+		return m_udata;
+	}
 protected:
 	MaterialAsset(const std::string& name);
 	MaterialAsset(const std::string& name, const fields& info);
@@ -58,6 +66,8 @@ protected:
 	friend class AssetManager;
 private:
 	fields m_info = {};
+	float* m_udata = nullptr; // Data passed to material uniform
+	size_t m_dataSize = 0;
 	bool m_isBeingPrepared = false;
 };
 

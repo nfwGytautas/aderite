@@ -45,15 +45,6 @@ bool ShaderAsset::deserialize(YAML::Node& data) {
 	return true;
 }
 
-void ShaderAsset::fillDrawCall(rendering::DrawCall* dc) {
-	if (!isLoaded()) {
-		dc->Valid = false;
-		return;
-	}
-
-	dc->Shader = m_handle;
-}
-
 void ShaderAsset::load() {
 	if (isLoaded()) {
 		LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);

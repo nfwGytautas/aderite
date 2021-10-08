@@ -2,7 +2,6 @@
 
 #include <bgfx/bgfx.h>
 #include "aderite/utility/Macros.hpp"
-#include "aderite/rendering/IRenderable.hpp"
 #include "aderite/asset/Asset.hpp"
 #include "aderite/asset/Forward.hpp"
 

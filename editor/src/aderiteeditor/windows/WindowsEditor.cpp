@@ -79,8 +79,8 @@ void WindowsEditor::onRuntimeInitialized() {
 	onStopGame();
 
 	// TODO: Startup dialog e.g. create new project, load project, etc.
-	this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");
-	//this->onLoadProject("../example/FPRP/FPRP.aproj");
+	//this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");
+	this->onLoadProject("../example/FPRP/FPRP.aproj");
 }
 
 void WindowsEditor::onRendererInitialized() {
@@ -169,7 +169,7 @@ void WindowsEditor::onEndRender() {
 	// Render ImGui
 
 	// State
-	bool show_demo_window = false;
+	bool show_demo_window = true;
 	bool show_another_window = false;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 

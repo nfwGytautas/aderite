@@ -1,25 +1,32 @@
 #pragma once
 
+#include <string>
+#include <unordered_map>
+#include <vector>
 #include <bgfx/bgfx.h>
 #include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Asset.hpp"
+#include "aderite/asset/property/Forward.hpp"
+#include "aderite/asset/property/Property.hpp"
 
 ADERITE_ASSET_NAMESPACE_BEGIN
 
 /**
- * @brief Shader asset implementation
+ * @brief Material type asset implementation
 */
-class ShaderAsset : public Asset {
+class MaterialTypeAsset : public Asset {
 public:
+	using Properties = std::vector<prop::Property*>;
+
 	/**
 	 * @brief Editable fields of the asset, this information is stored inside the asset file
 	*/
 	struct fields {
-		std::string VertexPath = "";
-		std::string FragmentPath = "";
+		size_t ElementCount; // Computed from properties
+		Properties Properties;
 	};
 public:
-	~ShaderAsset();
+	~MaterialTypeAsset();
 
 	virtual AssetType type() const override;
 	virtual bool isInGroup(AssetGroup group) const override;
@@ -33,29 +40,51 @@ public:
 	virtual size_t hash() const override;
 
 	/**
+	 * @brief Recalculates property offsets
+	*/
+	void recalculate();
+
+	/**
+	 * @brief Returns the size in bytes
+	*/
+	size_t getSizeInBytes() const;
+
+	/**
 	 * @brief Returns the info of shader fields
 	*/
 	fields getFields() const {
 		return m_info;
 	}
-	
+
 	/**
 	 * @brief Returns mutable field structure
 	*/
 	fields& getFieldsMutable() {
 		return m_info;
 	}
+
+	bgfx::ProgramHandle getShaderHandle() const {
+		return m_handle;
+	}
+	
+	bgfx::UniformHandle getUniformHandle() const {
+		return m_uniform;
+	}
 protected:
-	ShaderAsset(const std::string& name);
-	ShaderAsset(const std::string& name, const fields& info);
+	MaterialTypeAsset(const std::string& name);
+	MaterialTypeAsset(const std::string& name, const fields& info);
 
 	virtual bool serialize(YAML::Emitter& out) override;
 	virtual bool deserialize(YAML::Node& data) override;
 
 	friend class AssetManager;
 private:
-	// Handles
+	// Shader
 	bgfx::ProgramHandle m_handle = BGFX_INVALID_HANDLE;
+
+	// Material properties
+	bgfx::UniformHandle m_uniform = BGFX_INVALID_HANDLE;
+	// TODO: Samplers
 
 	fields m_info = {};
 

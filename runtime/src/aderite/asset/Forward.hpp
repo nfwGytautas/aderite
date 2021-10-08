@@ -11,6 +11,7 @@ ADERITE_ASSET_NAMESPACE_BEGIN
 class AssetManager;
 class Asset;
 class MaterialAsset;
+class MaterialTypeAsset;
 class MeshAsset;
 class MeshSource;
 class ShaderAsset;

@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include "aderite/utility/Macros.hpp"
+#include "aderite/scene/components/Forward.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
@@ -21,14 +22,20 @@ public:
 	// Shader with which to render
 	bgfx::ProgramHandle Shader = BGFX_INVALID_HANDLE;
 
-	// If this value is false the renderer will abort the draw call
-	bool Valid = true;
+	// Uniform from material type
+	bgfx::UniformHandle MaterialUniform = BGFX_INVALID_HANDLE;
 
-	// Should the draw call be instanced or not, default false
-	bool Instanced = false;
+	// Uniform data
+	float* UniformData = nullptr;
 
 	// Vector containing transformations, for instanced rendering
-	std::vector<glm::mat4> Transformations;
+	std::vector<scene::components::TransformComponent*> Transformations;
+
+	// Occlusion culled
+	bool FullyCulled = false;
+
+	// If true this draw call will be skipped
+	bool Skip = false;
 };
 
 ADERITE_RENDERING_NAMESPACE_END

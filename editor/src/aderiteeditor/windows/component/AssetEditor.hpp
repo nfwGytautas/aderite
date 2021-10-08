@@ -47,6 +47,11 @@ private:
 	 * @brief UI for texture asset
 	*/
 	void textureRender();
+
+	/**
+	 * @brief UI for material type asset
+	*/
+	void materialTypeRender();
 private:
 	asset::Asset* m_selectedAsset = nullptr;
 };

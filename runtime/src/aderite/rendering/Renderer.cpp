@@ -15,6 +15,7 @@
 #include "aderite/window/WindowManager.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
+#include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/Scene.hpp"
@@ -179,7 +180,9 @@ void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight, bo
 }
 
 void Renderer::renderScene(scene::Scene* scene) {
-	// TODO: Sorting
+	if (scene == nullptr) {
+		return;
+	}
 
 	if (!isReady()) {
 		return;
@@ -189,7 +192,7 @@ void Renderer::renderScene(scene::Scene* scene) {
 #if MIDDLEWARE_ENABLED == 1
 	interfaces::ICamera* middlewareCamera = scene->getMiddlewareCamera();
 	if (middlewareCamera && middlewareCamera->isEnabled()) {
-		renderFrom(middlewareCamera);
+		renderFrom(scene, middlewareCamera);
 
 #if DEBUG_RENDER == 1
 		m_debugPass->pass(middlewareCamera);
@@ -209,7 +212,7 @@ void Renderer::renderScene(scene::Scene* scene) {
 			continue;
 		}
 
-		renderFrom(camera.Camera);
+		renderFrom(scene, camera.Camera);
 	}
 
 	bgfx::discard(BGFX_DISCARD_ALL);
@@ -240,14 +243,162 @@ uniform::UniformManager* Renderer::getUniformManager() const {
 	return m_uManager;
 }
 
-void Renderer::renderFrom(interfaces::ICamera* eye) {
-	// TODO: Construct draw calls, and pass previous
-	for (uint8_t i = 0; i < c_NumPasses; i++) {
-		m_passes[i]->pass(eye);
+void Renderer::renderFrom(scene::Scene* scene, interfaces::ICamera* eye) {
+	DrawCallList drawcalls;
+	std::unordered_map<size_t, DrawCallList::iterator> lookup;
+
+	// Entity group
+	auto renderables = scene->getEntityRegistry().group<
+		scene::components::MeshRendererComponent, 
+		scene::components::TransformComponent
+	>
+	(
+		entt::get<scene::components::MetaComponent>
+	);
+
+	for (auto e : renderables) {
+		auto [meshRenderer, transform, meta] = renderables.get(e);
+		
+		// Validate
+		if (!validateEntity(meta, meshRenderer)) {
+			continue;
+		}
+
+		// Cull
+		if (!frustumCull(eye, transform)) {
+			continue;
+		}
+
+		// Check if draw call already exists
+		size_t hash = utility::combineHash(meshRenderer.MeshHandle->hash(), meshRenderer.MaterialHandle->hash());
+
+		if (lookup.find(hash) == lookup.end()) {
+			// Create new drawcall and insert
+			lookup[hash] = drawcalls.insert(drawcalls.end(), DrawCall{
+				meshRenderer.MeshHandle->getVboHandle(),
+				meshRenderer.MeshHandle->getIboHandle(),
+				meshRenderer.MaterialHandle->getFields().Type->getShaderHandle(),
+				meshRenderer.MaterialHandle->getFields().Type->getUniformHandle(),
+				meshRenderer.MaterialHandle->getPropertyData(),
+				std::vector<scene::components::TransformComponent*>()
+			});
+		}
+
+		(*lookup[hash]).Transformations.push_back(&transform);
+	}
+
+	// Occlusion cull
+	occlusionCull(drawcalls);
+
+	// Render
+	for (DrawCall& dc : drawcalls) {
+		optimize(dc);
+		render(dc);
 	}
 
 	// Discard this draw call information
 	bgfx::discard(BGFX_DISCARD_ALL);
+}
+
+bool Renderer::validateEntity(scene::components::MetaComponent& meta, scene::components::MeshRendererComponent& mrenderer) {
+	// TODO: Check if enabled
+
+	asset::MeshAsset* mesh = mrenderer.MeshHandle;
+	asset::MaterialAsset* material = mrenderer.MaterialHandle;
+
+	if (mesh == nullptr ||
+		material == nullptr) {
+		return false;
+	}
+
+	asset::MaterialTypeAsset* materialType = material->getFields().Type;
+
+	if (materialType == nullptr) {
+		return false;
+	}
+
+	if (material->getPropertyData() == nullptr) {
+		LOG_WARN("nullptr property data for {0}", meta.Name);
+		return false;
+	}
+
+	// Check if assets are loaded
+	if (!mesh->isLoaded() ||
+		!material->isLoaded()) {
+		// This shouldn't really happen, one of the systems are lagging behind
+		LOG_WARN("Unloaded asset rendering for {0}", meta.Name);
+		return false;
+	}
+	
+	// Check if they are valid
+	if (!bgfx::isValid(mesh->getVboHandle()) ||
+		!bgfx::isValid(mesh->getIboHandle())) {
+		LOG_WARN("Invalid mesh passed for {0}", meta.Name);
+		return false;
+	}
+
+	if (!bgfx::isValid(materialType->getShaderHandle()) ||
+		!bgfx::isValid(materialType->getUniformHandle())) {
+		LOG_WARN("Invalid material passed for {0}", meta.Name);
+		return false;
+	}
+
+	return true;
+}
+
+bool Renderer::frustumCull(interfaces::ICamera* eye, scene::components::TransformComponent& transform) {
+	// TODO: Frustum cull
+
+	return false;
+}
+
+void Renderer::occlusionCull(DrawCallList& dcl) {
+	// TODO: Implement
+}
+
+void Renderer::optimize(DrawCall& dc) {
+	if (dc.FullyCulled) {
+		dc.Skip = true;
+		return;
+	}
+
+	// Pack the transformations
+	size_t moveCount = 0;
+	for (size_t i = 0; i < dc.Transformations.size(); i++) {
+		if (dc.Transformations[i] == nullptr) {
+			moveCount += 1;
+		}
+		else {
+			dc.Transformations[i - moveCount] = dc.Transformations[i];
+		}
+	}
+
+	// Erase left over
+	dc.Transformations.erase(dc.Transformations.end() - moveCount, dc.Transformations.end());
+}
+
+void Renderer::render(const DrawCall& dc) {
+	// Check if valid draw call
+	if (dc.Skip) {
+		return;
+	}
+
+	// TODO: Output target from material type
+
+	// Uniform
+	bgfx::setUniform(dc.MaterialUniform, dc.UniformData, UINT16_MAX);
+
+	// Bind buffers
+	bgfx::setVertexBuffer(0, dc.VBO);
+	bgfx::setIndexBuffer(dc.IBO);
+
+	for (auto& transform : dc.Transformations) {
+		bgfx::setTransform(glm::value_ptr(scene::components::TransformComponent::computeTransform(*transform)));
+
+		// Submit draw call
+		uint8_t flags = BGFX_DISCARD_ALL & ~(BGFX_DISCARD_BINDINGS | BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS);
+		bgfx::submit(0, dc.Shader, 0, flags);
+	}
 }
 
 ADERITE_RENDERING_NAMESPACE_END

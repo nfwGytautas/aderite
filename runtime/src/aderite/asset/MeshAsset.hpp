@@ -2,7 +2,6 @@
 
 #include <bgfx/bgfx.h>
 #include "aderite/utility/Macros.hpp"
-#include "aderite/rendering/IRenderable.hpp"
 #include "aderite/asset/Asset.hpp"
 #include "aderite/asset/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
@@ -12,7 +11,7 @@ ADERITE_ASSET_NAMESPACE_BEGIN
 /**
  * @brief Mesh asset implementation, it just wraps around base mesh object, to provide interface with asset manager
 */
-class MeshAsset : public Asset, public interfaces::IRenderable {
+class MeshAsset : public Asset {
 public:
 	/**
 	 * @brief Editable fields of the asset, this information is stored inside the asset file
@@ -38,7 +37,7 @@ public:
 	virtual size_t hash() const override;
 
 	/**
-	 * @brief Returns the info of shader fields
+	 * @brief Returns the info of mesh fields
 	*/
 	fields getFields() const {
 		return m_info;
@@ -51,8 +50,13 @@ public:
 		return m_info;
 	}
 
-	// Inherited via irenderable
-	virtual void fillDrawCall(rendering::DrawCall* dc) override;
+	bgfx::VertexBufferHandle getVboHandle() const {
+		return m_vbh;
+	}
+
+	bgfx::IndexBufferHandle getIboHandle() const {
+		return m_ibh;
+	}
 protected:
 	MeshAsset(const std::string& name);
 	MeshAsset(const std::string& name, const fields& info);

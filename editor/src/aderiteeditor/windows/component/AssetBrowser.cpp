@@ -4,10 +4,10 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
+#include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
@@ -218,12 +218,12 @@ void AssetBrowser::render(){
 					createItem<asset::MaterialAsset>(m_currentDir, "New material");
 				}
 
-				if (ImGui::MenuItem("Shader")) {
-					createItem<asset::ShaderAsset>(m_currentDir, "New shader");
-				}
-
 				if (ImGui::MenuItem("Texture")) {
 					createItem<asset::TextureAsset>(m_currentDir, "New texture");
+				}
+
+				if (ImGui::MenuItem("Material type")) {
+					createItem<asset::MaterialTypeAsset>(m_currentDir, "New material type");
 				}
 
 				ImGui::EndMenu();
@@ -288,6 +288,10 @@ void AssetBrowser::render(){
 					target = shared::DDPayloadID__Directory;
 					break;
 				}
+				case FsNodeType::MATERIAL_TYPE: {
+					target = shared::DDPayloadID__MaterialType;
+					break;
+				}
 				default: {
 					target = shared::DDPayloadID__GenericAsset;
 				}
@@ -330,6 +334,7 @@ void AssetBrowser::render(){
 				case FsNodeType::SHADER:
 				case FsNodeType::MESH:
 				case FsNodeType::TEXTURE:
+				case FsNodeType::MATERIAL_TYPE:
 				{
 					shared::State::Sink->onSelectedAssetChanged(::aderite::Engine::getAssetManager()->getOrRead(node.Name));
 					break;
@@ -415,6 +420,9 @@ void AssetBrowser::resolveFs() {
 			}
 			else if (ext == ".texture") {
 				type = FsNodeType::TEXTURE;
+			}
+			else if (ext == ".mtype") {
+				type = FsNodeType::MATERIAL_TYPE;
 			}
 		}
 

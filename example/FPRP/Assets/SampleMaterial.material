@@ -1,0 +1,6 @@
+Version: 2021_07_31r1
+Type: 2
+MaterialType: ImageMaterialType.mtype
+Properties:
+  Size: 16
+  Data: [0, 0, 0, 4]

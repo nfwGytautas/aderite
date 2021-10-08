@@ -90,3 +90,7 @@
 // Uniform namespace where various uniforms are defined in
 #define ADERITE_UNIFORM_NAMESPACE_BEGIN ADERITE_RENDERING_NAMESPACE_BEGIN namespace uniform {
 #define ADERITE_UNIFORM_NAMESPACE_END ADERITE_RENDERING_NAMESPACE_END }
+
+// Property namespace where all material type properties are defined in
+#define ADERITE_PROPERTY_NAMESPACE_BEGIN ADERITE_ASSET_NAMESPACE_BEGIN namespace prop {
+#define ADERITE_PROPERTY_NAMESPACE_END ADERITE_ASSET_NAMESPACE_END }

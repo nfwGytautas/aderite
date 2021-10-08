@@ -92,6 +92,11 @@ void AudioController::shutdown() {
 }
 
 void AudioController::update() {
+	if (::aderite::Engine::getSceneManager()->getCurrentScene() == nullptr) {
+		return;
+	}
+
+
 	// Configure listener
 	bool thisFrameMute = false;
 	int enabledListenerCount = 0;

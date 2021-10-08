@@ -37,7 +37,7 @@ bool MeshAsset::serialize(YAML::Emitter& out) {
 
 bool MeshAsset::deserialize(YAML::Node& data) {
 	// TODO: Error check
-	
+
 	if (data["Source"]) {
 		m_info.SourceFile = data["Source"].as<std::string>();
 	}
@@ -47,16 +47,6 @@ bool MeshAsset::deserialize(YAML::Node& data) {
 	m_info.IsStatic = data["IsStatic"].as<bool>();
 
 	return true;
-}
-
-void MeshAsset::fillDrawCall(rendering::DrawCall* dc) {
-	if (!isLoaded()) {
-		dc->Valid = false;
-		return;
-	}
-
-	dc->VBO = m_vbh;
-	dc->IBO = m_ibh;
 }
 
 void MeshAsset::load() {

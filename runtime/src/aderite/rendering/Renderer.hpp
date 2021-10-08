@@ -10,6 +10,7 @@
 #include "aderite/rendering/pass/IPass.hpp"
 #include "aderite/window/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
+#include "aderite/scene/components/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/rendering/pass/Forward.hpp"
 #include "aderite/rendering/uniform/Forward.hpp"
@@ -20,6 +21,8 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
  * @brief The Renderer of aderite powered by bgfx
 */
 class Renderer {
+	using DrawCallList = std::vector<DrawCall>;
+
 public:
 	virtual ~Renderer() {}
 
@@ -90,7 +93,49 @@ private:
 	Renderer() {}
 	friend class Engine;
 
-	void renderFrom(interfaces::ICamera* eye);
+	void renderFrom(scene::Scene* scene, interfaces::ICamera* eye);
+
+	/**
+	 * @brief Validates entity
+	 * @param meta Meta component
+	 * @param mrenderer Mesh renderer component
+	 * @return True if valid and can be rendered, false otherwise
+	*/
+	bool validateEntity(
+		scene::components::MetaComponent& meta, 
+		scene::components::MeshRendererComponent& mrenderer);
+
+	/**
+	 * @brief Frustum cull entity
+	 * @param eye Camera
+	 * @param transform Transform of the entity
+	 * @return True if not culled, false otherwise
+	*/
+	bool frustumCull(
+		interfaces::ICamera* eye,
+		scene::components::TransformComponent& transform);
+
+	/**
+	 * @brief Performs occlusion culling for the draw calls
+	 * @param dcl Draw call list
+	*/
+	void occlusionCull(
+		DrawCallList& dcl
+	);
+
+	/**
+	 * @brief Performs optimizations for the draw call lit
+	 * @param dc Draw call
+	*/
+	void optimize(
+		DrawCall& dcl
+	);
+
+	/**
+	 * @brief Renders the draw call
+	 * @param dc Draw call to render
+	*/
+	void render(const DrawCall& dc);
 private:
 	static constexpr uint8_t c_NumPasses = 2;
 	std::array<interfaces::IPass*, c_NumPasses> m_passes;

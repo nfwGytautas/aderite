@@ -11,6 +11,7 @@
 #include "aderite/scene/Scene.hpp"
 #include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
+#include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/MeshSource.hpp"
 #include "aderite/asset/TextureAsset.hpp"
@@ -39,6 +40,9 @@ std::string getAssetExtension(Asset* asset) {
 	}
 	case AssetType::TEXTURE: {
 		return ".texture";
+	}
+	case AssetType::MATERIAL_TYPE: {
+		return ".mtype";
 	}
 	}
 
@@ -293,6 +297,9 @@ Asset* AssetManager::createAssetFromType(AssetType type, const std::string& name
 	}
 	case AssetType::TEXTURE: {
 		return new asset::TextureAsset(name);
+	}
+	case AssetType::MATERIAL_TYPE: {
+		return new asset::MaterialTypeAsset(name);
 	}
 	default: {
 		LOG_ERROR("Unknown asset type {0}", type);

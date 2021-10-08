@@ -49,6 +49,11 @@ constexpr char* DDPayloadID__AudioBank = "DDPayloadID__AudioBank";
 constexpr char* DDPayloadID__Directory = "DDPayloadID__Directory";
 
 /**
+ * @brief Drag and drop ip passed when the object that is being dragged is a material type object
+*/
+constexpr char* DDPayloadID__MaterialType = "DDPayloadID__MaterialType";
+
+/**
  * @brief Drag and drop id passed when the object that is being dragged is a raw file
 */
 constexpr char* DDPayloadID__RawData = "DDPayloadID__RawData";

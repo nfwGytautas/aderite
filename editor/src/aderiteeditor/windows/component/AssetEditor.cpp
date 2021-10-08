@@ -4,13 +4,16 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/Random.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/asset/Asset.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
+#include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
+#include "aderite/asset/property/Property.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/utility/Utility.hpp"
@@ -97,6 +100,10 @@ void AssetEditor::render() {
 	}
 	case asset::AssetType::TEXTURE: {
 		textureRender();
+		break;
+	}
+	case asset::AssetType::MATERIAL_TYPE: {
+		materialTypeRender();
 		break;
 	}
 	default:
@@ -199,35 +206,49 @@ void AssetEditor::materialRender() {
 	asset::MaterialAsset* material = static_cast<asset::MaterialAsset*>(m_selectedAsset);
 	asset::MaterialAsset::fields& finfo = material->getFieldsMutable();
 
+	if (ImGui::BeginCombo("Type", finfo.Type == nullptr ? "None" : finfo.Type->getName().c_str(), 0)) {
+		for (asset::MaterialTypeAsset* mta : ::aderite::Engine::getAssetManager()->getAllOfType<asset::MaterialTypeAsset>(asset::AssetType::MATERIAL_TYPE)) {
+			const bool is_selected = (finfo.Type == mta);
+			if (ImGui::Selectable(mta->getName().c_str(), is_selected)) {
+				material->setType(mta);
+			}
+
+			// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+			if (is_selected) {
+				ImGui::SetItemDefaultFocus();
+			}
+		}
+
+		ImGui::EndCombo();
+	}
+
+	ImGui::Separator();
+	ImGui::Text("Properties:");
+
 	if (ImGui::BeginTable("MaterialEditTable", 2)) {
 		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
 		ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
 
-		ImGui::TableNextRow();
+		if (finfo.Type != nullptr) {
+			for (asset::prop::Property* p : finfo.Type->getFields().Properties) {
+				ImGui::TableNextRow();
 
-		ImGui::TableSetColumnIndex(0);
-		ImGui::Text("Shader");
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text(p->getName().c_str());
 
-		ImGui::TableSetColumnIndex(1);
-		ImGui::PushItemWidth(-FLT_MIN);
+				ImGui::TableSetColumnIndex(1);
+				ImGui::PushItemWidth(-FLT_MIN);
 
-		//if (finfo.Shader != nullptr) {
-		//	ImGui::Button(finfo.Shader->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-		//}
-		//else {
-			ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-		//}
-
-		if (ImGui::BeginDragDropTarget()) {
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__ShaderAsset)) {
-				std::string name = static_cast<const char*>(payload->Data);
-				asset::Asset* asset = ::aderite::Engine::getAssetManager()->getByName(name);
-				if (asset) {
-					//finfo.Shader = asset;
+				switch (p->getType()) {
+				case asset::prop::PropertyType::FLOAT: {
+					float* val = p->getValue(material->getPropertyData());
+					ImGui::InputScalar("input float", ImGuiDataType_Float, p->getValue(material->getPropertyData()), NULL);
+					break;
+				}
+				default:
+					ImGui::Text("Unknown property type");
 				}
 			}
-
-			ImGui::EndDragDropTarget();
 		}
 
 		ImGui::EndTable();
@@ -384,6 +405,62 @@ void AssetEditor::textureRender() {
 
 		ImGui::EndTable();
 	}
+}
+
+void AssetEditor::materialTypeRender() {
+	static const std::string types[] = { "Texture 2D", "Texture Cube", "Float", "Vec2", "Vec3", "Vec4" };
+	static const size_t typeCount = sizeof(types) / sizeof(*types);
+
+	asset::MaterialTypeAsset* type = static_cast<asset::MaterialTypeAsset*>(m_selectedAsset);
+	asset::MaterialTypeAsset::fields& finfo = type->getFieldsMutable();
+
+	ImGui::Text("Properties:");
+
+	if (ImGui::BeginTable("MaterialTypeEditTable", 3)) {
+		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+		ImGui::TableSetupColumn("Spacing", ImGuiTableColumnFlags_WidthFixed, 10.0f);
+		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_None);
+
+		for (asset::prop::Property* prop : finfo.Properties) {
+			ImGui::TableNextRow();
+
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text(prop->getName().c_str());
+
+			ImGui::TableSetColumnIndex(2);
+			ImGui::Text(types[static_cast<size_t>(prop->getType())].c_str());
+		}
+
+		ImGui::EndTable();
+	}
+
+	ImGui::PushItemWidth(-FLT_MIN);
+	
+	if (ImGui::Button("Add property", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
+		ImGui::OpenPopup("SelectMaterialTypeProperty");
+	}
+
+	ImGui::Separator();
+	if (ImGui::Button("Open shader editor", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
+
+	}
+	
+	ImGui::PopItemWidth();
+
+	if (ImGui::BeginPopup("SelectMaterialTypeProperty"))
+	{
+		ImGui::Text("Type");
+		ImGui::Separator();
+		for (int i = 0; i < typeCount; i++) {
+			if (ImGui::Selectable(types[i].c_str())) {
+				//selected_fish = i;
+				finfo.Properties.push_back(new asset::prop::Property(static_cast<asset::prop::PropertyType>(i), "NewProperty_" + aderite::utility::generateString(8)));
+				type->recalculate();
+			}
+		}
+		ImGui::EndPopup();
+	}
+
 }
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_END

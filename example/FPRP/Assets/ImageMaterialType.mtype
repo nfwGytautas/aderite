@@ -1,0 +1,10 @@
+Version: 2021_07_31r1
+Type: 5
+ElementCount: 4
+Properties:
+  - Name: NewProperty_b5d338cd
+    Type: 4
+    Offset: 0
+  - Name: NewProperty_092afff1
+    Type: 2
+    Offset: 3

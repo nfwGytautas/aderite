@@ -130,6 +130,17 @@ public:
 	*/
 	asset::Asset* getOrRead(const std::string& name);
 
+	template<class T>
+	std::vector<T*> getAllOfType(asset::AssetType type) {
+		std::vector<T*> result;
+		for (asset::Asset* asset : m_assets) {
+			if (asset->type() == type) {
+				result.push_back(static_cast<T*>(asset));
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * @brief Saves the asset to device memory
 	 * @param asset Asset to save
