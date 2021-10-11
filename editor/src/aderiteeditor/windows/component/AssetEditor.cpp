@@ -264,7 +264,7 @@ void AssetEditor::materialRender() {
 				case asset::prop::PropertyType::TEXTURE_2D:
 				case asset::prop::PropertyType::TEXTURE_CUBE: {
 					// TODO: Verify type
-					asset::TextureAsset* sampler = material->getFields().Samplers[p->getName()];
+					asset::TextureAsset*& sampler = finfo.Samplers[p->getName()];
 
 					if (sampler) {
 						ImGui::Button(sampler->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));

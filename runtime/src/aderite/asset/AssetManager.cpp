@@ -132,6 +132,11 @@ std::string AssetManager::loadTxtFile(const std::string& path) {
 std::vector<unsigned char> AssetManager::loadBinFile(const std::string& path) {
 	// TODO: Error check
 	std::ifstream file(getRawDir() / path, std::ios::binary);
+
+	if (file.fail()) {
+		return {};
+	}
+
 	file.unsetf(std::ios::skipws);
 
 	std::streampos fileSize;

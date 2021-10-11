@@ -3,4 +3,9 @@ Type: 2
 MaterialType: ImageMaterialType.mtype
 Properties:
   Size: 56
-  Data: [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  Data: [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Samplers:
+  - Name: NewProperty_96664f36
+    Texture: ~
+  - Name: NewProperty_edee790d
+    Texture: TestTexture.texture

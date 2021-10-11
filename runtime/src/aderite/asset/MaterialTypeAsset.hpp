@@ -71,6 +71,10 @@ public:
 	bgfx::UniformHandle getUniformHandle() const {
 		return m_uniform;
 	}
+
+	std::unordered_map<std::string, bgfx::UniformHandle> getSamplers() const {
+		return m_samplers;
+	}
 protected:
 	MaterialTypeAsset(const std::string& name);
 	MaterialTypeAsset(const std::string& name, const fields& info);
@@ -85,7 +89,7 @@ private:
 
 	// Material properties
 	bgfx::UniformHandle m_uniform = BGFX_INVALID_HANDLE;
-	// TODO: Samplers
+	std::unordered_map<std::string, bgfx::UniformHandle> m_samplers;
 
 	fields m_info = {};
 

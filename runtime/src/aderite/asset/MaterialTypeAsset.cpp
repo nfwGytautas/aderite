@@ -41,6 +41,13 @@ void MaterialTypeAsset::prepareLoad() {
 
 	m_vertexSource = ::aderite::Engine::getAssetManager()->loadBinFile("vs_" + typeName + ".bin");
 	m_fragmentSource = ::aderite::Engine::getAssetManager()->loadBinFile("fs_" + typeName + ".bin");
+
+	if (m_vertexSource.size() == 0 || m_fragmentSource.size() == 0) {
+		// This is to not block when there are no sources, will be reworked together with entire asset system
+		m_vertexSource.push_back('_');
+		m_fragmentSource.push_back('_');
+	}
+
 	m_isBeingPrepared = true;
 }
 
@@ -52,6 +59,11 @@ void MaterialTypeAsset::load() {
 	if (isLoaded()) {
 		LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);
 		unload();
+	}
+
+	if (m_vertexSource.size() == 1 || m_fragmentSource.size() == 1) {
+		LOG_WARN("Failed to load");
+		return;
 	}
 
 	// Load bgfx bin shader
@@ -72,7 +84,14 @@ void MaterialTypeAsset::load() {
 		m_info.v4Count);
 
 	// Create samplers
-	// TODO: Create
+	for (prop::Property* prop : m_info.Properties) {
+		if (prop::isSampler(prop->getType())) {
+			m_samplers[prop->getName()] = bgfx::createUniform(
+				("s_" + typeName + "_" + prop->getName()).c_str(), 
+				bgfx::UniformType::Sampler, 
+				1);
+		}
+	}
 
 	m_isBeingPrepared = false;
 }
@@ -87,6 +106,14 @@ void MaterialTypeAsset::unload() {
 		bgfx::destroy(m_uniform);
 		m_uniform = BGFX_INVALID_HANDLE;
 	}
+
+	for (auto handle : m_samplers) {
+		if (bgfx::isValid(handle.second)) {
+			bgfx::destroy(handle.second);
+		}
+	}
+
+	m_samplers.clear();
 }
 
 bool MaterialTypeAsset::isPreparing() {

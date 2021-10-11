@@ -199,11 +199,11 @@ void Compiler::generateMaterialHeader(asset::MaterialTypeAsset* type) {
 			break;
 		}
 		case asset::prop::PropertyType::TEXTURE_2D: {
-			samplers += "SAMPLER2D(s_mat_" + typeName + "_" + prop->getName() + ", " + std::to_string(samplerIdx++) + ");\n";
+			samplers += "SAMPLER2D(s_" + typeName + "_" + prop->getName() + ", " + std::to_string(samplerIdx++) + ");\n";
 			break;
 		}
 		case asset::prop::PropertyType::TEXTURE_CUBE: {
-			samplers += "SAMPLERCUBE(s_mat_" + typeName + "_" + prop->getName() + ", " + std::to_string(samplerIdx++) + ");\n";
+			samplers += "SAMPLERCUBE(s_" + typeName + "_" + prop->getName() + ", " + std::to_string(samplerIdx++) + ");\n";
 			break;
 		}
 		default:
@@ -250,6 +250,7 @@ void Compiler::generateVertexShader(asset::MaterialTypeAsset* type) {
 
 	// Includes
 	output << "#include \"bgfx_shader.sh\"\n";
+	output << "#include \"shaderLib.sh\"\n";
 	output << "#include \""<< typeName << ".sh\"\n";
 	output << "\n";
 
@@ -300,6 +301,7 @@ void Compiler::generateFragmentShader(asset::MaterialTypeAsset* type) {
 
 	// Includes
 	output << "#include \"bgfx_shader.sh\"\n";
+	output << "#include \"shaderLib.sh\"\n";
 	output << "#include \"" << typeName << ".sh\"\n";
 	output << "\n";
 
@@ -308,7 +310,8 @@ void Compiler::generateFragmentShader(asset::MaterialTypeAsset* type) {
 
 	// Fragcolor
 	// TODO: Shader graph code goes here
-	output << "gl_FragColor = " << "u_ImageMaterialType_mtype_NewProperty_259e7581;\n";
+	output << "vec4 texcolor = toLinear(texture2D(s_ImageMaterialType_mtype_NewProperty_edee790d, v_texcoord));\n\t";
+	output << "gl_FragColor = " << "texcolor + u_ImageMaterialType_mtype_NewProperty_259e7581;\n";
 
 	// Close main
 	output << "}\n";

@@ -58,6 +58,8 @@ public:
 	float* getPropertyData() const {
 		return m_udata;
 	}
+
+	std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> getSamplerData() const;
 protected:
 	MaterialAsset(const std::string& name);
 	MaterialAsset(const std::string& name, const fields& info);

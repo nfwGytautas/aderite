@@ -1,13 +1,11 @@
 General:
 Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
 Shader tool
-All shaders in one source
 Animations
 More defined pipeline for rendering (Frustum culling, etc.)
 Rethink scene useAsset and removeAsset functions
 Scripting
 Include BGFX stats to ImGui
-Textures
 Fix dependencies folder and CMake
 Optimize component include
 Memory manager
@@ -17,35 +15,29 @@ Event system?
 Recovery from failure
 
 Asset manager:
+In drastic need of reworking
 Load caching
 Thread pool asset loading
 IWorkerThread
 IAssetLoader
 Rework ILoadable
 Asset registry
+Abort asset load
 
 FPRP:
-Material compiling
 Base vertex shader compiling
 Base fragment shader compiling
 Varying generation
-Loading generated shaders
 Compiling shaders from C++ code
-View ids
+Render calls
 Move MaterialTypeAsset::recalculate to editor
 Move MaterialAsset::setType to editor
 
 Rendering:
-Clustered
-IBL
-Shadow maps
-Textures
+Views
 View names
-Blending
 BGFX multithread encoder
 Optimize camera view and projection setting
-Hook scene skycolor to clear color
-Views
 
 Audio:
 3D audio
@@ -97,3 +89,4 @@ Mesh loading API optmization
 Move enums to files
 Move logger to engine system
 Add final to methods and classes
+More verbose logging

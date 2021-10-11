@@ -25,6 +25,9 @@ public:
 	// Uniform from material type
 	bgfx::UniformHandle MaterialUniform = BGFX_INVALID_HANDLE;
 
+	// Samplers
+	std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> Samplers;
+
 	// Uniform data
 	float* UniformData = nullptr;
 
