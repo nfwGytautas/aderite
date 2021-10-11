@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include <bgfx/bgfx.h>
 #include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Asset.hpp"
@@ -18,6 +19,7 @@ public:
 	*/
 	struct fields {
 		MaterialTypeAsset* Type; // Material type
+		std::unordered_map<std::string, TextureAsset*> Samplers;
 	};
 public:
 	~MaterialAsset();

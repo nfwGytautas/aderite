@@ -243,7 +243,53 @@ void AssetEditor::materialRender() {
 				switch (p->getType()) {
 				case asset::prop::PropertyType::FLOAT: {
 					float* val = p->getValue(material->getPropertyData());
-					ImGui::InputScalar("input float", ImGuiDataType_Float, p->getValue(material->getPropertyData()), NULL);
+					ImGui::InputFloat(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+					break;
+				}
+				case asset::prop::PropertyType::VEC2: {
+					float* val = p->getValue(material->getPropertyData());
+					ImGui::InputFloat2(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+					break;
+				}
+				case asset::prop::PropertyType::VEC3: {
+					float* val = p->getValue(material->getPropertyData());
+					ImGui::InputFloat3(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+					break;
+				}
+				case asset::prop::PropertyType::VEC4: {
+					float* val = p->getValue(material->getPropertyData());
+					ImGui::InputFloat4(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+					break;
+				}
+				case asset::prop::PropertyType::TEXTURE_2D:
+				case asset::prop::PropertyType::TEXTURE_CUBE: {
+					// TODO: Verify type
+					asset::TextureAsset* sampler = material->getFields().Samplers[p->getName()];
+
+					if (sampler) {
+						ImGui::Button(sampler->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+					}
+					else {
+						ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+					}
+
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__TextureAsset)) {
+							std::string name = static_cast<const char*>(payload->Data);
+							asset::Asset* asset = ::aderite::Engine::getAssetManager()->getOrRead(name);
+							if (asset) {
+								sampler = static_cast<asset::TextureAsset*>(asset);
+
+								if (!sampler->isLoaded()) {
+									sampler->prepareLoad();
+									sampler->load();
+								}
+							}
+						}
+
+						ImGui::EndDragDropTarget();
+					}
+
 					break;
 				}
 				default:

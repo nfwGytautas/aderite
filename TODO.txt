@@ -22,6 +22,7 @@ Thread pool asset loading
 IWorkerThread
 IAssetLoader
 Rework ILoadable
+Asset registry
 
 FPRP:
 Material compiling
@@ -31,6 +32,7 @@ Varying generation
 Loading generated shaders
 Compiling shaders from C++ code
 Move MaterialTypeAsset::recalculate to editor
+Move MaterialAsset::setType to editor
 
 Rendering:
 Clustered

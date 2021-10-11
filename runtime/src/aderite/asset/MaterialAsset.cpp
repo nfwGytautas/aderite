@@ -54,8 +54,10 @@ bool MaterialAsset::deserialize(YAML::Node& data) {
 
 	if (m_info.Type != nullptr) {
 		if (m_info.Type->getSizeInBytes() != m_dataSize) {
-			LOG_ERROR("Size and type mismatch for {0}", p_name);
-			return false;
+			LOG_WARN("Size and type mismatch for {0}, trying to reapply type", p_name);
+			// Reapply type
+			setType(m_info.Type);
+			return true;
 		}
 	}
 	else {
@@ -122,6 +124,7 @@ size_t MaterialAsset::hash() const {
 }
 
 void MaterialAsset::setType(MaterialTypeAsset* type) { 
+	// TODO: Move to editor
 	m_info.Type = type;
 	
 	if (m_dataSize != type->getSizeInBytes()) {
@@ -136,6 +139,14 @@ void MaterialAsset::setType(MaterialTypeAsset* type) {
 	}
 
 	std::memset(m_udata, 0, m_dataSize);
+
+	// Samplers
+	m_info.Samplers.clear();
+	for (prop::Property* prop : type->getFields().Properties) {
+		if (prop::isSampler(prop->getType())) {
+			m_info.Samplers[prop->getName()] = nullptr;
+		}
+	}
 }
 
 MaterialAsset::MaterialAsset(const std::string& name)
