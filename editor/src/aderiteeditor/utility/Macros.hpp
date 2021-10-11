@@ -29,3 +29,7 @@
 // Utility namespace where various utility functions are defined in
 #define ADERITE_EDITOR_UTILITY_NAMESPACE_BEGIN ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN namespace utility {
 #define ADERITE_EDITOR_UTILITY_NAMESPACE_END ADERITE_EDITOR_ROOT_NAMESPACE_END }
+
+// Compiler namespace where various functions that involve creating assets such as material shader headers are stored in
+#define ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN namespace compiler {
+#define ADERITE_EDITOR_COMPILER_NAMESPACE_END ADERITE_EDITOR_ROOT_NAMESPACE_END }

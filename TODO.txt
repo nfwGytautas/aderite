@@ -23,6 +23,15 @@ IWorkerThread
 IAssetLoader
 Rework ILoadable
 
+FPRP:
+Material compiling
+Base vertex shader compiling
+Base fragment shader compiling
+Varying generation
+Loading generated shaders
+Compiling shaders from C++ code
+Move MaterialTypeAsset::recalculate to editor
+
 Rendering:
 Clustered
 IBL

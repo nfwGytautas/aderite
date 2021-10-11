@@ -17,6 +17,7 @@
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/utility/Utility.hpp"
+#include "aderiteeditor/compiler/MaterialType.hpp"
 #include "aderiteeditor/windows/component/ComponentUtility.hpp"
 #include "aderiteeditor/windows/component/FileDialog.hpp"
 
@@ -443,6 +444,11 @@ void AssetEditor::materialTypeRender() {
 	ImGui::Separator();
 	if (ImGui::Button("Open shader editor", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
 
+	}
+
+	ImGui::Separator();
+	if (ImGui::Button("Generate", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
+		compiler::compileMaterialType(type);
 	}
 	
 	ImGui::PopItemWidth();
