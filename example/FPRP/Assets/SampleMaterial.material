@@ -3,4 +3,4 @@ Type: 2
 MaterialType: ImageMaterialType.mtype
 Properties:
   Size: 56
-  Data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  Data: [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]

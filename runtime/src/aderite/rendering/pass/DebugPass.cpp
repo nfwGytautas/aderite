@@ -147,8 +147,7 @@ bool DebugPass::init(rendering::uniform::UniformManager* um) {
 	m_cubeVBO = bgfx::createVertexBuffer(bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices)), cubeLayout);
 	m_cubeIBO = bgfx::createIndexBuffer(bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices)));
 
-
-	bgfx::setViewClear(m_debugView, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
+	bgfx::setViewClear(m_debugView, BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
 
 	return true;
 }

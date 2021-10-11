@@ -11,13 +11,13 @@
 
 ADERITE_ASSET_NAMESPACE_BEGIN
 
-bgfx::ShaderHandle load_shader(const std::vector<unsigned char>& source, const std::string& name) {
-	const bgfx::Memory* mem = bgfx::copy(source.data(), source.size() + 1);
-	mem->data[mem->size - 1] = '\0';
-	bgfx::ShaderHandle vsh = bgfx::createShader(mem);
-	bgfx::setName(vsh, name.c_str());
-	return vsh;
-}
+//bgfx::ShaderHandle load_shader(const std::vector<unsigned char>& source, const std::string& name) {
+//	const bgfx::Memory* mem = bgfx::copy(source.data(), source.size() + 1);
+//	mem->data[mem->size - 1] = '\0';
+//	bgfx::ShaderHandle vsh = bgfx::createShader(mem);
+//	bgfx::setName(vsh, name.c_str());
+//	return vsh;
+//}
 
 ShaderAsset::~ShaderAsset() {
 	if (bgfx::isValid(m_handle)) {
@@ -52,11 +52,11 @@ void ShaderAsset::load() {
 	}
 
 	// Load bgfx bin shader
-	bgfx::ShaderHandle vsh = load_shader(m_vertexSource, "vVertex");
-	bgfx::ShaderHandle fsh = load_shader(m_fragmentSource, "fVertex");
+	//bgfx::ShaderHandle vsh = load_shader(m_vertexSource, "vVertex");
+	//bgfx::ShaderHandle fsh = load_shader(m_fragmentSource, "fVertex");
 
 	// Create program
-	m_handle = bgfx::createProgram(vsh, fsh, true);
+	//m_handle = bgfx::createProgram(vsh, fsh, true);
 
 	m_isBeingPrepared = false;
 }

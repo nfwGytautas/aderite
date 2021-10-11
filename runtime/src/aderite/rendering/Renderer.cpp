@@ -165,6 +165,7 @@ void Renderer::setVsync(bool enabled) {
 }
 
 void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight, bool reset) {
+	setResolution(glm::uvec2(newWidth, newHeight));
 #if DEBUG_RENDER == 1
 	// TODO: Event system?
 	m_debugPass->onWindowResized(newWidth, newHeight);
@@ -291,6 +292,15 @@ void Renderer::renderFrom(scene::Scene* scene, interfaces::ICamera* eye) {
 	occlusionCull(drawcalls);
 
 	// Render
+	bgfx::setViewFrameBuffer(0, eye->getOutputHandle());
+	bgfx::touch(0);
+
+	// Set persistent matrices
+	bgfx::setViewTransform(
+		0,
+		glm::value_ptr(eye->computeViewMatrix()),
+		glm::value_ptr(eye->computeProjectionMatrix()));
+
 	for (DrawCall& dc : drawcalls) {
 		optimize(dc);
 		render(dc);
@@ -349,7 +359,7 @@ bool Renderer::validateEntity(scene::components::MetaComponent& meta, scene::com
 bool Renderer::frustumCull(interfaces::ICamera* eye, scene::components::TransformComponent& transform) {
 	// TODO: Frustum cull
 
-	return false;
+	return true;
 }
 
 void Renderer::occlusionCull(DrawCallList& dcl) {

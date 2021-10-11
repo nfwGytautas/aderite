@@ -61,8 +61,8 @@ void MeshAsset::load() {
 
 	if (m_info.HasPosition) {
 		layout.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
-		layout.add(bgfx::Attrib::Normal, 2, bgfx::AttribType::Float);
-		layout.add(bgfx::Attrib::TexCoord0, 3, bgfx::AttribType::Float);
+		layout.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float);
+		layout.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float);
 	}
 
 	layout.end();

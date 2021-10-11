@@ -2,4 +2,13 @@ Version: 2021_07_31r1
 Type: 1
 SkyColor: [0.529999971, 0.810000002, 0.980000019]
 Entities:
-  []
+  - Entity: 0
+    Meta:
+      Name: Cube
+    Transform:
+      Position: [0, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRenderer:
+      Mesh: CubeMesh.mesh
+      Material: SampleMaterial.material

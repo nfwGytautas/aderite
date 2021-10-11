@@ -1,8 +1,18 @@
 #include "MaterialTypeAsset.hpp"
 
+#include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/utility/Log.hpp"
 
 ADERITE_ASSET_NAMESPACE_BEGIN
+
+bgfx::ShaderHandle load_shader(const std::vector<unsigned char>& source, const std::string& name) {
+	const bgfx::Memory* mem = bgfx::copy(source.data(), source.size() + 1);
+	mem->data[mem->size - 1] = '\0';
+	bgfx::ShaderHandle vsh = bgfx::createShader(mem);
+	bgfx::setName(vsh, name.c_str());
+	return vsh;
+}
 
 MaterialTypeAsset::~MaterialTypeAsset() {
 	for (prop::Property* pb : m_info.Properties) {
@@ -22,27 +32,69 @@ bool MaterialTypeAsset::isInGroup(AssetGroup group) const {
 }
 
 void MaterialTypeAsset::prepareLoad() {
+	// Load sources
+	// TODO: Async
+	std::string typeName = getName();
+	std::replace_if(std::begin(typeName), std::end(typeName),
+		[](std::string::value_type v) { return v == '.'; },
+		'_');
 
+	m_vertexSource = ::aderite::Engine::getAssetManager()->loadBinFile("vs_" + typeName + ".bin");
+	m_fragmentSource = ::aderite::Engine::getAssetManager()->loadBinFile("fs_" + typeName + ".bin");
+	m_isBeingPrepared = true;
 }
 
 bool MaterialTypeAsset::isReadyToLoad() {
-	return true;
+	return (m_vertexSource.size() > 0 && m_fragmentSource.size() > 0);
 }
 
 void MaterialTypeAsset::load() {
-	// TODO: Create shader, uniform, samplers
+	if (isLoaded()) {
+		LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);
+		unload();
+	}
+
+	// Load bgfx bin shader
+	bgfx::ShaderHandle vsh = load_shader(m_vertexSource, "vVertex");
+	bgfx::ShaderHandle fsh = load_shader(m_fragmentSource, "fVertex");
+
+	// Create program
+	m_handle = bgfx::createProgram(vsh, fsh, true);
+
+	// Create uniform
+	std::string typeName = getName();
+	std::replace_if(std::begin(typeName), std::end(typeName),
+		[](std::string::value_type v) { return v == '.'; },
+		'_');
+	m_uniform = bgfx::createUniform(
+		("u_mat_buffer_" + typeName).c_str(), 
+		bgfx::UniformType::Vec4,
+		m_info.v4Count);
+
+	// Create samplers
+	// TODO: Create
+
+	m_isBeingPrepared = false;
 }
 
 void MaterialTypeAsset::unload() {
-	// TODO: Delete shader, uniform, samplers
+	if (bgfx::isValid(m_handle)) {
+		bgfx::destroy(m_handle);
+		m_handle = BGFX_INVALID_HANDLE;
+	}
+
+	if (bgfx::isValid(m_uniform)) {
+		bgfx::destroy(m_uniform);
+		m_uniform = BGFX_INVALID_HANDLE;
+	}
 }
 
 bool MaterialTypeAsset::isPreparing() {
-	return false;
+	return m_isBeingPrepared;
 }
 
 bool MaterialTypeAsset::isLoaded() {
-	return true;
+	return bgfx::isValid(m_handle);;
 }
 
 size_t MaterialTypeAsset::hash() const {
@@ -117,6 +169,13 @@ void MaterialTypeAsset::recalculate() {
 		prop->setOffset(offset);
 		m_info.ElementCount += prop::getElementCountForType(prop->getType());
 		offset = m_info.ElementCount;
+	}
+
+	if (m_info.ElementCount % 4 != 0) {
+		m_info.v4Count = ((m_info.ElementCount - m_info.ElementCount % 4) / 4) + 1;
+	}
+	else {
+		m_info.v4Count = m_info.ElementCount / 4;
 	}
 }
 

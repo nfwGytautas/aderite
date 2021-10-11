@@ -31,6 +31,7 @@ Base fragment shader compiling
 Varying generation
 Loading generated shaders
 Compiling shaders from C++ code
+View ids
 Move MaterialTypeAsset::recalculate to editor
 Move MaterialAsset::setType to editor
 
@@ -62,6 +63,7 @@ Broad-Phase callbacks
 Collision layers
 
 Editor:
+Copy bgfx shader includes to Raw/
 Internal system UI windows (loaded assets, asset manager, etc.)
 Unexpected exit or corrupted save restoration
 Fix modal architecture

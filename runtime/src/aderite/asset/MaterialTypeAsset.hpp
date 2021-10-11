@@ -23,6 +23,7 @@ public:
 	*/
 	struct fields {
 		size_t ElementCount; // Computed from properties
+		size_t v4Count;
 		Properties Properties;
 	};
 public:

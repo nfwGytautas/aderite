@@ -96,12 +96,14 @@ void MaterialAsset::load() {
 		unload();
 	}
 
-	//m_info.Shader->load();
+	m_info.Type->load();
 	m_isBeingPrepared = false;
 }
 
 void MaterialAsset::unload() {
 	//m_info.Shader->unload();
+	// TODO: Rework cause this is reference counted
+	m_info.Type->unload();
 }
 
 bool MaterialAsset::isPreparing() {
@@ -110,7 +112,7 @@ bool MaterialAsset::isPreparing() {
 
 bool MaterialAsset::isLoaded() {
 	//return m_info.Shader->isLoaded();
-	return true;
+	return m_info.Type->isLoaded();
 }
 
 size_t MaterialAsset::hash() const {
@@ -166,13 +168,13 @@ bool MaterialAsset::isInGroup(AssetGroup group) const {
 
 void MaterialAsset::prepareLoad() {
 	// Load sources
-	//m_info.Shader->prepareLoad();
+	m_info.Type->prepareLoad();
 	m_isBeingPrepared = true;
 }
 
 bool MaterialAsset::isReadyToLoad() {
-	//return m_info.Shader->isReadyToLoad();
-	return true;
+	return m_info.Type->isReadyToLoad();
+	//return true;
 }
 
 ADERITE_ASSET_NAMESPACE_END
