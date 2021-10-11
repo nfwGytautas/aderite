@@ -8,6 +8,7 @@
 #include <pfd/portable-file-dialogs.h>
 
 #include "aderiteeditor/windows/backend/bgfx/backend_bgfx.hpp"
+#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
@@ -89,6 +90,7 @@ void WindowsEditor::onRendererInitialized() {
 	// Initialize ImGui
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImNodes::CreateContext();
 
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
@@ -285,6 +287,7 @@ void WindowsEditor::onRuntimeShutdown() {
 	// Shutdown ImGui
 	backend::ImGui_Implbgfx_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
+	ImNodes::DestroyContext();
 	ImGui::DestroyContext();
 
 	delete shared::State::Project;
@@ -392,6 +395,7 @@ void WindowsEditor::onDestroyEntity(const scene::Entity& Entity) {
 
 void WindowsEditor::onSelectedAssetChanged(asset::Asset* asset) {
 	m_assetEditor->setActiveAsset(asset);
+	m_nodeEditor->setActiveAsset(asset);
 }
 
 void WindowsEditor::onStopGame() {

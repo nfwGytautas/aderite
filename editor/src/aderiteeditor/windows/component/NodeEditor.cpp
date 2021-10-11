@@ -1,47 +1,67 @@
 #include "NodeEditor.hpp"
 
-#include "aderiteeditor/windows/backend/node/imgui_node_editor.h"
+#include "aderite/utility/Log.hpp"
+#include "aderite/asset/MaterialTypeAsset.hpp"
+#include "aderiteeditor/windows/backend/node/imnodes.h"
+#include "aderiteeditor/node/MaterialInputNode.hpp"
+#include "aderiteeditor/node/Sampler2DNode.hpp"
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
-namespace ed = ax::NodeEditor;
-static ed::EditorContext* g_Context = nullptr;
+
+constexpr int c_RootMaterialNodeId = 0;
 
 NodeEditor::NodeEditor() {}
 
 NodeEditor::~NodeEditor() {}
 
 void NodeEditor::init() {
-	g_Context = ed::CreateEditor();
+
 }
 
 void NodeEditor::render() {
-    ed::SetCurrentEditor(g_Context);
-
     if (ImGui::Begin("Node editor")) {
-        ed::Begin("My Editor");
+        ImNodes::BeginNodeEditor();
+        ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
 
-        int uniqueId = 1;
+        m_currentState.renderUI();
 
-        // Start drawing nodes.
-        ed::BeginNode(uniqueId++);
-        ImGui::Text("Node A");
-        ed::BeginPin(uniqueId++, ed::PinKind::Input);
-        ImGui::Text("-> In");
-        ed::EndPin();
-        ImGui::SameLine();
-        ed::BeginPin(uniqueId++, ed::PinKind::Output);
-        ImGui::Text("Out ->");
-        ed::EndPin();
-        ed::EndNode();
+        ImNodes::MiniMap();
+        ImNodes::EndNodeEditor();
 
-        ed::End();
+        {
+            int start;
+            int end;
+            if (ImNodes::IsLinkCreated(&start, &end)) {
+                m_currentState.connect(start, end);
+            }
+        }
+
+        {
+            int link_id;
+            if (ImNodes::IsLinkDestroyed(&link_id)) {
+                m_currentState.disconnectLink(link_id);
+            }
+        }
+
+        ImNodes::PopAttributeFlag();
     }
 
     ImGui::End();
 }
 
 void NodeEditor::shutdown() {
-	ed::DestroyEditor(g_Context);
+
+}
+
+void NodeEditor::setActiveAsset(asset::Asset* asset) {
+    m_selectedAsset = asset;
+
+    if (m_selectedAsset->type() == asset::AssetType::MATERIAL_TYPE) {
+        m_currentState.addNode<node::MaterialInputNode>(static_cast<asset::MaterialTypeAsset*>(m_selectedAsset));
+
+        // TESTING
+        m_currentState.addNode<node::Sampler2DNode>();
+    }
 }
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_END

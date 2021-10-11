@@ -33,6 +33,26 @@ bool isSampler(PropertyType type) {
 	}
 }
 
+const char* getNameForType(PropertyType type) {
+	switch (type) {
+	case PropertyType::FLOAT:
+		return "Float";
+	case PropertyType::TEXTURE_2D:
+		return "Texture 2D";
+	case PropertyType::TEXTURE_CUBE:
+		return "Texture Cube";
+	case PropertyType::VEC2:
+		return "Vec2";
+	case PropertyType::VEC3:
+		return "Vec3";
+	case PropertyType::VEC4:
+		return "Vec4";
+	default:
+		LOG_ERROR("Unknown property type passed to getElementCountForType");
+		return "";
+	}
+}
+
 Property::Property(PropertyType type, const std::string& name)
 	: m_name(name), m_type(type)
 {}

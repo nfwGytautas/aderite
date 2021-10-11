@@ -1,9 +1,11 @@
 #pragma once
 
+#include "aderite/asset/Asset.hpp"
+#include "aderite/asset/Forward.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/shared/BaseComponent.hpp"
+#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/windows/component/Forward.hpp"
-
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 
@@ -20,7 +22,13 @@ public:
 	virtual void render() override;
 	virtual void shutdown() override;
 
+	/**
+	 * @brief Sets the current active asset
+	*/
+	void setActiveAsset(asset::Asset* asset);
 private:
+	node::Graph m_currentState;
+	asset::Asset* m_selectedAsset = nullptr;
 };
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_END

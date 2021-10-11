@@ -31,6 +31,13 @@ uint8_t getElementCountForType(PropertyType type);
 bool isSampler(PropertyType type);
 
 /**
+ * @brief Returns the string representation of the property type
+ * @param type Property type
+ * @return String representation
+*/
+const char* getNameForType(PropertyType type);
+
+/**
  * @brief Base class for material properties
 */
 class Property
