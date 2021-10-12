@@ -6,38 +6,38 @@ Nodes:
     InputPins: [1]
     OutputPins: []
     Position:
-      X: 568.742249
-      Y: 214.98349
+      X: 727
+      Y: 101
     ID: 0
   - NodeType: MaterialInput
     Material: ImageMaterialType.mtype
     InputPins: []
     OutputPins: [3, 4, 5, 6, 7, 8, 9, 10, 11]
     Position:
-      X: -61
-      Y: 141
+      X: 50
+      Y: 50
     ID: 2
   - NodeType: Sampler2D
-    InputPins: [13]
-    OutputPins: [14]
+    InputPins: [14]
+    OutputPins: [15]
     Position:
-      X: 239
-      Y: 328
-    ID: 12
+      X: 369
+      Y: 258
+    ID: 13
   - NodeType: Add
     ElementType: 5
-    InputPins: [16, 17]
-    OutputPins: [18]
+    InputPins: [18, 19]
+    OutputPins: [20]
     Position:
-      X: 392
-      Y: 162
-    ID: 15
+      X: 545
+      Y: 49
+    ID: 17
 Links:
+  - Out: 15
+    In: 19
   - Out: 11
-    In: 13
+    In: 14
   - Out: 9
-    In: 16
-  - Out: 14
-    In: 17
-  - Out: 18
+    In: 18
+  - Out: 20
     In: 1

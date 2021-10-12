@@ -15,6 +15,7 @@ Event system?
 Recovery from failure
 Move Property and MaterialType to editor, cause they are not mutable during runtime
 Rework pin type to be enum
+Profiling
 
 Licensing:
 FMOD splash screen

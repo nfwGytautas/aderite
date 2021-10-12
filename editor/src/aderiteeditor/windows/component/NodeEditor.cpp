@@ -68,6 +68,39 @@ void NodeEditor::render() {
             ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
             ImNodes::BeginNodeEditor();
 
+            {
+                const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
+                    ImNodes::IsEditorHovered() &&
+                    ImGui::IsMouseDown(ImGuiMouseButton_Right);
+
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.f, 8.f));
+                if (!ImGui::IsAnyItemHovered() && open_popup)
+                {
+                    ImGui::OpenPopup("add node");
+                }
+
+                if (ImGui::BeginPopup("add node"))
+                {
+                    const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
+
+                    if (ImGui::MenuItem("Add"))
+                    {
+                        node::Node* n = m_currentState->addNode<node::AddNode>();
+                        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+                    }
+
+                    if (ImGui::MenuItem("Sampler 2D"))
+                    {
+                        node::Node* n = m_currentState->addNode<node::Sampler2DNode>();
+                        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+                    }
+
+                    ImGui::EndPopup();
+                }
+                ImGui::PopStyleVar();
+            }
+
+
             m_currentState->renderUI();
 
             ImNodes::MiniMap();
@@ -106,11 +139,15 @@ void NodeEditor::setActiveAsset(asset::Asset* asset) {
             delete m_currentState;
         }
 
+        // TODO: Load already created graph for asset
+
         m_currentState = new node::Graph();
 
-        node::Node* n = m_currentState->addNode<node::MaterialOutputNode>();
-        m_currentState->addNode<node::MaterialInputNode>(static_cast<asset::MaterialTypeAsset*>(m_selectedAsset));
-        m_currentState->setLastNode(n);
+        node::Node* output = m_currentState->addNode<node::MaterialOutputNode>();
+        node::Node* input = m_currentState->addNode<node::MaterialInputNode>(static_cast<asset::MaterialTypeAsset*>(m_selectedAsset));
+        m_currentState->setLastNode(output);
+        ImNodes::SetNodeEditorSpacePos(input->getId(), ImVec2(50, 50));
+        ImNodes::SetNodeEditorSpacePos(output->getId(), ImVec2(350, 50));
     }
 }
 
