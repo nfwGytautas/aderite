@@ -1,9 +1,11 @@
 #pragma once
 
+#include <stack>
 #include <vector>
 #include <unordered_map>
 #include "aderite/interfaces/ISerializable.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
+#include "aderiteeditor/compiler/Forward.hpp"
 #include "aderiteeditor/node/Forward.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
@@ -19,19 +21,21 @@ public:
 
 	/**
 	 * @brief Creates a output pin with given arguments
+	 * @param node Node where the pin will be placed in
 	 * @param type Output pin type
 	 * @param name Output pin name
 	 * @return OutputPin instance
 	*/
-	OutputPin* createOutputPin(const std::string& type, const std::string& name);
+	OutputPin* createOutputPin(Node* node, const std::string& type, const std::string& name);
 
 	/**
 	 * @brief Creates a input pin with given arguments
+	 * @param node Node where the pin will be placed in
 	 * @param type Input pin type
 	 * @param name Input pin name
 	 * @return InputPin instance
 	*/
-	InputPin* createInputPin(const std::string& type, const std::string& name);
+	InputPin* createInputPin(Node* node, const std::string& type, const std::string& name);
 
 	/**
 	 * @brief Connects a output pin to an input pin
@@ -59,6 +63,23 @@ public:
 	}
 
 	/**
+	 * @brief Sets the last node of the graph
+	 * @param node Node to make last
+	*/
+	void setLastNode(Node* node);
+
+	/**
+	 * @brief Returns the last node of the graph
+	 * @return Node instance
+	*/
+	Node* getLastNode() const;
+
+	/**
+	 * @brief Resets evaluate flag on all nodes
+	*/
+	void resetEvaluateFlag() const;
+
+	/**
 	 * @brief Render the graph
 	*/
 	void renderUI();
@@ -71,10 +92,16 @@ private:
 	InputPin* findInputPin(int id) const;
 private:
 	int m_nextId = 0;
+
+	Node* m_lastNode = nullptr;
+
 	std::vector<Node*> m_nodes;
 	std::vector<OutputPin*> m_outputPins;
 	std::vector<InputPin*> m_inputPins;
+
+	// Links
 	std::unordered_map<int, Link*> m_links;
+	std::stack<int> m_freeLinks;
 };
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

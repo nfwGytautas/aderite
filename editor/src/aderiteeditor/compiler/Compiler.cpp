@@ -10,8 +10,44 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/asset/AssetManager.hpp"
+#include "aderiteeditor/compiler/ShaderWriter.hpp"
+#include "aderiteeditor/node/Graph.hpp"
+#include "aderiteeditor/node/Node.hpp"
+#include "aderiteeditor/node/InputPin.hpp"
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
+
+void Compiler::compileGraph(node::Graph* graph) {
+	// TODO: Change with actual material name
+	ShaderWriter fragmentWriter(ShaderWriter::ShaderType::FRAGMENT, "ImageMaterialType_mtype");
+	
+	graph->resetEvaluateFlag();
+	graph->getLastNode()->evaluate(&fragmentWriter);
+
+	fragmentWriter.writeToFile();
+
+	std::string typeName = "ImageMaterialType_mtype";
+
+	std::stringstream fcommand;
+	fcommand << "tools\\shadercRelease.exe -f ";
+	fcommand << (::aderite::Engine::getAssetManager()->getRawDir() / ("fs_" + typeName + ".sc")).string();
+	fcommand << " -o " << (::aderite::Engine::getAssetManager()->getRawDir() / ("fs_" + typeName + ".bin")).string();
+	fcommand << " --platform windows --type fragment --verbose --profile ps_5_0 --varyingdef ";
+	fcommand << (::aderite::Engine::getAssetManager()->getRawDir() / ("varying.def.sc")).string();
+
+	// Compile
+	LOG_TRACE("Running {0}", fcommand.str());
+	system(fcommand.str().c_str());
+}
+
+compiler::Variable Compiler::getMaterialProperty(asset::MaterialTypeAsset* material, asset::prop::Property* prop) {
+	std::string typeName = material->getName();
+	std::replace_if(std::begin(typeName), std::end(typeName),
+		[](std::string::value_type v) { return v == '.'; },
+		'_');
+
+	return typeName + "_" + prop->getName();
+}
 
 void Compiler::compileMaterialType(asset::MaterialTypeAsset* type) {
 	LOG_TRACE("Compiling material type {0}", type->getName());
@@ -20,7 +56,6 @@ void Compiler::compileMaterialType(asset::MaterialTypeAsset* type) {
 	generateMaterialHeader(type);
 	generateVarying(type);
 	generateVertexShader(type);
-	generateFragmentShader(type);
 
 	// Execute compiler
 	// TODO: Make into a library function
@@ -40,19 +75,13 @@ void Compiler::compileMaterialType(asset::MaterialTypeAsset* type) {
 	vcommand << " --platform windows --type vertex --verbose --profile vs_5_0 --varyingdef ";
 	vcommand << (::aderite::Engine::getAssetManager()->getRawDir() / ("varying.def.sc")).string();
 
-	// Fragment
-	std::stringstream fcommand;
-	fcommand << "tools\\shadercRelease.exe -f ";
-	fcommand << (::aderite::Engine::getAssetManager()->getRawDir() / ("fs_" + typeName + ".sc")).string();
-	fcommand << " -o " << (::aderite::Engine::getAssetManager()->getRawDir() / ("fs_" + typeName + ".bin")).string();
-	fcommand << " --platform windows --type fragment --verbose --profile ps_5_0 --varyingdef ";
-	fcommand << (::aderite::Engine::getAssetManager()->getRawDir() / ("varying.def.sc")).string();
-
 	// Compile
 	LOG_TRACE("Running {0}", vcommand.str());
 	system(vcommand.str().c_str());
-	LOG_TRACE("Running {0}", fcommand.str());
-	system(fcommand.str().c_str());
+
+	type->unload();
+	type->prepareLoad();
+	type->load();
 }
 
 void Compiler::generateVarying(asset::MaterialTypeAsset* type) {
@@ -192,18 +221,18 @@ void Compiler::generateMaterialHeader(asset::MaterialTypeAsset* type) {
 		case asset::prop::PropertyType::VEC2:
 		case asset::prop::PropertyType::VEC3:
 		case asset::prop::PropertyType::VEC4: {
-			output << "#define u_"
+			output << "#define "
 				<< typeName << "_" << prop->getName()
 				<< " u_mat_buffer_" << typeName
 				<< "[" << arrayIdx << "]." << access << "\n";
 			break;
 		}
 		case asset::prop::PropertyType::TEXTURE_2D: {
-			samplers += "SAMPLER2D(s_" + typeName + "_" + prop->getName() + ", " + std::to_string(samplerIdx++) + ");\n";
+			samplers += "SAMPLER2D(" + typeName + "_" + prop->getName() + ", " + std::to_string(samplerIdx++) + ");\n";
 			break;
 		}
 		case asset::prop::PropertyType::TEXTURE_CUBE: {
-			samplers += "SAMPLERCUBE(s_" + typeName + "_" + prop->getName() + ", " + std::to_string(samplerIdx++) + ");\n";
+			samplers += "SAMPLERCUBE(" + typeName + "_" + prop->getName() + ", " + std::to_string(samplerIdx++) + ");\n";
 			break;
 		}
 		default:

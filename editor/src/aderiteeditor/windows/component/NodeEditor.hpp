@@ -27,7 +27,7 @@ public:
 	*/
 	void setActiveAsset(asset::Asset* asset);
 private:
-	node::Graph m_currentState;
+	node::Graph* m_currentState = nullptr;
 	asset::Asset* m_selectedAsset = nullptr;
 };
 

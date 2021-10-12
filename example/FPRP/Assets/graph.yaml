@@ -1,0 +1,43 @@
+Version: test
+Type: test
+NextId: 23
+Nodes:
+  - NodeType: MaterialOutput
+    InputPins: [1]
+    OutputPins: []
+    Position:
+      X: 568.742249
+      Y: 214.98349
+    ID: 0
+  - NodeType: MaterialInput
+    Material: ImageMaterialType.mtype
+    InputPins: []
+    OutputPins: [3, 4, 5, 6, 7, 8, 9, 10, 11]
+    Position:
+      X: -61
+      Y: 141
+    ID: 2
+  - NodeType: Sampler2D
+    InputPins: [13]
+    OutputPins: [14]
+    Position:
+      X: 239
+      Y: 328
+    ID: 12
+  - NodeType: Add
+    ElementType: 5
+    InputPins: [16, 17]
+    OutputPins: [18]
+    Position:
+      X: 392
+      Y: 162
+    ID: 15
+Links:
+  - Out: 11
+    In: 13
+  - Out: 9
+    In: 16
+  - Out: 14
+    In: 17
+  - Out: 18
+    In: 1

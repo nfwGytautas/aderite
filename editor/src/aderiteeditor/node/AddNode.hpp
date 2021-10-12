@@ -6,18 +6,29 @@
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
 /**
- * @brief Input node for sampler 2D
+ * @brief Add node for 2 floats, vec2, vec3, vec4
 */
-class Sampler2DNode : public Node
+class AddNode : public Node
 {
 public:
-	Sampler2DNode(int id, Graph* graph);
+	AddNode(int id, Graph* graph, asset::prop::PropertyType type = asset::prop::PropertyType::NONE);
+
+	/**
+	 * @brief Change the node type
+	 * @param type New type
+	*/
+	void setType(asset::prop::PropertyType type);
 
 	// Inherited via Node
 	virtual const char* getNodeName() const override;
+	virtual void renderBody() override;
 	virtual void evaluate(compiler::ShaderWriter* writer) override;
 	virtual bool serialize(YAML::Emitter& out) override;
 	virtual bool deserialize(YAML::Node& data) override;
+private:
+	void renderSelection(asset::prop::PropertyType type);
+private:
+	asset::prop::PropertyType m_type;
 };
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

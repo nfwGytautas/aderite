@@ -14,7 +14,10 @@ public:
 	MaterialInputNode(int id, Graph* graph, asset::MaterialTypeAsset* material);
 
 	// Inherited via Node
-	virtual void renderUI() override;
+	virtual const char* getNodeName() const override;
+	virtual void renderBody() override;
+	virtual bool serialize(YAML::Emitter& out) override;
+	virtual bool deserialize(YAML::Node& data) override;
 private:
 	asset::MaterialTypeAsset* m_material = nullptr;
 };

@@ -17,6 +17,8 @@ uint8_t getElementCountForType(PropertyType type) {
 		return 3;
 	case PropertyType::VEC4:
 		return 4;
+	case PropertyType::NONE:
+		return 0;
 	default:
 		LOG_ERROR("Unknown property type passed to getElementCountForType");
 		return 0;
@@ -36,19 +38,21 @@ bool isSampler(PropertyType type) {
 const char* getNameForType(PropertyType type) {
 	switch (type) {
 	case PropertyType::FLOAT:
-		return "Float";
+		return "float";
 	case PropertyType::TEXTURE_2D:
 		return "Texture 2D";
 	case PropertyType::TEXTURE_CUBE:
 		return "Texture Cube";
 	case PropertyType::VEC2:
-		return "Vec2";
+		return "vec2";
 	case PropertyType::VEC3:
-		return "Vec3";
+		return "vec3";
 	case PropertyType::VEC4:
-		return "Vec4";
+		return "vec4";
+	case PropertyType::NONE:
+		return "None";
 	default:
-		LOG_ERROR("Unknown property type passed to getElementCountForType");
+		LOG_ERROR("Unknown property type passed to getNameForType");
 		return "";
 	}
 }

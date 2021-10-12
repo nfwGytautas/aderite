@@ -1,17 +1,16 @@
 #pragma once
 
-#include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderiteeditor/node/Node.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
 /**
- * @brief Input node for sampler 2D
+ * @brief Output node for material shaders
 */
-class Sampler2DNode : public Node
+class MaterialOutputNode : public Node
 {
 public:
-	Sampler2DNode(int id, Graph* graph);
+	MaterialOutputNode(int id, Graph* graph);
 
 	// Inherited via Node
 	virtual const char* getNodeName() const override;

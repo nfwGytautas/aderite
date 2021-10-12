@@ -1,8 +1,10 @@
 #pragma once
 
-#include "aderiteeditor/utility/Macros.hpp"
-
 #include "aderite/asset/MaterialTypeAsset.hpp"
+#include "aderite/asset/property/Property.hpp"
+#include "aderiteeditor/utility/Macros.hpp"
+#include "aderiteeditor/node/Forward.hpp"
+#include "aderiteeditor/compiler/Forward.hpp"
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 
@@ -12,6 +14,20 @@ ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 class Compiler
 {
 public:
+	/**
+	 * @brief Compiles a graph
+	 * @param graph Graph to compiler
+	*/
+	static void compileGraph(node::Graph* graph);
+
+	/**
+	 * @brief Returns access variable for material property
+	 * @param material Material where property exists in
+	 * @param prop Property instance
+	 * @return Variable access
+	*/
+	static compiler::Variable getMaterialProperty(asset::MaterialTypeAsset* material, asset::prop::Property* prop);
+
 	/**
 	 * @brief Compiles material asset to the current raw directory
 	 * @param type Type to compile

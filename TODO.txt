@@ -13,6 +13,8 @@ Propogate physics events
 BGFX leaks
 Event system?
 Recovery from failure
+Move Property and MaterialType to editor, cause they are not mutable during runtime
+Rework pin type to be enum
 
 Licensing:
 FMOD splash screen
@@ -21,6 +23,7 @@ bgfx splash screen
 
 Asset manager:
 In drastic need of reworking
+Rework ISerializable to register handlers and types
 Load caching
 Thread pool asset loading
 IWorkerThread
@@ -28,6 +31,9 @@ IAssetLoader
 Rework ILoadable
 Asset registry
 Abort asset load
+
+Node editor:
+Clear graph on new select
 
 FPRP:
 Base vertex shader compiling
@@ -60,6 +66,7 @@ Broad-Phase callbacks
 Collision layers
 
 Editor:
+Node editor middle mouse also moves scene view
 Copy bgfx shader includes to Raw/
 Internal system UI windows (loaded assets, asset manager, etc.)
 Unexpected exit or corrupted save restoration

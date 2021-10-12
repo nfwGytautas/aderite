@@ -23,9 +23,9 @@ std::string generateUuid() {
 }
 
 std::string generateString(const size_t& len) {
-	std::uniform_int_distribution<int> dist(0, 15);
+	std::uniform_int_distribution<int> dist(0, 61);
 
-	const char* v = "0123456789abcdef";
+	const char* v = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
 	std::string res;
 	for (int i = 0; i < len; i++) {

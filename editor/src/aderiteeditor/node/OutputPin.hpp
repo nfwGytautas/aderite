@@ -4,6 +4,7 @@
 #include <vector>
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/node/Forward.hpp"
+#include "aderiteeditor/compiler/Forward.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -13,7 +14,7 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 class OutputPin 
 {
 public:
-	OutputPin(int id, const std::string& type, const std::string& name);
+	OutputPin(int id, Node* node, const std::string& type, const std::string& name);
 
 	/**
 	 * @brief Returns the id of the pin
@@ -27,19 +28,54 @@ public:
 	std::string getType() const;
 
 	/**
+	 * @brief Changes the type of the pin, this disconnects any connections
+	 * @param type New type
+	*/
+	void setType(const std::string& type);
+
+	/**
 	 * @brief Returns the name of the pin
 	 * @return Name of the pin
 	*/
 	std::string getName() const;
 
 	/**
+	 * @brief Disconnects all pins connected to this one
+	*/
+	void disconnect();
+
+	/**
 	 * @brief Renders the pin
 	*/
 	void renderUI();
+
+	/**
+	 * @brief Set the value of the output pin
+	 * @param value New value of the pin
+	*/
+	void setValue(compiler::Variable value);
+
+	/**
+	 * @brief Get the value of the output pin
+	 * @return Value
+	*/
+	compiler::Variable getValue() const;
+
+	/**
+	 * @brief Returns the node that this pin exists on
+	 * @return Node instance
+	*/
+	Node* getNode() const;
+private:
+	std::vector<Link*> m_links;
+	friend class Link;
+	friend class Node;
 private:
 	int m_id;
 	std::string m_type;
 	std::string m_name;
+	Node* m_node = nullptr;
+	compiler::Variable m_value;
 };
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

@@ -11,7 +11,7 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 class Link
 {
 public:
-	Link(int id, InputPin* in, OutputPin* out);
+	Link(int id, Graph* graph, InputPin* in, OutputPin* out);
 
 	/**
 	 * @brief Returns the link id
@@ -39,11 +39,29 @@ public:
 	void setOutputPin(OutputPin& pin);
 
 	/**
+	 * @brief Sets input and output pins of the link
+	 * @param iPin Input pin
+	 * @param oPin Output pin
+	*/
+	void setPins(InputPin& iPin, OutputPin& oPin);
+
+	/**
+	 * @brief Destroys this link
+	*/
+	void destroy();
+
+	/**
+	 * @brief Returns true if the link is valid, false otherwise
+	*/
+	bool isValid() const;
+
+	/**
 	 * @brief Renders the link on the node editor
 	*/
 	void renderUI();
 private:
 	int m_id = 0;
+	Graph* m_graph = nullptr;
 	InputPin* m_inPin = nullptr;
 	OutputPin* m_outPin = nullptr;
 };

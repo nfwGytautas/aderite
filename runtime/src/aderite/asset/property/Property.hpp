@@ -9,12 +9,13 @@ ADERITE_PROPERTY_NAMESPACE_BEGIN
  * @brief Supported types of properties
 */
 enum class PropertyType {
-	TEXTURE_2D		= 0,
-	TEXTURE_CUBE	= 1,
-	FLOAT			= 2,
-	VEC2			= 3,
-	VEC3			= 4,
-	VEC4			= 5,
+	NONE			= -1,
+	TEXTURE_2D		=  0,
+	TEXTURE_CUBE	=  1,
+	FLOAT			=  2,
+	VEC2			=  3,
+	VEC3			=  4,
+	VEC4			=  5,
 };
 
 /**
