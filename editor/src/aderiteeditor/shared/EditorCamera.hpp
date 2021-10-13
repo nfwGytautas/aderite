@@ -20,7 +20,6 @@ public:
 	void onViewportResize(const glm::uvec2& size);
 
 	// Inherited via ICamera
-	virtual bgfx::FrameBufferHandle getOutputHandle() override;
 	virtual glm::mat4 computeViewMatrix() override;
 	virtual glm::mat4 computeProjectionMatrix() override;
 	virtual void update(float delta) override;
@@ -38,7 +37,6 @@ private:
 	float zoomSpeed() const;
 	glm::vec2 panSpeed() const;
 private:
-	bgfx::FrameBufferHandle m_target = BGFX_INVALID_HANDLE;
 	glm::uvec2 m_viewportSize = {};
 	glm::mat4 m_projectionMatrix;
 	glm::mat4 m_viewMatrix;

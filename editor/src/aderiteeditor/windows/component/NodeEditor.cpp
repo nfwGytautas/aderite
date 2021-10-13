@@ -23,6 +23,7 @@
 #include "aderiteeditor/node/pipeline/CameraProviderNode.hpp"
 #include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
 #include "aderiteeditor/node/pipeline/RenderNode.hpp"
+#include "aderiteeditor/node/pipeline/EditorHookNode.hpp"
 
 #include <fstream>
 #include "aderite/Aderite.hpp"
@@ -220,6 +221,17 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
     {
         node::Node* n = m_currentState->addNode<node::TargetProviderNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+    }
+
+    if (ImGui::BeginMenu("Editor"))
+    {
+        if (ImGui::MenuItem("Hook"))
+        {
+            node::Node* n = m_currentState->addNode<node::EditorHookNode>();
+            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+        }
+
+        ImGui::EndMenu();
     }
 
     if (ImGui::BeginMenu("Convert"))

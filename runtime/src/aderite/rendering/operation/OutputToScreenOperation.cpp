@@ -9,7 +9,7 @@ OutputToScreenOperation::OutputToScreenOperation(TargetProvideOperation* target)
 {}
 
 void OutputToScreenOperation::execute() {
-	LOG_TRACE("Output to screen operation");
+
 }
 
 ADERITE_RENDERING_NAMESPACE_END

@@ -14,12 +14,6 @@ public:
 	virtual ~ICamera() {};
 
 	/**
-	 * @brief Get the framebuffer where the renderer will render to
-	 * the renderer will render to it's default output
-	*/
-	virtual bgfx::FrameBufferHandle getOutputHandle() = 0;
-
-	/**
 	 * @brief Returns the view matrix for this camera
 	*/
 	virtual glm::mat4 computeViewMatrix() = 0;

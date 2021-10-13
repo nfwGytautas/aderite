@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "aderite/rendering/Forward.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/compiler/Forward.hpp"
@@ -30,11 +31,14 @@ public:
 	rendering::OperationBase* getOperation(EvaluatorValue value);
 
 	/**
-	 * @brief Outputs the order of the operations to the log
+	 * @brief Constructs rendering pipeline from current evaluator state, caller is responsible for freeing
+	 * the returned pipeline, this can only be called once per evaluator
+	 * @return Rendering pipeline instance
 	*/
-	void logOrder();
+	rendering::Pipeline* constructPipeline();
 private:
 	std::vector<rendering::OperationBase*> m_operations;
+	bool m_pipelineConstructed = false;
 };
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_END

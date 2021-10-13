@@ -13,8 +13,11 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
-#include "aderite/utility/bgfx.hpp"
 #include "aderite/rendering/Renderer.hpp"
+#include "aderite/rendering/Pipeline.hpp"
+#include "aderite/rendering/operation/DebugOperation.hpp"
+#include "aderite/rendering/operation/CameraProvideOperation.hpp"
+#include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/scene/Scene.hpp"
@@ -141,9 +144,6 @@ void WindowsEditor::onRendererInitialized() {
 		return;
 	}
 	backend::ImGui_Implbgfx_Init(255);
-
-	// Init debug render output
-	shared::State::DebugRenderHandle = utility::createFrameBuffer();
 
 	// Components
 	m_menubar->init();
@@ -373,6 +373,13 @@ void WindowsEditor::onSceneChanged(scene::Scene* scene) {
 
 void WindowsEditor::onSystemUpdate(float delta) {
 	shared::State::EditorCamera->update(delta);
+}
+
+void WindowsEditor::onPipelineChanged(rendering::Pipeline* pipeline) {	
+	// Init debug render output
+	rendering::DebugOperation* dop = pipeline->getDebugOperation();
+	dop->getCameraProvider()->setCamera(shared::State::EditorCamera);
+	shared::State::DebugRenderHandle = dop->getTargetProvider()->getHandle();
 }
 
 void WindowsEditor::onNewScene(const std::string& name) {

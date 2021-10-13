@@ -1,8 +1,6 @@
 General:
 Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
-Shader tool
 Animations
-More defined pipeline for rendering (Frustum culling, etc.)
 Rethink scene useAsset and removeAsset functions
 Scripting
 Include BGFX stats to ImGui
@@ -16,6 +14,8 @@ Recovery from failure
 Move Property and MaterialType to editor, cause they are not mutable during runtime
 Rework pin type to be enum
 Profiling
+Compiler switch to disable some setters in runtime
+Namespace refactoring
 
 Licensing:
 FMOD splash screen
@@ -35,10 +35,10 @@ Abort asset load
 
 Node editor:
 Clear graph on new select
+Constraints for number of nodes and deletion
 
 FPRP:
 Base vertex shader compiling
-Base fragment shader compiling
 Varying generation
 Compiling shaders from C++ code
 Render calls
@@ -46,6 +46,8 @@ Move MaterialTypeAsset::recalculate to editor
 Move MaterialAsset::setType to editor
 
 Rendering:
+Rethink camera architecture
+Object arrays for some operations
 Views
 View names
 BGFX multithread encoder
@@ -93,6 +95,7 @@ Rename dynamic text API
 Code:
 Add consts where no modifications are done
 Add final to classes
+Add inline
 Utility operators for types
 Asserts
 Error checking

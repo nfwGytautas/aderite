@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bgfx/bgfx.h>
+#include "aderite/rendering/Forward.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
 
@@ -14,6 +16,18 @@ public:
 
 	// Inherited via OperationBase
 	virtual void execute() override;
+private:
+	/**
+	 * @brief Validates child operations
+	 * @return True if valid and can render, false otherwise
+	*/
+	bool validateOperations();
+
+	/**
+	 * @brief Execute a single draw call
+	 * @param dc Draw call to execute
+	*/
+	void executeDrawCall(const DrawCall& dc);
 private:
 	EntityProvideOperation* m_entities = nullptr;
 	EyeProvideOperation* m_eye = nullptr;

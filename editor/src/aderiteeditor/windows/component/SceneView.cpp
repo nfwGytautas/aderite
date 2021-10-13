@@ -26,6 +26,7 @@ void SceneView::render() {
 		return;
 	}
 
+	m_fbth = bgfx::getTexture(shared::State::DebugRenderHandle, 0);
 	if (!bgfx::isValid(m_fbth)) {
 		ImGui::End();
 		ImGui::PopStyleVar();
@@ -46,7 +47,7 @@ void SceneView::render() {
 
 void SceneView::onSceneChanged(scene::Scene* scene) {
 	// TODO: Error check
-	m_fbth = bgfx::getTexture(shared::State::EditorCamera->getOutputHandle(), 0);
+	m_fbth = bgfx::getTexture(shared::State::DebugRenderHandle, 0);
 	shared::State::EditorCamera->onViewportResize(m_size);
 }
 

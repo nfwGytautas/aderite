@@ -5,7 +5,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "aderite/utility/bgfx.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/Aderite.hpp"
 #include "aderite/input/InputManager.hpp"
@@ -15,14 +14,10 @@
 ADERITE_EDITOR_SHARED_NAMESPACE_BEGIN
 
 EditorCamera::EditorCamera() {
-	// Create framebuffer
-	m_target = utility::createFrameBuffer();
-
 	updateViewMatrix();
 }
 
 EditorCamera::~EditorCamera() {
-	bgfx::destroy(m_target);
 }
 
 void EditorCamera::onViewportResize(const glm::uvec2& size) {
@@ -36,10 +31,6 @@ void EditorCamera::onViewportResize(const glm::uvec2& size) {
 		(float)m_viewportSize.x / (float)m_viewportSize.y, 
 		0.1f, 
 		1000.0f);
-}
-
-bgfx::FrameBufferHandle EditorCamera::getOutputHandle() {
-	return m_target;
 }
 
 glm::mat4 EditorCamera::computeViewMatrix() {

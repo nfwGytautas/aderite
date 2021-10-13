@@ -1,62 +1,55 @@
 Version: test
 Type: test
-NextId: 31
+NextId: 23
 LastNode: 0
 Nodes:
   - NodeType: Screen
     InputPins: [1, 2]
     OutputPins: []
     Position:
-      X: 593
-      Y: 212
+      X: 445
+      Y: 275
     ID: 0
-  - NodeType: Entities
+  - NodeType: EditorHook
     InputPins: []
-    OutputPins: [4]
+    OutputPins: [4, 5]
     Position:
-      X: 74
-      Y: 28
+      X: -24
+      Y: 239
     ID: 3
-  - NodeType: Camera
-    InputPins: []
-    OutputPins: [6]
-    Position:
-      X: -54
-      Y: 109
-    ID: 5
-  - NodeType: Target
-    InputPins: []
-    OutputPins: [8]
-    Position:
-      X: 86
-      Y: 195
-    ID: 7
   - NodeType: Convert
     From: Camera
     To: Eye
-    InputPins: [10]
+    InputPins: [7]
+    OutputPins: [8]
+    Position:
+      X: 96
+      Y: 120
+    ID: 6
+  - NodeType: Entities
+    InputPins: []
     OutputPins: [11]
     Position:
-      X: 117
-      Y: 101
-    ID: 9
+      X: 55.5571518
+      Y: 41.9728241
+    ID: 10
   - NodeType: Render
-    InputPins: [14, 15, 16, 17]
-    OutputPins: [18]
+    InputPins: [13, 14, 15, 16]
+    OutputPins: [17]
     Position:
-      X: 292
-      Y: 73
-    ID: 13
+      X: 274
+      Y: 117
+    ID: 12
 Links:
-  - Out: 11
-    In: 15
-  - Out: 6
-    In: 10
   - Out: 4
-    In: 14
-  - Out: 8
-    In: 16
-  - Out: 18
+    In: 7
+  - Out: 17
     In: 2
+  - Out: 11
+    In: 13
   - Out: 8
+    In: 14
+  - Out: 5
+    In: 15
+  - Out: 5
     In: 1

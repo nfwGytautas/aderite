@@ -17,7 +17,6 @@ public:
 	EntityCamera(Entity on);
 
 	// Inherited via ICamera
-	virtual bgfx::FrameBufferHandle getOutputHandle() override;
 	virtual glm::mat4 computeViewMatrix() override;
 	virtual glm::mat4 computeProjectionMatrix() override;
 	virtual void update(float delta) override;

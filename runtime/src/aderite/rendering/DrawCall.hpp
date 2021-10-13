@@ -39,6 +39,9 @@ public:
 
 	// If true this draw call will be skipped
 	bool Skip = false;
+
+	// If true then the draw call changed since last frame, so it should be recalculated
+	bool Altered = true;
 };
 
 ADERITE_RENDERING_NAMESPACE_END

@@ -132,9 +132,8 @@ void Engine::loop() {
 		updateScripts(deltaTimeSec);
 
 		// Rendering
-		scene::Scene* currentScene = m_sceneManager->getCurrentScene();
 		MIDDLEWARE_ACTION(onStartRender);
-		m_renderer->renderScene(currentScene);
+		m_renderer->render();
 		MIDDLEWARE_ACTION(onPreRenderCommit);
 		m_renderer->commit();
 		MIDDLEWARE_ACTION(onEndRender);
@@ -152,6 +151,10 @@ void Engine::abortExit() {
 
 void Engine::onRendererInitialized() {
 	MIDDLEWARE_ACTION(onRendererInitialized);
+}
+
+void Engine::onPipelineChanged(rendering::Pipeline* pipeline) {
+	MIDDLEWARE_ACTION(onPipelineChanged, pipeline);
 }
 
 void Engine::onSceneChanged(scene::Scene* scene) {

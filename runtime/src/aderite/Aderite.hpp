@@ -66,6 +66,12 @@ public:
 	void onRendererInitialized();
 
 	/**
+	 * @brief Function is invoked when the Renderer pipeline was changed
+	 * @param pipeline New pipeline
+	*/
+	void onPipelineChanged(rendering::Pipeline* pipeline);
+
+	/**
 	 * @brief Function is invoked when the active scene was changed
 	*/
 	void onSceneChanged(scene::Scene* scene);

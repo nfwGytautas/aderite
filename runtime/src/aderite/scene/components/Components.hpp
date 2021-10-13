@@ -79,6 +79,7 @@ struct MeshRendererComponent {
 */
 struct CameraComponent {
 	EntityCamera* Camera = nullptr;
+	bool Main = true;
 
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent&) = default;

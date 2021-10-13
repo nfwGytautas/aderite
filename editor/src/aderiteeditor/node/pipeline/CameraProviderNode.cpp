@@ -27,7 +27,7 @@ const char* CameraProviderNode::getNodeName() const {
 void CameraProviderNode::evaluate(compiler::GraphEvaluator* evaluator) {
     evaluateDependencies(evaluator);
     compiler::PipelineEvaluator* pe = static_cast<compiler::PipelineEvaluator*>(evaluator);
-    rendering::CameraProvideOperation* op = new rendering::CameraProvideOperation();
+    rendering::MainCameraProvideOperation* op = new rendering::MainCameraProvideOperation();
     p_outputs[0]->setValue(pe->addOperation(op));
     m_evaluated = true;
 }

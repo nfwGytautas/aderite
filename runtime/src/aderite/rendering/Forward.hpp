@@ -10,5 +10,6 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
 
 class Renderer;
 class DrawCall;
+class Pipeline;
 
 ADERITE_RENDERING_NAMESPACE_END

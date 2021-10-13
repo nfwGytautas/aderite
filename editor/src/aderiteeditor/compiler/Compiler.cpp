@@ -10,6 +10,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/asset/AssetManager.hpp"
+#include "aderite/rendering/Renderer.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/node/Graph.hpp"
@@ -48,7 +49,7 @@ void Compiler::compilePipeline(node::Graph* graph) {
 	graph->resetEvaluateFlag();
 	graph->getLastNode()->evaluate(&evaluator);
 
-	evaluator.logOrder();
+	::aderite::Engine::getRenderer()->setPipeline(evaluator.constructPipeline());
 }
 
 void Compiler::compileMaterialType(asset::MaterialTypeAsset* type) {

@@ -13,11 +13,6 @@ void EntityCamera::update(float delta) {
 	ADERITE_UNIMPLEMENTED;
 }
 
-bgfx::FrameBufferHandle EntityCamera::getOutputHandle() {
-	ADERITE_UNIMPLEMENTED;
-	return BGFX_INVALID_HANDLE;
-}
-
 glm::mat4 EntityCamera::computeViewMatrix() {
 	ADERITE_UNIMPLEMENTED;
 	return glm::mat4();

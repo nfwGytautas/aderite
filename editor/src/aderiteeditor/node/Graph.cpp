@@ -22,6 +22,7 @@
 #include "aderiteeditor/node/pipeline/ScreenNode.hpp"
 #include "aderiteeditor/node/pipeline/RenderNode.hpp"
 #include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
+#include "aderiteeditor/node/pipeline/EditorHookNode.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -220,6 +221,9 @@ bool Graph::deserialize(YAML::Node& data) {
 		}
 		else if (type == "Camera") {
 			n = addNode<node::CameraProviderNode>();
+		}
+		else if (type == "EditorHook") {
+			n = addNode<node::EditorHookNode>();
 		}
 
 		n->deserialize(node);

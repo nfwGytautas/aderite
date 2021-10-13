@@ -21,5 +21,10 @@ class AddNode;
 class Sampler2DNode;
 
 class ScreenNode;
+class EditorHookNode;
+class EntitiesNode;
+class RenderNode;
+class TargetProviderNode;
+class CameraProviderNode;
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

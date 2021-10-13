@@ -24,7 +24,8 @@ public:
 	virtual void onEndRender() override;
 	virtual void onRuntimeShutdown() override;
 	virtual void onSceneChanged(scene::Scene* scene) override;
-	virtual void onSystemUpdate(float delta);
+	virtual void onSystemUpdate(float delta) override;
+	virtual void onPipelineChanged(rendering::Pipeline* pipeline) override;
 
 	// ============================================================================
 	// Start of event routes, look at IEventSink interface for more information
@@ -40,7 +41,6 @@ public:
 	virtual void onStopGame() override;
 	virtual void onStartGame() override;
 	virtual void onResetGameState() override;
-
 private:
 	shared::EditorCamera* createEditorCamera();
 
