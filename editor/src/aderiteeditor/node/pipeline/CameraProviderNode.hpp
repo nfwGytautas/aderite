@@ -5,12 +5,12 @@
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
 /**
- * @brief Output node for material shaders
+ * @brief Input node for camera
 */
-class MaterialOutputNode : public Node
+class CameraProviderNode : public Node
 {
 public:
-	MaterialOutputNode(int id, Graph* graph);
+	CameraProviderNode(int id, Graph* graph);
 
 	// Inherited via Node
 	virtual const char* getNodeName() const override;

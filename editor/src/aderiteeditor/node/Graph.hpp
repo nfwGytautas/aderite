@@ -63,6 +63,12 @@ public:
 	}
 
 	/**
+	 * @brief Delete node from graph
+	 * @param id Id of the node to delete
+	*/
+	void deleteNode(int id);
+
+	/**
 	 * @brief Sets the last node of the graph
 	 * @param node Node to make last
 	*/
@@ -90,6 +96,7 @@ public:
 private:
 	OutputPin* findOutputPin(int id) const;
 	InputPin* findInputPin(int id) const;
+	Node* findNode(int id) const;
 private:
 	int m_nextId = 0;
 

@@ -22,7 +22,7 @@ public:
 	// Inherited via Node
 	virtual const char* getNodeName() const override;
 	virtual void renderBody() override;
-	virtual void evaluate(compiler::ShaderWriter* writer) override;
+	virtual void evaluate(compiler::GraphEvaluator* evaluator) override;
 	virtual bool serialize(YAML::Emitter& out) override;
 	virtual bool deserialize(YAML::Node& data) override;
 private:

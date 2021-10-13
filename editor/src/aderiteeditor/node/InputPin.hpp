@@ -5,6 +5,7 @@
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/node/Forward.hpp"
 #include "aderiteeditor/compiler/Forward.hpp"
+#include "aderiteeditor/compiler/GraphEvaluator.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -57,13 +58,23 @@ public:
 	/**
 	 * @brief Returns the value of the input pin
 	*/
-	compiler::Variable getValue() const;
+	compiler::EvaluatorValue getValue() const;
 
 	/**
 	 * @brief Returns the node that this pin exists on
 	 * @return Node instance
 	*/
 	Node* getNode() const;
+
+	/**
+	 * @brief Returns true if this input pin is optional, false otherwise
+	*/
+	bool isOptional() const;
+
+	/**
+	 * @brief Sets the pin to be optional or not
+	*/
+	void setOptional(bool optional);
 private:
 	Link* m_link = nullptr;
 	friend class Link;
@@ -73,6 +84,7 @@ private:
 	std::string m_type;
 	std::string m_name;
 	Node* m_node = nullptr;
+	bool m_optional = false;
 };
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

@@ -1,7 +1,7 @@
 #include "MaterialOutputNode.hpp"
 
 #include "aderite/asset/property/Property.hpp"
-#include "aderiteeditor/compiler/ShaderWriter.hpp"
+#include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 
@@ -21,9 +21,10 @@ const char* MaterialOutputNode::getNodeName() const {
     return "Output";
 }
 
-void MaterialOutputNode::evaluate(compiler::ShaderWriter* writer) {
-    evaluateDependencies(writer);
-    writer->addFragmentColorInstruction(p_inputs[0]->getValue());
+void MaterialOutputNode::evaluate(compiler::GraphEvaluator* evaluator) {
+    evaluateDependencies(evaluator);
+    compiler::ShaderEvaluator* se = static_cast<compiler::ShaderEvaluator*>(evaluator);
+    se->addFragmentColorInstruction(p_inputs[0]->getValue());
     m_evaluated = true;
 }
 

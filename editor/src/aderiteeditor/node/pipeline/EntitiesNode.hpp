@@ -5,12 +5,12 @@
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
 /**
- * @brief Output node for material shaders
+ * @brief Input node for providing entity list
 */
-class MaterialOutputNode : public Node
+class EntitiesNode : public Node
 {
 public:
-	MaterialOutputNode(int id, Graph* graph);
+	EntitiesNode(int id, Graph* graph);
 
 	// Inherited via Node
 	virtual const char* getNodeName() const override;

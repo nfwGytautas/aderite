@@ -4,7 +4,7 @@
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/compiler/ShaderWriter.hpp"
+#include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
@@ -53,9 +53,10 @@ void AddNode::renderBody() {
 	ImGui::PopItemWidth();
 }
 
-void AddNode::evaluate(compiler::ShaderWriter* writer) {
-	evaluateDependencies(writer);
-	compiler::Variable var = writer->addAddInstruction(
+void AddNode::evaluate(compiler::GraphEvaluator* evaluator) {
+	evaluateDependencies(evaluator);
+	compiler::ShaderEvaluator* se = static_cast<compiler::ShaderEvaluator*>(evaluator);
+	compiler::EvaluatorValue var = se->addAddInstruction(
 		std::string(asset::prop::getNameForType(m_type)),
 		p_inputs[0]->getValue(),
 		p_inputs[1]->getValue()

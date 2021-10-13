@@ -17,6 +17,7 @@ public:
 	virtual const char* getNodeName() const override;
 	virtual void renderBody() override;
 	virtual bool serialize(YAML::Emitter& out) override;
+	virtual void evaluate(compiler::GraphEvaluator* evaluator) override;
 	virtual bool deserialize(YAML::Node& data) override;
 private:
 	asset::MaterialTypeAsset* m_material = nullptr;

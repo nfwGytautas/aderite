@@ -10,10 +10,18 @@
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/Link.hpp"
 
+#include "aderiteeditor/node/ConvertNode.hpp"
+
 #include "aderiteeditor/node/AddNode.hpp"
 #include "aderiteeditor/node/MaterialInputNode.hpp"
 #include "aderiteeditor/node/MaterialOutputNode.hpp"
 #include "aderiteeditor/node/Sampler2DNode.hpp"
+
+#include "aderiteeditor/node/pipeline/EntitiesNode.hpp"
+#include "aderiteeditor/node/pipeline/CameraProviderNode.hpp"
+#include "aderiteeditor/node/pipeline/ScreenNode.hpp"
+#include "aderiteeditor/node/pipeline/RenderNode.hpp"
+#include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -24,14 +32,6 @@ Graph::Graph() {
 Graph::~Graph() {
 	for (Node* n : m_nodes) {
 		delete n;
-	}
-
-	for (OutputPin* p : m_outputPins) {
-		delete p;
-	}
-
-	for (InputPin* p : m_inputPins) {
-		delete p;
 	}
 
 	for (auto pair : m_links) {
@@ -105,6 +105,26 @@ void Graph::disconnectLink(int linkId) {
 	}
 }
 
+void Graph::deleteNode(int id) {
+	Node* n = findNode(id);
+
+	// Disconnect
+	for (InputPin* ipin : n->getInputPins()) {
+		ipin->disconnect();
+	}
+
+	for (OutputPin* opin : n->getOutputPins()) {
+		opin->disconnect();
+	}
+
+	// Delete node
+	auto it = std::find_if(m_nodes.begin(), m_nodes.end(), [id](Node* n) {
+		return n->getId() == id;
+	});
+	m_nodes.erase(it);
+	delete n;
+}
+
 void Graph::setLastNode(Node* node) {
 	m_lastNode = node;
 }
@@ -132,6 +152,14 @@ void Graph::renderUI() {
 bool Graph::serialize(YAML::Emitter& out) {
 	out << YAML::Key << "NextId" << YAML::Value << m_nextId;
 
+	out << YAML::Key << "LastNode" << YAML::Value;
+	if (m_lastNode != nullptr) {
+		out << m_lastNode->getId();
+	}
+	else {
+		out << YAML::Null;
+	}
+
 	out << YAML::Key << "Nodes" << YAML::BeginSeq;
 	for (Node* node : m_nodes) {
 		node->serialize(out);
@@ -140,6 +168,10 @@ bool Graph::serialize(YAML::Emitter& out) {
 
 	out << YAML::Key << "Links" << YAML::BeginSeq;
 	for (auto pair : m_links) {
+		if (!pair.second->isValid()) {
+			continue;
+		}
+
 		out << YAML::BeginMap;
 		out << YAML::Key << "Out" << YAML::Value << pair.second->getOutputPin()->getId();
 		out << YAML::Key << "In" << YAML::Value << pair.second->getInputPin()->getId();
@@ -169,6 +201,26 @@ bool Graph::deserialize(YAML::Node& data) {
 		else if (type == "MaterialOutput") {
 			n = addNode<node::MaterialOutputNode>();
 		}
+		else if (type == "Convert") {
+			std::string from = node["From"].as<std::string>();
+			std::string to = node["To"].as<std::string>();
+			n = addNode<node::ConvertNode>(from, to);
+		}
+		else if (type == "Target") {
+			n = addNode<node::TargetProviderNode>();
+		}
+		else if (type == "Screen") {
+			n = addNode<node::ScreenNode>();
+		}
+		else if (type == "Render") {
+			n = addNode<node::RenderNode>();
+		}
+		else if (type == "Entities") {
+			n = addNode<node::EntitiesNode>();
+		}
+		else if (type == "Camera") {
+			n = addNode<node::CameraProviderNode>();
+		}
 
 		n->deserialize(node);
 	}
@@ -182,6 +234,10 @@ bool Graph::deserialize(YAML::Node& data) {
 	
 	// Last because nodes will create ids
 	m_nextId = data["NextId"].as<int>();
+
+	if (!data["LastNode"].IsNull()) {
+		m_lastNode = findNode(data["LastNode"].as<int>());
+	}
 
 	return true;
 }
@@ -204,6 +260,18 @@ InputPin* Graph::findInputPin(int id) const {
 	});
 
 	if (it == m_inputPins.end()) {
+		return nullptr;
+	}
+
+	return *it;
+}
+
+Node* Graph::findNode(int id) const {
+	auto it = std::find_if(m_nodes.begin(), m_nodes.end(), [id](Node* n) {
+		return n->getId() == id;
+	});
+
+	if (it == m_nodes.end()) {
 		return nullptr;
 	}
 

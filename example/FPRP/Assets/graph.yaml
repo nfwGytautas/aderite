@@ -1,43 +1,62 @@
 Version: test
 Type: test
-NextId: 23
+NextId: 31
+LastNode: 0
 Nodes:
-  - NodeType: MaterialOutput
-    InputPins: [1]
+  - NodeType: Screen
+    InputPins: [1, 2]
     OutputPins: []
     Position:
-      X: 727
-      Y: 101
+      X: 593
+      Y: 212
     ID: 0
-  - NodeType: MaterialInput
-    Material: ImageMaterialType.mtype
+  - NodeType: Entities
     InputPins: []
-    OutputPins: [3, 4, 5, 6, 7, 8, 9, 10, 11]
+    OutputPins: [4]
     Position:
-      X: 50
-      Y: 50
-    ID: 2
-  - NodeType: Sampler2D
-    InputPins: [14]
-    OutputPins: [15]
+      X: 74
+      Y: 28
+    ID: 3
+  - NodeType: Camera
+    InputPins: []
+    OutputPins: [6]
     Position:
-      X: 369
-      Y: 258
+      X: -54
+      Y: 109
+    ID: 5
+  - NodeType: Target
+    InputPins: []
+    OutputPins: [8]
+    Position:
+      X: 86
+      Y: 195
+    ID: 7
+  - NodeType: Convert
+    From: Camera
+    To: Eye
+    InputPins: [10]
+    OutputPins: [11]
+    Position:
+      X: 117
+      Y: 101
+    ID: 9
+  - NodeType: Render
+    InputPins: [14, 15, 16, 17]
+    OutputPins: [18]
+    Position:
+      X: 292
+      Y: 73
     ID: 13
-  - NodeType: Add
-    ElementType: 5
-    InputPins: [18, 19]
-    OutputPins: [20]
-    Position:
-      X: 545
-      Y: 49
-    ID: 17
 Links:
-  - Out: 15
-    In: 19
   - Out: 11
+    In: 15
+  - Out: 6
+    In: 10
+  - Out: 4
     In: 14
-  - Out: 9
-    In: 18
-  - Out: 20
+  - Out: 8
+    In: 16
+  - Out: 18
+    In: 2
+  - Out: 8
     In: 1

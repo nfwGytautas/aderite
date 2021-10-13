@@ -20,4 +20,6 @@ class MaterialOutputNode;
 class AddNode;
 class Sampler2DNode;
 
+class ScreenNode;
+
 ADERITE_EDITOR_NODE_NAMESPACE_END

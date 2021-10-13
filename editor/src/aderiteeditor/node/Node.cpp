@@ -12,7 +12,13 @@ Node::Node(int id)
 {}
 
 Node::~Node() {
+	for (OutputPin* p : p_outputs) {
+		delete p;
+	}
 
+	for (InputPin* p : p_inputs) {
+		delete p;
+	}
 }
 
 int Node::getId() const {
@@ -41,21 +47,23 @@ void Node::renderUI() {
 	ImNodes::EndNode();
 }
 
-void Node::evaluate(compiler::ShaderWriter* writer) {
+void Node::evaluate(compiler::GraphEvaluator* evaluator) {
 	m_evaluated = true;
 }
 
-void Node::evaluateDependencies(compiler::ShaderWriter* writer) {
+void Node::evaluateDependencies(compiler::GraphEvaluator* evaluator) {
 	for (InputPin* pin : p_inputs) {
 		OutputPin* opin = pin->getConnection();
 		if (opin == nullptr) {
-			LOG_ERROR("Input pin without connected output pin");
-			return;
+			if (!pin->isOptional()) {
+				LOG_ERROR("Input pin without connected output pin");
+			}
+			continue;
 		}
 
 		Node* n = opin->getNode();
 		if (!n->m_evaluated) {
-			n->evaluate(writer);
+			n->evaluate(evaluator);
 		}
 	}
 }

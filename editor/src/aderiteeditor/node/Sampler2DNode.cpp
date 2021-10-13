@@ -7,7 +7,7 @@
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
-#include "aderiteeditor/compiler/ShaderWriter.hpp"
+#include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -38,9 +38,10 @@ const char* Sampler2DNode::getNodeName() const {
     return "Sampler 2D";
 }
 
-void Sampler2DNode::evaluate(compiler::ShaderWriter* writer) {
-    evaluateDependencies(writer);
-    compiler::Variable var = writer->add2DSamplingInstruction(p_inputs[0]->getValue());
+void Sampler2DNode::evaluate(compiler::GraphEvaluator* evaluator) {
+    evaluateDependencies(evaluator);
+    compiler::ShaderEvaluator* se = static_cast<compiler::ShaderEvaluator*>(evaluator);
+    compiler::EvaluatorValue var = se->add2DSamplingInstruction(p_inputs[0]->getValue());
     p_outputs[0]->setValue(var);
     m_evaluated = true;
 }

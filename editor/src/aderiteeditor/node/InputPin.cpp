@@ -50,10 +50,10 @@ void InputPin::disconnect() {
 	}
 }
 
-compiler::Variable InputPin::getValue() const {
+compiler::EvaluatorValue InputPin::getValue() const {
 	OutputPin* pin = getConnection();
 	if (!pin) {
-		return "";
+		return 0;
 	}
 	else {
 		return pin->getValue();
@@ -62,6 +62,14 @@ compiler::Variable InputPin::getValue() const {
 
 Node* InputPin::getNode() const {
 	return m_node;
+}
+
+bool InputPin::isOptional() const {
+	return m_optional;
+}
+
+void InputPin::setOptional(bool optional) {
+	m_optional = optional;
 }
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

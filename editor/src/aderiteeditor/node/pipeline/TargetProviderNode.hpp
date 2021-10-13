@@ -5,12 +5,12 @@
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
 /**
- * @brief Output node for material shaders
+ * @brief Input node for providing framebuffer target
 */
-class MaterialOutputNode : public Node
+class TargetProviderNode : public Node
 {
 public:
-	MaterialOutputNode(int id, Graph* graph);
+	TargetProviderNode(int id, Graph* graph);
 
 	// Inherited via Node
 	virtual const char* getNodeName() const override;

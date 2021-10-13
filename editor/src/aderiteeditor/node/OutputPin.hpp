@@ -5,6 +5,7 @@
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/node/Forward.hpp"
 #include "aderiteeditor/compiler/Forward.hpp"
+#include "aderiteeditor/compiler/GraphEvaluator.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -53,13 +54,13 @@ public:
 	 * @brief Set the value of the output pin
 	 * @param value New value of the pin
 	*/
-	void setValue(compiler::Variable value);
+	void setValue(compiler::EvaluatorValue value);
 
 	/**
 	 * @brief Get the value of the output pin
 	 * @return Value
 	*/
-	compiler::Variable getValue() const;
+	compiler::EvaluatorValue getValue() const;
 
 	/**
 	 * @brief Returns the node that this pin exists on
@@ -75,7 +76,7 @@ private:
 	std::string m_type;
 	std::string m_name;
 	Node* m_node = nullptr;
-	compiler::Variable m_value;
+	compiler::EvaluatorValue m_value;
 };
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

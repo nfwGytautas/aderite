@@ -2,15 +2,27 @@
 
 #include "aderite/utility/Log.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
+#include "aderite/input/InputManager.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
 #include "aderiteeditor/compiler/Compiler.hpp"
 
 // Nodes
+
+#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/ConvertNode.hpp"
+
+// Material
 #include "aderiteeditor/node/MaterialInputNode.hpp"
 #include "aderiteeditor/node/MaterialOutputNode.hpp"
 #include "aderiteeditor/node/Sampler2DNode.hpp"
 #include "aderiteeditor/node/AddNode.hpp"
 
+// Render pipeline
+#include "aderiteeditor/node/pipeline/ScreenNode.hpp"
+#include "aderiteeditor/node/pipeline/EntitiesNode.hpp"
+#include "aderiteeditor/node/pipeline/CameraProviderNode.hpp"
+#include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
+#include "aderiteeditor/node/pipeline/RenderNode.hpp"
 
 #include <fstream>
 #include "aderite/Aderite.hpp"
@@ -25,13 +37,23 @@ NodeEditor::NodeEditor() {}
 NodeEditor::~NodeEditor() {}
 
 void NodeEditor::init() {
-    
+    // TEMPORARY RENDER PIPELINE GRAPH
+    m_currentState = new node::Graph();
+
+    node::Node* output = m_currentState->addNode<node::ScreenNode>();
+    m_currentState->setLastNode(output);
+    ImNodes::SetNodeEditorSpacePos(output->getId(), ImVec2(50, 50));
 }
 
 void NodeEditor::render() {
     if (ImGui::Begin("Node editor")) {
         if (ImGui::Button("Compile")) {
-            compiler::Compiler::compileGraph(m_currentState);
+            if (m_selectedAsset && m_selectedAsset->type() == asset::AssetType::MATERIAL_TYPE) {
+                compiler::Compiler::compileGraph(m_currentState);
+            }
+            else {
+                compiler::Compiler::compilePipeline(m_currentState);
+            }
         }
         ImGui::SameLine();
         if (ImGui::Button("Save")) {
@@ -65,7 +87,11 @@ void NodeEditor::render() {
         }
 
         if (m_currentState) {
-            ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
+            bool pushed = false;
+            if (aderite::Engine::getInputManager()->isKeyPressed(input::Key::LEFT_ALT)) {
+                ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
+                pushed = true;
+            }
             ImNodes::BeginNodeEditor();
 
             {
@@ -81,18 +107,11 @@ void NodeEditor::render() {
 
                 if (ImGui::BeginPopup("add node"))
                 {
-                    const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
-
-                    if (ImGui::MenuItem("Add"))
-                    {
-                        node::Node* n = m_currentState->addNode<node::AddNode>();
-                        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+                    if (m_selectedAsset && m_selectedAsset->type() == asset::AssetType::MATERIAL_TYPE) {
+                        renderMaterialEditorContextMenu();
                     }
-
-                    if (ImGui::MenuItem("Sampler 2D"))
-                    {
-                        node::Node* n = m_currentState->addNode<node::Sampler2DNode>();
-                        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+                    else {
+                        renderRenderPipelineEditorContextMenu();
                     }
 
                     ImGui::EndPopup();
@@ -105,13 +124,28 @@ void NodeEditor::render() {
 
             ImNodes::MiniMap();
             ImNodes::EndNodeEditor();
-            ImNodes::PopAttributeFlag();
+
+            if (pushed) {
+                ImNodes::PopAttributeFlag();
+            }
 
             {
                 int start;
                 int end;
                 if (ImNodes::IsLinkCreated(&start, &end)) {
                     m_currentState->connect(start, end);
+                }
+            }
+
+            {
+                if (aderite::Engine::getInputManager()->isKeyPressed(input::Key::DEL)) {
+                    std::vector<int> nodes;
+                    nodes.resize(ImNodes::NumSelectedNodes());
+                    ImNodes::GetSelectedNodes(nodes.data());
+
+                    for (int node : nodes) {
+                        m_currentState->deleteNode(node);
+                    }
                 }
             }
 
@@ -148,6 +182,68 @@ void NodeEditor::setActiveAsset(asset::Asset* asset) {
         m_currentState->setLastNode(output);
         ImNodes::SetNodeEditorSpacePos(input->getId(), ImVec2(50, 50));
         ImNodes::SetNodeEditorSpacePos(output->getId(), ImVec2(350, 50));
+    }
+}
+
+void NodeEditor::renderMaterialEditorContextMenu() {
+    const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
+
+    if (ImGui::MenuItem("Add"))
+    {
+        node::Node* n = m_currentState->addNode<node::AddNode>();
+        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+    }
+
+    if (ImGui::MenuItem("Sampler 2D"))
+    {
+        node::Node* n = m_currentState->addNode<node::Sampler2DNode>();
+        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+    }
+}
+
+void NodeEditor::renderRenderPipelineEditorContextMenu() {
+    const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
+
+    if (ImGui::MenuItem("Entities"))
+    {
+        node::Node* n = m_currentState->addNode<node::EntitiesNode>();
+        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+    }
+
+    if (ImGui::MenuItem("Camera provider"))
+    {
+        node::Node* n = m_currentState->addNode<node::CameraProviderNode>();
+        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+    }
+
+    if (ImGui::MenuItem("Target provider"))
+    {
+        node::Node* n = m_currentState->addNode<node::TargetProviderNode>();
+        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+    }
+
+    if (ImGui::BeginMenu("Convert"))
+    {
+        if (ImGui::MenuItem("Camera to Eye"))
+        {
+            node::Node* n = m_currentState->addNode<node::ConvertNode>(
+                pipeline::getTypeName(pipeline::PropertyType::Camera), 
+                pipeline::getTypeName(pipeline::PropertyType::Eye));
+            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+        }
+
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Rendering"))
+    {
+        if (ImGui::MenuItem("Depth & Color"))
+        {
+            node::Node* n = m_currentState->addNode<node::RenderNode>();
+            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+        }
+
+        ImGui::EndMenu();
     }
 }
 

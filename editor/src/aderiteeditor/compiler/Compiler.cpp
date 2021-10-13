@@ -10,7 +10,8 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/asset/AssetManager.hpp"
-#include "aderiteeditor/compiler/ShaderWriter.hpp"
+#include "aderiteeditor/compiler/ShaderEvaluator.hpp"
+#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
@@ -19,7 +20,7 @@ ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 
 void Compiler::compileGraph(node::Graph* graph) {
 	// TODO: Change with actual material name
-	ShaderWriter fragmentWriter(ShaderWriter::ShaderType::FRAGMENT, "ImageMaterialType_mtype");
+	ShaderEvaluator fragmentWriter(ShaderEvaluator::ShaderType::FRAGMENT, "ImageMaterialType_mtype");
 	
 	graph->resetEvaluateFlag();
 	graph->getLastNode()->evaluate(&fragmentWriter);
@@ -40,13 +41,14 @@ void Compiler::compileGraph(node::Graph* graph) {
 	system(fcommand.str().c_str());
 }
 
-compiler::Variable Compiler::getMaterialProperty(asset::MaterialTypeAsset* material, asset::prop::Property* prop) {
-	std::string typeName = material->getName();
-	std::replace_if(std::begin(typeName), std::end(typeName),
-		[](std::string::value_type v) { return v == '.'; },
-		'_');
+void Compiler::compilePipeline(node::Graph* graph) {
+	LOG_TRACE("Compiling rendering pipeline");
+	PipelineEvaluator evaluator;
 
-	return typeName + "_" + prop->getName();
+	graph->resetEvaluateFlag();
+	graph->getLastNode()->evaluate(&evaluator);
+
+	evaluator.logOrder();
 }
 
 void Compiler::compileMaterialType(asset::MaterialTypeAsset* type) {

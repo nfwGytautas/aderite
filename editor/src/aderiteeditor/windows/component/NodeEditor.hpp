@@ -26,6 +26,10 @@ public:
 	 * @brief Sets the current active asset
 	*/
 	void setActiveAsset(asset::Asset* asset);
+
+private:
+	void renderMaterialEditorContextMenu();
+	void renderRenderPipelineEditorContextMenu();
 private:
 	node::Graph* m_currentState = nullptr;
 	asset::Asset* m_selectedAsset = nullptr;

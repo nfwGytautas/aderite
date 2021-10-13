@@ -5,6 +5,7 @@
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/node/Forward.hpp"
 #include "aderiteeditor/compiler/Forward.hpp"
+#include "aderiteeditor/compiler/GraphEvaluator.hpp"
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 
@@ -21,12 +22,10 @@ public:
 	static void compileGraph(node::Graph* graph);
 
 	/**
-	 * @brief Returns access variable for material property
-	 * @param material Material where property exists in
-	 * @param prop Property instance
-	 * @return Variable access
+	 * @brief Compiles a render pipeline graph
+	 * @param graph Graph to compiler
 	*/
-	static compiler::Variable getMaterialProperty(asset::MaterialTypeAsset* material, asset::prop::Property* prop);
+	static void compilePipeline(node::Graph* graph);
 
 	/**
 	 * @brief Compiles material asset to the current raw directory

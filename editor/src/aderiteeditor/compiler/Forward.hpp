@@ -8,7 +8,8 @@
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 
-class ShaderWriter;
-using Variable = std::string;
+class GraphEvaluator;
+class PipelineEvaluator;
+class ShaderEvaluator;
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_END

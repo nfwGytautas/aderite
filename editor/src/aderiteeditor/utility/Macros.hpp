@@ -37,3 +37,7 @@
 // Node namespace where node editor related objects are defined in
 #define ADERITE_EDITOR_NODE_NAMESPACE_BEGIN ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN namespace node {
 #define ADERITE_EDITOR_NODE_NAMESPACE_END ADERITE_EDITOR_ROOT_NAMESPACE_END }
+
+// Pipeline namespace where node editor related objects for rendering pipeline are defined in
+#define ADERITE_EDITOR_PIPELINE_NAMESPACE_BEGIN ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN namespace pipeline {
+#define ADERITE_EDITOR_PIPELINE_NAMESPACE_END ADERITE_EDITOR_ROOT_NAMESPACE_END }

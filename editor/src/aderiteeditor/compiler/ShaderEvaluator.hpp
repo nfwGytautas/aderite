@@ -5,13 +5,14 @@
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/compiler/Forward.hpp"
+#include "aderiteeditor/compiler/GraphEvaluator.hpp"
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 
 /**
  * @brief Object used to create a shader from node graph
 */
-class ShaderWriter
+class ShaderEvaluator : public GraphEvaluator
 {
 public:
 	struct Function {
@@ -27,21 +28,22 @@ public:
 		VERTEX		=  1,
 	};
 public:
-	ShaderWriter(ShaderType type, const std::string& name);
+	ShaderEvaluator(ShaderType type, const std::string& name);
 
 	/**
 	 * @brief Returns an access variable for accessing object properties
-	 * @param prop Property name
+	 * @param material Material intance
+	 * @param prop Property instance
 	 * @return Variable name
 	*/
-	Variable getProperty(const std::string& prop) const;
+	EvaluatorValue getProperty(const asset::MaterialTypeAsset* material, const asset::prop::Property* prop);
 
 	/**
 	 * @brief Adds a 2D sampling instruction to the current scope
 	 * @param texture Texture to sample, (must be in scope)
 	 * @return Variable where result is stored
 	*/
-	Variable add2DSamplingInstruction(const Variable& texture);
+	EvaluatorValue add2DSamplingInstruction(const EvaluatorValue& texture);
 
 	/**
 	 * @brief Adds an addition instruction to the current scope
@@ -50,13 +52,13 @@ public:
 	 * @param rhs Right hand side variable
 	 * @return Variable where result is stored
 	*/
-	Variable addAddInstruction(const std::string& type, const Variable& lhs, const Variable& rhs);
+	EvaluatorValue addAddInstruction(const std::string& type, const EvaluatorValue& lhs, const EvaluatorValue& rhs);
 
 	/**
 	 * @brief Adds a fragment color assign instruction to the current scope (must be main)
 	 * @param value Value to assign
 	*/
-	void addFragmentColorInstruction(const Variable& value);
+	void addFragmentColorInstruction(const EvaluatorValue& value);
 
 	/**
 	 * @brief Write shader to the raw directory, the name will the name of the type + writer + ".sc"
@@ -82,6 +84,10 @@ private:
 	const char* getPrefix() const;
 	const char* getFullName() const;
 	Function createMainScope() const;
+
+	std::string getValue(EvaluatorValue value) const;
+	EvaluatorValue createValue();
+	EvaluatorValue createValue(const std::string& value);
 private:
 	ShaderType m_type = ShaderType::UNKNOWN;
 	std::string m_name;
@@ -89,6 +95,8 @@ private:
 	std::vector<Function> m_functions;
 	Function* m_currentScope = nullptr;
 	Function* m_mainScope = nullptr;
+
+	std::vector<std::string> m_values;
 };
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_END

@@ -43,11 +43,11 @@ void OutputPin::renderUI() {
 	ImNodes::EndOutputAttribute();
 }
 
-void OutputPin::setValue(compiler::Variable value) {
+void OutputPin::setValue(compiler::EvaluatorValue value) {
 	m_value = value;
 }
 
-compiler::Variable OutputPin::getValue() const {
+compiler::EvaluatorValue OutputPin::getValue() const {
 	return m_value;
 }
 

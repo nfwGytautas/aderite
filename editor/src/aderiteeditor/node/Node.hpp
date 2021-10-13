@@ -39,15 +39,13 @@ public:
 
 	/**
 	 * @brief Evaluate this node data and store information in it's output pins
-	 * @param writer Writer
 	*/
-	virtual void evaluate(compiler::ShaderWriter* writer);
+	virtual void evaluate(compiler::GraphEvaluator* evaluator);
 
 	/**
 	 * @brief Evaluates dependencies for this node
-	 * @param writer Writer
 	*/
-	void evaluateDependencies(compiler::ShaderWriter* writer);
+	void evaluateDependencies(compiler::GraphEvaluator* evaluator);
 
 	/**
 	 * @brief Resets evaluate flag on node
