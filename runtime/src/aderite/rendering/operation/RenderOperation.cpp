@@ -12,9 +12,20 @@
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
+static uint8_t nextViewId = 0;
+
 RenderOperation::RenderOperation(EntityProvideOperation* entities, EyeProvideOperation* eye, TargetProvideOperation* target)
 	: m_entities(entities), m_eye(eye), m_target(target)
 {}
+
+void RenderOperation::initialize() {
+	m_viewId = nextViewId++;
+
+	ADERITE_DEBUG_SECTION
+	(
+		bgfx::setViewName(m_viewId, p_debugName.c_str());
+	)
+}
 
 void RenderOperation::execute() {
 	if (!validateOperations()) {
@@ -22,12 +33,12 @@ void RenderOperation::execute() {
 	}
 
 	// Render
-	bgfx::setViewFrameBuffer(0, m_target->getHandle());
-	bgfx::touch(0);
+	bgfx::setViewFrameBuffer(m_viewId, m_target->getHandle());
+	bgfx::touch(m_viewId);
 
 	// Set persistent matrices
 	bgfx::setViewTransform(
-		0,
+		m_viewId,
 		glm::value_ptr(m_eye->getViewMatrix()),
 		glm::value_ptr(m_eye->getProjectionMatrix()));
 
@@ -101,7 +112,7 @@ void RenderOperation::executeDrawCall(const DrawCall& dc) {
 	
 		// Submit draw call
 		uint8_t flags = BGFX_DISCARD_ALL & ~(BGFX_DISCARD_BINDINGS | BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE);
-		bgfx::submit(0, dc.Shader, 0, flags);
+		bgfx::submit(m_viewId, dc.Shader, 0, flags);
 	}
 }
 

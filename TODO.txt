@@ -41,9 +41,9 @@ FPRP:
 Base vertex shader compiling
 Varying generation
 Compiling shaders from C++ code
-Render calls
 Move MaterialTypeAsset::recalculate to editor
 Move MaterialAsset::setType to editor
+Pipeline verification
 
 Rendering:
 Rethink camera architecture
@@ -106,5 +106,4 @@ Case surround with braces
 Mesh loading API optmization
 Move enums to files
 Move logger to engine system
-Add final to methods and classes
 More verbose logging

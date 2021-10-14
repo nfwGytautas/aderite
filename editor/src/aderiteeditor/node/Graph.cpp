@@ -25,6 +25,9 @@
 #include "aderiteeditor/node/pipeline/EditorRenderNode.hpp"
 #include "aderiteeditor/node/pipeline/EditorTargetNode.hpp"
 #include "aderiteeditor/node/pipeline/EditorCameraNode.hpp"
+#include "aderiteeditor/node/pipeline/RequireLockNode.hpp"
+#include "aderiteeditor/node/pipeline/ConcatObjectsNode.hpp"
+#include "aderiteeditor/node/pipeline/SelectObjectNode.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -63,6 +66,19 @@ void Graph::connect(int outputPinId, int inputPinId) {
 		return;
 	}
 
+	// Check if connection is aborted or not
+	Node* inode = ipin->getNode();
+	Node* onode = opin->getNode();
+
+	if (!inode->onConnectToInput(ipin, opin)) {
+		return;
+	}
+
+	if (!onode->onConnectToOutput(opin, ipin)) {
+		return;
+	}
+
+	// Verify types
 	if (ipin->getType() != opin->getType()) {
 		// Incorrect types
 		return;
@@ -110,6 +126,11 @@ void Graph::disconnectLink(int linkId) {
 
 void Graph::deleteNode(int id) {
 	Node* n = findNode(id);
+
+	if (n == nullptr) {
+		LOG_WARN("Failed to delete node {0}", id);
+		return;
+	}
 
 	// Disconnect
 	for (InputPin* ipin : n->getInputPins()) {
@@ -232,6 +253,15 @@ bool Graph::deserialize(YAML::Node& data) {
 		}
 		else if (type == "EditorCamera") {
 			n = addNode<node::EditorCameraNode>();
+		}
+		else if (type == "RequireLock") {
+			n = addNode<node::RequireLockNode>();
+		}
+		else if (type == "SelectObject") {
+			n = addNode<node::SelectObjectNode>("Object");
+		}
+		else if (type == "ConcatObjects") {
+			n = addNode<node::ConcatObjectsNode>("Object");
 		}
 
 		if (n == nullptr) {

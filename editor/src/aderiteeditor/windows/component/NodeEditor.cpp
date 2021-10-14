@@ -26,6 +26,9 @@
 #include "aderiteeditor/node/pipeline/EditorRenderNode.hpp"
 #include "aderiteeditor/node/pipeline/EditorTargetNode.hpp"
 #include "aderiteeditor/node/pipeline/EditorCameraNode.hpp"
+#include "aderiteeditor/node/pipeline/RequireLockNode.hpp"
+#include "aderiteeditor/node/pipeline/ConcatObjectsNode.hpp"
+#include "aderiteeditor/node/pipeline/SelectObjectNode.hpp"
 
 #include <fstream>
 #include "aderite/Aderite.hpp"
@@ -144,10 +147,13 @@ void NodeEditor::render() {
                 if (aderite::Engine::getInputManager()->isKeyPressed(input::Key::DEL)) {
                     std::vector<int> nodes;
                     nodes.resize(ImNodes::NumSelectedNodes());
-                    ImNodes::GetSelectedNodes(nodes.data());
 
-                    for (int node : nodes) {
-                        m_currentState->deleteNode(node);
+                    if (nodes.size() > 0) {
+                        ImNodes::GetSelectedNodes(nodes.data());
+
+                        for (int node : nodes) {
+                            m_currentState->deleteNode(node);
+                        }
                     }
                 }
             }
@@ -225,26 +231,30 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
-    if (ImGui::BeginMenu("Editor"))
+    if (ImGui::BeginMenu("Array"))
     {
-        if (ImGui::MenuItem("Render"))
+        if (ImGui::MenuItem("Concat"))
         {
-            node::Node* n = m_currentState->addNode<node::EditorRenderNode>();
+            node::Node* n = m_currentState->addNode<node::ConcatObjectsNode>("Object");
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
-        if (ImGui::MenuItem("Camera"))
+        if (ImGui::MenuItem("Select"))
         {
-            node::Node* n = m_currentState->addNode<node::EditorCameraNode>();
+            node::Node* n = m_currentState->addNode<node::SelectObjectNode>("Object");
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
-        if (ImGui::MenuItem("Target"))
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Flow control"))
+    {
+        if (ImGui::MenuItem("Require lock"))
         {
-            node::Node* n = m_currentState->addNode<node::EditorTargetNode>();
+            node::Node* n = m_currentState->addNode<node::RequireLockNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
-
 
         ImGui::EndMenu();
     }
@@ -269,6 +279,32 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
             node::Node* n = m_currentState->addNode<node::RenderNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
+
+        ImGui::EndMenu();
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::BeginMenu("Editor"))
+    {
+        if (ImGui::MenuItem("Render"))
+        {
+            node::Node* n = m_currentState->addNode<node::EditorRenderNode>();
+            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+        }
+
+        if (ImGui::MenuItem("Camera"))
+        {
+            node::Node* n = m_currentState->addNode<node::EditorCameraNode>();
+            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+        }
+
+        if (ImGui::MenuItem("Target"))
+        {
+            node::Node* n = m_currentState->addNode<node::EditorTargetNode>();
+            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+        }
+
 
         ImGui::EndMenu();
     }

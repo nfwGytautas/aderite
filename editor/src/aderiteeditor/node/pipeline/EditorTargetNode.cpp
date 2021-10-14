@@ -29,7 +29,7 @@ void EditorTargetNode::evaluate(compiler::GraphEvaluator* evaluator) {
     evaluateDependencies(evaluator);
     compiler::PipelineEvaluator* pe = static_cast<compiler::PipelineEvaluator*>(evaluator);
     runtime::EditorTargetOperation* op = new runtime::EditorTargetOperation();
-    pe->addOperation(op);
+    p_outputs[0]->setValue(pe->addOperation(op));
     m_evaluated = true;
 }
 

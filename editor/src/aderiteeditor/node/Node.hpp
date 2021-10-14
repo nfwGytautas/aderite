@@ -51,6 +51,22 @@ public:
 	 * @brief Resets evaluate flag on node
 	*/
 	void resetEvaluateFlag();
+
+	/**
+	 * @brief Function invoked when a new link is trying to be established to this node input pin
+	 * @param target Input pin of this node
+	 * @param source Output pin that is being connected from
+	 * @return True if connection accepted, false otherwise
+	*/
+	virtual bool onConnectToInput(InputPin* target, OutputPin* source) { return true; };
+
+	/**
+	 * @brief Function invoked when a new link is trying to be established to this node output pin
+	 * @param target Output pin of this node
+	 * @param source Input pin that is being connected from
+	 * @return True if connection accepted, false otherwise
+	*/
+	virtual bool onConnectToOutput(OutputPin* target, InputPin* source) { return true; };
 protected:
 	/**
 	 * @brief Returns the name of the node

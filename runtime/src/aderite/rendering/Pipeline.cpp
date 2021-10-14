@@ -1,5 +1,7 @@
 #include "Pipeline.hpp"
 
+#include "aderite/utility/Log.hpp"
+
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
 Pipeline::~Pipeline() {
@@ -31,5 +33,19 @@ void Pipeline::shutdown() {
 		op->shutdown();
 	}
 }
+
+ADERITE_DEBUG_SECTION
+(
+void Pipeline::logPipeline() const {
+	LOG_TRACE("");
+	LOG_TRACE("====================================================================================");
+	LOG_TRACE("                                      PIPELINE                                      ");
+	LOG_TRACE("====================================================================================");
+	for (size_t i = 0; i < m_operations.size(); i++) {
+		LOG_TRACE("[{0:02d}] Operation: {1:<32} Debug name: {2}", i, m_operations[i]->getOperationName(), m_operations[i]->getDebugName());
+	}
+	LOG_TRACE("");
+}
+)
 
 ADERITE_RENDERING_NAMESPACE_END

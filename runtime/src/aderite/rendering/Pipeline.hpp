@@ -39,6 +39,11 @@ public:
 	 * @brief Shutdown the pipeline and all of it's operations, freeing resources
 	*/
 	void shutdown();
+
+	ADERITE_DEBUG_SECTION
+	(
+		void logPipeline() const;
+	)
 private:
 	std::vector<OperationBase*> m_operations;
 };

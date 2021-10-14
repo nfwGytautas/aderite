@@ -15,6 +15,11 @@ public:
 
 	// Inherited from TargetProvideOperation
 	virtual void initialize() override;
+
+	ADERITE_DEBUG_SECTION
+	(
+		virtual const char* getOperationName() override { return "EditorTargetOperation"; }
+	)
 };
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_END

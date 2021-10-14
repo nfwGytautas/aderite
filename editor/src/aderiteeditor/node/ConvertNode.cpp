@@ -9,6 +9,7 @@
 #include "aderiteeditor/windows/backend/node/imnodes.h"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
+#include "aderiteeditor/runtime/OperationArray.hpp"
 
 #include "aderite/rendering/operation/All.hpp"
 
@@ -28,6 +29,38 @@ ConvertNode::ConvertNode(int id, Graph* graph, const std::string& from, const st
 		m_to,
 		"To"
 	));
+}
+
+void ConvertNode::setFromType(const std::string& from) {
+	p_inputs[0]->setType(from);
+
+	if (pipeline::isArray(from) && !pipeline::isArray(m_to)) {
+		// Convert output to array
+		p_outputs[0]->setType(m_to + "[]");
+	}
+	else if (!pipeline::isArray(from) && pipeline::isArray(m_to)) {
+		// Remove array
+		p_outputs[0]->setType(m_to.substr(0, m_to.length() - 2));
+	}
+
+	// TODO: remove m_to and m_from
+	m_to = p_outputs[0]->getType();
+}
+
+void ConvertNode::setToType(const std::string& to) {
+	p_outputs[0]->setType(to);
+
+	if (pipeline::isArray(to) && !pipeline::isArray(m_from)) {
+		// Convert output to array
+		p_inputs[0]->setType(m_from + "[]");
+	}
+	else if (!pipeline::isArray(to) && pipeline::isArray(m_from)) {
+		// Remove array
+		p_inputs[0]->setType(m_from.substr(0, m_from.length() - 2));
+	}
+
+	// TODO: remove m_to and m_from
+	m_from = p_inputs[0]->getType();
 }
 
 const char* ConvertNode::getNodeName() const {
@@ -63,14 +96,26 @@ bool ConvertNode::deserialize(YAML::Node& data) {
 	return true;
 }
 
+bool ConvertNode::onConnectToInput(InputPin* target, OutputPin* source) {
+	if (source->getType() != m_from) {
+		this->setFromType(source->getType());
+	}
+
+	return true;
+}
+
+bool ConvertNode::onConnectToOutput(OutputPin* target, InputPin* source) {
+	if (source->getType() != m_to) {
+		this->setToType(source->getType());
+	}
+
+	return true;
+}
+
 void ConvertNode::handlePipelineConvert(compiler::PipelineEvaluator* pe) {
-	if (m_from == pipeline::getTypeName(pipeline::PropertyType::Camera)) {
-		if (m_to == pipeline::getTypeName(pipeline::PropertyType::Eye)) {
-			rendering::EyeProvideOperation* op = new rendering::EyeProvideOperation();
-			op->provideFromCamera(
-				static_cast<rendering::CameraProvideOperation*>(pe->getOperation(p_inputs[0]->getValue()))
-			);
-			p_outputs[0]->setValue(pe->addOperation(op));
+	if (pipeline::isArrayOrType(m_from, pipeline::getTypeName(pipeline::PropertyType::Camera))) {
+		if (pipeline::isArrayOrType(m_to, pipeline::getTypeName(pipeline::PropertyType::Eye))) {
+			convert(pe, &ConvertNode::eyeToCamera);
 			return;
 		}
 	}
@@ -80,6 +125,38 @@ void ConvertNode::handlePipelineConvert(compiler::PipelineEvaluator* pe) {
 
 void ConvertNode::handleShaderConvert(compiler::ShaderEvaluator* se) {
 
+}
+
+void ConvertNode::convert(compiler::PipelineEvaluator* pe, PipelineConversionFn cfn) {
+	if (pipeline::isArray(m_from)) {
+		// Array convert
+		applyArray(pe, cfn);
+	}
+	else {
+		rendering::OperationBase* from = pe->getOperation(p_inputs[0]->getValue());
+		rendering::OperationBase* to = (this->*cfn)(from);
+		p_outputs[0]->setValue(pe->addOperation(to));
+	}
+}
+
+void ConvertNode::applyArray(compiler::PipelineEvaluator* pe, PipelineConversionFn cfn) {
+	runtime::OperationArray* oparr = static_cast<runtime::OperationArray*>(pe->getOperation(p_inputs[0]->getValue()));
+	runtime::OperationArray* result = new runtime::OperationArray();
+	for (rendering::OperationBase* op : *oparr) {
+		rendering::OperationBase* converted = (this->*cfn)(op);
+		pe->addOperation(converted);
+		result->addOperation(converted);
+	}
+	result->setDebugName("Convert (" + m_from + "->" + m_to + ")");
+	p_outputs[0]->setValue(pe->addOperation(result));
+}
+
+rendering::OperationBase* ConvertNode::eyeToCamera(rendering::OperationBase* from) {
+	rendering::EyeProvideOperation* op = new rendering::EyeProvideOperation();
+	op->provideFromCamera(
+		static_cast<rendering::CameraProvideOperation*>(from)
+	);
+	return op;
 }
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

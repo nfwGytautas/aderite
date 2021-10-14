@@ -8,14 +8,19 @@
 ADERITE_EDITOR_RUNTIME_NAMESPACE_BEGIN
 
 EditorRenderOperation::EditorRenderOperation()
-{}
+{
+	p_debugName = "EditorRenderHook";
+}
 
 EditorRenderOperation::~EditorRenderOperation() {
 
 }
 
 void EditorRenderOperation::initialize() {
-
+	ADERITE_DEBUG_SECTION
+	(
+		bgfx::setViewName(c_ViewId, p_debugName.c_str());
+	)
 }
 
 void EditorRenderOperation::execute() {

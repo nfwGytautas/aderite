@@ -24,6 +24,11 @@ public:
 
 	// Inherited via OperationBase
 	virtual void execute() override;
+
+	ADERITE_DEBUG_SECTION
+	(
+		virtual const char* getOperationName() override { return "EntityProvideOperation"; }
+	)
 public:
 	/**
 	 * @brief Validates entity

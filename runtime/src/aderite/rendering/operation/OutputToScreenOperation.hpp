@@ -15,6 +15,10 @@ public:
 	// Inherited via OperationBase
 	virtual void execute() override;
 
+	ADERITE_DEBUG_SECTION
+	(
+		virtual const char* getOperationName() override { return "OutputToScreenOperation"; }
+	)
 private:
 	TargetProvideOperation* m_target;
 };

@@ -12,3 +12,7 @@ Entities:
     MeshRenderer:
       Mesh: CubeMesh.mesh
       Material: SampleMaterial.material
+    Colliders:
+      - Type: 0
+        IsTrigger: false
+        Size: [1, 1, 1]

@@ -31,6 +31,12 @@
 // Helper define for logging when a unimplemented method is called
 #define ADERITE_UNIMPLEMENTED LOG_WARN("Function {0} in {1}, on line {2} not yet implemented", __func__, __FILE__, __LINE__);
 
+#ifdef _DEBUG
+#define ADERITE_DEBUG_SECTION(code) code
+#else
+#define ADERITE_DEBUG_SECTION(code) 
+#endif
+
 // ---------------------------------
 // NAMESPACES
 // ---------------------------------

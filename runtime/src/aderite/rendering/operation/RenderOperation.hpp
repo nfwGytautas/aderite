@@ -15,7 +15,13 @@ public:
 	RenderOperation(EntityProvideOperation* entities, EyeProvideOperation* eye, TargetProvideOperation* target);
 
 	// Inherited via OperationBase
+	virtual void initialize() override;
 	virtual void execute() override;
+
+	ADERITE_DEBUG_SECTION
+	(
+		virtual const char* getOperationName() override { return "RenderOperation"; }
+	)
 private:
 	/**
 	 * @brief Validates child operations
@@ -29,9 +35,12 @@ private:
 	*/
 	void executeDrawCall(const DrawCall& dc);
 private:
+	// Dependencies
 	EntityProvideOperation* m_entities = nullptr;
 	EyeProvideOperation* m_eye = nullptr;
 	TargetProvideOperation* m_target = nullptr;
+
+	uint8_t m_viewId = 0;
 };
 
 ADERITE_RENDERING_NAMESPACE_END

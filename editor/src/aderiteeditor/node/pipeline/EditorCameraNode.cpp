@@ -29,7 +29,7 @@ void EditorCameraNode::evaluate(compiler::GraphEvaluator* evaluator) {
     evaluateDependencies(evaluator);
     compiler::PipelineEvaluator* pe = static_cast<compiler::PipelineEvaluator*>(evaluator);
     runtime::EditorCameraOperation* op = new runtime::EditorCameraOperation();
-    pe->addOperation(op);
+    p_outputs[0]->setValue(pe->addOperation(op));
     m_evaluated = true;
 }
 

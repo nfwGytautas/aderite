@@ -1,35 +1,23 @@
 #pragma once
 
+#include <string>
 #include "aderiteeditor/node/Node.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
 /**
- * @brief Node that executes a rendering pass
+ * @brief Node for taking multiple require nodes and producing 1 require node
 */
-class RenderNode : public Node
+class RequireLockNode : public Node
 {
 public:
-	RenderNode(int id, Graph* graph);
-
-	/**
-	 * @brief Change the node to array type
-	*/
-	void convertToArray();
-
-	/**
-	 * @brief Change the node to single object type
-	*/
-	void convertToSingle();
+	RequireLockNode(int id, Graph* graph);
 
 	// Inherited via Node
 	virtual const char* getNodeName() const override;
 	virtual void evaluate(compiler::GraphEvaluator* evaluator) override;
 	virtual bool serialize(YAML::Emitter& out) override;
 	virtual bool deserialize(YAML::Node& data) override;
-	virtual bool onConnectToInput(InputPin* target, OutputPin* source) override;
-private:
-	bool m_array = false;
 };
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

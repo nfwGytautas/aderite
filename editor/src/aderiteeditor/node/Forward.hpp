@@ -31,5 +31,8 @@ class CameraProviderNode;
 class EditorRenderNode;
 class EditorTargetNode;
 class EditorCameraNode;
+class RequireLockNode;
+class ConcatObjectsNode;
+class SelectObjectNode;
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

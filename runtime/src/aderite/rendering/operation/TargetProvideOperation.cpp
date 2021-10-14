@@ -81,6 +81,11 @@ void TargetProvideOperation::createFramebuffer() {
 	if (!bgfx::isValid(m_handle)) {
 		LOG_WARN("Failed to create framebuffer");
 	}
+
+	ADERITE_DEBUG_SECTION
+	(
+		bgfx::setName(m_handle, p_debugName.c_str());
+	)
 }
 
 ADERITE_RENDERING_NAMESPACE_END

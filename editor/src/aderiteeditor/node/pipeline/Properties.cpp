@@ -28,4 +28,12 @@ const char* getTypeName(PropertyType type) {
 	}
 }
 
+bool isArray(const std::string& type) {
+	return type[type.length() - 2] == '[' && type[type.length() - 1] == ']';
+}
+
+bool isArrayOrType(const std::string& check, const std::string& type) {
+	return check == type || check == (type + "[]");
+}
+
 ADERITE_EDITOR_PIPELINE_NAMESPACE_END

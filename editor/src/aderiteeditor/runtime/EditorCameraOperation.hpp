@@ -12,6 +12,11 @@ ADERITE_EDITOR_RUNTIME_NAMESPACE_BEGIN
 class EditorCameraOperation : public rendering::CameraProvideOperation {
 public:
 	EditorCameraOperation();
+
+	ADERITE_DEBUG_SECTION
+	(
+		virtual const char* getOperationName() override { return "EditorCameraOperation"; }
+	)
 };
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_END

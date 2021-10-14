@@ -1,26 +1,23 @@
 #pragma once
 
+#include <string>
 #include "aderiteeditor/node/Node.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
 /**
- * @brief Node that executes a rendering pass
+ * @brief Node for taking n amount of single objects and producing an array output
 */
-class RenderNode : public Node
+class ConcatObjectsNode : public Node
 {
 public:
-	RenderNode(int id, Graph* graph);
+	ConcatObjectsNode(int id, Graph* graph, const std::string& type);
 
 	/**
-	 * @brief Change the node to array type
+	 * @brief Changes the type of the concat node
+	 * @param newType New type of the node
 	*/
-	void convertToArray();
-
-	/**
-	 * @brief Change the node to single object type
-	*/
-	void convertToSingle();
+	void setType(const std::string& newType);
 
 	// Inherited via Node
 	virtual const char* getNodeName() const override;
@@ -29,7 +26,7 @@ public:
 	virtual bool deserialize(YAML::Node& data) override;
 	virtual bool onConnectToInput(InputPin* target, OutputPin* source) override;
 private:
-	bool m_array = false;
+	std::string m_currentType;
 };
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

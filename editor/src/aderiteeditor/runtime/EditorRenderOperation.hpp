@@ -21,6 +21,11 @@ public:
 	virtual void initialize() override;
 	virtual void execute() override;
 	virtual void shutdown() override;
+
+	ADERITE_DEBUG_SECTION
+	(
+		virtual const char* getOperationName() override { return "EditorRenderOperation"; }
+	)
 private:
 
 };
