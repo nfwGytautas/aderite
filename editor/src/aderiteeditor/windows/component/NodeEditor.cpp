@@ -155,6 +155,8 @@ void NodeEditor::render() {
                             m_currentState->deleteNode(node);
                         }
                     }
+
+                    ImNodes::ClearNodeSelection();
                 }
             }
 
