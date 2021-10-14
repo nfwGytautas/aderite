@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/property/Property.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
@@ -33,6 +34,14 @@ public:
 	*/
 	static void compileMaterialType(asset::MaterialTypeAsset* type);
 
+	/**
+	 * @brief Compiles a shader source file to the specified destination
+	 * @param sourceDir Source directory to compile this must be the same name as the shader 
+	 * @param destinationDir Destination directory where to store compiled shader (extension .bin)
+	*/
+	static void compileShaderSource(
+		std::filesystem::path sourceDir, 
+		std::filesystem::path destinationDir);
 private:
 	/**
 	 * @brief Generates a varying.def.sc file

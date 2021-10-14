@@ -1,5 +1,6 @@
 #include "Pipeline.hpp"
 
+#include <bgfx/bgfx.h>
 #include "aderite/utility/Log.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
@@ -23,6 +24,7 @@ void Pipeline::initialize() {
 }
 
 void Pipeline::execute() const {
+	bgfx::discard(BGFX_DISCARD_ALL);
 	for (OperationBase* op : m_operations) {
 		op->execute();
 	}

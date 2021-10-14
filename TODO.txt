@@ -16,6 +16,7 @@ Rework pin type to be enum
 Profiling
 Compiler switch to disable some setters in runtime
 Namespace refactoring
+Move objects for editor so that they don't get destroyed on pipeline change
 
 Licensing:
 FMOD splash screen

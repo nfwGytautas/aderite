@@ -47,7 +47,7 @@ void ShaderEvaluator::addFragmentColorInstruction(const EvaluatorValue& value) {
 }
 
 void ShaderEvaluator::writeToFile() {
-	std::filesystem::path outPath = ::aderite::Engine::getAssetManager()->getRawDir() / (getPrefix() + m_name + ".sc");
+	std::filesystem::path outPath = ::aderite::Engine::getAssetManager()->getRawDir() / (m_name + getPrefix());
 	std::stringstream output;
 	std::ofstream outFile(outPath);
 	LOG_TRACE("Outputting to file {0}", outPath.string());
@@ -111,10 +111,10 @@ void ShaderEvaluator::writeScope(std::ofstream& of, Function* scope) {
 const char* ShaderEvaluator::getPrefix() const {
 	switch (m_type) {
 	case ShaderType::FRAGMENT: {
-		return "fs_";
+		return ".fs";
 	}
 	case ShaderType::VERTEX: {
-		return "vs_";
+		return ".vs";
 	}
 	default: {
 		return "";

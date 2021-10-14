@@ -1,0 +1,121 @@
+Version: test
+Type: test
+NextId: 56
+LastNode: 0
+Nodes:
+  - NodeType: Screen
+    InputPins: [1, 2]
+    OutputPins: []
+    Position:
+      X: 752
+      Y: 317
+    ID: 0
+  - NodeType: Convert
+    From: Camera[]
+    To: Eye[]
+    InputPins: [7]
+    OutputPins: [8]
+    Position:
+      X: 96
+      Y: 120
+    ID: 6
+  - NodeType: Entities
+    InputPins: []
+    OutputPins: [11]
+    Position:
+      X: 55.5571518
+      Y: 41.9728241
+    ID: 10
+  - NodeType: Render
+    IsArray: true
+    InputPins: [13, 14, 15, 16]
+    OutputPins: [17]
+    Position:
+      X: 274
+      Y: 117
+    ID: 12
+  - NodeType: EditorCamera
+    InputPins: []
+    OutputPins: [24]
+    Position:
+      X: -274
+      Y: 72
+    ID: 23
+  - NodeType: EditorTarget
+    InputPins: []
+    OutputPins: [27]
+    Position:
+      X: -148
+      Y: 257
+    ID: 26
+  - NodeType: Target
+    InputPins: []
+    OutputPins: [30]
+    Position:
+      X: -161
+      Y: 322
+    ID: 29
+  - NodeType: Camera
+    InputPins: []
+    OutputPins: [32]
+    Position:
+      X: -286
+      Y: 143
+    ID: 31
+  - NodeType: EditorRender
+    InputPins: [35]
+    OutputPins: [36]
+    Position:
+      X: 441
+      Y: 127
+    ID: 34
+  - NodeType: ConcatObjects
+    PinType: Target
+    InputPins: [39, 40]
+    OutputPins: [41]
+    Position:
+      X: 37
+      Y: 231
+    ID: 38
+  - NodeType: ConcatObjects
+    PinType: Camera
+    InputPins: [44, 45]
+    OutputPins: [46]
+    Position:
+      X: -98
+      Y: 102
+    ID: 43
+  - NodeType: RequireLock
+    InputPins: [49, 50]
+    OutputPins: [51]
+    Position:
+      X: 586
+      Y: 219
+    ID: 48
+Links:
+  - Out: 17
+    In: 50
+  - Out: 30
+    In: 40
+  - Out: 11
+    In: 13
+  - Out: 46
+    In: 7
+  - Out: 17
+    In: 35
+  - Out: 24
+    In: 44
+  - Out: 27
+    In: 39
+  - Out: 30
+    In: 1
+  - Out: 32
+    In: 45
+  - Out: 36
+    In: 49
+  - Out: 51
+    In: 2
+  - Out: 8
+    In: 14
+  - Out: 41
+    In: 15

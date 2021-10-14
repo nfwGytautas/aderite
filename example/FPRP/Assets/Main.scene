@@ -14,5 +14,5 @@ Entities:
       Material: SampleMaterial.material
     Colliders:
       - Type: 0
-        IsTrigger: false
+        IsTrigger: true
         Size: [1, 1, 1]

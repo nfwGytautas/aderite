@@ -7,6 +7,8 @@ dependencies/imgui/build/
 *.vcxproj.filters
 *.sln
 
+*.hint
+
 
 # CMake ignore
 

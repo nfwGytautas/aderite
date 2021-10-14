@@ -29,17 +29,7 @@ void Compiler::compileGraph(node::Graph* graph) {
 	fragmentWriter.writeToFile();
 
 	std::string typeName = "ImageMaterialType_mtype";
-
-	std::stringstream fcommand;
-	fcommand << "tools\\shadercRelease.exe -f ";
-	fcommand << (::aderite::Engine::getAssetManager()->getRawDir() / ("fs_" + typeName + ".sc")).string();
-	fcommand << " -o " << (::aderite::Engine::getAssetManager()->getRawDir() / ("fs_" + typeName + ".bin")).string();
-	fcommand << " --platform windows --type fragment --verbose --profile ps_5_0 --varyingdef ";
-	fcommand << (::aderite::Engine::getAssetManager()->getRawDir() / ("varying.def.sc")).string();
-
-	// Compile
-	LOG_TRACE("Running {0}", fcommand.str());
-	system(fcommand.str().c_str());
+	compileShaderSource((::aderite::Engine::getAssetManager()->getRawDir() / (typeName + ".fs")), ::aderite::Engine::getAssetManager()->getRawDir());
 }
 
 void Compiler::compilePipeline(node::Graph* graph) {
@@ -85,6 +75,44 @@ void Compiler::compileMaterialType(asset::MaterialTypeAsset* type) {
 	type->unload();
 	type->prepareLoad();
 	type->load();
+}
+
+void Compiler::compileShaderSource(std::filesystem::path sourceDir, std::filesystem::path destinationDir) {
+	// TODO: Replace with lib call
+	std::string shaderName = sourceDir.parent_path().filename().string();
+
+	if (!std::filesystem::exists(destinationDir)) {
+		std::filesystem::create_directory(destinationDir);
+	}
+
+	LOG_TRACE("Compiling {0}", shaderName);
+
+	std::string includePath = (sourceDir.parent_path().parent_path() / "include/").string();
+
+	// Create commands
+	std::stringstream fCommand;
+	fCommand << "tools\\shadercRelease.exe -f ";
+	fCommand << (sourceDir / (shaderName  + ".fs")).string();
+	fCommand << " -o " << destinationDir.string() + (shaderName + ".fs.bin");
+	fCommand << " --platform windows --verbose ";
+	fCommand << " --varyingdef " << (sourceDir / (shaderName + "_varying.def.sc")).string();
+	fCommand << " --type fragment --profile ps_5_0 -i ";
+	fCommand << includePath;
+
+	std::stringstream vCommand;
+	vCommand << "tools\\shadercRelease.exe -f ";
+	vCommand << (sourceDir / (shaderName + ".vs")).string();
+	vCommand << " -o " << destinationDir.string() + (shaderName + ".vs.bin");
+	vCommand << " --platform windows --verbose ";
+	vCommand << " --varyingdef " << (sourceDir / (shaderName + "_varying.def.sc")).string();
+	vCommand << " --type vertex --profile vs_5_0 -i ";
+	vCommand << includePath;
+
+	// Compile
+	LOG_TRACE("Running {0}", vCommand.str());
+	system(vCommand.str().c_str());
+	LOG_TRACE("Running {0}", fCommand.str());
+	system(fCommand.str().c_str());
 }
 
 void Compiler::generateVarying(asset::MaterialTypeAsset* type) {
