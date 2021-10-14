@@ -15,7 +15,6 @@
 #include "aderite/utility/Macros.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/rendering/Pipeline.hpp"
-#include "aderite/rendering/operation/DebugOperation.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/asset/AssetManager.hpp"
@@ -376,10 +375,7 @@ void WindowsEditor::onSystemUpdate(float delta) {
 }
 
 void WindowsEditor::onPipelineChanged(rendering::Pipeline* pipeline) {	
-	// Init debug render output
-	rendering::DebugOperation* dop = pipeline->getDebugOperation();
-	dop->getCameraProvider()->setCamera(shared::State::EditorCamera);
-	shared::State::DebugRenderHandle = dop->getTargetProvider()->getHandle();
+	
 }
 
 void WindowsEditor::onNewScene(const std::string& name) {

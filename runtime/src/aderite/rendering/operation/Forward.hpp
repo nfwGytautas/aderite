@@ -17,7 +17,6 @@ class FreeCameraProvideOperation;
 class EyeProvideOperation;
 class TargetProvideOperation;
 class RenderOperation;
-class DebugOperation;
 class OutputToScreenOperation;
 
 ADERITE_RENDERING_NAMESPACE_END

@@ -15,16 +15,21 @@ class OutputPin;
 class Link;
 
 // Node types
+
+// Material
 class MaterialInputNode;
 class MaterialOutputNode;
 class AddNode;
 class Sampler2DNode;
 
+// Rendering pipeline
 class ScreenNode;
-class EditorHookNode;
 class EntitiesNode;
 class RenderNode;
 class TargetProviderNode;
 class CameraProviderNode;
+class EditorRenderNode;
+class EditorTargetNode;
+class EditorCameraNode;
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

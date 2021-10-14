@@ -22,7 +22,9 @@
 #include "aderiteeditor/node/pipeline/ScreenNode.hpp"
 #include "aderiteeditor/node/pipeline/RenderNode.hpp"
 #include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
-#include "aderiteeditor/node/pipeline/EditorHookNode.hpp"
+#include "aderiteeditor/node/pipeline/EditorRenderNode.hpp"
+#include "aderiteeditor/node/pipeline/EditorTargetNode.hpp"
+#include "aderiteeditor/node/pipeline/EditorCameraNode.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -222,8 +224,19 @@ bool Graph::deserialize(YAML::Node& data) {
 		else if (type == "Camera") {
 			n = addNode<node::CameraProviderNode>();
 		}
-		else if (type == "EditorHook") {
-			n = addNode<node::EditorHookNode>();
+		else if (type == "EditorRender") {
+			n = addNode<node::EditorRenderNode>();
+		}
+		else if (type == "EditorTarget") {
+			n = addNode<node::EditorTargetNode>();
+		}
+		else if (type == "EditorCamera") {
+			n = addNode<node::EditorCameraNode>();
+		}
+
+		if (n == nullptr) {
+			LOG_WARN("Unknown node {0}", type);
+			continue;
 		}
 
 		n->deserialize(node);

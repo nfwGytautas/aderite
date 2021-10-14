@@ -39,12 +39,6 @@ public:
 	 * @brief Shutdown the pipeline and all of it's operations, freeing resources
 	*/
 	void shutdown();
-
-	/**
-	 * @brief Helper method for getting the debug operation in the pipeline, 
-	 * returns nullptr if the pipeline doesn't have a debug operation
-	*/
-	rendering::DebugOperation* getDebugOperation();
 private:
 	std::vector<OperationBase*> m_operations;
 };

@@ -6,7 +6,6 @@
 
 #include "aderite/rendering/operation/OperationBase.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
-#include "aderite/rendering/operation/DebugOperation.hpp"
 #include "aderite/rendering/operation/EyeProvideOperation.hpp"
 #include "aderite/rendering/operation/EntityProvideOperation.hpp"
 #include "aderite/rendering/operation/OutputToScreenOperation.hpp"

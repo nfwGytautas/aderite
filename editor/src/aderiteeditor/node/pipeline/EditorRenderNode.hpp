@@ -7,10 +7,10 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 /**
  * @brief Node used to set at which point will the engine will render colliders, gizmos, etc.
 */
-class EditorHookNode : public Node
+class EditorRenderNode : public Node
 {
 public:
-	EditorHookNode(int id, Graph* graph);
+	EditorRenderNode(int id, Graph* graph);
 
 	// Inherited via Node
 	virtual const char* getNodeName() const override;

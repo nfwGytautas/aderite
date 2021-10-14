@@ -26,6 +26,12 @@ void SceneView::render() {
 		return;
 	}
 
+	if (!bgfx::isValid(shared::State::DebugRenderHandle)) {
+		ImGui::End();
+		ImGui::PopStyleVar();
+		return;
+	}
+
 	m_fbth = bgfx::getTexture(shared::State::DebugRenderHandle, 0);
 	if (!bgfx::isValid(m_fbth)) {
 		ImGui::End();

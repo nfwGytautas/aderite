@@ -1,7 +1,5 @@
 #include "Pipeline.hpp"
 
-#include "aderite/rendering/operation/DebugOperation.hpp"
-
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
 Pipeline::~Pipeline() {
@@ -32,17 +30,6 @@ void Pipeline::shutdown() {
 	for (OperationBase* op : m_operations) {
 		op->shutdown();
 	}
-}
-
-rendering::DebugOperation* Pipeline::getDebugOperation() {
-	for (OperationBase* ob : m_operations) {
-		DebugOperation* dop = dynamic_cast<DebugOperation*>(ob);
-		if (dop != nullptr) {
-			return dop;
-		}
-	}
-
-	return nullptr;
 }
 
 ADERITE_RENDERING_NAMESPACE_END

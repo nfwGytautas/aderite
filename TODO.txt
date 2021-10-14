@@ -69,6 +69,7 @@ Broad-Phase callbacks
 Collision layers
 
 Editor:
+Component architecture rethink
 Node editor middle mouse also moves scene view
 Copy bgfx shader includes to Raw/
 Internal system UI windows (loaded assets, asset manager, etc.)
@@ -93,6 +94,7 @@ Free scene on new project create
 Rename dynamic text API
 
 Code:
+Remove virtual from places that don't need it
 Add consts where no modifications are done
 Add final to classes
 Add inline

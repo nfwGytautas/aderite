@@ -24,31 +24,12 @@ bgfx::TextureFormat::Enum findDepthFormat(uint64_t textureFlags, bool stencil = 
 	return depthFormat;
 }
 
-bgfx::FrameBufferHandle createFrameBuffer(bool hdr, bool depth) {
-	bgfx::TextureHandle textures[2];
-	uint8_t attachments = 0;
+TargetProvideOperation::TargetProvideOperation(const TargetParams& params) 
+	: m_params(params)
+{}
 
-	const uint64_t samplerFlags = BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT |
-		BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
+TargetProvideOperation::~TargetProvideOperation() {
 
-	// BGRA is often faster (internal GPU format)
-	bgfx::TextureFormat::Enum format = hdr ? bgfx::TextureFormat::RGBA16F : bgfx::TextureFormat::BGRA8;
-	assert(bgfx::isTextureValid(0, false, 1, format, BGFX_TEXTURE_RT | samplerFlags));
-	textures[attachments++] = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, format, BGFX_TEXTURE_RT | samplerFlags);
-
-	if (depth) {
-		bgfx::TextureFormat::Enum depthFormat = findDepthFormat(BGFX_TEXTURE_RT_WRITE_ONLY | samplerFlags);
-		assert(depthFormat != bgfx::TextureFormat::Enum::Count);
-		textures[attachments++] = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, depthFormat, BGFX_TEXTURE_RT_WRITE_ONLY | samplerFlags);
-	}
-
-	bgfx::FrameBufferHandle fb = bgfx::createFrameBuffer(attachments, textures, true);
-
-	if (!bgfx::isValid(fb)) {
-		LOG_WARN("Failed to create framebuffer");
-	}
-
-	return fb;
 }
 
 bgfx::FrameBufferHandle TargetProvideOperation::getHandle() const {
@@ -56,11 +37,50 @@ bgfx::FrameBufferHandle TargetProvideOperation::getHandle() const {
 }
 
 void TargetProvideOperation::initialize() {
-	m_handle = createFrameBuffer(false, true);
+	createFramebuffer();
 }
 
 void TargetProvideOperation::shutdown() {
 	bgfx::destroy(m_handle);
+}
+
+void TargetProvideOperation::createFramebuffer() {
+	bgfx::TextureHandle textures[2];
+	uint8_t attachments = 0;
+
+	const uint64_t textureFlags =
+		(m_params.Blittable ? BGFX_TEXTURE_BLIT_DST : 0) |
+		0;
+
+	const uint64_t samplerFlags = 
+		BGFX_SAMPLER_MIN_POINT | 
+		BGFX_SAMPLER_MAG_POINT | 
+		BGFX_SAMPLER_MIP_POINT |
+		BGFX_SAMPLER_U_CLAMP | 
+		BGFX_SAMPLER_V_CLAMP |
+		0;
+
+	// BGRA is often faster (internal GPU format)
+	bgfx::TextureFormat::Enum format = m_params.HDR ? bgfx::TextureFormat::RGBA16F : bgfx::TextureFormat::BGRA8;
+	assert(bgfx::isTextureValid(0, false, 1, format, BGFX_TEXTURE_RT | samplerFlags));
+	textures[attachments++] = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, format, BGFX_TEXTURE_RT | samplerFlags | textureFlags);
+
+	if (m_params.DepthAttachment) {
+		bgfx::TextureFormat::Enum depthFormat = findDepthFormat(BGFX_TEXTURE_RT_WRITE_ONLY | samplerFlags, m_params.StencilAttachment);
+		assert(depthFormat != bgfx::TextureFormat::Enum::Count);
+		textures[attachments++] = bgfx::createTexture2D(
+			bgfx::BackbufferRatio::Equal, 
+			false, 
+			1, 
+			depthFormat, 
+			BGFX_TEXTURE_RT_WRITE_ONLY | samplerFlags | textureFlags);
+	}
+
+	m_handle = bgfx::createFrameBuffer(attachments, textures, true);
+
+	if (!bgfx::isValid(m_handle)) {
+		LOG_WARN("Failed to create framebuffer");
+	}
 }
 
 ADERITE_RENDERING_NAMESPACE_END

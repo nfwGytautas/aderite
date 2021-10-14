@@ -23,7 +23,9 @@
 #include "aderiteeditor/node/pipeline/CameraProviderNode.hpp"
 #include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
 #include "aderiteeditor/node/pipeline/RenderNode.hpp"
-#include "aderiteeditor/node/pipeline/EditorHookNode.hpp"
+#include "aderiteeditor/node/pipeline/EditorRenderNode.hpp"
+#include "aderiteeditor/node/pipeline/EditorTargetNode.hpp"
+#include "aderiteeditor/node/pipeline/EditorCameraNode.hpp"
 
 #include <fstream>
 #include "aderite/Aderite.hpp"
@@ -225,11 +227,24 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
 
     if (ImGui::BeginMenu("Editor"))
     {
-        if (ImGui::MenuItem("Hook"))
+        if (ImGui::MenuItem("Render"))
         {
-            node::Node* n = m_currentState->addNode<node::EditorHookNode>();
+            node::Node* n = m_currentState->addNode<node::EditorRenderNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
+
+        if (ImGui::MenuItem("Camera"))
+        {
+            node::Node* n = m_currentState->addNode<node::EditorCameraNode>();
+            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+        }
+
+        if (ImGui::MenuItem("Target"))
+        {
+            node::Node* n = m_currentState->addNode<node::EditorTargetNode>();
+            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+        }
+
 
         ImGui::EndMenu();
     }
