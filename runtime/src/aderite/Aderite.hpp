@@ -15,7 +15,7 @@
 
 #define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static class_name* public_name() { return ::aderite::Engine::get()->field_name; } private: class_name* field_name = nullptr;
 
-ADERITE_ROOT_NAMESPACE_BEGIN
+namespace aderite {
 
 /**
  * @brief Main aderite engine instance
@@ -123,6 +123,7 @@ private:
 	Engine() {}
 	Engine(const Engine& o) = delete;
 
+	// Update functions
 	void updateSystem(float delta);
 	void updateScenes(float delta);
 	void updatePhysics(float delta);
@@ -147,4 +148,4 @@ private:
 #endif
 };
 
-ADERITE_ROOT_NAMESPACE_END
+}

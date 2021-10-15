@@ -8,7 +8,6 @@
 #include "aderite/scene/Scene.hpp"
 #include "aderite/asset/Asset.hpp"
 #include "aderite/asset/AssetManager.hpp"
-#include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
@@ -83,10 +82,6 @@ void AssetEditor::render() {
 
 	// Type switch
 	switch (m_selectedAsset->type()) {
-	case asset::AssetType::SHADER: {
-		shaderRender();
-		break;
-	}
 	case asset::AssetType::MATERIAL: {
 		materialRender();
 		break;
@@ -116,91 +111,6 @@ void AssetEditor::render() {
 
 void AssetEditor::setActiveAsset(asset::Asset* asset) {
 	m_selectedAsset = asset;
-}
-
-void AssetEditor::shaderRender() {
-	asset::ShaderAsset* shader = static_cast<asset::ShaderAsset*>(m_selectedAsset);
-	asset::ShaderAsset::fields& finfo = shader->getFieldsMutable();
-
-	if (ImGui::BeginTable("ShaderEditTable", 3)) {
-		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
-		ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
-		ImGui::TableSetupColumn("Add", ImGuiTableColumnFlags_WidthFixed, 20.0f);
-
-		ImGui::TableNextRow();
-
-		ImGui::TableSetColumnIndex(0);
-		ImGui::Text("Vertex program");
-
-		ImGui::TableSetColumnIndex(1);
-		ImGui::PushItemWidth(-FLT_MIN);
-
-		if (!finfo.VertexPath.empty()) {
-			ImGui::Button(finfo.VertexPath.c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-		}
-		else {
-			ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-		}
-
-		if (ImGui::BeginDragDropTarget()) {
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__RawData)) {
-
-			}
-
-			ImGui::EndDragDropTarget();
-		}
-
-		ImGui::TableSetColumnIndex(2);
-		if (ImGui::Button("+###VertexSelect")) {
-			std::string file = FileDialog::selectFile("Select vertex shader program source file");
-
-			if (!file.empty()) {
-				// Copy file to Raw
-				std::filesystem::path filename = std::filesystem::path(file).filename();
-				std::filesystem::path raw_dst = utility::makeUniquePath(::aderite::Engine::getAssetManager()->getRawDir() / filename);
-				std::filesystem::copy_file(file, raw_dst);
-				finfo.VertexPath = raw_dst.filename().string();
-			}
-		}
-
-		ImGui::TableNextRow();
-		ImGui::TableSetColumnIndex(0);
-		ImGui::Text("Fragment program");
-
-		ImGui::TableSetColumnIndex(1);
-		ImGui::PushItemWidth(-FLT_MIN);
-
-		if (!finfo.FragmentPath.empty()) {
-			ImGui::Button(finfo.FragmentPath.c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-		}
-		else {
-			ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-		}
-
-		if (ImGui::BeginDragDropTarget()) {
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__RawData)) {
-
-			}
-
-			ImGui::EndDragDropTarget();
-		}
-
-		ImGui::TableSetColumnIndex(2);
-		if (ImGui::Button("+###FragmentSelect")) {
-			std::string file = FileDialog::selectFile("Select fragment shader program source file");
-
-			if (!file.empty()) {
-				std::filesystem::path filename = std::filesystem::path(file).filename();
-				std::filesystem::path raw_dst = utility::makeUniquePath(::aderite::Engine::getAssetManager()->getRawDir() / filename);
-				std::filesystem::copy_file(file, raw_dst);
-				finfo.FragmentPath = raw_dst.filename().string();
-			}
-		}
-
-		// TODO: Try compile button
-
-		ImGui::EndTable();
-	}
 }
 
 void AssetEditor::materialRender() {

@@ -1,10 +1,12 @@
 #include "Serializer.hpp"
 
+#include <fstream>
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/PathResolver.hpp"
 #include "aderite/io/Instancer.hpp"
+#include "aderite/io/RuntimeSerializables.hpp"
 
 namespace aderite {
 namespace io {
@@ -14,8 +16,10 @@ bool Serializer::init() {
 
 	// Runtime instancers
 	LOG_TRACE("Setting runtime instancers");
-	this->registerRuntimeTypes();
+	
 
+	// Check that no runtime serializables have been forgotten
+	ADERITE_DYNAMIC_ASSERT(m_instancers.size() == static_cast<size_t>(RuntimeSerializables::END), "Not all runtime serializables are linked");
 	return true;
 }
 
@@ -49,8 +53,9 @@ void Serializer::linkInstancer(SerializableType type, InstancerBase* instancer) 
 }
 
 SerializableObject* Serializer::parseType(const YAML::Node& data) {
-	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
-	ADERITE_DYNAMIC_ASSERT(data["Handle"], "No handle specified in data scope");
+	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in scope");
+	ADERITE_DYNAMIC_ASSERT(data["Handle"], "No handle specified in scope");
+	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
 
 	// Get resolver for type
 	SerializableType type = data["Type"].as<SerializableType>();
@@ -66,7 +71,28 @@ SerializableObject* Serializer::parseType(const YAML::Node& data) {
 	ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
 
 	// Deserialize
-	instance->deserialize(this, data);
+	instance->deserialize(this, data["Data"]);
+
+	return instance;
+}
+
+SerializableObject* Serializer::parseUntrackedType(const YAML::Node& data) {
+	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
+	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
+
+	// Get resolver for type
+	SerializableType type = data["Type"].as<SerializableType>();
+
+	// Get instancer
+	InstancerBase* instancer = resolveInstancer(type);
+
+	// Create object
+	SerializableObject* instance = instancer->create();
+
+	ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
+
+	// Deserialize
+	instance->deserialize(this, data["Data"]);
 
 	return instance;
 }
@@ -118,8 +144,34 @@ SerializableObject* Serializer::getOrRead(SerializableHandle handle) {
 	return type;
 }
 
-void Serializer::save(SerializableObject* object, std::filesystem::path file) {
+void Serializer::save(SerializableObject* object) {
+	ADERITE_DYNAMIC_ASSERT(m_resolver != nullptr, "No path resolver set");
 
+	YAML::Emitter out;
+
+	ADERITE_DYNAMIC_ASSERT(object->getHandle() != c_InvalidHandle, "SerializableObject with invalid handle passed");
+
+	out << YAML::BeginMap;
+
+	// Common
+	out << YAML::Key << "Version" << YAML::Value << c_CurrentVersion;
+	out << YAML::Key << "Type" << YAML::Value << object->getType();
+	out << YAML::Key << "Handle" << YAML::Value << object->getHandle();
+	out << YAML::Key << "Data" << YAML::BeginMap;
+
+	if (!object->serialize(this, out)) {
+		LOG_ERROR("Failed to serialize object handle: {0}, name: {1}", object->getHandle(), object->getName());
+		return;
+	}
+
+	out << YAML::EndMap;
+	out << YAML::EndMap;
+
+	// Resolve where to store this object
+	Path path = this->resolvePath(object->getHandle());
+
+	std::ofstream fout(path.File);
+	fout << out.c_str();
 }
 
 ADERITE_DEBUG_SECTION(
@@ -132,10 +184,10 @@ ADERITE_DEBUG_SECTION(
 			if (i.second != nullptr) {
 				SerializableObject* temp = nullptr;
 				temp = i.second->create();
-				LOG_TRACE("Type: {0:03d} Instancer: {:p} Created type: {2}", i.first, i.second, temp->getType());
+				LOG_TRACE("Type: {0:03d} Instancer: {:p} Created type: {2}", i.first, static_cast<void*>(i.second), temp->getType());
 			}
 			else {
-				LOG_TRACE("Type: {0:03d} Instancer: {:p} Created type: UNKNOWN", i.first, i.second);
+				LOG_TRACE("Type: {0:03d} Instancer: {:p} Created type: UNKNOWN", i.first, static_cast<void*>(i.second));
 			}
 		}
 	}
@@ -147,10 +199,6 @@ ADERITE_MIDDLEWARE_SECTION(
 		m_nextAvailableHandle = handle;
 	}
 )
-
-void Serializer::registerRuntimeTypes() {
-
-}
 
 InstancerBase* Serializer::resolveInstancer(SerializableType type) {
 	auto it = m_instancers.find(type);

@@ -62,6 +62,7 @@ Rethink serialization
 
 Components:
 Meta enabled field
+Handle to ColliderList, audio list etc., managers take care of these lists
 
 Physics:
 Multithreading

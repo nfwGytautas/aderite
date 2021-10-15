@@ -5,7 +5,7 @@
  * all META data io operations.
  * 
  * The serializer works in a pretty simple way and utilizes a mini reflection system.
- * Every serializable file (for this instance yaml files are used, but for most production products)
+ * Every serializable file (for this example instance yaml files are used, but for most compiled projects)
  * a binary format will be used.
  * 
  * The file starts with a version definition, then the Type and Name specifier
@@ -52,7 +52,7 @@ namespace io {
 /**
  * @brief Serializer class that is responsible for serializing and deserializing asset meta objects
 */
-class Serializer {
+class Serializer final {
 	using SerializableMapKey = SerializableHandle;
 	using SerializableMapVal = SerializableObject*;
 	using SerializableMap = std::map<SerializableMapKey, SerializableMapVal>;
@@ -76,7 +76,7 @@ public:
 
 	/**
 	 * @brief Links a type to an instancer, if a type already has a linked instancer, then
-	 * the instancer is overridden and a INFO message is logged
+	 * the instancer is overridden and a DEBUG message is logged
 	 * @param type Type to link
 	 * @param instancer Instancer instance to use (takes ownership)
 	*/
@@ -85,9 +85,20 @@ public:
 	/**
 	 * @brief Parses the type inside the current data scope and returns it
 	 * @param data Data node, must have Type and Handle keys
-	 * @return SerializableObject instance or nullptr
+	 * @return SerializableObject instance
 	*/
 	SerializableObject* parseType(const YAML::Node& data);
+
+	/**
+	 * @brief Parses the type inside the current data scope, but DOES NOT track the object, meaning
+	 * the user is responsible for calling delete on it and this object cannot be received through the 
+	 * serializer. This is mainly used when having nested objects who are managed by their parents, example
+	 * editor graphs. This method allows the user to interact with the mini reflection system that serializer
+	 * uses internally.
+	 * @param data Data node, must have Type key
+	 * @return SerializableObject instance
+	*/
+	SerializableObject* parseUntrackedType(const YAML::Node& data);
 
 	/**
 	 * @brief Returns object associated with the serializable handle
@@ -120,9 +131,8 @@ public:
 	/**
 	 * @brief Serializes object into a file
 	 * @param object Object to serialize
-	 * @param file File where to store result
 	*/
-	void save(SerializableObject* object, std::filesystem::path file);
+	void save(SerializableObject* object);
 
 	auto begin() {
 		return m_serializables.begin();
@@ -157,11 +167,6 @@ private:
 	Serializer() {}
 	friend class Engine;
 private:
-	/**
-	 * @brief Register all runtime serializables and their instancers
-	*/
-	void registerRuntimeTypes();
-
 	/**
 	 * @brief Resolves an instancer for a type, asserts if a type doesn't have a type
 	 * @param type Type to get instancer for

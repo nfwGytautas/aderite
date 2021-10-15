@@ -9,7 +9,6 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MeshAsset.hpp"
-#include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/audio/Bank.hpp"
 #include "aderite/audio/AudioEvent.hpp"
@@ -88,11 +87,6 @@ void Menubar::render() {
 						switch (asset->type()) {
 						case asset::AssetType::MESH: {
 							used.push_back(::aderite::Engine::getAssetManager()->getRawDir() / static_cast<asset::MeshAsset*>(asset)->getFields().SourceFile);
-							break;
-						}
-						case asset::AssetType::SHADER: {
-							used.push_back(::aderite::Engine::getAssetManager()->getRawDir() / static_cast<asset::ShaderAsset*>(asset)->getFields().VertexPath);
-							used.push_back(::aderite::Engine::getAssetManager()->getRawDir() / static_cast<asset::ShaderAsset*>(asset)->getFields().FragmentPath);
 							break;
 						}
 						case asset::AssetType::SCENE:

@@ -5,15 +5,13 @@
  * serialization related objects
 */
 
-#include <limits>
-
 namespace aderite {
 namespace io {
 
 // Typedefs
 using SerializableHandle = size_t;
 using SerializableType = size_t;
-constexpr size_t c_InvalidHandle = std::numeric_limits<size_t>::max();
+constexpr size_t c_InvalidHandle = 0xffffffffffffffffui64; // std::numeric_limits<size_t>::max() or ULLONG_MAX
 
 // Classes
 class Serializer;

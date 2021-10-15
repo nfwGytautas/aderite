@@ -20,7 +20,7 @@
 #define MIDDLEWARE_ACTION(action, ...) 
 #endif
 
-ADERITE_ROOT_NAMESPACE_BEGIN
+namespace aderite {
 
 Engine* Engine::get() {
 	static Engine* instance = new Engine();
@@ -249,4 +249,4 @@ void Engine::updateScripts(float delta) {
 	MIDDLEWARE_ACTION(onScriptUpdate, delta);
 }
 
-ADERITE_ROOT_NAMESPACE_END
+}
