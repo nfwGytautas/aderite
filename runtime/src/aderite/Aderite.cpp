@@ -7,6 +7,7 @@
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/input/InputManager.hpp"
+#include "aderite/io/Serializer.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/Scene.hpp"
@@ -36,6 +37,13 @@ bool Engine::init(InitOptions options) {
 	// Asset manager
 	m_assetManager = new asset::AssetManager();
 	if (!m_assetManager->init()) {
+		LOG_ERROR("Aborting aderite initialization");
+		return false;
+	}
+
+	// Serializer
+	m_serializer = new io::Serializer();
+	if (!m_serializer->init()) {
 		LOG_ERROR("Aborting aderite initialization");
 		return false;
 	}
@@ -99,6 +107,7 @@ void Engine::shutdown() {
 
 	m_sceneManager->shutdown();
 	m_assetManager->shutdown();
+	m_serializer->shutdown();
 	m_physicsController->shutdown();
 	m_audioController->shutdown();
 	m_renderer->shutdown();
@@ -112,6 +121,8 @@ void Engine::shutdown() {
 	delete m_renderer;
 	delete m_windowManager;
 	delete m_inputManager;
+	delete m_serializer;
+
 	delete m_middleware;
 }
 

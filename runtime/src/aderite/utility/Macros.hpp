@@ -4,6 +4,8 @@
  * @brief This file contains all macros defined by the aderite engine
  */
 
+#include "aderite/Config.hpp"
+
  // ---------------------------------
  // PLATFORM
  // ---------------------------------
@@ -32,9 +34,19 @@
 #define ADERITE_UNIMPLEMENTED LOG_WARN("Function {0} in {1}, on line {2} not yet implemented", __func__, __FILE__, __LINE__);
 
 #ifdef _DEBUG
+#include <cassert>
 #define ADERITE_DEBUG_SECTION(code) code
+#define ADERITE_STATIC_ASSERT(check, message) static_assert(check, message)
+#define ADERITE_DYNAMIC_ASSERT(check, message) assert(((void)message, check))
 #else
 #define ADERITE_DEBUG_SECTION(code) 
+#define ADERITE_STATIC_ASSERT(check, message) 
+#endif
+
+#if MIDDLEWARE_ENABLED == 1
+#define ADERITE_MIDDLEWARE_SECTION(code) code
+#else
+#define ADERITE_MIDDLEWARE_SECTION(code)
 #endif
 
 // ---------------------------------

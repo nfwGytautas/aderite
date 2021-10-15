@@ -9,7 +9,6 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 #include "aderite/scene/Scene.hpp"
-#include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
@@ -31,9 +30,6 @@ std::string getAssetExtension(Asset* asset) {
 	}
 	case AssetType::SCENE: {
 		return ".scene";
-	}
-	case AssetType::SHADER: {
-		return ".shader";
 	}
 	case AssetType::MESH: {
 		return ".mesh";
@@ -290,9 +286,6 @@ Asset* AssetManager::createAssetFromType(AssetType type, const std::string& name
 	switch (type) {
 	case AssetType::SCENE: {
 		return new scene::Scene(name);
-	}
-	case AssetType::SHADER: {
-		return new asset::ShaderAsset(name);
 	}
 	case AssetType::MATERIAL: {
 		return new asset::MaterialAsset(name);

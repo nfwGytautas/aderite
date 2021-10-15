@@ -23,9 +23,11 @@ FMOD splash screen
 PhysX splash screen
 bgfx splash screen
 
+Serialization:
+Rework ISerializable to register handlers and types
+
 Asset manager:
 In drastic need of reworking
-Rework ISerializable to register handlers and types
 Load caching
 Thread pool asset loading
 IWorkerThread
@@ -39,6 +41,7 @@ Clear graph on new select
 Constraints for number of nodes and deletion
 
 FPRP:
+Operation resize events
 Base vertex shader compiling
 Varying generation
 Compiling shaders from C++ code
@@ -48,13 +51,13 @@ Pipeline verification
 
 Rendering:
 Rethink camera architecture
-Object arrays for some operations
 Views
 View names
 BGFX multithread encoder
 Optimize camera view and projection setting
 
 Audio:
+Rethink serialization
 3D audio
 
 Components:
@@ -95,6 +98,8 @@ Free scene on new project create
 Rename dynamic text API
 
 Code:
+this for self invokes
+Middleware sections
 Remove virtual from places that don't need it
 Add consts where no modifications are done
 Add final to classes

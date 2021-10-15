@@ -329,13 +329,6 @@ void Scene::removeAsset(asset::Asset* asset) {
 }
 
 bool Scene::serialize(YAML::Emitter& out) {
-	// Properties
-	if (m_skybox != nullptr) {
-		out << YAML::Key << "Skybox" << YAML::Value << m_skybox->getName();
-	}
-
-	out << YAML::Key << "SkyColor" << YAML::Value << m_skyColor;
-
 	// Entities
 	out << YAML::Key << "Entities" << YAML::BeginSeq;
 
@@ -356,19 +349,6 @@ bool Scene::serialize(YAML::Emitter& out) {
 }
 
 bool Scene::deserialize(YAML::Node& data) {
-	// Properties
-	if (data["Skybox"]) {
-		const std::string name = data["Skybox"].as<std::string>();
-		asset::Asset* pAsset = ::aderite::Engine::getAssetManager()->getOrRead(name);
-
-		if (pAsset) {
-			this->useAsset(pAsset);
-			m_skybox = static_cast<asset::TextureAsset*>(pAsset);
-		}
-	}
-
-	m_skyColor = data["SkyColor"].as<glm::vec3>();
-
 	// Entities
 	m_assets.clear();
 	auto entities = data["Entities"];

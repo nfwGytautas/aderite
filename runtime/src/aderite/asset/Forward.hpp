@@ -14,7 +14,6 @@ class MaterialAsset;
 class MaterialTypeAsset;
 class MeshAsset;
 class MeshSource;
-class ShaderAsset;
 class TextureAsset;
 class TextureSource;
 

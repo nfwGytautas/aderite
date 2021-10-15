@@ -22,7 +22,6 @@ enum class AssetGroup : size_t {
  * @brief The asset type
 */
 enum class AssetType : size_t {
-	SHADER			= 0,
 	SCENE			= 1,
 	MATERIAL		= 2,
 	MESH			= 3,

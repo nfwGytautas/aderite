@@ -366,7 +366,6 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 
 void WindowsEditor::onSceneChanged(scene::Scene* scene) {
 	// Attach editor camera
-	scene->attachMiddlewareCamera(shared::State::EditorCamera);
 	m_sceneView->onSceneChanged(scene);
 }
 

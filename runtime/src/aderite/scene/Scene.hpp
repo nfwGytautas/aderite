@@ -83,27 +83,6 @@ public:
 
 	virtual asset::AssetType type() const override;
 	virtual bool isInGroup(asset::AssetGroup group) const override;
-
-#if MIDDLEWARE_ENABLED == 1
-	/**
-	 * @brief Attach a middleware camera
-	 * @param camera Middleware camera
-	*/
-	void attachMiddlewareCamera(interfaces::ICamera* camera) {
-		m_middlewareCamera = camera;
-	}
-
-	/**
-	 * @brief Returns the attached middleware camera or nullptr
-	*/
-	interfaces::ICamera* getMiddlewareCamera() const {
-		return m_middlewareCamera;
-	}
-
-private:
-	interfaces::ICamera* m_middlewareCamera = nullptr;
-public:
-#endif
 protected:
 	virtual bool serialize(YAML::Emitter& out) override;
 	virtual bool deserialize(YAML::Node& data) override;
@@ -159,10 +138,6 @@ private:
 	std::vector<asset::Asset*> m_assets;
 	entt::registry m_registry;
 	physx::PxScene* m_physicsScene = nullptr;
-
-	// Properties
-	asset::TextureAsset* m_skybox = nullptr;
-	glm::vec3 m_skyColor = { 0.53f, 0.81f, 0.98f }; // Only used if m_skybox is nullptr
 };
 
 ADERITE_SCENE_NAMESPACE_END
