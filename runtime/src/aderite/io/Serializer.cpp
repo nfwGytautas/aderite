@@ -19,13 +19,13 @@ bool Serializer::init() {
 	
 
 	// Check that no runtime serializables have been forgotten
-	ADERITE_DYNAMIC_ASSERT(m_instancers.size() == static_cast<size_t>(RuntimeSerializables::END), "Not all runtime serializables are linked");
+	ADERITE_DYNAMIC_ASSERT(m_instancers.size() == (static_cast<size_t>(RuntimeSerializables::END) - static_cast<size_t>(RuntimeSerializables::RESERVED) - 1), "Not all runtime serializables are linked");
 	return true;
 }
 
 void Serializer::shutdown() {
-	for (auto obj : m_serializables) {
-		delete obj.second;
+	for (auto obj : m_objects) {
+		delete obj;
 	}
 
 	for (auto instancer : m_instancers) {
@@ -52,7 +52,7 @@ void Serializer::linkInstancer(SerializableType type, InstancerBase* instancer) 
 	m_instancers.insert_or_assign(type, instancer);
 }
 
-SerializableObject* Serializer::parseType(const YAML::Node& data) {
+SerializableObject* Serializer::parseType(const YAML::Node& data) const {
 	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in scope");
 	ADERITE_DYNAMIC_ASSERT(data["Handle"], "No handle specified in scope");
 	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
@@ -76,7 +76,19 @@ SerializableObject* Serializer::parseType(const YAML::Node& data) {
 	return instance;
 }
 
-SerializableObject* Serializer::parseUntrackedType(const YAML::Node& data) {
+void Serializer::writeType(YAML::Emitter& emitter, SerializableObject* object) const {
+	ADERITE_DYNAMIC_ASSERT(object->getHandle() == c_InvalidHandle, "No handle specified in scope");
+
+	emitter << YAML::BeginMap;
+	emitter << YAML::Key << "Type" << YAML::Value << object->getType();
+	emitter << YAML::Key << "Handle" << YAML::Value << object->getHandle();
+	emitter << YAML::Key << "Data" << YAML::BeginMap;
+	object->serialize(this, emitter);
+	emitter << YAML::EndMap;
+	emitter << YAML::EndMap;
+}
+
+SerializableObject* Serializer::parseUntrackedType(const YAML::Node& data) const {
 	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
 	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
 
@@ -97,38 +109,39 @@ SerializableObject* Serializer::parseUntrackedType(const YAML::Node& data) {
 	return instance;
 }
 
+void Serializer::writeUntrackedType(YAML::Emitter& emitter, SerializableObject* object) const {
+	emitter << YAML::BeginMap;
+	emitter << YAML::Key << "Type" << YAML::Value << object->getType();
+	emitter << YAML::Key << "Data" << YAML::BeginMap;
+	object->serialize(this, emitter);
+	emitter << YAML::EndMap;
+	emitter << YAML::EndMap;
+}
+
 SerializableObject* Serializer::get(SerializableHandle handle) {
-	if (handle == c_InvalidHandle) {
-		LOG_WARN("Invalid handled passed to Serializer::get");
-		return nullptr;
-	}
-
-	auto it = m_serializables.find(handle);
-	if (it == m_serializables.end()) {
-		return nullptr;
-	}
-
-	return it->second;
+	ADERITE_DYNAMIC_ASSERT(handle != c_InvalidHandle, "Invalid handle passed to serializer get method");
+	ADERITE_DYNAMIC_ASSERT(m_objects.size() <= handle, "Requested non existing object");
+	return m_objects[handle];
 }
 
 void Serializer::add(SerializableObject* object) {
 	ADERITE_DYNAMIC_ASSERT(object->getHandle() == c_InvalidHandle, "Tried to add an already existing object to Serializer");
-	object->m_handle = m_nextAvailableHandle++;
-	m_serializables.insert_or_assign(object->m_handle, object);
+	SerializableHandle handle = this->nextAvailableHandle();
+	object->m_handle = handle;
+	m_resolver->store(object);
+	m_objects[handle] = object;
 }
 
 void Serializer::remove(SerializableHandle handle) {
-	auto it = m_serializables.find(handle);
-	ADERITE_DYNAMIC_ASSERT(it != m_serializables.end(), "Tried to remove non existing object");
-	it->second->m_handle = c_InvalidHandle;
-	delete it->second;
-	m_serializables.erase(it);
+	ADERITE_DYNAMIC_ASSERT(m_objects.size() >= handle, "Tried to remove non existing object");
+	delete m_objects[handle];
+	m_objects[handle] = nullptr;
+	m_hasNull = true;
 }
 
 SerializableObject* Serializer::getOrRead(SerializableHandle handle) {
-	SerializableObject* obj = this->get(handle);
-	if (obj != nullptr) {
-		return obj;
+	if (m_objects.size() > handle && m_objects[handle] != nullptr) {
+		return m_objects[handle];
 	}
 
 	// Resolve path and load
@@ -140,8 +153,22 @@ SerializableObject* Serializer::getOrRead(SerializableHandle handle) {
 
 	// TODO: Check version and upgrade if needed
 	SerializableObject* type = this->parseType(data);
-	m_serializables[type->getHandle()] = type;
+
+	if (type->getHandle() + 1 > m_objects.size()) {
+		// Resize
+		m_objects.resize(type->getHandle() + 1, nullptr);
+		m_hasNull = true;
+	}
+
+	m_objects[type->getHandle()] = type;
 	return type;
+}
+
+void Serializer::reread(SerializableObject* object) {
+	// Resolve path and load
+	Path path = this->resolvePath(object->getHandle());
+	YAML::Node data = YAML::LoadFile(path.File.string());
+	object->deserialize(this, data["Data"]);
 }
 
 void Serializer::save(SerializableObject* object) {
@@ -160,7 +187,7 @@ void Serializer::save(SerializableObject* object) {
 	out << YAML::Key << "Data" << YAML::BeginMap;
 
 	if (!object->serialize(this, out)) {
-		LOG_ERROR("Failed to serialize object handle: {0}, name: {1}", object->getHandle(), object->getName());
+		LOG_ERROR("Failed to serialize object handle: {0}", object->getHandle());
 		return;
 	}
 
@@ -193,14 +220,7 @@ ADERITE_DEBUG_SECTION(
 	}
 )
 
-ADERITE_MIDDLEWARE_SECTION(
-	void Serializer::setNextId(SerializableHandle handle) {
-		ADERITE_DYNAMIC_ASSERT(m_nextAvailableHandle != 0, "setNextId called after serializer has already been used");
-		m_nextAvailableHandle = handle;
-	}
-)
-
-InstancerBase* Serializer::resolveInstancer(SerializableType type) {
+InstancerBase* Serializer::resolveInstancer(SerializableType type) const {
 	auto it = m_instancers.find(type);
 	ADERITE_DYNAMIC_ASSERT(it != m_instancers.end(), "Tried to resolve instancer for non registered type {0}", type);
 	return it->second;
@@ -209,6 +229,25 @@ InstancerBase* Serializer::resolveInstancer(SerializableType type) {
 Path Serializer::resolvePath(SerializableHandle handle) {
 	ADERITE_DYNAMIC_ASSERT(m_resolver != nullptr, "Tried to resolve path with no resolver");
 	return m_resolver->resolve(handle);
+}
+
+SerializableHandle Serializer::nextAvailableHandle() {
+	if (!m_hasNull) {
+		m_objects.push_back(nullptr);
+		return m_objects.size() - 1;
+	}
+	
+	// Find next nullptr
+	for (size_t i = 0; i < m_objects.size(); i++) {
+		if (m_objects[i] == nullptr) {
+			return i;
+		}
+	}
+
+	// Was a false positive null flag
+	m_hasNull = false;
+	m_objects.push_back(nullptr);
+	return m_objects.size() - 1;
 }
 
 }

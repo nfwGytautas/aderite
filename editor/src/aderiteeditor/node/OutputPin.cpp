@@ -6,12 +6,16 @@
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-OutputPin::OutputPin(int id, Node* node, const std::string& type, const std::string& name)
-	: m_id(id), m_node(node), m_type(type), m_name(name)
+OutputPin::OutputPin(Node* node, const std::string& type, const std::string& name)
+	: m_node(node), m_type(type), m_name(name)
 {}
 
 int OutputPin::getId() const {
 	return m_id;
+}
+
+void OutputPin::setId(int id) {
+	m_id = id;
 }
 
 std::string OutputPin::getType() const {
@@ -27,20 +31,16 @@ std::string OutputPin::getName() const {
 	return m_name;
 }
 
+void OutputPin::setName(const std::string& name) {
+	m_name = name;
+}
+
 void OutputPin::disconnect() {
 	for (Link* l : m_links) {
 		l->destroy();
 	}
 
 	m_links.clear();
-}
-
-void OutputPin::renderUI() {
-	ImNodes::BeginOutputAttribute(m_id);
-	ImGui::Text(m_name.c_str());
-	ImGui::SameLine();
-	ImGui::Text(m_type.c_str());
-	ImNodes::EndOutputAttribute();
 }
 
 void OutputPin::setValue(compiler::EvaluatorValue value) {

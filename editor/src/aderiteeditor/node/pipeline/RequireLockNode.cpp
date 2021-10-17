@@ -7,33 +7,33 @@
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
+#include "aderiteeditor/runtime/EditorSerializables.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-RequireLockNode::RequireLockNode(int id, Graph* graph)
-    : Node(id)
+RequireLockNode::RequireLockNode()
 {
     // Inputs
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        std::string(pipeline::getTypeName(pipeline::PropertyType::Require)),
+        std::string(node::getTypeName(node::PropertyType::Require)),
         "Require"
     ));
 
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        std::string(pipeline::getTypeName(pipeline::PropertyType::Require)),
+        std::string(node::getTypeName(node::PropertyType::Require)),
         "Require"
     ));
 
     // TODO: Add more dynamically
 
     // Output
-    p_outputs.push_back(graph->createOutputPin(
+    p_outputs.push_back(new OutputPin(
         this,
-        std::string(pipeline::getTypeName(pipeline::PropertyType::Require)),
+        std::string(node::getTypeName(node::PropertyType::Require)),
         "Require"
     ));
 }
@@ -47,15 +47,16 @@ void RequireLockNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool RequireLockNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "RequireLock";
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
+io::SerializableType RequireLockNode::getType() {
+    return static_cast<io::SerializableType>(io::EditorSerializables::ConcatObjectsNode);
 }
 
-bool RequireLockNode::deserialize(YAML::Node& data) {
+bool RequireLockNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    serializeData(emitter);
+    return true;
+}
+
+bool RequireLockNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

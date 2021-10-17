@@ -5,23 +5,23 @@
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
+#include "aderiteeditor/runtime/EditorSerializables.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-ScreenNode::ScreenNode(int id, Graph* graph)
-    : Node(id)
+ScreenNode::ScreenNode()
 {
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Target),
+        node::getTypeName(node::PropertyType::Target),
         "Target"
     ));
 
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Require),
+        node::getTypeName(node::PropertyType::Require),
         "Require"
     ));
 
@@ -43,15 +43,16 @@ void ScreenNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool ScreenNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "Screen";
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
+io::SerializableType ScreenNode::getType() {
+    return static_cast<io::SerializableType>(io::EditorSerializables::ScreenNode);
 }
 
-bool ScreenNode::deserialize(YAML::Node& data) {
+bool ScreenNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    serializeData(emitter);
+    return true;
+}
+
+bool ScreenNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

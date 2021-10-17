@@ -2,7 +2,8 @@
 
 #include "aderite/utility/Log.hpp"
 
-ADERITE_EDITOR_PIPELINE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
 const char* getTypeName(PropertyType type) {
 	switch (type) {
@@ -36,4 +37,5 @@ bool isArrayOrType(const std::string& check, const std::string& type) {
 	return check == type || check == (type + "[]");
 }
 
-ADERITE_EDITOR_PIPELINE_NAMESPACE_END
+}
+}

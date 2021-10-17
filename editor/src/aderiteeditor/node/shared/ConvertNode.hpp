@@ -12,7 +12,7 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 class ConvertNode : public Node
 {
 public:
-	ConvertNode(int id, Graph* graph, const std::string& from, const std::string& to);
+	ConvertNode();
 
 	/**
 	 * @brief Change the type of the convert node
@@ -27,10 +27,11 @@ public:
 	// Inherited via Node
 	virtual const char* getNodeName() const override;
 	virtual void evaluate(compiler::GraphEvaluator* evaluator) override;
-	virtual bool serialize(YAML::Emitter& out) override;
-	virtual bool deserialize(YAML::Node& data) override;
 	virtual bool onConnectToInput(InputPin* target, OutputPin* source) override;
 	virtual bool onConnectToOutput(OutputPin* target, InputPin* source) override;
+	virtual io::SerializableType getType() override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	void handlePipelineConvert(compiler::PipelineEvaluator* pe);
 	void handleShaderConvert(compiler::ShaderEvaluator* se);
@@ -42,9 +43,6 @@ private:
 
 	// Conversion methods
 	rendering::OperationBase* eyeToCamera(rendering::OperationBase* from);
-private:
-	std::string m_from;
-	std::string m_to;
 };
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

@@ -6,26 +6,26 @@
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorRenderOperation.hpp"
+#include "aderiteeditor/runtime/EditorSerializables.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-EditorRenderNode::EditorRenderNode(int id, Graph* graph)
-    : Node(id)
+EditorRenderNode::EditorRenderNode()
 {
     // Inputs
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Require),
+        node::getTypeName(node::PropertyType::Require),
         "Require"
     ));
 
     // Output
-    p_outputs.push_back(graph->createOutputPin(
+    p_outputs.push_back(new OutputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Require),
+        node::getTypeName(node::PropertyType::Require),
         "Require"
     ));
 }
@@ -42,15 +42,16 @@ void EditorRenderNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool EditorRenderNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "EditorRender";
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
+io::SerializableType EditorRenderNode::getType() {
+    return static_cast<io::SerializableType>(io::EditorSerializables::EditorRenderNode);
 }
 
-bool EditorRenderNode::deserialize(YAML::Node& data) {
+bool EditorRenderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    serializeData(emitter);
+    return true;
+}
+
+bool EditorRenderNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

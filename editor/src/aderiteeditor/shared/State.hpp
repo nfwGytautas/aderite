@@ -3,6 +3,7 @@
 #include <bgfx/bgfx.h>
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/shared/Forward.hpp"
+#include "aderiteeditor/runtime/Resolver.hpp"
 
 ADERITE_EDITOR_SHARED_NAMESPACE_BEGIN
 
@@ -15,6 +16,7 @@ public:
 	static Project* Project;
 	static EditorCamera* EditorCamera;
 	static bgfx::FrameBufferHandle DebugRenderHandle;
+	static io::MappedResolver* Resolver;
 
 	/**
 	 * @brief True if currently in game mode, false otherwise

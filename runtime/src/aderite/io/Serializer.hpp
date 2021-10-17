@@ -40,6 +40,7 @@
 */
 
 #include <filesystem>
+#include <vector>
 #include <map>
 #include <yaml-cpp/yaml.h>
 #include "aderite/utility/Macros.hpp" 
@@ -53,9 +54,6 @@ namespace io {
  * @brief Serializer class that is responsible for serializing and deserializing asset meta objects
 */
 class Serializer final {
-	using SerializableMapKey = SerializableHandle;
-	using SerializableMapVal = SerializableObject*;
-	using SerializableMap = std::map<SerializableMapKey, SerializableMapVal>;
 public:
 	/**
 	 * @brief Initializes the serializer
@@ -87,7 +85,14 @@ public:
 	 * @param data Data node, must have Type and Handle keys
 	 * @return SerializableObject instance
 	*/
-	SerializableObject* parseType(const YAML::Node& data);
+	SerializableObject* parseType(const YAML::Node& data) const;
+
+	/**
+	 * @brief Write an object to the specified emitter
+	 * @param emitter Emitter to write to
+	 * @param object Object to write
+	*/
+	void writeType(YAML::Emitter& emitter, SerializableObject* object) const;
 
 	/**
 	 * @brief Parses the type inside the current data scope, but DOES NOT track the object, meaning
@@ -98,7 +103,14 @@ public:
 	 * @param data Data node, must have Type key
 	 * @return SerializableObject instance
 	*/
-	SerializableObject* parseUntrackedType(const YAML::Node& data);
+	SerializableObject* parseUntrackedType(const YAML::Node& data) const;
+
+	/**
+	 * @brief Write an untracked object to the specified emitter
+	 * @param emitter Emitter to write to
+	 * @param object Object to write
+	*/
+	void writeUntrackedType(YAML::Emitter& emitter, SerializableObject* object) const;
 
 	/**
 	 * @brief Returns object associated with the serializable handle
@@ -129,25 +141,31 @@ public:
 	SerializableObject* getOrRead(SerializableHandle handle);
 
 	/**
+	 * @brief Rereads the meta data of the specified object
+	 * @param object Object whose meta data to reread
+	*/
+	void reread(SerializableObject* object);
+
+	/**
 	 * @brief Serializes object into a file
 	 * @param object Object to serialize
 	*/
 	void save(SerializableObject* object);
 
 	auto begin() {
-		return m_serializables.begin();
+		return m_objects.begin();
 	}
 
 	auto begin() const {
-		return m_serializables.begin();
+		return m_objects.begin();
 	}
 
 	auto end() {
-		return m_serializables.end();
+		return m_objects.end();
 	}
 
 	auto end() const {
-		return m_serializables.end();
+		return m_objects.end();
 	}
 
 	ADERITE_DEBUG_SECTION(
@@ -155,13 +173,6 @@ public:
 		 * @brief Debug functionality to print what type is linked to what instancer
 		*/
 		void printInstancers();
-	);
-
-	ADERITE_MIDDLEWARE_SECTION(
-		/**
-		 * @brief Sets the next available handle, done once when loading a project from middleware
-		*/
-		void setNextId(SerializableHandle handle);
 	);
 private:
 	Serializer() {}
@@ -172,7 +183,7 @@ private:
 	 * @param type Type to get instancer for
 	 * @return Instancer instance
 	*/
-	InstancerBase* resolveInstancer(SerializableType type);
+	InstancerBase* resolveInstancer(SerializableType type) const;
 
 	/**
 	 * @brief Use the resolver to resolve the path to a serializable
@@ -180,12 +191,18 @@ private:
 	 * @return Path
 	*/
 	Path resolvePath(SerializableHandle handle);
+
+	/**
+	 * @brief Returns the next available handle for an object, expanding the object vector as needed
+	 * @return Next available handle
+	*/
+	SerializableHandle nextAvailableHandle();
 private:
 	std::map<SerializableType, InstancerBase*> m_instancers;
-	SerializableMap m_serializables;
+	std::vector<SerializableObject*> m_objects;
 
-	SerializableHandle m_nextAvailableHandle = {};
 	PathResolver* m_resolver = nullptr;
+	bool m_hasNull = false;
 };
 
 }

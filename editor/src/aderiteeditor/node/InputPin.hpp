@@ -15,12 +15,18 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 class InputPin
 {
 public:
-	InputPin(int id, Node* node, const std::string& type, const std::string& name);
+	InputPin(Node* node, const std::string& type, const std::string& name);
 
 	/**
 	 * @brief Returns the id of the pin
 	*/
 	int getId() const;
+
+	/**
+	 * @brief Sets the pin id
+	 * @param id New id of the pin
+	*/
+	void setId(int id);
 
 	/**
 	 * @brief Returns the type of the pin
@@ -39,11 +45,6 @@ public:
 	 * @return Name of the pin
 	*/
 	std::string getName() const;
-
-	/**
-	 * @brief Renders the pin
-	*/
-	void renderUI();
 
 	/**
 	 * @brief Gets the output pin of that this pin is connected to or nullptr if no connection
@@ -79,8 +80,9 @@ private:
 	Link* m_link = nullptr;
 	friend class Link;
 	friend class Node;
+	friend class Graph;
 private:
-	int m_id;
+	int m_id = -1;
 	std::string m_type;
 	std::string m_name;
 	Node* m_node = nullptr;

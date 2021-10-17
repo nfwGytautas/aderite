@@ -1,0 +1,126 @@
+Version: 2021_10_15r1
+Type: 50
+Handle: 0
+Data:
+  Graph:
+    Type: 51
+    Data:
+      NextId: 44
+      LastNode: 0
+      Nodes:
+        - Type: 23
+          Data:
+            InputPins: [1, 2]
+            OutputPins: []
+            Position:
+              X: 474.844391
+              Y: 302.034607
+            ID: 0
+        - Type: 20
+          Data:
+            InputPins: []
+            OutputPins: [4]
+            Position:
+              X: -201
+              Y: 75
+            ID: 3
+        - Type: 21
+          Data:
+            IsArray: true
+            InputPins: [6, 7, 8, 9]
+            OutputPins: [10]
+            Position:
+              X: 153
+              Y: 128
+            ID: 5
+        - Type: 18
+          Data:
+            InputPins: [12]
+            OutputPins: [13]
+            Position:
+              X: 327.832123
+              Y: 180.789352
+            ID: 11
+        - Type: 17
+          Data:
+            InputPins: []
+            OutputPins: [15]
+            Position:
+              X: -365.167877
+              Y: 218.789352
+            ID: 14
+        - Type: 19
+          Data:
+            InputPins: []
+            OutputPins: [17]
+            Position:
+              X: -227.167877
+              Y: 374.789337
+            ID: 16
+        - Type: 15
+          Data:
+            InputPins: []
+            OutputPins: [19]
+            Position:
+              X: -379.167877
+              Y: 147.789352
+            ID: 18
+        - Type: 16
+          Data:
+            PinType: Camera
+            InputPins: [21, 22]
+            OutputPins: [23]
+            Position:
+              X: -229.167877
+              Y: 169.789352
+            ID: 20
+        - Type: 26
+          Data:
+            From: Camera[]
+            To: Eye[]
+            InputPins: [27]
+            OutputPins: [28]
+            Position:
+              X: -58.1678772
+              Y: 187.789368
+            ID: 26
+        - Type: 25
+          Data:
+            InputPins: []
+            OutputPins: [33]
+            Position:
+              X: -228
+              Y: 276
+            ID: 32
+        - Type: 16
+          Data:
+            PinType: Target
+            InputPins: [35, 36]
+            OutputPins: [37]
+            Position:
+              X: -80
+              Y: 331
+            ID: 34
+      Links:
+        - Out: 37
+          In: 8
+        - Out: 19
+          In: 21
+        - Out: 15
+          In: 22
+        - Out: 28
+          In: 7
+        - Out: 23
+          In: 27
+        - Out: 33
+          In: 35
+        - Out: 4
+          In: 6
+        - Out: 17
+          In: 36
+        - Out: 10
+          In: 12
+        - Out: 13
+          In: 2
+        - Out: 33
+          In: 1

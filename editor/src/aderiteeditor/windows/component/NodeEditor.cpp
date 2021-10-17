@@ -1,34 +1,41 @@
 #include "NodeEditor.hpp"
 
+#include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/input/InputManager.hpp"
+#include "aderite/io/Serializer.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
 #include "aderiteeditor/compiler/Compiler.hpp"
+#include "aderiteeditor/asset/RenderingPipeline.hpp"
+#include "aderiteeditor/runtime/Resolver.hpp"
+#include "aderiteeditor/shared/State.hpp"
 
 // Nodes
 
-#include "aderiteeditor/node/pipeline/Properties.hpp"
-#include "aderiteeditor/node/ConvertNode.hpp"
-
 // Material
-#include "aderiteeditor/node/MaterialInputNode.hpp"
-#include "aderiteeditor/node/MaterialOutputNode.hpp"
-#include "aderiteeditor/node/Sampler2DNode.hpp"
-#include "aderiteeditor/node/AddNode.hpp"
+#include "aderiteeditor/node/material/AddNode.hpp"
+#include "aderiteeditor/node/material/MaterialInputNode.hpp"
+#include "aderiteeditor/node/material/MaterialOutputNode.hpp"
+#include "aderiteeditor/node/material/Sampler2DNode.hpp"
 
-// Render pipeline
-#include "aderiteeditor/node/pipeline/ScreenNode.hpp"
-#include "aderiteeditor/node/pipeline/EntitiesNode.hpp"
+// Pipeline
 #include "aderiteeditor/node/pipeline/CameraProviderNode.hpp"
-#include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
-#include "aderiteeditor/node/pipeline/RenderNode.hpp"
+#include "aderiteeditor/node/pipeline/ConcatObjectsNode.hpp"
+#include "aderiteeditor/node/pipeline/EditorCameraNode.hpp"
 #include "aderiteeditor/node/pipeline/EditorRenderNode.hpp"
 #include "aderiteeditor/node/pipeline/EditorTargetNode.hpp"
-#include "aderiteeditor/node/pipeline/EditorCameraNode.hpp"
+#include "aderiteeditor/node/pipeline/EntitiesNode.hpp"
+#include "aderiteeditor/node/pipeline/RenderNode.hpp"
 #include "aderiteeditor/node/pipeline/RequireLockNode.hpp"
-#include "aderiteeditor/node/pipeline/ConcatObjectsNode.hpp"
+#include "aderiteeditor/node/pipeline/ScreenNode.hpp"
 #include "aderiteeditor/node/pipeline/SelectObjectNode.hpp"
+#include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
+
+// Shared
+#include "aderiteeditor/node/shared/Properties.hpp"
+#include "aderiteeditor/node/shared/ConvertNode.hpp"
+
 
 #include <fstream>
 #include "aderite/Aderite.hpp"
@@ -43,56 +50,37 @@ NodeEditor::NodeEditor() {}
 NodeEditor::~NodeEditor() {}
 
 void NodeEditor::init() {
-    // TEMPORARY RENDER PIPELINE GRAPH
-    m_currentState = new node::Graph();
-
-    node::Node* output = m_currentState->addNode<node::ScreenNode>();
-    m_currentState->setLastNode(output);
-    ImNodes::SetNodeEditorSpacePos(output->getId(), ImVec2(50, 50));
+    //// TEMPORARY RENDER PIPELINE GRAPH
+    //m_currentState = new node::Graph();
+    //
+    //node::Node* output = m_currentState->addNode<node::ScreenNode>();
+    //m_currentState->setLastNode(output);
+    //ImNodes::SetNodeEditorSpacePos(output->getId(), ImVec2(50, 50));
 }
 
 void NodeEditor::render() {
     if (ImGui::Begin("Node editor")) {
         if (ImGui::Button("Compile")) {
-            if (m_selectedAsset && m_selectedAsset->type() == asset::AssetType::MATERIAL_TYPE) {
+            /*if (m_selectedAsset && m_selectedAsset->type() == asset::AssetType::MATERIAL_TYPE) {
                 compiler::Compiler::compileGraph(m_currentState);
             }
             else {
-                compiler::Compiler::compilePipeline(m_currentState);
-            }
+                
+            }*/
+            compiler::Compiler::compilePipeline(m_pipeline->getGraph());
         }
         ImGui::SameLine();
         if (ImGui::Button("Save")) {
-            YAML::Emitter out;
-
-            out << YAML::BeginMap;
-
-            // Common
-            out << YAML::Key << "Version" << YAML::Value << "test";
-            //out << YAML::Key << "Name" << YAML::Value << asset->getName();
-            out << YAML::Key << "Type" << YAML::Value << "test";
-
-            m_currentState->serialize(out);
-
-            out << YAML::EndMap;
-
-            std::ofstream fout((aderite::Engine::getAssetManager()->getResDir() / "graph.yaml"));
-            fout << out.c_str();
+            ::aderite::Engine::getSerializer()->save(m_pipeline);
         }
         ImGui::SameLine();
         if (ImGui::Button("Load")) {
-            // Open YAML reader
-            if (!std::filesystem::exists((aderite::Engine::getAssetManager()->getResDir() / "graph.yaml"))) {
-                return;
-            }
-            delete m_currentState;
-            m_currentState = new node::Graph();
-
-            YAML::Node data = YAML::LoadFile((aderite::Engine::getAssetManager()->getResDir() / "graph.yaml").string());
-            m_currentState->deserialize(data);
+            // TODO: Fix this
+            m_pipeline = static_cast<asset::RenderingPipeline*>(::aderite::Engine::getSerializer()->getOrRead(0));
+            ::aderite::Engine::getSerializer()->reread(m_pipeline);
         }
 
-        if (m_currentState) {
+        if (m_pipeline) {
             bool pushed = false;
             if (aderite::Engine::getInputManager()->isKeyPressed(input::Key::LEFT_ALT)) {
                 ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
@@ -113,12 +101,14 @@ void NodeEditor::render() {
 
                 if (ImGui::BeginPopup("add node"))
                 {
-                    if (m_selectedAsset && m_selectedAsset->type() == asset::AssetType::MATERIAL_TYPE) {
+                    /*if (m_selectedAsset && m_selectedAsset->type() == asset::AssetType::MATERIAL_TYPE) {
                         renderMaterialEditorContextMenu();
                     }
                     else {
                         renderRenderPipelineEditorContextMenu();
-                    }
+                    }*/
+
+                    renderRenderPipelineEditorContextMenu();
 
                     ImGui::EndPopup();
                 }
@@ -126,7 +116,7 @@ void NodeEditor::render() {
             }
 
 
-            m_currentState->renderUI();
+            m_pipeline->getGraph()->renderUI();
 
             ImNodes::MiniMap();
             ImNodes::EndNodeEditor();
@@ -139,7 +129,7 @@ void NodeEditor::render() {
                 int start;
                 int end;
                 if (ImNodes::IsLinkCreated(&start, &end)) {
-                    m_currentState->connect(start, end);
+                    m_pipeline->getGraph()->connect(start, end);
                 }
             }
 
@@ -152,7 +142,7 @@ void NodeEditor::render() {
                         ImNodes::GetSelectedNodes(nodes.data());
 
                         for (int node : nodes) {
-                            m_currentState->deleteNode(node);
+                            m_pipeline->getGraph()->deleteNode(node);
                         }
                     }
 
@@ -163,7 +153,7 @@ void NodeEditor::render() {
             {
                 int link_id;
                 if (ImNodes::IsLinkDestroyed(&link_id)) {
-                    m_currentState->disconnectLink(link_id);
+                    m_pipeline->getGraph()->disconnectLink(link_id);
                 }
             }
         }
@@ -177,23 +167,25 @@ void NodeEditor::shutdown() {
 }
 
 void NodeEditor::setActiveAsset(asset::Asset* asset) {
-    m_selectedAsset = asset;
-
-    if (m_selectedAsset->type() == asset::AssetType::MATERIAL_TYPE) {
-        if (!m_currentState) {
-            delete m_currentState;
-        }
-
-        // TODO: Load already created graph for asset
-
-        m_currentState = new node::Graph();
-
-        node::Node* output = m_currentState->addNode<node::MaterialOutputNode>();
-        node::Node* input = m_currentState->addNode<node::MaterialInputNode>(static_cast<asset::MaterialTypeAsset*>(m_selectedAsset));
-        m_currentState->setLastNode(output);
-        ImNodes::SetNodeEditorSpacePos(input->getId(), ImVec2(50, 50));
-        ImNodes::SetNodeEditorSpacePos(output->getId(), ImVec2(350, 50));
-    }
+    m_pipeline = new asset::RenderingPipeline();
+    ::aderite::Engine::getSerializer()->add(m_pipeline);
+    //m_selectedAsset = asset;
+    //
+    //if (m_selectedAsset->type() == asset::AssetType::MATERIAL_TYPE) {
+    //    if (!m_currentState) {
+    //        delete m_currentState;
+    //    }
+    //
+    //    // TODO: Load already created graph for asset
+    //
+    //    m_currentState = new node::Graph();
+    //
+    //    node::Node* output = m_currentState->addNode<node::MaterialOutputNode>();
+    //    node::Node* input = m_currentState->addNode<node::MaterialInputNode>();
+    //    m_currentState->setLastNode(output);
+    //    ImNodes::SetNodeEditorSpacePos(input->getId(), ImVec2(50, 50));
+    //    ImNodes::SetNodeEditorSpacePos(output->getId(), ImVec2(350, 50));
+    //}
 }
 
 void NodeEditor::renderMaterialEditorContextMenu() {
@@ -201,13 +193,13 @@ void NodeEditor::renderMaterialEditorContextMenu() {
 
     if (ImGui::MenuItem("Add"))
     {
-        node::Node* n = m_currentState->addNode<node::AddNode>();
+        node::Node* n = m_pipeline->getGraph()->addNode<node::AddNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
     if (ImGui::MenuItem("Sampler 2D"))
     {
-        node::Node* n = m_currentState->addNode<node::Sampler2DNode>();
+        node::Node* n = m_pipeline->getGraph()->addNode<node::Sampler2DNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 }
@@ -217,19 +209,19 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
 
     if (ImGui::MenuItem("Entities"))
     {
-        node::Node* n = m_currentState->addNode<node::EntitiesNode>();
+        node::Node* n = m_pipeline->getGraph()->addNode<node::EntitiesNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
     if (ImGui::MenuItem("Camera provider"))
     {
-        node::Node* n = m_currentState->addNode<node::CameraProviderNode>();
+        node::Node* n = m_pipeline->getGraph()->addNode<node::CameraProviderNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
     if (ImGui::MenuItem("Target provider"))
     {
-        node::Node* n = m_currentState->addNode<node::TargetProviderNode>();
+        node::Node* n = m_pipeline->getGraph()->addNode<node::TargetProviderNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
@@ -237,13 +229,13 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
     {
         if (ImGui::MenuItem("Concat"))
         {
-            node::Node* n = m_currentState->addNode<node::ConcatObjectsNode>("Object");
+            node::Node* n = m_pipeline->getGraph()->addNode<node::ConcatObjectsNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
         if (ImGui::MenuItem("Select"))
         {
-            node::Node* n = m_currentState->addNode<node::SelectObjectNode>("Object");
+            node::Node* n = m_pipeline->getGraph()->addNode<node::SelectObjectNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
@@ -254,31 +246,23 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
     {
         if (ImGui::MenuItem("Require lock"))
         {
-            node::Node* n = m_currentState->addNode<node::RequireLockNode>();
+            node::Node* n = m_pipeline->getGraph()->addNode<node::RequireLockNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
         ImGui::EndMenu();
     }
 
-    if (ImGui::BeginMenu("Convert"))
-    {
-        if (ImGui::MenuItem("Camera to Eye"))
-        {
-            node::Node* n = m_currentState->addNode<node::ConvertNode>(
-                pipeline::getTypeName(pipeline::PropertyType::Camera), 
-                pipeline::getTypeName(pipeline::PropertyType::Eye));
-            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-        }
-
-        ImGui::EndMenu();
+    if (ImGui::MenuItem("Convert")) {
+        node::Node* n = m_pipeline->getGraph()->addNode<node::ConvertNode>();
+        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
     if (ImGui::BeginMenu("Rendering"))
     {
         if (ImGui::MenuItem("Depth & Color"))
         {
-            node::Node* n = m_currentState->addNode<node::RenderNode>();
+            node::Node* n = m_pipeline->getGraph()->addNode<node::RenderNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
@@ -291,19 +275,19 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
     {
         if (ImGui::MenuItem("Render"))
         {
-            node::Node* n = m_currentState->addNode<node::EditorRenderNode>();
+            node::Node* n = m_pipeline->getGraph()->addNode<node::EditorRenderNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
         if (ImGui::MenuItem("Camera"))
         {
-            node::Node* n = m_currentState->addNode<node::EditorCameraNode>();
+            node::Node* n = m_pipeline->getGraph()->addNode<node::EditorCameraNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
         if (ImGui::MenuItem("Target"))
         {
-            node::Node* n = m_currentState->addNode<node::EditorTargetNode>();
+            node::Node* n = m_pipeline->getGraph()->addNode<node::EditorTargetNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 

@@ -30,18 +30,17 @@ public:
 	virtual ~PathResolver() {};
 
 	/**
-	 * @brief Resolve a given string value to a data block
-	 * @param value String to resolve, can be a path or name or anything, depends on the resolver
-	 * @return DataBlock
-	*/
-	virtual Path resolve(const std::string& value) = 0;
-
-	/**
 	 * @brief Resolve a given handle to it's path
 	 * @param handle Handle of to resolve
 	 * @return DataBlock
 	*/
 	virtual Path resolve(SerializableHandle handle) = 0;
+
+	/**
+	 * @brief Function called when a new object has been added to the serializer
+	 * @param object Object instance
+	*/
+	virtual void store(SerializableObject* object) = 0;
 };
 
 }

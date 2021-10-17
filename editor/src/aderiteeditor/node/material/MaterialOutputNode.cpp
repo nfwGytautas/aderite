@@ -4,13 +4,13 @@
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
+#include "aderiteeditor/runtime/EditorSerializables.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-MaterialOutputNode::MaterialOutputNode(int id, Graph* graph) 
-    : Node(id)
+MaterialOutputNode::MaterialOutputNode() 
 {
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
 		this,
         asset::prop::getNameForType(asset::prop::PropertyType::VEC4),
         "Color"
@@ -28,15 +28,16 @@ void MaterialOutputNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool MaterialOutputNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "MaterialOutput";
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
+io::SerializableType MaterialOutputNode::getType() {
+    return static_cast<io::SerializableType>(io::EditorSerializables::MaterialOutputNode);
 }
 
-bool MaterialOutputNode::deserialize(YAML::Node& data) {
+bool MaterialOutputNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    serializeData(emitter);
+    return true;
+}
+
+bool MaterialOutputNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

@@ -8,25 +8,25 @@
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
+#include "aderiteeditor/runtime/EditorSerializables.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-SelectObjectNode::SelectObjectNode(int id, Graph* graph, const std::string& type)
-    : Node(id), m_currentType(type)
+SelectObjectNode::SelectObjectNode()
 {
     // Inputs
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        type + "[]",
+        "None[]",
         "Objects"
     ));
 
     // Output
-    p_outputs.push_back(graph->createOutputPin(
+    p_outputs.push_back(new OutputPin(
         this,
-        type,
+        "None",
         "Item"
     ));
 }
@@ -49,25 +49,6 @@ void SelectObjectNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool SelectObjectNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "SelectObject";
-    out << YAML::Key << "PinType" << YAML::Value << m_currentType;
-    out << YAML::Key << "SelectIndex" << YAML::Value << m_index;
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
-}
-
-bool SelectObjectNode::deserialize(YAML::Node& data) {
-    deserializeData(data);
-    if (m_currentType != data["PinType"].as<std::string>()) {
-        this->setType(data["PinType"].as<std::string>());
-    }
-    m_index = data["SelectIndex"].as<size_t>();
-    return true;
-}
-
 bool SelectObjectNode::onConnectToInput(InputPin* target, OutputPin* source) {
     if (source->getType() != m_currentType) {
         this->setType(source->getType());
@@ -78,6 +59,26 @@ bool SelectObjectNode::onConnectToInput(InputPin* target, OutputPin* source) {
 
 void SelectObjectNode::renderBody() {
     ImGui::InputScalar("Index", ImGuiDataType_U64, &m_index);
+}
+
+io::SerializableType SelectObjectNode::getType() {
+    return static_cast<io::SerializableType>(io::EditorSerializables::ConcatObjectsNode);
+}
+
+bool SelectObjectNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    emitter << YAML::Key << "PinType" << YAML::Value << m_currentType;
+    emitter << YAML::Key << "SelectIndex" << YAML::Value << m_index;
+    serializeData(emitter);
+    return true;
+}
+
+bool SelectObjectNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+    deserializeData(data);
+    if (m_currentType != data["PinType"].as<std::string>()) {
+        this->setType(data["PinType"].as<std::string>());
+    }
+    m_index = data["SelectIndex"].as<size_t>();
+    return true;
 }
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

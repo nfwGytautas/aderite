@@ -8,15 +8,15 @@
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
+#include "aderiteeditor/runtime/EditorSerializables.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-Sampler2DNode::Sampler2DNode(int id, Graph* graph)
-    : Node(id)
+Sampler2DNode::Sampler2DNode()
 {
     // Create pins
     p_inputs.push_back(
-        graph->createInputPin(
+        new InputPin(
             this,
             asset::prop::getNameForType(
                 asset::prop::PropertyType::TEXTURE_2D), 
@@ -25,7 +25,7 @@ Sampler2DNode::Sampler2DNode(int id, Graph* graph)
     );
 
     p_outputs.push_back(
-        graph->createOutputPin(
+        new OutputPin(
             this,
             asset::prop::getNameForType(
                 asset::prop::PropertyType::VEC4), 
@@ -46,15 +46,16 @@ void Sampler2DNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool Sampler2DNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "Sampler2D";
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
+io::SerializableType Sampler2DNode::getType() {
+    return static_cast<io::SerializableType>(io::EditorSerializables::Sampler2DNode);
 }
 
-bool Sampler2DNode::deserialize(YAML::Node& data) {
+bool Sampler2DNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    serializeData(emitter);
+    return true;
+}
+
+bool Sampler2DNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

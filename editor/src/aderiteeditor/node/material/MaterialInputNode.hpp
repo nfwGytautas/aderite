@@ -11,14 +11,15 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 class MaterialInputNode : public Node 
 {
 public:
-	MaterialInputNode(int id, Graph* graph, asset::MaterialTypeAsset* material);
+	MaterialInputNode();
 
 	// Inherited via Node
 	virtual const char* getNodeName() const override;
 	virtual void renderBody() override;
-	virtual bool serialize(YAML::Emitter& out) override;
 	virtual void evaluate(compiler::GraphEvaluator* evaluator) override;
-	virtual bool deserialize(YAML::Node& data) override;
+	virtual io::SerializableType getType() override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	asset::MaterialTypeAsset* m_material = nullptr;
 };

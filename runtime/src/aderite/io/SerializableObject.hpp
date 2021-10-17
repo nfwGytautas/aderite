@@ -21,12 +21,6 @@ public:
 	SerializableHandle getHandle() const;
 
 	/**
-	 * @brief Returns the name of the object
-	 * @return Name of the object
-	*/
-	virtual const char* getName() = 0;
-
-	/**
 	 * @brief The type of the serializable object
 	 * @return SerializableType value
 	*/

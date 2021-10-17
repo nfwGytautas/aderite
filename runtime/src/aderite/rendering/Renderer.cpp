@@ -81,9 +81,6 @@ bool Renderer::init() {
 	if (!bgfx::init(bgfxInit)) {
 		LOG_ERROR("Failed to initialize BGFX");
 	}
-	
-	// Clear color
-	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
 
 	// Initial view rect
 	auto windowSize = ::aderite::Engine::getWindowManager()->getSize();
@@ -134,6 +131,7 @@ bool Renderer::isReady() {
 
 void Renderer::setResolution(const glm::uvec2& size) {
 	bgfx::setViewRect(0, 0, 0, size.x, size.y);
+	bgfx::setViewRect(1, 0, 0, size.x, size.y);
 
 	// TODO: Forward to render passes	
 }

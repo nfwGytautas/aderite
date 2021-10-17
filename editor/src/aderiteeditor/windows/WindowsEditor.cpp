@@ -23,6 +23,7 @@
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/window/WindowManager.hpp"
 #include "aderite/input/InputManager.hpp"
+#include "aderite/io/Serializer.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
@@ -34,6 +35,7 @@
 #include "aderiteeditor/windows/component/AssetBrowser.hpp"
 #include "aderiteeditor/windows/component/AssetEditor.hpp"
 #include "aderiteeditor/windows/component/NodeEditor.hpp"
+#include "aderiteeditor/runtime/Instancers.hpp"
 
 
 #define EVENT_ROUTE(e, dst) event_router::e = std::bind(&WindowsEditor::dst, this, std::placeholders::_1)
@@ -77,9 +79,14 @@ void WindowsEditor::onRuntimeInitialized() {
 	}
 
 	shared::State::EditorCamera = new shared::EditorCamera();
+	shared::State::Resolver = new io::MappedResolver();
+	aderite::Engine::getSerializer()->setResolver(shared::State::Resolver);
 
 	// By default disable game updates
 	onStopGame();
+
+	// Setup instancers for serializer
+	utility::linkInstancers();
 
 	// TODO: Startup dialog e.g. create new project, load project, etc.
 	//this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");

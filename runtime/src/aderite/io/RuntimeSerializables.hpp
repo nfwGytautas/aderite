@@ -14,6 +14,8 @@ namespace io {
 */
 enum class RuntimeSerializables : SerializableType {
 
+	// Last element of runtime serializables, used to specify the end runtime serializables
+	RESERVED = 10,
 	// END used to extend runtime serializables
 	END
 };

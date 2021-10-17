@@ -9,41 +9,41 @@
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/OperationArray.hpp"
+#include "aderiteeditor/runtime/EditorSerializables.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-RenderNode::RenderNode(int id, Graph* graph)
-    : Node(id)
+RenderNode::RenderNode()
 {
     // Inputs
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        std::string(pipeline::getTypeName(pipeline::PropertyType::Entity)) + "[]",
+        std::string(node::getTypeName(node::PropertyType::Entity)) + "[]",
         "Objects"
     ));
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Eye),
+        node::getTypeName(node::PropertyType::Eye),
         "Eye"
     ));
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Target),
+        node::getTypeName(node::PropertyType::Target),
         "Target"
     ));
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Require),
+        node::getTypeName(node::PropertyType::Require),
         "Require"
     ));
 
     // Outputs
-    p_outputs.push_back(graph->createOutputPin(
+    p_outputs.push_back(new OutputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Require),
+        node::getTypeName(node::PropertyType::Require),
         "Require"
     ));
 
@@ -52,13 +52,13 @@ RenderNode::RenderNode(int id, Graph* graph)
 }
 
 void RenderNode::convertToArray() {
-    p_inputs[1]->setType(std::string(pipeline::getTypeName(pipeline::PropertyType::Eye)) + "[]");
-    p_inputs[2]->setType(std::string(pipeline::getTypeName(pipeline::PropertyType::Target)) + "[]");
+    p_inputs[1]->setType(std::string(node::getTypeName(node::PropertyType::Eye)) + "[]");
+    p_inputs[2]->setType(std::string(node::getTypeName(node::PropertyType::Target)) + "[]");
 }
 
 void RenderNode::convertToSingle() {
-    p_inputs[1]->setType(std::string(pipeline::getTypeName(pipeline::PropertyType::Eye)));
-    p_inputs[2]->setType(std::string(pipeline::getTypeName(pipeline::PropertyType::Target)));
+    p_inputs[1]->setType(std::string(node::getTypeName(node::PropertyType::Eye)));
+    p_inputs[2]->setType(std::string(node::getTypeName(node::PropertyType::Target)));
 }
 
 const char* RenderNode::getNodeName() const {
@@ -101,24 +101,6 @@ void RenderNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool RenderNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "Render";
-    out << YAML::Key << "IsArray" << YAML::Value << m_array;
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
-}
-
-bool RenderNode::deserialize(YAML::Node& data) {
-    deserializeData(data);
-    m_array = data["IsArray"].as<bool>();
-    if (m_array) {
-        convertToArray();
-    }
-    return true;
-}
-
 bool RenderNode::onConnectToInput(InputPin* target, OutputPin* source) {
     // Check which pin
     if (p_inputs[0] == target || p_inputs[3] == target) {
@@ -126,7 +108,7 @@ bool RenderNode::onConnectToInput(InputPin* target, OutputPin* source) {
         return true;
     }
 
-    if (pipeline::isArray(source->getType())) {
+    if (node::isArray(source->getType())) {
         if (!m_array) {
             // Convert to array
             m_array = true;
@@ -141,6 +123,25 @@ bool RenderNode::onConnectToInput(InputPin* target, OutputPin* source) {
         }
     }
 
+    return true;
+}
+
+io::SerializableType RenderNode::getType() {
+    return static_cast<io::SerializableType>(io::EditorSerializables::RenderNode);
+}
+
+bool RenderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    emitter << YAML::Key << "IsArray" << YAML::Value << m_array;
+    serializeData(emitter);
+    return true;
+}
+
+bool RenderNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+    deserializeData(data);
+    m_array = data["IsArray"].as<bool>();
+    if (m_array) {
+        convertToArray();
+    }
     return true;
 }
 

@@ -11,7 +11,7 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 class ConcatObjectsNode : public Node
 {
 public:
-	ConcatObjectsNode(int id, Graph* graph, const std::string& type);
+	ConcatObjectsNode();
 
 	/**
 	 * @brief Changes the type of the concat node
@@ -22,9 +22,10 @@ public:
 	// Inherited via Node
 	virtual const char* getNodeName() const override;
 	virtual void evaluate(compiler::GraphEvaluator* evaluator) override;
-	virtual bool serialize(YAML::Emitter& out) override;
-	virtual bool deserialize(YAML::Node& data) override;
 	virtual bool onConnectToInput(InputPin* target, OutputPin* source) override;
+	virtual io::SerializableType getType() override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	std::string m_currentType;
 };

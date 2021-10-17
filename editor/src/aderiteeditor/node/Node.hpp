@@ -1,6 +1,6 @@
 #pragma once
 
-#include "aderite/interfaces/ISerializable.hpp"
+#include "aderite/io/SerializableObject.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/node/Forward.hpp"
 #include "aderiteeditor/compiler/Forward.hpp"
@@ -11,9 +11,10 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
  * @brief Base node class
  * NOTES: Inherited nodes should define their constructor as (id, Graph*, args...)
 */
-class Node : public interfaces::ISerializable
+class Node : public io::SerializableObject
 {
 public:
+	Node();
 	Node(int id);
 	virtual ~Node();
 
@@ -21,6 +22,12 @@ public:
 	 * @brief Returns the node id
 	*/
 	int getId() const;
+
+	/**
+	 * @brief Sets the id of the node
+	 * @param id New id of the node
+	*/
+	void setId(int id);
 
 	/**
 	 * @brief Returns the input pins of the node
@@ -67,7 +74,7 @@ public:
 	 * @return True if connection accepted, false otherwise
 	*/
 	virtual bool onConnectToOutput(OutputPin* target, InputPin* source) { return true; };
-protected:
+
 	/**
 	 * @brief Returns the name of the node
 	 * @return Name of the node
@@ -78,7 +85,7 @@ protected:
 	 * @brief Optional UI body
 	*/
 	virtual void renderBody() {};
-
+protected:
 	/**
 	 * @brief Serializes pins and position
 	*/
@@ -87,12 +94,7 @@ protected:
 	/**
 	 * @brief Deserializes pins and position
 	*/
-	void deserializeData(YAML::Node& data);
-private:
-	/**
-	 * @brief Renders input and output pins
-	*/
-	void renderPins();
+	void deserializeData(const YAML::Node& data);
 protected:
 	std::vector<InputPin*> p_inputs;
 	std::vector<OutputPin*> p_outputs;

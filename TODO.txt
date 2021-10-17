@@ -24,7 +24,7 @@ PhysX splash screen
 bgfx splash screen
 
 Serialization:
-Rework ISerializable to register handlers and types
+Name resolve
 
 Asset manager:
 In drastic need of reworking

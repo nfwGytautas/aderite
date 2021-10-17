@@ -20,6 +20,7 @@ RenderOperation::RenderOperation(EntityProvideOperation* entities, EyeProvideOpe
 
 void RenderOperation::initialize() {
 	m_viewId = nextViewId++;
+	bgfx::setViewClear(m_viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
 
 	ADERITE_DEBUG_SECTION
 	(

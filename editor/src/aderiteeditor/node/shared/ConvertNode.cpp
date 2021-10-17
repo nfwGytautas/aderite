@@ -5,28 +5,28 @@
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/runtime/OperationArray.hpp"
+#include "aderiteeditor/runtime/EditorSerializables.hpp"
 
 #include "aderite/rendering/operation/All.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-ConvertNode::ConvertNode(int id, Graph* graph, const std::string& from, const std::string& to)
-	: Node(id), m_from(from), m_to(to)
+ConvertNode::ConvertNode()
 {
-	p_inputs.push_back(graph->createInputPin(
+	p_inputs.push_back(new InputPin(
 		this,
-		m_from,
+		"None",
 		"From"
 	));
 
-	p_outputs.push_back(graph->createOutputPin(
+	p_outputs.push_back(new OutputPin(
 		this,
-		m_to,
+		"None",
 		"To"
 	));
 }
@@ -34,33 +34,28 @@ ConvertNode::ConvertNode(int id, Graph* graph, const std::string& from, const st
 void ConvertNode::setFromType(const std::string& from) {
 	p_inputs[0]->setType(from);
 
-	if (pipeline::isArray(from) && !pipeline::isArray(m_to)) {
+	// TODO: Add convenience function for converting to and from arrays
+	if (node::isArray(from) && !node::isArray(p_outputs[0]->getType())) {
 		// Convert output to array
-		p_outputs[0]->setType(m_to + "[]");
+		p_outputs[0]->setType(p_outputs[0]->getType() + "[]");
 	}
-	else if (!pipeline::isArray(from) && pipeline::isArray(m_to)) {
+	else if (!node::isArray(from) && node::isArray(p_outputs[0]->getType())) {
 		// Remove array
-		p_outputs[0]->setType(m_to.substr(0, m_to.length() - 2));
+		p_outputs[0]->setType(p_outputs[0]->getType().substr(0, p_outputs[0]->getType().length() - 2));
 	}
-
-	// TODO: remove m_to and m_from
-	m_to = p_outputs[0]->getType();
 }
 
 void ConvertNode::setToType(const std::string& to) {
 	p_outputs[0]->setType(to);
 
-	if (pipeline::isArray(to) && !pipeline::isArray(m_from)) {
+	if (node::isArray(to) && !node::isArray(p_inputs[0]->getType())) {
 		// Convert output to array
-		p_inputs[0]->setType(m_from + "[]");
+		p_inputs[0]->setType(p_inputs[0]->getType() + "[]");
 	}
-	else if (!pipeline::isArray(to) && pipeline::isArray(m_from)) {
+	else if (!node::isArray(to) && node::isArray(p_inputs[0]->getType())) {
 		// Remove array
-		p_inputs[0]->setType(m_from.substr(0, m_from.length() - 2));
+		p_inputs[0]->setType(p_inputs[0]->getType().substr(0, p_inputs[0]->getType().length() - 2));
 	}
-
-	// TODO: remove m_to and m_from
-	m_from = p_inputs[0]->getType();
 }
 
 const char* ConvertNode::getNodeName() const {
@@ -81,23 +76,8 @@ void ConvertNode::evaluate(compiler::GraphEvaluator* evaluator) {
 	m_evaluated = true;
 }
 
-bool ConvertNode::serialize(YAML::Emitter& out) {
-	out << YAML::BeginMap;
-	out << YAML::Key << "NodeType" << YAML::Value << "Convert";
-	out << YAML::Key << "From" << YAML::Value << m_from;
-	out << YAML::Key << "To" << YAML::Value << m_to;
-	serializeData(out);
-	out << YAML::EndMap;
-	return false;
-}
-
-bool ConvertNode::deserialize(YAML::Node& data) {
-	deserializeData(data);
-	return true;
-}
-
 bool ConvertNode::onConnectToInput(InputPin* target, OutputPin* source) {
-	if (source->getType() != m_from) {
+	if (source->getType() != p_inputs[0]->getType()) {
 		this->setFromType(source->getType());
 	}
 
@@ -105,22 +85,40 @@ bool ConvertNode::onConnectToInput(InputPin* target, OutputPin* source) {
 }
 
 bool ConvertNode::onConnectToOutput(OutputPin* target, InputPin* source) {
-	if (source->getType() != m_to) {
+	if (source->getType() != p_outputs[0]->getType()) {
 		this->setToType(source->getType());
 	}
 
 	return true;
 }
 
+io::SerializableType ConvertNode::getType() {
+	return static_cast<io::SerializableType>(io::EditorSerializables::ConvertNode);
+}
+
+bool ConvertNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	emitter << YAML::Key << "From" << YAML::Value << p_inputs[0]->getType();
+	emitter << YAML::Key << "To" << YAML::Value << p_outputs[0]->getType();
+	serializeData(emitter);
+	return true;
+}
+
+bool ConvertNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+	deserializeData(data);
+	p_inputs[0]->setType(data["From"].as<std::string>());
+	p_outputs[0]->setType(data["To"].as<std::string>());
+	return true;
+}
+
 void ConvertNode::handlePipelineConvert(compiler::PipelineEvaluator* pe) {
-	if (pipeline::isArrayOrType(m_from, pipeline::getTypeName(pipeline::PropertyType::Camera))) {
-		if (pipeline::isArrayOrType(m_to, pipeline::getTypeName(pipeline::PropertyType::Eye))) {
+	if (node::isArrayOrType(p_inputs[0]->getType(), node::getTypeName(node::PropertyType::Camera))) {
+		if (node::isArrayOrType(p_outputs[0]->getType(), node::getTypeName(node::PropertyType::Eye))) {
 			convert(pe, &ConvertNode::eyeToCamera);
 			return;
 		}
 	}
 
-	LOG_ERROR("Unknown conversion from {0} to {1}", m_from, m_to);
+	LOG_ERROR("Unknown conversion from {0} to {1}", p_inputs[0]->getType(), p_outputs[0]->getType());
 }
 
 void ConvertNode::handleShaderConvert(compiler::ShaderEvaluator* se) {
@@ -128,7 +126,7 @@ void ConvertNode::handleShaderConvert(compiler::ShaderEvaluator* se) {
 }
 
 void ConvertNode::convert(compiler::PipelineEvaluator* pe, PipelineConversionFn cfn) {
-	if (pipeline::isArray(m_from)) {
+	if (node::isArray(p_inputs[0]->getType())) {
 		// Array convert
 		applyArray(pe, cfn);
 	}
@@ -147,7 +145,7 @@ void ConvertNode::applyArray(compiler::PipelineEvaluator* pe, PipelineConversion
 		pe->addOperation(converted);
 		result->addOperation(converted);
 	}
-	result->setDebugName("Convert (" + m_from + "->" + m_to + ")");
+	result->setDebugName("Convert (" + p_inputs[0]->getType() + "->" + p_outputs[0]->getType() + ")");
 	p_outputs[0]->setValue(pe->addOperation(result));
 }
 

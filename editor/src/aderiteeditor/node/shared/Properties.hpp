@@ -3,7 +3,8 @@
 #include <string>
 #include "aderiteeditor/utility/Macros.hpp"
 
-ADERITE_EDITOR_PIPELINE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
 enum class PropertyType : size_t {
 	Target = 0, // FBO
@@ -35,4 +36,5 @@ bool isArray(const std::string& type);
 */
 bool isArrayOrType(const std::string& check, const std::string& type);
 
-ADERITE_EDITOR_PIPELINE_NAMESPACE_END
+}
+}
