@@ -3,16 +3,17 @@
 #include <unordered_map>
 #include <bgfx/bgfx.h>
 #include "aderite/utility/Macros.hpp"
-#include "aderite/asset/Asset.hpp"
-#include "aderite/asset/Forward.hpp"
+#include "aderite/io/SerializableObject.hpp"
+#include "aderite/io/Loader.hpp"
 #include "aderite/asset/property/Forward.hpp"
 
-ADERITE_ASSET_NAMESPACE_BEGIN
+namespace aderite {
+namespace asset {
 
 /**
  * @brief Material asset implementation
 */
-class MaterialAsset : public Asset {
+class MaterialAsset : public io::SerializableObject, public io::ILoadable {
 public:
 	/**
 	 * @brief Editable fields of the asset, this information is stored inside the asset file
@@ -24,16 +25,14 @@ public:
 public:
 	~MaterialAsset();
 
-	virtual AssetType type() const override;
-	virtual bool isInGroup(AssetGroup group) const override;
-
-	virtual void prepareLoad() override;
-	virtual bool isReadyToLoad() override;
-	virtual void load() override;
+	// Inherited via ILoadable
+	virtual void load(const io::Loader* loader) override;
 	virtual void unload() override;
-	virtual bool isPreparing() override;
-	virtual bool isLoaded() override;
-	virtual size_t hash() const override;
+
+	// Inherited via SerializableObject
+	virtual io::SerializableType getType() override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 
 	/**
 	 * @brief Sets the type of the material
@@ -60,19 +59,11 @@ public:
 	}
 
 	std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> getSamplerData() const;
-protected:
-	MaterialAsset(const std::string& name);
-	MaterialAsset(const std::string& name, const fields& info);
-
-	virtual bool serialize(YAML::Emitter& out) override;
-	virtual bool deserialize(YAML::Node& data) override;
-
-	friend class AssetManager;
 private:
 	fields m_info = {};
 	float* m_udata = nullptr; // Data passed to material uniform
 	size_t m_dataSize = 0;
-	bool m_isBeingPrepared = false;
 };
 
-ADERITE_ASSET_NAMESPACE_END
+}
+}

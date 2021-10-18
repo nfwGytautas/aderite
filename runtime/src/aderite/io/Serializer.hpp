@@ -67,12 +67,6 @@ public:
 	void shutdown();
 
 	/**
-	 * @brief Set the resolver of the serializer, caller remains the owner of the instance
-	 * @param resolver Resolver instance
-	*/
-	void setResolver(PathResolver* resolver);
-
-	/**
 	 * @brief Links a type to an instancer, if a type already has a linked instancer, then
 	 * the instancer is overridden and a DEBUG message is logged
 	 * @param type Type to link
@@ -186,13 +180,6 @@ private:
 	InstancerBase* resolveInstancer(SerializableType type) const;
 
 	/**
-	 * @brief Use the resolver to resolve the path to a serializable
-	 * @param handle Handle to resolve
-	 * @return Path
-	*/
-	Path resolvePath(SerializableHandle handle);
-
-	/**
 	 * @brief Returns the next available handle for an object, expanding the object vector as needed
 	 * @return Next available handle
 	*/
@@ -200,8 +187,6 @@ private:
 private:
 	std::map<SerializableType, InstancerBase*> m_instancers;
 	std::vector<SerializableObject*> m_objects;
-
-	PathResolver* m_resolver = nullptr;
 	bool m_hasNull = false;
 };
 

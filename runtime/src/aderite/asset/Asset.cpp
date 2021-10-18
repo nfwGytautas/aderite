@@ -1,7 +1,0 @@
-#include "Asset.hpp"
-
-ADERITE_ASSET_NAMESPACE_BEGIN
-
-// Code here
-
-ADERITE_ASSET_NAMESPACE_END

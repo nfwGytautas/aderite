@@ -27,14 +27,7 @@ Serialization:
 Name resolve
 
 Asset manager:
-In drastic need of reworking
-Load caching
-Thread pool asset loading
-IWorkerThread
-IAssetLoader
-Rework ILoadable
-Asset registry
-Abort asset load
+Asset ref counting
 
 Node editor:
 Clear graph on new select
@@ -114,3 +107,4 @@ Mesh loading API optmization
 Move enums to files
 Move logger to engine system
 More verbose logging
+Remove pointers where not needed

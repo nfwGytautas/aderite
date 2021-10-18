@@ -1,7 +1,6 @@
 #pragma once
 
 #include "aderite/utility/Macros.hpp"
-#include "aderite/interfaces/ISerializable.hpp"
 
 ADERITE_PROPERTY_NAMESPACE_BEGIN
 

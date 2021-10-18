@@ -10,15 +10,18 @@ namespace io {
 
 // Typedefs
 using SerializableHandle = size_t;
+using LoadableHandle = size_t;
 using SerializableType = size_t;
 constexpr size_t c_InvalidHandle = 0xffffffffffffffffui64; // std::numeric_limits<size_t>::max() or ULLONG_MAX
 
 // Classes
+class FileHandler;
 class Serializer;
 class InstancerBase;
 class SerializableObject;
-class PathResolver;
-struct Path;
+class ILoadable;
+class Loader;
+class LoaderPool;
 
 }
 }

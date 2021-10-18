@@ -1,12 +1,14 @@
 #include "Serializer.hpp"
 
-#include <fstream>
+#include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
 #include "aderite/io/SerializableObject.hpp"
-#include "aderite/io/PathResolver.hpp"
+#include "aderite/io/FileHandler.hpp"
 #include "aderite/io/Instancer.hpp"
 #include "aderite/io/RuntimeSerializables.hpp"
+
+#include "aderite/asset/MeshAsset.hpp"
 
 namespace aderite {
 namespace io {
@@ -16,7 +18,7 @@ bool Serializer::init() {
 
 	// Runtime instancers
 	LOG_TRACE("Setting runtime instancers");
-	
+	linkInstancer(static_cast<size_t>(RuntimeSerializables::MESH), new Instancer<asset::MeshAsset>());
 
 	// Check that no runtime serializables have been forgotten
 	ADERITE_DYNAMIC_ASSERT(m_instancers.size() == (static_cast<size_t>(RuntimeSerializables::END) - static_cast<size_t>(RuntimeSerializables::RESERVED) - 1), "Not all runtime serializables are linked");
@@ -31,10 +33,6 @@ void Serializer::shutdown() {
 	for (auto instancer : m_instancers) {
 		delete instancer.second;
 	}
-}
-
-void Serializer::setResolver(PathResolver* resolver) {
-	m_resolver = resolver;
 }
 
 void Serializer::linkInstancer(SerializableType type, InstancerBase* instancer) {
@@ -128,7 +126,6 @@ void Serializer::add(SerializableObject* object) {
 	ADERITE_DYNAMIC_ASSERT(object->getHandle() == c_InvalidHandle, "Tried to add an already existing object to Serializer");
 	SerializableHandle handle = this->nextAvailableHandle();
 	object->m_handle = handle;
-	m_resolver->store(object);
 	m_objects[handle] = object;
 }
 
@@ -145,8 +142,8 @@ SerializableObject* Serializer::getOrRead(SerializableHandle handle) {
 	}
 
 	// Resolve path and load
-	Path path = this->resolvePath(handle);
-	YAML::Node data = YAML::LoadFile(path.File.string());
+	DataChunk chunk = aderite::Engine::getFileHandler()->open(handle);
+	YAML::Node data = YAML::Load(reinterpret_cast<const char*>(chunk.Data.data()));
 
 	// Check version
 	ADERITE_DYNAMIC_ASSERT(data["Version"], "Tried to read a file without a specified version");
@@ -166,14 +163,12 @@ SerializableObject* Serializer::getOrRead(SerializableHandle handle) {
 
 void Serializer::reread(SerializableObject* object) {
 	// Resolve path and load
-	Path path = this->resolvePath(object->getHandle());
-	YAML::Node data = YAML::LoadFile(path.File.string());
+	DataChunk chunk = aderite::Engine::getFileHandler()->open(object->getHandle());
+	YAML::Node data = YAML::Load(reinterpret_cast<const char*>(chunk.Data.data()));
 	object->deserialize(this, data["Data"]);
 }
 
 void Serializer::save(SerializableObject* object) {
-	ADERITE_DYNAMIC_ASSERT(m_resolver != nullptr, "No path resolver set");
-
 	YAML::Emitter out;
 
 	ADERITE_DYNAMIC_ASSERT(object->getHandle() != c_InvalidHandle, "SerializableObject with invalid handle passed");
@@ -195,10 +190,10 @@ void Serializer::save(SerializableObject* object) {
 	out << YAML::EndMap;
 
 	// Resolve where to store this object
-	Path path = this->resolvePath(object->getHandle());
-
-	std::ofstream fout(path.File);
-	fout << out.c_str();
+	DataChunk chunk = aderite::Engine::getFileHandler()->open(object->getHandle());
+	chunk.Data.resize(out.size());
+	std::memcpy(chunk.Data.data(), out.c_str(), chunk.Data.size());
+	aderite::Engine::getFileHandler()->commit(chunk);
 }
 
 ADERITE_DEBUG_SECTION(
@@ -224,11 +219,6 @@ InstancerBase* Serializer::resolveInstancer(SerializableType type) const {
 	auto it = m_instancers.find(type);
 	ADERITE_DYNAMIC_ASSERT(it != m_instancers.end(), "Tried to resolve instancer for non registered type {0}", type);
 	return it->second;
-}
-
-Path Serializer::resolvePath(SerializableHandle handle) {
-	ADERITE_DYNAMIC_ASSERT(m_resolver != nullptr, "Tried to resolve path with no resolver");
-	return m_resolver->resolve(handle);
 }
 
 SerializableHandle Serializer::nextAvailableHandle() {

@@ -1,10 +1,12 @@
 #include "MaterialTypeAsset.hpp"
 
 #include "aderite/Aderite.hpp"
-#include "aderite/asset/AssetManager.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/io/Loader.hpp"
+#include "aderite/io/RuntimeSerializables.hpp"
 
-ADERITE_ASSET_NAMESPACE_BEGIN
+namespace aderite {
+namespace asset {
 
 bgfx::ShaderHandle load_shader(const std::vector<unsigned char>& source, const std::string& name) {
 	const bgfx::Memory* mem = bgfx::copy(source.data(), source.size() + 1);
@@ -20,66 +22,26 @@ MaterialTypeAsset::~MaterialTypeAsset() {
 	}
 }
 
-AssetType MaterialTypeAsset::type() const {
-	return AssetType::MATERIAL_TYPE;
-}
+void MaterialTypeAsset::load(const io::Loader* loader) {
+	io::Loader::BinaryLoadResult vBlr = loader->loadBinary(m_info.Vertex);
+	io::Loader::BinaryLoadResult fBlr = loader->loadBinary(m_info.Fragment);
 
-bool MaterialTypeAsset::isInGroup(AssetGroup group) const {
-	switch (group) {
-	default:
-		return false;
-	}
-}
-
-void MaterialTypeAsset::prepareLoad() {
-	// Load sources
-	// TODO: Async
-	std::string typeName = getName();
-	std::replace_if(std::begin(typeName), std::end(typeName),
-		[](std::string::value_type v) { return v == '.'; },
-		'_');
-
-	m_vertexSource = ::aderite::Engine::getAssetManager()->loadBinFile("vs_" + typeName + ".bin");
-	m_fragmentSource = ::aderite::Engine::getAssetManager()->loadBinFile("fs_" + typeName + ".bin");
-
-	if (m_vertexSource.size() == 0 || m_fragmentSource.size() == 0) {
-		// This is to not block when there are no sources, will be reworked together with entire asset system
-		m_vertexSource.push_back('_');
-		m_fragmentSource.push_back('_');
-	}
-
-	m_isBeingPrepared = true;
-}
-
-bool MaterialTypeAsset::isReadyToLoad() {
-	return (m_vertexSource.size() > 0 && m_fragmentSource.size() > 0);
-}
-
-void MaterialTypeAsset::load() {
-	if (isLoaded()) {
-		LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);
-		unload();
-	}
-
-	if (m_vertexSource.size() == 1 || m_fragmentSource.size() == 1) {
-		LOG_WARN("Failed to load");
-		return;
-	}
+	ADERITE_DYNAMIC_ASSERT(vBlr.Error.empty() && fBlr.Error.empty(), "Vertex or fragment is nullptr");
 
 	// Load bgfx bin shader
-	bgfx::ShaderHandle vsh = load_shader(m_vertexSource, "vVertex");
-	bgfx::ShaderHandle fsh = load_shader(m_fragmentSource, "fVertex");
+	bgfx::ShaderHandle vsh = load_shader(vBlr.Content, m_info.Name + " vertex");
+	bgfx::ShaderHandle fsh = load_shader(fBlr.Content, m_info.Name + " fragment");
 
 	// Create program
 	m_handle = bgfx::createProgram(vsh, fsh, true);
 
 	// Create uniform
-	std::string typeName = getName();
+	std::string typeName = m_info.Name;
 	std::replace_if(std::begin(typeName), std::end(typeName),
 		[](std::string::value_type v) { return v == '.'; },
 		'_');
 	m_uniform = bgfx::createUniform(
-		("u_mat_buffer_" + typeName).c_str(), 
+		("u_mat_buffer_" + typeName).c_str(),
 		bgfx::UniformType::Vec4,
 		m_info.v4Count);
 
@@ -87,13 +49,11 @@ void MaterialTypeAsset::load() {
 	for (prop::Property* prop : m_info.Properties) {
 		if (prop::isSampler(prop->getType())) {
 			m_samplers[prop->getName()] = bgfx::createUniform(
-				("s_" + typeName + "_" + prop->getName()).c_str(), 
-				bgfx::UniformType::Sampler, 
+				("s_" + typeName + "_" + prop->getName()).c_str(),
+				bgfx::UniformType::Sampler,
 				1);
 		}
 	}
-
-	m_isBeingPrepared = false;
 }
 
 void MaterialTypeAsset::unload() {
@@ -116,17 +76,47 @@ void MaterialTypeAsset::unload() {
 	m_samplers.clear();
 }
 
-bool MaterialTypeAsset::isPreparing() {
-	return m_isBeingPrepared;
+io::SerializableType MaterialTypeAsset::getType() {
+	return static_cast<io::SerializableType>(io::RuntimeSerializables::MAT_TYPE);
 }
 
-bool MaterialTypeAsset::isLoaded() {
-	return bgfx::isValid(m_handle);;
+bool MaterialTypeAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	emitter << YAML::Key << "ElementCount" << YAML::Value << m_info.ElementCount;
+
+	emitter << YAML::Key << "Properties" << YAML::BeginSeq;
+	for (prop::Property* pb : m_info.Properties) {
+		emitter << YAML::BeginMap;
+		emitter << YAML::Key << "Name" << YAML::Value << pb->getName();
+		emitter << YAML::Key << "Type" << YAML::Value << static_cast<size_t>(pb->getType());
+		emitter << YAML::Key << "Offset" << YAML::Value << pb->getOffset();
+		emitter << YAML::EndMap;
+	}
+	emitter << YAML::EndSeq;
+
+	return true;
 }
 
-size_t MaterialTypeAsset::hash() const {
-	size_t thisHash = std::hash<std::string>{}(p_name);
-	return thisHash;
+bool MaterialTypeAsset::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+	if (data["ElementCount"]) {
+		m_info.ElementCount = data["ElementCount"].as<size_t>();
+	}
+
+	auto properties = data["Properties"];
+	if (properties) {
+		for (auto property : properties) {
+			// Resolve type
+			prop::PropertyType type = static_cast<prop::PropertyType>((property["Type"].as<size_t>()));
+			std::string name = property["Name"].as<std::string>();
+			uint16_t offset = property["Offset"].as<uint16_t>();
+
+			prop::Property* propInstance = new prop::Property(type, name);
+			propInstance->setOffset(offset);
+
+			m_info.Properties.push_back(propInstance);
+		}
+	}
+
+	return true;
 }
 
 void MaterialTypeAsset::recalculate() {
@@ -210,51 +200,5 @@ size_t MaterialTypeAsset::getSizeInBytes() const {
 	return m_info.ElementCount * sizeof(float);
 }
 
-MaterialTypeAsset::MaterialTypeAsset(const std::string& name)
-	: Asset(name + ".mtype")
-{}
-
-MaterialTypeAsset::MaterialTypeAsset(const std::string& name, const fields& info)
-	: Asset(name + ".mtype"), m_info(info)
-{}
-
-bool MaterialTypeAsset::serialize(YAML::Emitter& out) {
-	out << YAML::Key << "ElementCount" << YAML::Value << m_info.ElementCount;
-
-	out << YAML::Key << "Properties" << YAML::BeginSeq;
-	for (prop::Property* pb : m_info.Properties) {
-		out << YAML::BeginMap;
-		out << YAML::Key << "Name" << YAML::Value << pb->getName();
-		out << YAML::Key << "Type" << YAML::Value << static_cast<size_t>(pb->getType());
-		out << YAML::Key << "Offset" << YAML::Value << pb->getOffset();
-		out << YAML::EndMap;
-	}
-	out << YAML::EndSeq;
-
-	return true;
 }
-
-bool MaterialTypeAsset::deserialize(YAML::Node& data) {
-	if (data["ElementCount"]) {
-		m_info.ElementCount = data["ElementCount"].as<size_t>();
-	}
-
-	auto properties = data["Properties"];
-	if (properties) {
-		for (auto property : properties) {
-			// Resolve type
-			prop::PropertyType type = static_cast<prop::PropertyType>((property["Type"].as<size_t>()));
-			std::string name = property["Name"].as<std::string>();
-			uint16_t offset = property["Offset"].as<uint16_t>();
-
-			prop::Property* propInstance = new prop::Property(type, name);
-			propInstance->setOffset(offset);
-
-			m_info.Properties.push_back(propInstance);
-		}
-	}
-
-	return true;
 }
-
-ADERITE_ASSET_NAMESPACE_END

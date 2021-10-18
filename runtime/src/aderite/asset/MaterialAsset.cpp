@@ -7,72 +7,81 @@
 #include "aderite/utility/Macros.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Utility.hpp"
-#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
-#include "aderite/rendering/DrawCall.hpp"
+#include "aderite/io/Loader.hpp"
+#include "aderite/io/RuntimeSerializables.hpp"
+#include "aderite/io/Serializer.hpp"
 
-ADERITE_ASSET_NAMESPACE_BEGIN
+namespace aderite {
+namespace asset {
 
 MaterialAsset::~MaterialAsset() {
 	std::free(m_udata);
 }
 
-AssetType MaterialAsset::type() const {
-	return AssetType::MATERIAL;
+void MaterialAsset::load(const io::Loader* loader) {
+	// TODO: Reference 
 }
 
-bool MaterialAsset::serialize(YAML::Emitter& out) {
+void MaterialAsset::unload() {
+	// TODO: Rework cause this is reference counted
+}
+
+io::SerializableType MaterialAsset::getType() {
+	return static_cast<io::SerializableType>(io::RuntimeSerializables::MATERIAL);
+}
+
+bool MaterialAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
 	// Material
 	if (m_info.Type != nullptr) {
-		out << YAML::Key << "MaterialType" << YAML::Value << m_info.Type->getName();
+		emitter << YAML::Key << "MaterialType" << YAML::Value << m_info.Type->getHandle();
 	}
 
-	out << YAML::Key << "Properties" << YAML::BeginMap;
-	out << YAML::Key << "Size" << YAML::Value << m_dataSize;
+	emitter << YAML::Key << "Properties" << YAML::BeginMap;
+	emitter << YAML::Key << "Size" << YAML::Value << m_dataSize;
 
-	out << YAML::Key << "Data" << YAML::Flow << YAML::BeginSeq;
+	emitter << YAML::Key << "Data" << YAML::Flow << YAML::BeginSeq;
 	for (size_t i = 0; i < m_dataSize / sizeof(float); i++) {
 		float val = m_udata[i];
-		out << m_udata[i];
+		emitter << m_udata[i];
 	}
-	out << YAML::EndSeq;
-	out << YAML::EndMap;
+	emitter << YAML::EndSeq;
+	emitter << YAML::EndMap;
 
-	out << YAML::Key << "Samplers" << YAML::BeginSeq;
+	emitter << YAML::Key << "Samplers" << YAML::BeginSeq;
 	for (auto pair : m_info.Samplers) {
-		out << YAML::BeginMap; 
-		out << YAML::Key << "Name" << YAML::Value << pair.first;
-		out << YAML::Key << "Texture" << YAML::Value;
+		emitter << YAML::BeginMap;
+		emitter << YAML::Key << "Name" << YAML::Value << pair.first;
+		emitter << YAML::Key << "Texture" << YAML::Value;
 
 		if (pair.second != nullptr) {
-			out << pair.second->getName();
+			emitter << pair.second->getHandle();
 		}
 		else {
-			out << YAML::Null;
+			emitter << YAML::Null;
 		}
 
-		out << YAML::EndMap;
+		emitter << YAML::EndMap;
 	}
-	out << YAML::EndSeq;
-
+	emitter << YAML::EndSeq;
 
 	return true;
 }
 
-bool MaterialAsset::deserialize(YAML::Node& data) {
+bool MaterialAsset::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
 	if (data["MaterialType"]) {
-		std::string typeName = data["MaterialType"].as<std::string>();
+	    io::SerializableHandle typeName = data["MaterialType"].as<io::SerializableHandle>();
 
 		// TODO: Error check
-		m_info.Type = static_cast<MaterialTypeAsset*>(::aderite::Engine::getAssetManager()->getOrRead(typeName));
+		m_info.Type = static_cast<MaterialTypeAsset*>(::aderite::Engine::getSerializer()->getOrRead(typeName));
 	}
 
 	m_dataSize = data["Properties"]["Size"].as<size_t>();
 
 	if (m_info.Type != nullptr) {
 		if (m_info.Type->getSizeInBytes() != m_dataSize) {
-			LOG_WARN("Size and type mismatch for {0}, trying to reapply type", p_name);
+			LOG_WARN("Size and type mismatch for {0}, trying to reapply type", getHandle());
 			// Reapply type
 			setType(m_info.Type);
 			return true;
@@ -80,7 +89,7 @@ bool MaterialAsset::deserialize(YAML::Node& data) {
 	}
 	else {
 		if (m_dataSize > 0) {
-			LOG_ERROR("Size is more than 0 on a material with no type {0}", p_name);
+			LOG_ERROR("Size is more than 0 on a material with no type {0}", getHandle());
 			return false;
 		}
 	}
@@ -88,16 +97,16 @@ bool MaterialAsset::deserialize(YAML::Node& data) {
 	m_udata = static_cast<float*>(std::malloc(m_dataSize));
 
 	if (m_udata == nullptr) {
-		LOG_ERROR("Failed to allocate space for material property data {0}", p_name);
+		LOG_ERROR("Failed to allocate space for material property data {0}", getHandle());
 		return false;
 	}
 
 	std::memset(m_udata, 0, m_dataSize);
 
-	YAML::Node& d = data["Properties"]["Data"];
+	const YAML::Node& d = data["Properties"]["Data"];
 
 	if (d.size() > (m_dataSize / sizeof(float))) {
-		LOG_ERROR("Incorrect size for stored material data and type {0}", p_name);
+		LOG_ERROR("Incorrect size for stored material data and type {0}", getHandle());
 		return false;
 	}
 
@@ -105,11 +114,11 @@ bool MaterialAsset::deserialize(YAML::Node& data) {
 		m_udata[i] = d[i].as<float>();
 	}
 
-	for (YAML::Node& sampler : data["Samplers"]) {
+	for (const YAML::Node& sampler : data["Samplers"]) {
 		TextureAsset* texture = nullptr;
 
 		if (!sampler["Texture"].IsNull()) {
-			texture = static_cast<TextureAsset*>(::aderite::Engine::getAssetManager()->getOrRead(sampler["Texture"].as<std::string>()));
+			texture = static_cast<TextureAsset*>(::aderite::Engine::getSerializer()->getOrRead(sampler["Texture"].as<io::SerializableHandle>()));
 		}
 
 		m_info.Samplers[sampler["Name"].as<std::string>()] = texture;
@@ -118,61 +127,10 @@ bool MaterialAsset::deserialize(YAML::Node& data) {
 	return true;
 }
 
-void MaterialAsset::load() {
-	if (isLoaded()) {
-		LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);
-		unload();
-	}
-
-	m_info.Type->load();
-	for (auto samplers : m_info.Samplers) {
-		if (samplers.second) {
-			samplers.second->load();
-		}
-	}
-	m_isBeingPrepared = false;
-}
-
-void MaterialAsset::unload() {
-	//m_info.Shader->unload();
-	// TODO: Rework cause this is reference counted
-	for (auto samplers : m_info.Samplers) {
-		if (samplers.second) {
-			samplers.second->unload();
-		}
-	}
-	m_info.Type->unload();
-}
-
-bool MaterialAsset::isPreparing() {
-	return m_isBeingPrepared;
-}
-
-bool MaterialAsset::isLoaded() {
-	for (auto samplers : m_info.Samplers) {
-		if (samplers.second) {
-			if (!samplers.second->isLoaded()) {
-				return false;
-			}
-		}
-	}
-	return m_info.Type->isLoaded();
-}
-
-size_t MaterialAsset::hash() const {
-	size_t thisHash = std::hash<std::string>{}(p_name);
-	//if (m_info.Shader) {
-	//	size_t shaderHash = m_info.Shader->hash();
-	//	return utility::combineHash(shaderHash, thisHash);
-	//}
-
-	return thisHash;
-}
-
-void MaterialAsset::setType(MaterialTypeAsset* type) { 
+void MaterialAsset::setType(MaterialTypeAsset* type) {
 	// TODO: Move to editor
 	m_info.Type = type;
-	
+
 	if (m_dataSize != type->getSizeInBytes()) {
 		// Recreate buffer
 		m_dataSize = type->getSizeInBytes();
@@ -202,56 +160,19 @@ std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> MaterialAsset::
 	for (auto sampler : m_info.Samplers) {
 		if (!sampler.second) {
 			result.push_back(std::make_pair(
-				typeSamplers[sampler.first], bgfx::TextureHandle{bgfx::kInvalidHandle}
+				typeSamplers[sampler.first], bgfx::TextureHandle{ bgfx::kInvalidHandle }
 			));
 
 			continue;
 		}
 
 		result.push_back(std::make_pair(
-			typeSamplers[sampler.first], sampler.second->getHandle()
+			typeSamplers[sampler.first], sampler.second->getTextureHandle()
 		));
 	}
 
 	return result;
 }
 
-MaterialAsset::MaterialAsset(const std::string& name)
-	: Asset(name + ".material")
-{}
-
-MaterialAsset::MaterialAsset(const std::string& name, const fields& info)
-	: Asset(name + ".material"), m_info(info)
-{}
-
-bool MaterialAsset::isInGroup(AssetGroup group) const {
-	switch (group) {
-	default:
-		return false;
-	}
 }
-
-void MaterialAsset::prepareLoad() {
-	// Load sources
-	m_info.Type->prepareLoad();
-	for (auto samplers : m_info.Samplers) {
-		if (samplers.second) {
-			samplers.second->prepareLoad();
-		}
-	}
-	m_isBeingPrepared = true;
 }
-
-bool MaterialAsset::isReadyToLoad() {
-	for (auto samplers : m_info.Samplers) {
-		if (samplers.second) {
-			if (!samplers.second->isReadyToLoad()) {
-				return false;
-			}
-		}
-	}
-	return m_info.Type->isReadyToLoad();
-	//return true;
-}
-
-ADERITE_ASSET_NAMESPACE_END
