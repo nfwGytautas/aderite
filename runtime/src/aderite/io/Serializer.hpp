@@ -95,16 +95,16 @@ public:
 	 * editor graphs. This method allows the user to interact with the mini reflection system that serializer
 	 * uses internally.
 	 * @param data Data node, must have Type key
-	 * @return SerializableObject instance
+	 * @return ISerializable instance
 	*/
-	SerializableObject* parseUntrackedType(const YAML::Node& data) const;
+	ISerializable* parseUntrackedType(const YAML::Node& data) const;
 
 	/**
 	 * @brief Write an untracked object to the specified emitter
 	 * @param emitter Emitter to write to
 	 * @param object Object to write
 	*/
-	void writeUntrackedType(YAML::Emitter& emitter, SerializableObject* object) const;
+	void writeUntrackedType(YAML::Emitter& emitter, ISerializable* object) const;
 
 	/**
 	 * @brief Returns object associated with the serializable handle

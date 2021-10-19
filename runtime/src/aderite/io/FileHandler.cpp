@@ -11,7 +11,7 @@ DataChunk::DataChunk(size_t offset, size_t size, const char* name, std::vector<u
     : Offset(offset), OriginalSize(size), Name(name), Data(std::move(data))
 {}
 
-DataChunk FileHandler::open(SerializableHandle handle) const {
+DataChunk FileHandler::openSerializable(SerializableHandle handle) const {
     std::ifstream in(m_rootDir / "Asset" / (std::to_string(handle) + ".asset"));
     size_t offset = 0;
     size_t size = in.seekg(0, std::ios::end).tellg();
@@ -22,7 +22,7 @@ DataChunk FileHandler::open(SerializableHandle handle) const {
     return DataChunk(offset, size, ("Asset/" + std::to_string(handle) + ".asset").c_str(), data);
 }
 
-DataChunk FileHandler::open(LoadableHandle handle) const {
+DataChunk FileHandler::openLoadable(LoadableHandle handle) const {
     std::ifstream in(m_rootDir / "Data" / (std::to_string(handle) + ".data"));
     size_t offset = 0;
     size_t size = in.seekg(0, std::ios::end).tellg();

@@ -12,38 +12,24 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
 class EyeProvideOperation : public OperationBase {
 public:
 	/**
-	 * @brief Provide eye from camera
-	 * @param camera Camera to provide from
-	*/
-	void provideFromCamera(CameraProvideOperation* camera);
-
-	/**
 	 * @brief Returns the computed view matrix
 	*/
-	const glm::mat4& getViewMatrix() const;
+	virtual const glm::mat4& getViewMatrix() const = 0;
 
 	/**
 	 * @brief Returns the computed projection matrix
 	*/
-	const glm::mat4& getProjectionMatrix() const;
+	virtual const glm::mat4& getProjectionMatrix() const = 0;
 
 	/**
 	 * @brief Returns true if current data is valid
 	*/
-	bool isValid() const;
-
-	// Inherited via OperationBase
-	virtual void execute() override;
+	virtual bool isValid() const = 0;
 
 	ADERITE_DEBUG_SECTION
 	(
 		virtual const char* getOperationName() override { return "EyeProvideOperation"; }
-	)
-private:
-	glm::mat4 m_viewMatrix;
-	glm::mat4 m_projectionMatrix;
-
-	CameraProvideOperation* m_camera = nullptr;
+	);
 };
 
 ADERITE_RENDERING_NAMESPACE_END

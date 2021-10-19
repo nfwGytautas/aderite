@@ -33,18 +33,27 @@ public:
 class FileHandler final {
 public:
 	/**
+	 * @brief Struct containing reserved serializable and loadable ids
+	*/
+	struct Reserved {
+		static constexpr LoadableHandle MasterAudioBank = 0;
+		static constexpr LoadableHandle StringsAudioBank = 1;
+	};
+
+public:
+	/**
 	 * @brief Resolves the handle file and chunk, loads it and returns it, don't forget to call close
 	 * @param handle Handle to read
 	 * @return DataChunk instance
 	*/
-	DataChunk open(SerializableHandle handle) const;
+	DataChunk openSerializable(SerializableHandle handle) const;
 
 	/**
 	 * @brief Resolves the handle file and chunk, loads it and returns it, don't forget to call close
 	 * @param handle Handle to read
 	 * @return DataChunk instance
 	*/
-	DataChunk open(LoadableHandle handle) const;
+	DataChunk openLoadable(LoadableHandle handle) const;
 
 	/**
 	 * @brief Commit changes to the data chunk to it's respective file

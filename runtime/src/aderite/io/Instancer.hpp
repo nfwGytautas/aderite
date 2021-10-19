@@ -18,7 +18,7 @@ public:
 	 * @brief Create SerializableObject instance
 	 * @return SerializableObject instance
 	*/
-	virtual SerializableObject* create() = 0;
+	virtual ISerializable* create() = 0;
 };
 
 /**
@@ -28,9 +28,9 @@ public:
 template<typename T>
 class Instancer : public InstancerBase {
 public:
-	virtual SerializableObject* create() override {
-		ADERITE_STATIC_ASSERT(std::is_base_of<SerializableObject, T>::value, "Instancer can only be used with types that inherit from SerializableObject");
-		return static_cast<SerializableObject*>(new T());
+	virtual ISerializable* create() override {
+		ADERITE_STATIC_ASSERT(std::is_base_of<ISerializable, T>::value, "Instancer can only be used with types that inherit from ISerializable");
+		return static_cast<ISerializable*>(new T());
 	}
 };
 

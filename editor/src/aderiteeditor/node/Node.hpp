@@ -11,7 +11,7 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
  * @brief Base node class
  * NOTES: Inherited nodes should define their constructor as (id, Graph*, args...)
 */
-class Node : public io::SerializableObject
+class Node : public io::ISerializable
 {
 public:
 	Node();

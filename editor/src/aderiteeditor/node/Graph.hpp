@@ -13,7 +13,7 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 /**
  * @brief Main node editor object which represent the current graph state
 */
-class Graph : public io::SerializableObject
+class Graph : public io::ISerializable
 {
 public:
 	Graph();
@@ -73,7 +73,7 @@ public:
 	*/
 	void renderUI();
 
-	// Inherited via SerializableObject
+	// Inherited via ISerializable
 	virtual io::SerializableType getType() override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
 	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;

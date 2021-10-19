@@ -5,11 +5,11 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/YAML.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/asset/Asset.hpp"
-#include "aderite/asset/AssetManager.hpp"
 #include "aderite/physics/PhysicsController.hpp"
+#include "aderite/io/RuntimeSerializables.hpp"
 
-ADERITE_PHYSICS_NAMESPACE_BEGIN
+namespace aderite {
+namespace physics {
 
 Collider::Collider(physx::PxGeometry* geometry) {
 	physx::PxPhysics* physics = ::aderite::Engine::getPhysicsController()->getPhysics();
@@ -58,12 +58,6 @@ void Collider::setTrigger(bool value) {
 	p_shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, value);
 }
 
-void Collider::setMaterial(asset::Asset* material) {
-	m_material = material;
-
-	//p_shape->setMaterial();
-}
-
 void Collider::setActor(physx::PxRigidActor* actor) {
 	physx::PxRigidActor* prevActor = p_shape->getActor();
 	if (prevActor != nullptr) {
@@ -73,30 +67,19 @@ void Collider::setActor(physx::PxRigidActor* actor) {
 	actor->attachShape(*p_shape);
 }
 
-asset::Asset* Collider::getMaterial() const {
-	return m_material;
+io::SerializableType Collider::getType() const {
+	return static_cast<io::SerializableType>(io::RuntimeSerializables::CLDR);
 }
 
-bool Collider::serialize(YAML::Emitter& out) {
-	// TODO: Error check
-	out << YAML::Key << "IsTrigger" << YAML::Value << isTrigger();
-
-	if (m_material != nullptr) {
-		out << YAML::Key << "Material" << YAML::Value << m_material->getName();
-	}
-
+bool Collider::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	emitter << YAML::Key << "IsTrigger" << YAML::Value << isTrigger();
 	return true;
 }
 
-bool Collider::deserialize(YAML::Node& data) {
+bool Collider::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
 	setTrigger(data["IsTrigger"].as<bool>());
-
-	if (data["Material"]) {
-		asset::Asset* material = ::aderite::Engine::getAssetManager()->getOrRead(data["Material"].as<std::string>());
-		setMaterial(material);
-	}
-
 	return true;
 }
 
-ADERITE_PHYSICS_NAMESPACE_END
+}
+}

@@ -12,8 +12,6 @@ class OperationBase;
 
 class EntityProvideOperation;
 class CameraProvideOperation;
-class MainCameraProvideOperation;
-class FreeCameraProvideOperation;
 class EyeProvideOperation;
 class TargetProvideOperation;
 class RenderOperation;

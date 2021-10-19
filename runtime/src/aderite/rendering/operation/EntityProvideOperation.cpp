@@ -1,5 +1,6 @@
 #include "EntityProvideOperation.hpp"
 
+#include <functional>
 #include <bgfx/bgfx.h>
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Utility.hpp"
@@ -45,7 +46,7 @@ void EntityProvideOperation::execute() {
 		}
 
 		// Check if draw call already exists
-		size_t hash = utility::combineHash(meshRenderer.MeshHandle->hash(), meshRenderer.MaterialHandle->hash());
+		size_t hash = utility::combineHash(meshRenderer.MeshHandle->getHandle(), meshRenderer.MaterialHandle->getHandle());
 
 		if (m_lookup.find(hash) == m_lookup.end()) {
 			// Create new drawcall and insert
@@ -82,14 +83,6 @@ bool EntityProvideOperation::validateEntity(scene::components::MetaComponent& me
 
 	if (material->getPropertyData() == nullptr) {
 		LOG_WARN("nullptr property data for {0}", meta.Name);
-		return false;
-	}
-
-	// Check if assets are loaded
-	if (!mesh->isLoaded() ||
-		!material->isLoaded()) {
-		// This shouldn't really happen, one of the systems are lagging behind
-		LOG_WARN("Unloaded asset rendering for {0}", meta.Name);
 		return false;
 	}
 

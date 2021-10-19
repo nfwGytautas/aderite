@@ -55,7 +55,7 @@ public:
 	Assimp::Importer Importer;
 };
 
-Loader::Loader(LoaderPool& pool) 
+Loader::Loader(LoaderPool* pool) 
 	: m_pool(pool), m_impl(new LoaderImpl())
 {
 	if (!g_LoggerSet) {
@@ -70,7 +70,14 @@ Loader::~Loader() {
 }
 
 void Loader::startup() {
-	m_thread = std::thread(std::bind(&Loader::workLoop, this));
+	m_thread = std::thread([&]() {
+		while (!m_terminated) {
+			ILoadable* loadable = m_pool->getNextLoadable();
+			if (loadable != nullptr) {
+				loadable->load(this);
+			}
+		}
+	});
 }
 
 void Loader::terminate() {
@@ -78,7 +85,7 @@ void Loader::terminate() {
 }
 
 Loader::MeshLoadResult Loader::loadMesh(LoadableHandle handle) const {
-	DataChunk chunk = ::aderite::Engine::getFileHandler()->open(handle);
+	DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
 	if (chunk.Data.size() == 0) {
 		return {
 			"File doesn't exist"
@@ -158,10 +165,12 @@ Loader::MeshLoadResult Loader::loadMesh(LoadableHandle handle) const {
 			result.Indices.push_back(face.mIndices[indiceIdx]);
 		}
 	}
+
+	return result;
 }
 
 Loader::TextureLoadResult<unsigned char> Loader::loadTexture(LoadableHandle handle) const {
-	DataChunk chunk = ::aderite::Engine::getFileHandler()->open(handle);
+	DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
 	if (chunk.Data.size() == 0) {
 		return {
 			"File doesn't exist"
@@ -200,7 +209,7 @@ Loader::TextureLoadResult<unsigned char> Loader::loadTexture(LoadableHandle hand
 }
 
 Loader::TextureLoadResult<float> Loader::loadHdrTexture(LoadableHandle handle) const {
-	DataChunk chunk = ::aderite::Engine::getFileHandler()->open(handle);
+	DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
 	if (chunk.Data.size() == 0) {
 		return {
 			"File doesn't exist"
@@ -239,7 +248,7 @@ Loader::TextureLoadResult<float> Loader::loadHdrTexture(LoadableHandle handle) c
 }
 
 Loader::BinaryLoadResult Loader::loadBinary(LoadableHandle handle) const {
-	DataChunk chunk = ::aderite::Engine::getFileHandler()->open(handle);
+	DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
 	if (chunk.Data.size() == 0) {
 		return {
 			"File doesn't exist"
@@ -250,15 +259,6 @@ Loader::BinaryLoadResult Loader::loadBinary(LoadableHandle handle) const {
 		"",
 		chunk.Data
 	};
-}
-
-void Loader::workLoop() {
-	while (!m_terminated) {
-		ILoadable* loadable = m_pool.getNextLoadable();
-		if (loadable != nullptr) {
-			loadable->load(this);
-		}
-	}
 }
 	
 }

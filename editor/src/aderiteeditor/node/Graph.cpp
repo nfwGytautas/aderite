@@ -3,7 +3,6 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/io/Serializer.hpp"
-#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/property/Property.hpp"
 #include "aderiteeditor/node/Node.hpp"

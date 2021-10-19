@@ -76,7 +76,7 @@ void MaterialTypeAsset::unload() {
 	m_samplers.clear();
 }
 
-io::SerializableType MaterialTypeAsset::getType() {
+io::SerializableType MaterialTypeAsset::getType() const {
 	return static_cast<io::SerializableType>(io::RuntimeSerializables::MAT_TYPE);
 }
 

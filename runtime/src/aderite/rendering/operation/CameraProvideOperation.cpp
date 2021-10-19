@@ -4,21 +4,18 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
-#include "aderite/scene/EntityCamera.hpp"
 
-ADERITE_RENDERING_NAMESPACE_BEGIN
+namespace aderite {
+namespace rendering {
 
-interfaces::ICamera* CameraProvideOperation::getCamera() const {
-	return p_camera;
-}
+void CameraProvideOperation::execute() {
+	m_valid = false;
 
-void MainCameraProvideOperation::execute() {
 	// Resolve the camera to use
-	
+
 	// Get current scene
 	scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 	if (!currentScene) {
-		p_camera = nullptr;
 		return;
 	}
 
@@ -26,22 +23,34 @@ void MainCameraProvideOperation::execute() {
 	auto cameras = currentScene->getEntityRegistry().group<
 		scene::components::CameraComponent
 	>
-	(
-		entt::get<scene::components::TransformComponent>
-	);
+		(
+			entt::get<scene::components::TransformComponent>
+			);
 
 	for (auto entity : cameras) {
 		auto [camera, transform] = cameras.get(entity);
 
 		if (camera.Main) {
-			p_camera = static_cast<interfaces::ICamera*>(camera.Camera);
+			// TODO: Calculate matrices
+			m_viewMatrix = glm::mat4(1);
+			m_projMatrix = glm::mat4(1);
+			m_valid = true;
 			return;
 		}
 	}
 }
 
-void FreeCameraProvideOperation::setCamera(interfaces::ICamera* camera) {
-	p_camera = camera;
+const glm::mat4& CameraProvideOperation::getViewMatrix() const {
+	return m_viewMatrix;
 }
 
-ADERITE_RENDERING_NAMESPACE_END
+const glm::mat4& CameraProvideOperation::getProjectionMatrix() const {
+	return m_projMatrix;
+}
+
+bool CameraProvideOperation::isValid() const {
+	return m_valid;
+}
+
+}
+}

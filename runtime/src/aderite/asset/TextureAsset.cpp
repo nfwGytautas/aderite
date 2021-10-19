@@ -40,7 +40,7 @@ void TextureAsset::unload() {
 	}
 }
 
-io::SerializableType TextureAsset::getType() {
+io::SerializableType TextureAsset::getType() const {
 	return static_cast<io::SerializableType>(io::RuntimeSerializables::TEXTURE);
 }
 

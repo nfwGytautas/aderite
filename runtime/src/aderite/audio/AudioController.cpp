@@ -8,11 +8,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/audio/Bank.hpp"
-#include "aderite/audio/AudioInstanceList.hpp"
-#include "aderite/audio/AudioEvent.hpp"
-#include "aderite/audio/AudioInstance.hpp"
-#include "aderite/asset/AssetManager.hpp"
+#include "aderite/io/FileHandler.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/Scene.hpp"
 
@@ -96,7 +92,6 @@ void AudioController::update() {
 		return;
 	}
 
-
 	// Configure listener
 	bool thisFrameMute = false;
 	int enabledListenerCount = 0;
@@ -147,59 +142,47 @@ void AudioController::update() {
 	
 	// Configure sources
 	auto audioGroup = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry()
-		.group<scene::components::AudioSourcesComponent>(entt::get<scene::components::TransformComponent>);
+		.group<scene::components::AudioSourceComponent>(entt::get<scene::components::TransformComponent>);
 	for (auto entity : audioGroup) {
-		auto [audioSources, transform] = audioGroup.get<
-			scene::components::AudioSourcesComponent,
+		auto [audioSource, transform] = audioGroup.get<
+			scene::components::AudioSourceComponent,
 			scene::components::TransformComponent>(entity);
 
-		// Update instances
-
-		for (AudioInstance* ai : *audioSources.Instances) {
-			if (m_disabled) {
-				// Stop
-				if (ai->isInitialized()) {
-					ai->stop();
-					continue;
-				}
-			}
-
-			// Init if needed
-			if (ai->canBeInitialized()) {
-				ai->init();
-			}
-
-			if (ai->isInitialized()) {
-				if (m_wasDisabled && ai->getPlayOnStart()) {
-					ai->start();
-				}
-
-				FMOD_3D_ATTRIBUTES source3dAttributes = {};
-
-				// TODO: Volume
-				if (m_mute || thisFrameMute) {
-					if (ai->getFmodInstance()->setVolume(0.0f) != FMOD_OK) {
-						LOG_WARN("Failed to set volume for audio instance");
-					}
-				}
-				else {
-					if (ai->getFmodInstance()->setVolume(1.0f) != FMOD_OK) {
-						LOG_WARN("Failed to set volume for audio instance");
-					}
-				}
-
-				source3dAttributes.position = { transform.Position.x, transform.Position.y, transform.Position.z };
-
-				// TODO: Rotation
-				source3dAttributes.up = { 0.0f, 1.0f, 0.0f };
-				source3dAttributes.forward = { 0.0f, 0.0f, 1.0f };
-
-				// TODO: Velocity
-				source3dAttributes.velocity = { 0.0f, 0.0f, 0.0f };
-
-				ai->getFmodInstance()->set3DAttributes(&source3dAttributes);
-			}
+		if (audioSource.Instance == c_InvalidHandle) {
+			continue;
 		}
+
+		// Update instances
+		// TODO: Error checking and handling
+		FMOD::Studio::EventInstance* instance = m_instances[audioSource.Instance];
+		if (m_disabled) {
+			instance->stop(FMOD_STUDIO_STOP_IMMEDIATE);
+		}
+
+		if (m_wasDisabled && audioSource.PlayOnStart) {
+			instance->start();
+		}
+
+		FMOD_3D_ATTRIBUTES source3dAttributes = {};
+
+		// TODO: Volume
+		if (m_mute || thisFrameMute) {
+			instance->setVolume(0.0f);
+		}
+		else {
+			instance->setVolume(1.0f);
+		}
+
+		source3dAttributes.position = { transform.Position.x, transform.Position.y, transform.Position.z };
+
+		// TODO: Rotation
+		source3dAttributes.up = { 0.0f, 1.0f, 0.0f };
+		source3dAttributes.forward = { 0.0f, 0.0f, 1.0f };
+
+		// TODO: Velocity
+		source3dAttributes.velocity = { 0.0f, 0.0f, 0.0f };
+
+		instance->set3DAttributes(&source3dAttributes);
 	}
 
 	if (!m_disabled) {
@@ -211,20 +194,12 @@ void AudioController::update() {
 	}
 }
 
-void AudioController::loadMasterBank(const std::filesystem::path& dir) {
-	// Setup audio controller
-	std::filesystem::path resDir = ::aderite::Engine::getAssetManager()->getResDir();
+void AudioController::loadMasterBank() {
+	io::DataChunk masterChunk = ::aderite::Engine::getFileHandler()->openLoadable(io::FileHandler::Reserved::MasterAudioBank);
+	io::DataChunk stringsChunk = ::aderite::Engine::getFileHandler()->openLoadable(io::FileHandler::Reserved::StringsAudioBank);
 
-	LOG_DEBUG("Loading master banks from {0}", (resDir / dir).string());
-
-	// Check if banks exist
-	std::filesystem::path masterPath = (resDir / dir / "Master.bank");
-	std::filesystem::path stringPath = (resDir / dir / "Master.strings.bank");
-
-	if (!std::filesystem::exists(masterPath) || !std::filesystem::exists(stringPath)) {
-		LOG_WARN("The directory didn't contain 'Master.bank' and 'Master.strings.bank' file, leaving unchanged");
-		return;
-	}
+	ADERITE_DYNAMIC_ASSERT(masterChunk.Data.size() > 0, "loadMasterBank called when no master bank exists");
+	ADERITE_DYNAMIC_ASSERT(stringsChunk.Data.size() > 0, "loadMasterBank called when no strings bank exists");
 
 	// Unload
 	if (m_stringBank != nullptr) {
@@ -239,15 +214,43 @@ void AudioController::loadMasterBank(const std::filesystem::path& dir) {
 	m_masterBank = nullptr;
 
 	// Load
-	if (m_fmodSystem->loadBankFile(stringPath.string().c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &m_stringBank) != FMOD_OK) {
-		LOG_WARN("Failed to load strings bank from {0}", stringPath.string());
-		return;
-	}
+	FMOD_RESULT result = m_fmodSystem->loadBankMemory(
+		reinterpret_cast<const char*>(stringsChunk.Data.data()),
+		stringsChunk.Data.size(),
+		FMOD_STUDIO_LOAD_MEMORY,
+		FMOD_STUDIO_LOAD_BANK_NORMAL,
+		&m_stringBank);
 
-	if (m_fmodSystem->loadBankFile(masterPath.string().c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &m_masterBank) != FMOD_OK) {
-		LOG_WARN("Failed to load master bank from {0}", masterPath.string());
-		m_stringBank->unload();
-		return;
+	ADERITE_DYNAMIC_ASSERT(result == FMOD_OK, "Failed to load strings bank");
+
+	// Load
+	result = m_fmodSystem->loadBankMemory(
+		reinterpret_cast<const char*>(masterChunk.Data.data()),
+		masterChunk.Data.size(),
+		FMOD_STUDIO_LOAD_MEMORY,
+		FMOD_STUDIO_LOAD_BANK_NORMAL,
+		&m_masterBank);
+
+	ADERITE_DYNAMIC_ASSERT(result == FMOD_OK, "Failed to load master bank");
+
+	// Get all events
+	this->unloadAll();
+
+	LOG_TRACE("Querying strings");
+	int strings = 0;
+	ADERITE_DYNAMIC_ASSERT(m_stringBank->getStringCount(&strings) == FMOD_OK, "Failed to query string count");
+
+	LOG_TRACE("Querying events and banks");
+	constexpr size_t c_pathSize = 100;
+	std::string pathHolder;
+	pathHolder.reserve(c_pathSize);
+	for (int i = 0; i < strings; i++) {
+		ADERITE_DYNAMIC_ASSERT(m_stringBank->getStringInfo(1, nullptr, pathHolder.data(), c_pathSize, nullptr) == FMOD_OK, "Failed to query string count");
+
+		LOG_TRACE("Found {0}", pathHolder);
+		if (pathHolder.rfind("event:/", 0) == 0) { 
+			m_knownEvents.push_back(pathHolder);
+		}
 	}
 }
 
@@ -255,65 +258,13 @@ bool AudioController::masterBanksLoaded() const {
 	return m_masterBank != nullptr && m_stringBank != nullptr;
 }
 
-bool AudioController::has(const std::string& name) {
-	auto it = std::find_if(m_banks.begin(), m_banks.end(), [&](Bank* bank) {
-		return bank->getName() == name;
-	});
-
-	return it != m_banks.end();
-}
-
-Bank* AudioController::readBank(const std::string& name) {
-	// Check for duplication
-	if (has(name)) {
-		LOG_WARN("Requested double read");
-		return getBank(name);
-	}
-
-	LOG_TRACE("Audio controller reading bank {0}", name);
-
-	Bank* bank = new Bank(m_fmodSystem, name);
-	m_banks.push_back(bank);
-	return bank;
-}
-
-Bank* AudioController::getOrRead(const std::string& name) {
-	if (!has(name)) {
-		return readBank(name);
-	}
-	else {
-		return getBank(name);
-	}
-}
-
-Bank* AudioController::getBank(const std::string& name) {
-	auto it = std::find_if(m_banks.begin(), m_banks.end(), [&](Bank* bank) {
-		return bank->getName() == name;
-	});
-
-	if (it == m_banks.end()) {
-		LOG_WARN("Tried to get non existing bank with name {0}", name);
-		return nullptr;
-	}
-
-	return *it;
-}
-
-void AudioController::unloadBank(const std::string& name) {
-	auto it = std::find_if(m_banks.begin(), m_banks.end(), [&](Bank* bank) {
-		return bank->getName() == name;
-	});
-
-	if (it == m_banks.end()) {
-		return;
-	}
-
-	delete (*it);
-	m_banks.erase(it);
-}
-
-void AudioController::unloadBank(Bank* bank) {
-	unloadBank(bank->getName());
+AudioInstanceId aderite::audio::AudioController::createAudioInstance(const std::string name) {
+	FMOD::Studio::EventDescription* desc;
+	ADERITE_DYNAMIC_ASSERT(m_fmodSystem->getEvent(name.c_str(), &desc) == FMOD_OK, "Failed to get event");
+	FMOD::Studio::EventInstance* instance;
+	ADERITE_DYNAMIC_ASSERT(desc->createInstance(&instance) == FMOD_OK, "Failed to create event instance");
+	m_instances.push_back(instance);
+	return m_instances.size() - 1;
 }
 
 void AudioController::setMute(bool value) {
@@ -325,17 +276,17 @@ void AudioController::disable(bool value) {
 	m_disabled = value;
 }
 
+const std::vector<std::string>& aderite::audio::AudioController::getKnownEvents() const {
+	return m_knownEvents;
+}
+
 void AudioController::unloadAll() {
 	// Unload all then delete
-	for (auto& bank : m_banks) {
-		bank->unloadData();
+	for (auto& instance : m_instances) {
+		instance->stop(FMOD_STUDIO_STOP_IMMEDIATE);
 	}
 
-	for (auto& bank : m_banks) {
-		delete bank;
-	}
-
-	m_banks.clear();
+	m_instances.clear();
 }
 
 ADERITE_AUDIO_NAMESPACE_END

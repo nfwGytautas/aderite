@@ -13,8 +13,8 @@ LoaderPool::LoaderPool()
 
 LoaderPool::LoaderPool(size_t threadCount) {
 	for (size_t i = 0; i < threadCount; i++) {
-		m_loaders.push_back(Loader(*this));
-		m_loaders[i].startup();
+		m_loaders.push_back(new Loader(this));
+		m_loaders[i]->startup();
 	}
 }
 
@@ -22,7 +22,13 @@ LoaderPool::~LoaderPool() {
 	m_terminated = true;
 
 	for (size_t i = 0; i < m_loaders.size(); i++) {
-		m_loaders[i].terminate();
+		m_loaders[i]->terminate();
+	}
+
+	m_cvAdded.notify_all();
+
+	for (size_t i = 0; i < m_loaders.size(); i++) {
+		delete m_loaders[i];
 	}
 
 	m_loaders.clear();

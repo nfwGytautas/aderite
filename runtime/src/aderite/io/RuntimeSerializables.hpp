@@ -13,14 +13,20 @@ namespace io {
  * @brief Enum containing all serializable types that the runtime has
 */
 enum class RuntimeSerializables : SerializableType {
+	// Assets
 	MESH		= 0,
 	MATERIAL	= 1,
 	TEXTURE		= 2,
 	SCENE		= 3,
 	MAT_TYPE	= 4,
 
+	// Colliders
+	CLDR_LIST	= 10,
+	CLDR		= 11,
+	BOX_CLDR	= 12,
+
 	// Last element of runtime serializables, used to specify the end runtime serializables
-	RESERVED = 10,
+	RESERVED = 30,
 	// END used to extend runtime serializables
 	END
 };

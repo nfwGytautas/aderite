@@ -4,18 +4,18 @@
 #include <glm/glm.hpp>
 #include <PxShape.h>
 #include "aderite/utility/Macros.hpp"
+#include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
-#include "aderite/interfaces/ISerializable.hpp"
-#include "aderite/scene/Entity.hpp"
 
-ADERITE_PHYSICS_NAMESPACE_BEGIN
+namespace aderite {
+namespace physics {
 
 /**
  * @brief A list of colliders used for an entity
 */
-class ColliderList : public interfaces::ISerializable {
+class ColliderList : public io::ISerializable {
 public:
-	ColliderList(scene::Entity entity);
+	ColliderList();
 	~ColliderList();
 
 	/**
@@ -47,10 +47,6 @@ public:
 	*/
 	physx::PxRigidActor* getActor() const;
 
-	// Inherited via ISerializable
-	virtual bool serialize(YAML::Emitter& out) override;
-	virtual bool deserialize(YAML::Node& data) override;
-
 	auto begin() const {
 		return m_colliders.begin();
 	}
@@ -58,12 +54,17 @@ public:
 	auto end() const {
 		return m_colliders.end();
 	}
+
+	// Inherited via ISerializable
+	virtual io::SerializableType getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 private:
-	scene::Entity m_entity = scene::Entity::null();
 	std::vector<Collider*> m_colliders;
 
 	// Runtime variable set by physics controller
 	physx::PxRigidActor* m_actor = nullptr;
 };
 
-ADERITE_PHYSICS_NAMESPACE_END
+}
+}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "aderite/utility/Macros.hpp"
 
 ADERITE_PROPERTY_NAMESPACE_BEGIN

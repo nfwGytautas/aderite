@@ -2,7 +2,6 @@
 
 #include <vector>
 #include "aderite/utility/Macros.hpp"
-#include "aderite/interfaces/ISerializable.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
 

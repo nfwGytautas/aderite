@@ -53,7 +53,7 @@ private:
 
 	friend class Loader;
 private:
-	std::vector<Loader> m_loaders;
+	std::vector<Loader*> m_loaders;
 	std::mutex m_lock;
 	std::condition_variable m_cvAdded;
 	bool m_terminated = false;

@@ -28,7 +28,7 @@ void MaterialAsset::unload() {
 	// TODO: Rework cause this is reference counted
 }
 
-io::SerializableType MaterialAsset::getType() {
+io::SerializableType MaterialAsset::getType() const {
 	return static_cast<io::SerializableType>(io::RuntimeSerializables::MATERIAL);
 }
 

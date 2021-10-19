@@ -35,7 +35,7 @@ public:
 */
 class Loader final {
 public: // Thread handling
-	Loader(LoaderPool& pool);
+	Loader(LoaderPool* pool);
 	~Loader();
 
 	/**
@@ -104,12 +104,7 @@ public: // Loading operations
 	*/
 	BinaryLoadResult loadBinary(LoadableHandle handle) const;
 private:
-	/**
-	 * @brief Function that the internal worker thread is doing
-	*/
-	void workLoop();
-private:
-	LoaderPool& m_pool;
+	LoaderPool* m_pool;
 	std::thread m_thread;
 	bool m_terminated = false;
 

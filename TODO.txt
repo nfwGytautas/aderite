@@ -1,7 +1,6 @@
 General:
 Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
 Animations
-Rethink scene useAsset and removeAsset functions
 Scripting
 Include BGFX stats to ImGui
 Fix dependencies folder and CMake
@@ -17,6 +16,9 @@ Profiling
 Compiler switch to disable some setters in runtime
 Namespace refactoring
 Move objects for editor so that they don't get destroyed on pipeline change
+
+ECS:
+Parent
 
 Licensing:
 FMOD splash screen
@@ -65,6 +67,7 @@ Disable/enable actors at runtime
 Disable/enable colliders at runtime
 Broad-Phase callbacks
 Collision layers
+Rethink the collision callback architecture
 
 Editor:
 Component architecture rethink

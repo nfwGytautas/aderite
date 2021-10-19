@@ -8,6 +8,7 @@
 #include "aderite/utility/Macros.hpp"
 #include "aderite/io/Loader.hpp"
 #include "aderite/io/RuntimeSerializables.hpp"
+#include "aderite/asset/TextureAsset.hpp"
 
 namespace aderite {
 namespace asset {
@@ -56,7 +57,7 @@ void MeshAsset::unload() {
 	}
 }
 
-io::SerializableType MeshAsset::getType() {
+io::SerializableType MeshAsset::getType() const {
 	return static_cast<io::SerializableType>(io::RuntimeSerializables::MESH);
 }
 

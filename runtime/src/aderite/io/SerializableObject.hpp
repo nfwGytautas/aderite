@@ -8,23 +8,17 @@ namespace aderite {
 namespace io {
 
 /**
- * @brief Base class for all serializable objects
+ * @brief Base class providing serializable interface
 */
-class SerializableObject {
+class ISerializable {
 public:
-	virtual ~SerializableObject() {}
-
-	/**
-	 * @brief Returns the handle of this serializable object
-	 * @return Object handle
-	*/
-	SerializableHandle getHandle() const;
+	virtual ~ISerializable() {}
 
 	/**
 	 * @brief The type of the serializable object
 	 * @return SerializableType value
 	*/
-	virtual SerializableType getType() = 0;
+	virtual SerializableType getType() const = 0;
 
 	/**
 	 * @brief Serialize object to emmitter
@@ -41,6 +35,20 @@ public:
 	 * @return True if deserialized, false otherwise
 	*/
 	virtual bool deserialize(const Serializer* serializer, const YAML::Node& data) = 0;
+};
+
+/**
+ * @brief Base class for all serializable objects (object is something that has an ID)
+*/
+class SerializableObject : public ISerializable {
+public:
+	virtual ~SerializableObject() {}
+
+	/**
+	 * @brief Returns the handle of this serializable object
+	 * @return Object handle
+	*/
+	SerializableHandle getHandle() const;
 public:
 	friend class Serializer; // Used to set the handle
 private:

@@ -8,7 +8,16 @@
 #include "aderite/io/Instancer.hpp"
 #include "aderite/io/RuntimeSerializables.hpp"
 
+// Assets, needed for linking instancers
 #include "aderite/asset/MeshAsset.hpp"
+#include "aderite/asset/MaterialAsset.hpp"
+#include "aderite/asset/MaterialTypeAsset.hpp"
+#include "aderite/asset/TextureAsset.hpp"
+#include "aderite/scene/Scene.hpp"
+
+#include "aderite/physics/ColliderList.hpp"
+#include "aderite/physics/Collider.hpp"
+#include "aderite/physics/collider/BoxCollider.hpp"
 
 namespace aderite {
 namespace io {
@@ -18,10 +27,23 @@ bool Serializer::init() {
 
 	// Runtime instancers
 	LOG_TRACE("Setting runtime instancers");
+	// Assets
 	linkInstancer(static_cast<size_t>(RuntimeSerializables::MESH), new Instancer<asset::MeshAsset>());
+	linkInstancer(static_cast<size_t>(RuntimeSerializables::MATERIAL), new Instancer<asset::MaterialAsset>());
+	linkInstancer(static_cast<size_t>(RuntimeSerializables::MAT_TYPE), new Instancer<asset::MaterialTypeAsset>());
+	linkInstancer(static_cast<size_t>(RuntimeSerializables::TEXTURE), new Instancer<asset::TextureAsset>());
+	linkInstancer(static_cast<size_t>(RuntimeSerializables::SCENE), new Instancer<scene::Scene>());
 
-	// Check that no runtime serializables have been forgotten
-	ADERITE_DYNAMIC_ASSERT(m_instancers.size() == (static_cast<size_t>(RuntimeSerializables::END) - static_cast<size_t>(RuntimeSerializables::RESERVED) - 1), "Not all runtime serializables are linked");
+	// Colliders
+	linkInstancer(static_cast<size_t>(RuntimeSerializables::CLDR_LIST), new Instancer<physics::ColliderList>());
+	//linkInstancer(static_cast<size_t>(RuntimeSerializables::CLDR), new Instancer<physics::Collider>());
+	linkInstancer(static_cast<size_t>(RuntimeSerializables::BOX_CLDR), new Instancer<physics::BoxCollider>());
+
+	LOG_DEBUG("Registered runtime {0} instancers", m_instancers.size());
+	ADERITE_DEBUG_SECTION(
+		this->printInstancers();
+	);
+
 	return true;
 }
 
@@ -63,7 +85,7 @@ SerializableObject* Serializer::parseType(const YAML::Node& data) const {
 	InstancerBase* instancer = resolveInstancer(type);
 
 	// Create object
-	SerializableObject* instance = instancer->create();
+	SerializableObject* instance = static_cast<SerializableObject*>(instancer->create());
 	instance->m_handle = handle;
 
 	ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
@@ -86,7 +108,7 @@ void Serializer::writeType(YAML::Emitter& emitter, SerializableObject* object) c
 	emitter << YAML::EndMap;
 }
 
-SerializableObject* Serializer::parseUntrackedType(const YAML::Node& data) const {
+ISerializable* Serializer::parseUntrackedType(const YAML::Node& data) const {
 	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
 	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
 
@@ -97,7 +119,7 @@ SerializableObject* Serializer::parseUntrackedType(const YAML::Node& data) const
 	InstancerBase* instancer = resolveInstancer(type);
 
 	// Create object
-	SerializableObject* instance = instancer->create();
+	ISerializable* instance = instancer->create();
 
 	ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
 
@@ -107,7 +129,7 @@ SerializableObject* Serializer::parseUntrackedType(const YAML::Node& data) const
 	return instance;
 }
 
-void Serializer::writeUntrackedType(YAML::Emitter& emitter, SerializableObject* object) const {
+void Serializer::writeUntrackedType(YAML::Emitter& emitter, ISerializable* object) const {
 	emitter << YAML::BeginMap;
 	emitter << YAML::Key << "Type" << YAML::Value << object->getType();
 	emitter << YAML::Key << "Data" << YAML::BeginMap;
@@ -142,7 +164,7 @@ SerializableObject* Serializer::getOrRead(SerializableHandle handle) {
 	}
 
 	// Resolve path and load
-	DataChunk chunk = aderite::Engine::getFileHandler()->open(handle);
+	DataChunk chunk = aderite::Engine::getFileHandler()->openSerializable(handle);
 	YAML::Node data = YAML::Load(reinterpret_cast<const char*>(chunk.Data.data()));
 
 	// Check version
@@ -163,7 +185,7 @@ SerializableObject* Serializer::getOrRead(SerializableHandle handle) {
 
 void Serializer::reread(SerializableObject* object) {
 	// Resolve path and load
-	DataChunk chunk = aderite::Engine::getFileHandler()->open(object->getHandle());
+	DataChunk chunk = aderite::Engine::getFileHandler()->openSerializable(object->getHandle());
 	YAML::Node data = YAML::Load(reinterpret_cast<const char*>(chunk.Data.data()));
 	object->deserialize(this, data["Data"]);
 }
@@ -190,7 +212,7 @@ void Serializer::save(SerializableObject* object) {
 	out << YAML::EndMap;
 
 	// Resolve where to store this object
-	DataChunk chunk = aderite::Engine::getFileHandler()->open(object->getHandle());
+	DataChunk chunk = aderite::Engine::getFileHandler()->openSerializable(object->getHandle());
 	chunk.Data.resize(out.size());
 	std::memcpy(chunk.Data.data(), out.c_str(), chunk.Data.size());
 	aderite::Engine::getFileHandler()->commit(chunk);
@@ -204,7 +226,7 @@ ADERITE_DEBUG_SECTION(
 		LOG_TRACE("====================================================================================");
 		for (auto i : m_instancers) {
 			if (i.second != nullptr) {
-				SerializableObject* temp = nullptr;
+				ISerializable* temp = nullptr;
 				temp = i.second->create();
 				LOG_TRACE("Type: {0:03d} Instancer: {:p} Created type: {2}", i.first, static_cast<void*>(i.second), temp->getType());
 			}
