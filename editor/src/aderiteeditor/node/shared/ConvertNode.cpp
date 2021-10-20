@@ -92,7 +92,7 @@ bool ConvertNode::onConnectToOutput(OutputPin* target, InputPin* source) {
 	return true;
 }
 
-io::SerializableType ConvertNode::getType() {
+io::SerializableType ConvertNode::getType() const {
 	return static_cast<io::SerializableType>(io::EditorSerializables::ConvertNode);
 }
 
@@ -111,13 +111,7 @@ bool ConvertNode::deserialize(const io::Serializer* serializer, const YAML::Node
 }
 
 void ConvertNode::handlePipelineConvert(compiler::PipelineEvaluator* pe) {
-	if (node::isArrayOrType(p_inputs[0]->getType(), node::getTypeName(node::PropertyType::Camera))) {
-		if (node::isArrayOrType(p_outputs[0]->getType(), node::getTypeName(node::PropertyType::Eye))) {
-			convert(pe, &ConvertNode::eyeToCamera);
-			return;
-		}
-	}
-
+	
 	LOG_ERROR("Unknown conversion from {0} to {1}", p_inputs[0]->getType(), p_outputs[0]->getType());
 }
 
@@ -147,14 +141,6 @@ void ConvertNode::applyArray(compiler::PipelineEvaluator* pe, PipelineConversion
 	}
 	result->setDebugName("Convert (" + p_inputs[0]->getType() + "->" + p_outputs[0]->getType() + ")");
 	p_outputs[0]->setValue(pe->addOperation(result));
-}
-
-rendering::OperationBase* ConvertNode::eyeToCamera(rendering::OperationBase* from) {
-	rendering::EyeProvideOperation* op = new rendering::EyeProvideOperation();
-	op->provideFromCamera(
-		static_cast<rendering::CameraProvideOperation*>(from)
-	);
-	return op;
 }
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

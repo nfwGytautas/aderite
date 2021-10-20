@@ -24,14 +24,14 @@ void Toolbar::render() {
 		return;
 	}
 
-	if (ImGui::Selectable("Start", shared::State::IsGameMode, shared::State::IsGameMode ? ImGuiSelectableFlags_Disabled : 0, ImVec2(50, 0))) {
-		shared::State::Sink->onStartGame();
+	if (ImGui::Selectable("Start", editor::State::IsGameMode, editor::State::IsGameMode ? ImGuiSelectableFlags_Disabled : 0, ImVec2(50, 0))) {
+		editor::State::Sink->onStartGame();
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Selectable("Stop", !shared::State::IsGameMode, shared::State::IsGameMode ? 0 : ImGuiSelectableFlags_Disabled, ImVec2(50, 0))) {
-		shared::State::Sink->onStopGame();
+	if (ImGui::Selectable("Stop", !editor::State::IsGameMode, editor::State::IsGameMode ? 0 : ImGuiSelectableFlags_Disabled, ImVec2(50, 0))) {
+		editor::State::Sink->onStopGame();
 	}
 
 	ImGui::End();

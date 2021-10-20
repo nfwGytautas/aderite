@@ -42,7 +42,7 @@ void EditorRenderNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType EditorRenderNode::getType() {
+io::SerializableType EditorRenderNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::EditorRenderNode);
 }
 

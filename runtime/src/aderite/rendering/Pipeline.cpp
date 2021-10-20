@@ -2,6 +2,7 @@
 
 #include <bgfx/bgfx.h>
 #include "aderite/utility/Log.hpp"
+#include "aderite/io/RuntimeSerializables.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
@@ -34,6 +35,20 @@ void Pipeline::shutdown() {
 	for (OperationBase* op : m_operations) {
 		op->shutdown();
 	}
+}
+
+io::SerializableType Pipeline::getType() const {
+	return static_cast<io::SerializableType>(io::RuntimeSerializables::PIPELINE);
+}
+
+bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	// TODO: Serialize
+	return true;
+}
+
+bool Pipeline::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+	// TODO: Deserialize
+	return true;
 }
 
 ADERITE_DEBUG_SECTION

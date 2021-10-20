@@ -67,10 +67,6 @@ void Collider::setActor(physx::PxRigidActor* actor) {
 	actor->attachShape(*p_shape);
 }
 
-io::SerializableType Collider::getType() const {
-	return static_cast<io::SerializableType>(io::RuntimeSerializables::CLDR);
-}
-
 bool Collider::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
 	emitter << YAML::Key << "IsTrigger" << YAML::Value << isTrigger();
 	return true;

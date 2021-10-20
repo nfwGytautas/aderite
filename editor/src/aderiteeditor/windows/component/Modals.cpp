@@ -4,7 +4,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderiteeditor/windows/component/ComponentUtility.hpp"
+#include "aderiteeditor/utility/ImGui.hpp"
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 
@@ -63,7 +63,7 @@ void TextInputModal::render() {
 	{
 		ImGui::Text("%s", m_text.c_str());
 		ImGui::SameLine();
-		DynamicInputText("", &m_value, input_flags);
+		utility::DynamicInputText("", &m_value, input_flags);
 		ImGui::Separator();
 
 		float width = ImGui::GetContentRegionAvail().x * 0.4855f;

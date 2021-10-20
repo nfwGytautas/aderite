@@ -126,7 +126,7 @@ bool RenderNode::onConnectToInput(InputPin* target, OutputPin* source) {
     return true;
 }
 
-io::SerializableType RenderNode::getType() {
+io::SerializableType RenderNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::RenderNode);
 }
 

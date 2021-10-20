@@ -14,8 +14,8 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 CameraProviderNode::CameraProviderNode() {
     p_outputs.push_back(new OutputPin(
         this,
-        node::getTypeName(node::PropertyType::Camera),
-        "Camera"
+        node::getTypeName(node::PropertyType::Eye),
+        "Eye"
     ));
 }
 
@@ -26,12 +26,12 @@ const char* CameraProviderNode::getNodeName() const {
 void CameraProviderNode::evaluate(compiler::GraphEvaluator* evaluator) {
     evaluateDependencies(evaluator);
     compiler::PipelineEvaluator* pe = static_cast<compiler::PipelineEvaluator*>(evaluator);
-    rendering::MainCameraProvideOperation* op = new rendering::MainCameraProvideOperation();
+    rendering::CameraProvideOperation* op = new rendering::CameraProvideOperation();
     p_outputs[0]->setValue(pe->addOperation(op));
     m_evaluated = true;
 }
 
-io::SerializableType CameraProviderNode::getType() {
+io::SerializableType CameraProviderNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::CameraProviderNode);
 }
 

@@ -50,7 +50,7 @@ void AddNode::evaluate(compiler::GraphEvaluator* evaluator) {
 	m_evaluated = true;
 }
 
-io::SerializableType AddNode::getType() {
+io::SerializableType AddNode::getType() const {
 	return static_cast<io::SerializableType>(io::EditorSerializables::AddNode);
 }
 

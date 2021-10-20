@@ -10,7 +10,7 @@ EditorTargetOperation::EditorTargetOperation()
 
 void EditorTargetOperation::initialize() {
 	TargetProvideOperation::initialize();
-	shared::State::DebugRenderHandle = getHandle();
+	editor::State::DebugRenderHandle = getHandle();
 }
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_END

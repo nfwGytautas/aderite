@@ -61,7 +61,7 @@ void SelectObjectNode::renderBody() {
     ImGui::InputScalar("Index", ImGuiDataType_U64, &m_index);
 }
 
-io::SerializableType SelectObjectNode::getType() {
+io::SerializableType SelectObjectNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::ConcatObjectsNode);
 }
 

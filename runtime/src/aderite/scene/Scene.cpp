@@ -16,14 +16,15 @@
 #include "aderite/io/RuntimeSerializables.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/asset/MeshAsset.hpp" 
+#include "aderite/asset/TextureAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/ColliderList.hpp"
+#include "aderite/rendering/Pipeline.hpp"
 
-#include "aderite/asset/TextureAsset.hpp"
 
 namespace aderite {
 namespace scene {
@@ -291,6 +292,14 @@ physx::PxScene* Scene::getPhysicsScene() const {
 	return m_physicsScene;
 }
 
+rendering::Pipeline* Scene::getPipeline() const {
+	return m_pipeline;
+}
+
+void Scene::setPipeline(rendering::Pipeline* pipeline) {
+	m_pipeline = pipeline;
+}
+
 io::SerializableType Scene::getType() const {
 	return static_cast<io::SerializableType>(io::RuntimeSerializables::SCENE);
 }
@@ -312,6 +321,14 @@ bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
 
 	emitter << YAML::EndSeq; // Entities
 
+	emitter << YAML::Key << "Pipeline" << YAML::Value;
+	if (m_pipeline != nullptr) {
+		emitter << m_pipeline->getHandle();
+	}
+	else {
+		emitter << YAML::Null;
+	}
+
 	return true;
 }
 
@@ -323,6 +340,10 @@ bool Scene::deserialize(const io::Serializer* serializer, const YAML::Node& data
 			// Error check
 			deserialize_entity(Entity, this);
 		}
+	}
+
+	if (!data["Pipeline"].IsNull()) {
+		setPipeline(static_cast<rendering::Pipeline*>(::aderite::Engine::getSerializer()->getOrRead(data["Pipeline"].as<io::SerializableHandle>())));
 	}
 
 	return true;

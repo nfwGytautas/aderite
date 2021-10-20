@@ -72,7 +72,7 @@ bool ConcatObjectsNode::onConnectToInput(InputPin* target, OutputPin* source) {
     return true;
 }
 
-io::SerializableType ConcatObjectsNode::getType() {
+io::SerializableType ConcatObjectsNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::ConcatObjectsNode);
 }
 

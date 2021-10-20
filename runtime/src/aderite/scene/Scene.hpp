@@ -11,6 +11,7 @@
 #include "aderite/scene/Forward.hpp"
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/physics/Forward.hpp"
+#include "aderite/rendering/Forward.hpp"
 
 namespace aderite {
 namespace scene {
@@ -60,6 +61,17 @@ public:
 	 * @brief Returns the physics scene
 	*/
 	physx::PxScene* getPhysicsScene() const;
+
+	/**
+	 * @brief Returns the pipeline of this scene
+	*/
+	rendering::Pipeline* getPipeline() const;
+
+	/**
+	 * @brief Sets the pipeline of the scene
+	 * @param pipeline New pipeline
+	*/
+	void setPipeline(rendering::Pipeline* pipeline);
 
 	// Inherited via SerializableObject
 	virtual io::SerializableType getType() const override;
@@ -112,6 +124,7 @@ private:
 private:
 	entt::registry m_registry;
 	physx::PxScene* m_physicsScene = nullptr;
+	rendering::Pipeline* m_pipeline = nullptr;
 };
 
 }

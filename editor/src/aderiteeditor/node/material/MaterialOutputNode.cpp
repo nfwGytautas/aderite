@@ -28,7 +28,7 @@ void MaterialOutputNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType MaterialOutputNode::getType() {
+io::SerializableType MaterialOutputNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::MaterialOutputNode);
 }
 

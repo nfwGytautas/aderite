@@ -17,13 +17,7 @@ public:
 
 	// Inherited via BaseComponent
 	virtual void render() override;
-
-	/**
-	 * @brief Sets the current active Entity (used to identify which is active)
-	*/
-	void setActiveEntity(scene::Entity& Entity);
 private:
-	scene::Entity m_selectedEntity = scene::Entity::null();
 	TextInputModal* m_textModal = nullptr;
 };
 

@@ -43,7 +43,7 @@ void ScreenNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType ScreenNode::getType() {
+io::SerializableType ScreenNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::ScreenNode);
 }
 

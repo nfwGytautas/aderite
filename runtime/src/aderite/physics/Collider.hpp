@@ -47,7 +47,6 @@ public:
 	virtual void setScale(const glm::vec3& scale) = 0;
 
 	// Inherited via ISerializable
-	virtual io::SerializableType getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
 	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 protected:

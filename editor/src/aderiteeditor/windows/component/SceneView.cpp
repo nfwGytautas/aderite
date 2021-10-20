@@ -26,13 +26,13 @@ void SceneView::render() {
 		return;
 	}
 
-	if (!bgfx::isValid(shared::State::DebugRenderHandle)) {
+	if (!bgfx::isValid(editor::State::DebugRenderHandle)) {
 		ImGui::End();
 		ImGui::PopStyleVar();
 		return;
 	}
 
-	m_fbth = bgfx::getTexture(shared::State::DebugRenderHandle, 0);
+	m_fbth = bgfx::getTexture(editor::State::DebugRenderHandle, 0);
 	if (!bgfx::isValid(m_fbth)) {
 		ImGui::End();
 		ImGui::PopStyleVar();
@@ -43,7 +43,7 @@ void SceneView::render() {
 	ImVec2 viewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 	m_size.x = viewportPanelSize.x;
 	m_size.y = viewportPanelSize.y;
-	shared::State::EditorCamera->onViewportResize(m_size);
+	editor::State::EditorCamera->onViewportResize(m_size);
 	
 	ImGui::Image((void*)(intptr_t)m_fbth.idx, viewportSize, ImVec2(1, 0), ImVec2(0, 1));
 
@@ -53,8 +53,8 @@ void SceneView::render() {
 
 void SceneView::onSceneChanged(scene::Scene* scene) {
 	// TODO: Error check
-	m_fbth = bgfx::getTexture(shared::State::DebugRenderHandle, 0);
-	shared::State::EditorCamera->onViewportResize(m_size);
+	m_fbth = bgfx::getTexture(editor::State::DebugRenderHandle, 0);
+	editor::State::EditorCamera->onViewportResize(m_size);
 }
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_END

@@ -47,7 +47,7 @@ void RequireLockNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType RequireLockNode::getType() {
+io::SerializableType RequireLockNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::ConcatObjectsNode);
 }
 

@@ -8,7 +8,6 @@
 namespace aderite {
 namespace rendering {
 
-
 /**
  * @brief Operation used to create an entity camera provider
 */
@@ -21,7 +20,6 @@ public:
 	*/
 	virtual void execute() override;
 
-	// Inherited via CameraProvideOperation
 	// Inherited via EyeProvideOperation
 	virtual const glm::mat4& getViewMatrix() const override;
 	virtual const glm::mat4& getProjectionMatrix() const override;

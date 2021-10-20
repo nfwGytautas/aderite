@@ -5,9 +5,18 @@
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_BEGIN
 
-EditorCameraOperation::EditorCameraOperation()
-{
-	p_camera = shared::State::EditorCamera;
+const glm::mat4& EditorCameraOperation::getViewMatrix() const {
+	return editor::State::EditorCamera->getViewMatrix();
+}
+
+const glm::mat4& EditorCameraOperation::getProjectionMatrix() const {
+	return editor::State::EditorCamera->getProjectionMatrix();
+}
+
+bool EditorCameraOperation::isValid() const {
+	return editor::State::EditorCamera->isEnabled();
 }
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_END
+
+

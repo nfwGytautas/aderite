@@ -19,11 +19,6 @@ constexpr char* DDPayloadID__MeshAsset = "DDPayloadID__MeshAsset";
 constexpr char* DDPayloadID__MaterialAsset = "DDPayloadID__MaterialAsset";
 
 /**
- * @brief Drag and drop id passed when the object that is being dragged is a shader object
-*/
-constexpr char* DDPayloadID__ShaderAsset = "DDPayloadID__ShaderAsset";
-
-/**
  * @brief Drag and drop id passed when the object that is being dragged is a generic object
 */
 constexpr char* DDPayloadID__GenericAsset = "DDPayloadID__GenericAsset";

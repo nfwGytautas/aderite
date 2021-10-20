@@ -214,7 +214,7 @@ Node* Graph::findNode(int id) const {
 	return *it;
 }
 
-io::SerializableType Graph::getType() {
+io::SerializableType Graph::getType() const {
 	return static_cast<io::SerializableType>(io::EditorSerializables::GraphAsset);
 }
 

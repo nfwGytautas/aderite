@@ -35,7 +35,7 @@ private:
 
 	// Rendering operations
 	void renderPhysicsObjects();
-	void renderBoxCollider(physics::collider::BoxCollider* collider, const scene::components::TransformComponent& transform);
+	void renderBoxCollider(physics::BoxCollider* collider, const scene::components::TransformComponent& transform);
 
 	// Helpers
 	void loadMeshes();

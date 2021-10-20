@@ -33,7 +33,7 @@ void EditorTargetNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType EditorTargetNode::getType() {
+io::SerializableType EditorTargetNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::EditorTargetNode);
 }
 

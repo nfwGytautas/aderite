@@ -32,7 +32,7 @@ void EntitiesNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType EntitiesNode::getType() {
+io::SerializableType EntitiesNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::EntitiesNode);
 }
 

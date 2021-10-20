@@ -16,7 +16,7 @@ enum class EditorSerializables : SerializableType {
 	MaterialOutputNode,
 	Sampler2DNode,
 
-	CameraProviderNode,
+	CameraProviderNode = 75,
 	ConcatObjectsNode,
 	EditorCameraNode,
 	EditorRenderNode,
@@ -28,9 +28,9 @@ enum class EditorSerializables : SerializableType {
 	SelectObjectNode,
 	TargetProviderNode,
 
-	ConvertNode,
+	ConvertNode = 125,
 
-	RenderingPipelineAsset = 50,
+	RenderingPipelineAsset = 150,
 	GraphAsset,
 };
 

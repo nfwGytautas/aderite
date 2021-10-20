@@ -19,11 +19,11 @@ enum class RuntimeSerializables : SerializableType {
 	TEXTURE		= 2,
 	SCENE		= 3,
 	MAT_TYPE	= 4,
+	PIPELINE	= 5,
 
 	// Colliders
 	CLDR_LIST	= 10,
-	CLDR		= 11,
-	BOX_CLDR	= 12,
+	BOX_CLDR	= 11,
 
 	// Last element of runtime serializables, used to specify the end runtime serializables
 	RESERVED = 30,

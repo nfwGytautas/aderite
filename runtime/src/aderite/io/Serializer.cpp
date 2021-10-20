@@ -9,6 +9,8 @@
 #include "aderite/io/RuntimeSerializables.hpp"
 
 // Assets, needed for linking instancers
+#include "aderite/rendering/Pipeline.hpp"
+
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
@@ -30,13 +32,13 @@ bool Serializer::init() {
 	// Assets
 	linkInstancer(static_cast<size_t>(RuntimeSerializables::MESH), new Instancer<asset::MeshAsset>());
 	linkInstancer(static_cast<size_t>(RuntimeSerializables::MATERIAL), new Instancer<asset::MaterialAsset>());
-	linkInstancer(static_cast<size_t>(RuntimeSerializables::MAT_TYPE), new Instancer<asset::MaterialTypeAsset>());
 	linkInstancer(static_cast<size_t>(RuntimeSerializables::TEXTURE), new Instancer<asset::TextureAsset>());
 	linkInstancer(static_cast<size_t>(RuntimeSerializables::SCENE), new Instancer<scene::Scene>());
+	linkInstancer(static_cast<size_t>(RuntimeSerializables::MAT_TYPE), new Instancer<asset::MaterialTypeAsset>());
+	linkInstancer(static_cast<size_t>(RuntimeSerializables::PIPELINE), new Instancer<rendering::Pipeline>());
 
 	// Colliders
 	linkInstancer(static_cast<size_t>(RuntimeSerializables::CLDR_LIST), new Instancer<physics::ColliderList>());
-	//linkInstancer(static_cast<size_t>(RuntimeSerializables::CLDR), new Instancer<physics::Collider>());
 	linkInstancer(static_cast<size_t>(RuntimeSerializables::BOX_CLDR), new Instancer<physics::BoxCollider>());
 
 	LOG_DEBUG("Registered runtime {0} instancers", m_instancers.size());

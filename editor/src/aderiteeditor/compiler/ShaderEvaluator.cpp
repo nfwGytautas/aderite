@@ -3,7 +3,6 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
-#include "aderite/asset/AssetManager.hpp"
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 
@@ -18,12 +17,13 @@ ShaderEvaluator::ShaderEvaluator(ShaderType type, const std::string& name)
 }
 
 EvaluatorValue ShaderEvaluator::getProperty(const asset::MaterialTypeAsset* material, const asset::prop::Property* prop) {
-	std::string typeName = material->getName();
-	std::replace_if(std::begin(typeName), std::end(typeName),
-		[](std::string::value_type v) { return v == '.'; },
-		'_');
+	//std::string typeName = material->getName();
+	//std::replace_if(std::begin(typeName), std::end(typeName),
+	//	[](std::string::value_type v) { return v == '.'; },
+	//	'_');
 
-	return createValue("u_" + typeName + "_" + prop->getName());
+	//return createValue("u_" + typeName + "_" + prop->getName());
+	return 0;
 }
 
 EvaluatorValue ShaderEvaluator::add2DSamplingInstruction(const EvaluatorValue& texture) {
@@ -47,17 +47,18 @@ void ShaderEvaluator::addFragmentColorInstruction(const EvaluatorValue& value) {
 }
 
 void ShaderEvaluator::writeToFile() {
-	std::filesystem::path outPath = ::aderite::Engine::getAssetManager()->getRawDir() / (m_name + getPrefix());
-	std::stringstream output;
-	std::ofstream outFile(outPath);
-	LOG_TRACE("Outputting to file {0}", outPath.string());
-
-	// Content
-	writeInputsOutputs(outFile);
-	writeGenerationComment(outFile);
-	writeLibraries(outFile);
-	writeConstants(outFile);
-	writeFunctions(outFile);
+	// TODO: Migrate to new serializer
+	//std::filesystem::path outPath = ::aderite::Engine::getAssetManager()->getRawDir() / (m_name + getPrefix());
+	//std::stringstream output;
+	//std::ofstream outFile(outPath);
+	//LOG_TRACE("Outputting to file {0}", outPath.string());
+	//
+	//// Content
+	//writeInputsOutputs(outFile);
+	//writeGenerationComment(outFile);
+	//writeLibraries(outFile);
+	//writeConstants(outFile);
+	//writeFunctions(outFile);
 }
 
 ShaderEvaluator::ShaderType ShaderEvaluator::getType() const {

@@ -1,12 +1,9 @@
 #include "MaterialInputNode.hpp"
 
 #include "aderite/Aderite.hpp"
-#include "aderite/asset/AssetManager.hpp"
-#include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
-#include "aderiteeditor/compiler/Compiler.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorSerializables.hpp"
 
@@ -20,8 +17,8 @@ const char* MaterialInputNode::getNodeName() const {
 }
 
 void MaterialInputNode::renderBody() {
-    ImGui::Text(m_material->getName().c_str());
-    ImGui::Spacing();
+    //ImGui::Text(m_material->getName().c_str());
+    //ImGui::Spacing();
 }
 
 void MaterialInputNode::evaluate(compiler::GraphEvaluator* evaluator) {
@@ -34,18 +31,18 @@ void MaterialInputNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType MaterialInputNode::getType() {
+io::SerializableType MaterialInputNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::MaterialInputNode);
 }
 
 bool MaterialInputNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
-    emitter << YAML::Key << "Material" << YAML::Value << m_material->getName();
+    //emitter << YAML::Key << "Material" << YAML::Value << m_material->getName();
     serializeData(emitter);
     return true;
 }
 
 bool MaterialInputNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
-    m_material = static_cast<asset::MaterialTypeAsset*>(::aderite::Engine::getAssetManager()->getOrRead(data["Material"].as<std::string>()));
+    //m_material = static_cast<asset::MaterialTypeAsset*>(::aderite::Engine::getAssetManager()->getOrRead(data["Material"].as<std::string>()));
 
     // Create pins
     for (int i = 0; i < m_material->getFields().Properties.size(); i++) {

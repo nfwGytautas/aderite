@@ -46,7 +46,7 @@ void Sampler2DNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType Sampler2DNode::getType() {
+io::SerializableType Sampler2DNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::Sampler2DNode);
 }
 

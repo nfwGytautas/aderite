@@ -6,12 +6,14 @@
 namespace aderite {
 namespace node {
 
+/**
+ * @brief Possible properties 
+*/
 enum class PropertyType : size_t {
-	Target = 0, // FBO
-	Entity = 1, // Entity in the world that has components for rendering
-	Camera = 2, // Camera provider
+	Target	= 0, // FBO
+	Entity	= 1, // Entity in the world that has components for rendering
+	Eye		= 2, // Lower level component of the camera
 	Require = 3, // Require connection
-	Eye = 4, // Lower level component of the camera
 };
 
 /**

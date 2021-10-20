@@ -11,6 +11,14 @@
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
 /**
+ * @brief Type of the graph
+*/
+enum class GraphType {
+	RENDER_PIPELINE,
+	MATERIAL
+};
+
+/**
  * @brief Main node editor object which represent the current graph state
 */
 class Graph : public io::ISerializable
@@ -74,7 +82,7 @@ public:
 	void renderUI();
 
 	// Inherited via ISerializable
-	virtual io::SerializableType getType() override;
+	virtual io::SerializableType getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
 	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 private:

@@ -16,8 +16,8 @@ EditorCameraNode::EditorCameraNode()
     // Output
     p_outputs.push_back(new OutputPin(
         this,
-        node::getTypeName(node::PropertyType::Camera),
-        "Camera"
+        node::getTypeName(node::PropertyType::Eye),
+        "Eye"
     ));
 }
 
@@ -33,7 +33,7 @@ void EditorCameraNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType EditorCameraNode::getType() {
+io::SerializableType EditorCameraNode::getType() const {
     return static_cast<io::SerializableType>(io::EditorSerializables::EditorCameraNode);
 }
 
