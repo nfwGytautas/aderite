@@ -106,7 +106,7 @@ public:
 	*/
 	static VFS* load(std::filesystem::path root);
 private:
-	Directory* m_root;
+	Directory* m_root = nullptr;
 };
 
 }

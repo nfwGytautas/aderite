@@ -1,0 +1,20 @@
+Version: 2021_10_15r1
+Type: 5
+Handle: 2
+Data:
+  Graph:
+    Type: 151
+    Data:
+      NextId: 1
+      LastNode: 0
+      Nodes:
+        - Type: 83
+          Data:
+            InputPins: [-1, -1]
+            OutputPins: []
+            Position:
+              X: 200
+              Y: 200
+            ID: 0
+      Links:
+        []

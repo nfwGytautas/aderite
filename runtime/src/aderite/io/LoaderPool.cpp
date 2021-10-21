@@ -37,6 +37,13 @@ LoaderPool::~LoaderPool() {
 void LoaderPool::enqueue(ILoadable* loadable, Priority priority) {
 	std::unique_lock<std::mutex> lock(m_lock);
 
+	if (loadable->m_loading) {
+		// Already in load queue
+		return;
+	}
+
+	loadable->m_loading = true;
+
 	switch (priority) {
 	case Priority::LOW: {
 		m_lowQueue.push(loadable);

@@ -17,7 +17,6 @@ public:
 	 * @brief Editable fields of the asset, this information is stored inside the asset file
 	*/
 	struct fields {
-		io::LoadableHandle DataFile = c_InvalidHandle;
 		bool IsStatic = true;
 	};
 public:

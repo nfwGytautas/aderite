@@ -11,8 +11,6 @@ ADERITE_EDITOR_RUNTIME_NAMESPACE_BEGIN
 */
 class EditorCameraOperation : public rendering::EyeProvideOperation {
 public:
-	EditorCameraOperation();
-
 	// Inherited via EyeProvideOperation
 	virtual const glm::mat4& getViewMatrix() const override;
 	virtual const glm::mat4& getProjectionMatrix() const override;

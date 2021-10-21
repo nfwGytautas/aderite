@@ -22,6 +22,10 @@ private:
 	void renderItems();
 
 	void renderAddItemPopup();
+
+	void renderDirectoryNode(vfs::Directory* dir);
+
+	void directoryDragDropHandler(vfs::Directory* dir);
 private:
 	vfs::Directory* m_currentDir = nullptr;
 };

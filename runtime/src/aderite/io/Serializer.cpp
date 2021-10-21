@@ -41,7 +41,7 @@ bool Serializer::init() {
 	linkInstancer(static_cast<size_t>(RuntimeSerializables::CLDR_LIST), new Instancer<physics::ColliderList>());
 	linkInstancer(static_cast<size_t>(RuntimeSerializables::BOX_CLDR), new Instancer<physics::BoxCollider>());
 
-	LOG_DEBUG("Registered runtime {0} instancers", m_instancers.size());
+	LOG_DEBUG("Registered {0} runtime instancers", m_instancers.size());
 	ADERITE_DEBUG_SECTION(
 		this->printInstancers();
 	);
@@ -220,6 +220,12 @@ void Serializer::save(SerializableObject* object) {
 	aderite::Engine::getFileHandler()->commit(chunk);
 }
 
+void Serializer::saveAll() {
+	for (SerializableObject* obj : m_objects) {
+		this->save(obj);
+	}
+}
+
 ADERITE_DEBUG_SECTION(
 	void Serializer::printInstancers() {
 		LOG_TRACE("");
@@ -230,12 +236,13 @@ ADERITE_DEBUG_SECTION(
 			if (i.second != nullptr) {
 				ISerializable* temp = nullptr;
 				temp = i.second->create();
-				LOG_TRACE("Type: {0:03d} Instancer: {:p} Created type: {2}", i.first, static_cast<void*>(i.second), temp->getType());
+				LOG_TRACE("Type: {0:03d} Instancer: {1:p} Created type: {2}", i.first, static_cast<void*>(i.second), temp->getType());
 			}
 			else {
-				LOG_TRACE("Type: {0:03d} Instancer: {:p} Created type: UNKNOWN", i.first, static_cast<void*>(i.second));
+				LOG_TRACE("Type: {0:03d} Instancer: {1:p} Created type: UNKNOWN", i.first, static_cast<void*>(i.second));
 			}
 		}
+		LOG_TRACE("");
 	}
 )
 

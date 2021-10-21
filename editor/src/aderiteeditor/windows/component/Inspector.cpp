@@ -7,6 +7,7 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 #include "aderite/scene/Scene.hpp"
+#include "aderite/scene/components/Components.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
@@ -14,22 +15,34 @@
 #include "aderite/asset/property/Property.hpp"
 #include "aderite/io/RuntimeSerializables.hpp"
 #include "aderite/io/SerializableObject.hpp"
+#include "aderite/io/FileHandler.hpp"
+#include "aderite/io/LoaderPool.hpp"
+#include "aderite/io/Serializer.hpp"
 #include "aderite/audio/AudioController.hpp"
+#include "aderite/rendering/Pipeline.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/ColliderList.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
 
+#include "aderiteeditor/utility/Utility.hpp"
+#include "aderiteeditor/utility/ImGui.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/SelectableObject.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
+#include "aderiteeditor/shared/DragDropObject.hpp"
+#include "aderiteeditor/asset/RenderingPipeline.hpp"
 #include "aderiteeditor/vfs/File.hpp"
 #include "aderiteeditor/vfs/VFS.hpp"
-#include "aderiteeditor/utility/Utility.hpp"
-#include "aderiteeditor/utility/ImGui.hpp"
+#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
+#include "aderiteeditor/compiler/ShaderEvaluator.hpp"
+#include "aderiteeditor/node/Node.hpp"
+#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/windows/WindowsEditor.hpp"
 #include "aderiteeditor/windows/component/FileDialog.hpp"
+#include "aderiteeditor/windows/component/NodeEditor.hpp"
 
 namespace aderite {
 namespace editor_ui {
@@ -419,6 +432,7 @@ void Inspector::renderAsset() {
 
 	if (renamer.renderUI()) {
 		editor::State::Project->getVfs()->rename(cacheFile, renamer.getValue());
+		renamer.setValue(renamer.getValue());
 	}
 
 	ImGui::Separator();
@@ -444,6 +458,14 @@ void Inspector::renderAsset() {
 		this->renderScene(object);
 		break;
 	}
+	default: {}
+	}
+
+	switch (static_cast<io::EditorSerializables>(object->getType())) {
+	case io::EditorSerializables::RenderingPipelineAsset: {
+		this->renderPipeline(object);
+		break;
+	}
 	default: {
 		return;
 	}
@@ -454,131 +476,54 @@ void Inspector::renderMesh(io::SerializableObject* asset) {
 	asset::MeshAsset* mesh = static_cast<asset::MeshAsset*>(asset);
 	asset::MeshAsset::fields& finfo = mesh->getFieldsMutable();
 
-	// TODO: Render mesh preview
+	// Replace source button
+	ImGui::PushItemWidth(-FLT_MIN);
+	if (ImGui::Button("Replace source", ImVec2(-1.0f, 0.0f))) {
+		std::string file = component::FileDialog::selectFile("Select mesh file");
 
-	//if (ImGui::BeginTable("MeshEditTable", 3)) {
-	//	ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
-	//	ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
-	//	ImGui::TableSetupColumn("Add", ImGuiTableColumnFlags_WidthFixed, 20.0f);
+		if (!file.empty()) {
+			::aderite::Engine::getFileHandler()->writePhysicalFile(mesh->getHandle(), file);
+		}
+	}
+	ImGui::PopItemWidth();
 
-	//	ImGui::TableNextRow();
+	// Properties
 
-	//	ImGui::TableSetColumnIndex(0);
-	//	ImGui::Text("Source");
+	// Preview
+	// TODO: Preview
 
-	//	ImGui::TableSetColumnIndex(1);
-	//	ImGui::PushItemWidth(-FLT_MIN);
-
-	//	if (finfo.DataFile != c_InvalidHandle) {
-	//		ImGui::Button(finfo.SourceFile.c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-	//	}
-	//	else {
-	//		ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-	//	}
-
-	//	if (ImGui::BeginDragDropTarget()) {
-	//		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__RawData)) {
-
-	//		}
-
-	//		ImGui::EndDragDropTarget();
-	//	}
-
-	//	ImGui::TableSetColumnIndex(2);
-	//	if (ImGui::Button("+###MeshSelect")) {
-	//		std::string file = FileDialog::selectFile("Select mesh file");
-
-	//		if (!file.empty()) {
-	//			std::filesystem::path filename = std::filesystem::path(file).filename();
-	//			std::filesystem::path raw_dst = utility::makeUniquePath(::aderite::Engine::getAssetManager()->getRawDir() / filename);
-	//			std::filesystem::copy_file(file, raw_dst);
-	//			finfo.SourceFile = raw_dst.filename().string();
-
-	//			// Load it immediately
-	//			mesh->prepareLoad();
-
-	//			while (!mesh->isReadyToLoad()) {
-	//				// TODO: Show loading screen
-	//			}
-
-	//			mesh->load();
-	//		}
-	//	}
-
-	//	ImGui::EndTable();
-	//}
 }
 
 void Inspector::renderTexture(io::SerializableObject* asset) {
 	asset::TextureAsset* texture = static_cast<asset::TextureAsset*>(asset);
 	asset::TextureAsset::fields& finfo = texture->getFieldsMutable();
 
-	// Needed for preview
-	if (!bgfx::isValid(texture->getTextureHandle())) {
-		ImGui::Text("Loading...");
-		// Can't show yet
-		return;
-	}
+	// Replace source button
+	ImGui::PushItemWidth(-FLT_MIN);
+	if (ImGui::Button("Replace source", ImVec2(-1.0f, 0.0f))) {
+		std::string file = component::FileDialog::selectFile("Select image file");
 
+		if (!file.empty()) {
+			::aderite::Engine::getFileHandler()->writePhysicalFile(texture->getHandle(), file);
+		}
+	}
+	ImGui::PopItemWidth();
+
+	// Properties
 	//if (ImGui::Checkbox("Is HDR", &finfo.IsHDR)) {
 	//	// Unload previous
 	//	texture->unload();
 	//}
 
-	//if (ImGui::BeginTable("TextureEditTable", 3)) {
-	//	ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
-	//	ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
-	//	ImGui::TableSetupColumn("Add", ImGuiTableColumnFlags_WidthFixed, 20.0f);
+	// Needed for preview
+	if (!bgfx::isValid(texture->getTextureHandle())) {
+		ImGui::Text("Loading preview...");
+		aderite::Engine::getLoaderPool()->enqueue(texture, io::LoaderPool::Priority::HIGH);
+		// Can't show yet
+		return;
+	}
 
-	//	ImGui::TableNextRow();
-
-	//	ImGui::TableSetColumnIndex(0);
-	//	ImGui::Text("Source");
-
-	//	ImGui::TableSetColumnIndex(1);
-	//	ImGui::PushItemWidth(-FLT_MIN);
-
-	//	if (!finfo.SourceFile.empty()) {
-	//		ImGui::Button(finfo.SourceFile.c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-	//	}
-	//	else {
-	//		ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-	//	}
-
-	//	if (ImGui::BeginDragDropTarget()) {
-	//		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__RawData)) {
-
-	//		}
-
-	//		ImGui::EndDragDropTarget();
-	//	}
-
-	//	ImGui::TableSetColumnIndex(2);
-	//	if (ImGui::Button("+###TextureSelect")) {
-	//		std::string file = FileDialog::selectFile("Select texture file");
-
-	//		if (!file.empty()) {
-	//			std::filesystem::path filename = std::filesystem::path(file).filename();
-	//			std::filesystem::path raw_dst = utility::makeUniquePath(::aderite::Engine::getAssetManager()->getRawDir() / filename);
-	//			std::filesystem::copy_file(file, raw_dst);
-	//			finfo.SourceFile = raw_dst.filename().string();
-
-	//			// Load it immediately
-	//			texture->prepareLoad();
-
-	//			while (!texture->isReadyToLoad()) {
-	//				// TODO: Show loading screen
-	//			}
-
-	//			texture->load();
-	//		}
-	//	}
-
-	//	ImGui::EndTable();
-	//}
-
-	//ImGui::Spacing();
-
+	// Preview
 	// TODO: Can be remade to less bloated version
 	if (ImGui::BeginTable("TexturePreviewTable", 2)) {
 		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
@@ -737,6 +682,7 @@ void Inspector::renderMaterialType(io::SerializableObject* asset) {
 	ImGui::Separator();
 	if (ImGui::Button("Open shader editor", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
 		// TODO: Set graph
+		//WindowsEditor::getInstance()->NodeEditor->setGraph(type->ge);
 	}
 
 	ImGui::Separator();
@@ -762,17 +708,52 @@ void Inspector::renderMaterialType(io::SerializableObject* asset) {
 }
 
 void Inspector::renderScene(io::SerializableObject* asset) {
-	// TODO: Rendering pipeline
-	ImGui::Separator();
-	if (ImGui::Button("Open pipeline editor", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
-		// TODO: Set graph
+	static vfs::File* cacheFile = nullptr;
+	scene::Scene* type = static_cast<scene::Scene*>(asset);
+
+	if (ImGui::BeginTable("SceneEditTable", 2)) {
+		ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_None);
+
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
+		ImGui::Text("Rendering pipeline:");
+		
+		ImGui::TableSetColumnIndex(1);
+		if (type->getPipeline() == nullptr) {
+			ImGui::Selectable("None");
+		}
+		else {
+			vfs::File* file = editor::State::Project->getVfs()->getFile(type->getPipeline()->getHandle());
+			ImGui::Selectable(file->getName().c_str());
+		}
+
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__PipelineAsset)) {
+				editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+				vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+				type->setPipeline(static_cast<rendering::Pipeline*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle())));
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		ImGui::EndTable();
+	}
+}
+
+void Inspector::renderPipeline(io::SerializableObject* asset) {
+	asset::RenderingPipeline* type = static_cast<asset::RenderingPipeline*>(asset);
+
+	ImGui::PushItemWidth(-FLT_MIN);
+	if (ImGui::Button("Open editor", ImVec2(-1.0f, 0.0f))) {
+		WindowsEditor::getInstance()->NodeEditor->setGraph(type->getGraph(), component::NodeEditor::NodeEditorType::RENDER_PIPELINE);
 	}
 
-	ImGui::Separator();
-	if (ImGui::Button("Compile", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
-		// TODO: Compile
-		//compiler::Compiler::compileMaterialType(type);
+	if (ImGui::Button("Compile", ImVec2(-1.0f, 0.0f))) {
+		type->compile();
 	}
+	ImGui::PopItemWidth();
 }
 
 }

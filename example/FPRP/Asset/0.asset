@@ -1,0 +1,15 @@
+Version: 2021_10_15r1
+Type: 3
+Handle: 0
+Data:
+  Entities:
+    - Entity: 0
+      Meta:
+        Name: Cube
+      Transform:
+        Position: [0, 0, 0]
+        Rotation: [1, 0, 0, 0]
+        Scale: [1, 1, 1]
+      MeshRenderer:
+        {}
+  Pipeline: 2

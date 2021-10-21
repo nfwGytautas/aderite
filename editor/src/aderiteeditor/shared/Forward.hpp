@@ -21,6 +21,7 @@ namespace editor {
 
 class State;
 class SelectableObject;
+class DragDropObject;
 
 }
 }

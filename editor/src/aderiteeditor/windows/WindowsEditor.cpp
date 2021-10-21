@@ -27,6 +27,7 @@
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
+#include "aderiteeditor/windows/StartupModal.hpp"
 #include "aderiteeditor/windows/component/Inspector.hpp"
 #include "aderiteeditor/windows/component/Menubar.hpp"
 #include "aderiteeditor/windows/component/Toolbar.hpp"
@@ -35,36 +36,45 @@
 #include "aderiteeditor/windows/component/AssetBrowser.hpp"
 #include "aderiteeditor/windows/component/NodeEditor.hpp"
 #include "aderiteeditor/runtime/Instancers.hpp"
+#include "aderiteeditor/vfs/File.hpp"
+#include "aderiteeditor/vfs/VFS.hpp"
 
 
 #define EVENT_ROUTE(e, dst) event_router::e = std::bind(&WindowsEditor::dst, this, std::placeholders::_1)
 
 ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN
 
+WindowsEditor* WindowsEditor::m_instance = nullptr;
+
 WindowsEditor::WindowsEditor(int argc, char** argv) {
-	m_inspector = new editor_ui::Inspector();
-	m_menubar = new component::Menubar();
-	m_toolbar = new component::Toolbar();
-	m_sceneView = new component::SceneView();
-	m_sceneHierarchy = new component::SceneHierarchy();
-	m_assetBrowser = new component::AssetBrowser();
-	m_nodeEditor = new component::NodeEditor();
+	StartupModal = new editor_ui::StartupModal();
+
+	Inspector = new editor_ui::Inspector();
+	Menubar = new component::Menubar();
+	Toolbar = new component::Toolbar();
+	SceneView = new component::SceneView();
+	SceneHierarchy = new component::SceneHierarchy();
+	AssetBrowser = new component::AssetBrowser();
+	NodeEditor = new component::NodeEditor();
 
 	editor::State::EditorCamera = new shared::EditorCamera();
 
 	// Setup event router
 	editor::State::Sink = this;
 	editor::State::Project = nullptr;
+	m_instance = this;
 }
 
 WindowsEditor::~WindowsEditor() {
-	delete m_inspector;
-	delete m_menubar;
-	delete m_toolbar;
-	delete m_sceneView;
-	delete m_sceneHierarchy;
-	delete m_assetBrowser;
-	delete m_nodeEditor;
+	delete Inspector;
+	delete Menubar;
+	delete Toolbar;
+	delete SceneView;
+	delete SceneHierarchy;
+	delete AssetBrowser;
+	delete NodeEditor;
+
+	delete StartupModal;
 }
 
 void WindowsEditor::onRuntimeInitialized() {
@@ -82,10 +92,6 @@ void WindowsEditor::onRuntimeInitialized() {
 
 	// Setup instancers for serializer
 	utility::linkInstancers();
-
-	// TODO: Startup dialog e.g. create new project, load project, etc.
-	//this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");
-	//this->onLoadProject("../example/FPRP/FPRP.aproj");
 }
 
 void WindowsEditor::onRendererInitialized() {
@@ -147,13 +153,17 @@ void WindowsEditor::onRendererInitialized() {
 	backend::ImGui_Implbgfx_Init(255);
 
 	// Components
-	m_inspector->init();
-	m_menubar->init();
-	m_toolbar->init();
-	m_sceneView->init();
-	m_sceneHierarchy->init();
-	m_assetBrowser->init();
-	m_nodeEditor->init();
+	StartupModal->init();
+	Inspector->init();
+	Menubar->init();
+	Toolbar->init();
+	SceneView->init();
+	SceneHierarchy->init();
+	AssetBrowser->init();
+	NodeEditor->init();
+
+	// Show the startup modal
+	StartupModal->show();
 }
 
 void WindowsEditor::onStartRender() {
@@ -166,11 +176,6 @@ void WindowsEditor::onPreRenderCommit() {
 
 void WindowsEditor::onEndRender() {
 	// Render ImGui
-
-	// State
-	bool show_demo_window = true;
-	bool show_another_window = false;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	// Start the Dear ImGui frame
 	backend::ImGui_Implbgfx_NewFrame();
@@ -232,19 +237,7 @@ void WindowsEditor::onEndRender() {
 
 	// Dockspace components start here
 
-	// Components
-	m_inspector->render();
-	m_menubar->render();
-	m_toolbar->render();
-	m_sceneView->render();
-	m_sceneHierarchy->render();
-	m_assetBrowser->render();
-	m_nodeEditor->render();
-
-	// DEMO WINDOW
-	if (show_demo_window) {
-		ImGui::ShowDemoWindow(&show_demo_window);
-	}
+	this->renderComponents();
 
 	// Dockspace components end here
 
@@ -271,13 +264,14 @@ void WindowsEditor::onRuntimeShutdown() {
 		//onSaveProject();
 	}
 
-	m_inspector->shutdown();
-	m_menubar->shutdown();
-	m_toolbar->shutdown();
-	m_sceneView->shutdown();
-	m_sceneHierarchy->shutdown();
-	m_assetBrowser->shutdown();
-	m_nodeEditor->shutdown();
+	StartupModal->shutdown();
+	Inspector->shutdown();
+	Menubar->shutdown();
+	Toolbar->shutdown();
+	SceneView->shutdown();
+	SceneHierarchy->shutdown();
+	AssetBrowser->shutdown();
+	NodeEditor->shutdown();
 
 	// Shutdown ImGui
 	backend::ImGui_Implbgfx_Shutdown();
@@ -298,8 +292,23 @@ void WindowsEditor::onNewProject(const std::string& dir, const std::string& name
 
 	editor::State::Project = new shared::Project(dir, name);
 
+	// Create directories
+	if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Asset/")) {
+		std::filesystem::create_directory(editor::State::Project->getRootDir() / "Asset/");
+	}
+
+	if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Data/")) {
+		std::filesystem::create_directory(editor::State::Project->getRootDir() / "Data/");
+	}
+
 	// Setup asset manager
 	::aderite::Engine::getFileHandler()->setRoot(editor::State::Project->getRootDir());
+
+	// Create new scene
+	onNewScene("Untitled scene");
+
+	// Save
+	editor::State::Project->save();
 }
 
 void WindowsEditor::onSaveProject() {
@@ -309,10 +318,7 @@ void WindowsEditor::onSaveProject() {
 	}
 
 	// Save all assets
-	/*for (asset::Asset* asset : *::aderite::Engine::getAssetManager()) {
-		::aderite::Engine::getAssetManager()->saveAsset(asset);
-	}*/
-
+	::aderite::Engine::getSerializer()->saveAll();
 	editor::State::Project->save();
 }
 
@@ -333,15 +339,12 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 	::aderite::Engine::get()->getWindowManager()->setTitle(editor::State::Project->getName());
 
 	// Setup asset manager
-	::aderite::Engine::getFileHandler()->setRoot(editor::State::Project->getRootDir().string());
+	::aderite::Engine::getFileHandler()->setRoot(editor::State::Project->getRootDir());
 
 	// Setup audio controller
 	::aderite::Engine::getAudioController()->loadMasterBank();
 
-	if (editor::State::Project->getActiveScene() == c_InvalidHandle) {
-		onNewScene("Untitled 1");
-	}
-	else {
+	if (editor::State::Project->getActiveScene() != c_InvalidHandle) {
 		// Read scene
 		scene::Scene* s = static_cast<scene::Scene*>(::aderite::Engine::getSerializer()->getOrRead(editor::State::Project->getActiveScene()));
 		::aderite::Engine::getSceneManager()->setActive(s);
@@ -350,7 +353,7 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 
 void WindowsEditor::onSceneChanged(scene::Scene* scene) {
 	// Attach editor camera
-	m_sceneView->onSceneChanged(scene);
+	SceneView->onSceneChanged(scene);
 }
 
 void WindowsEditor::onSystemUpdate(float delta) {
@@ -365,8 +368,12 @@ void WindowsEditor::onNewScene(const std::string& name) {
 	LOG_TRACE("New scene with name: {0}", name);
 
 	// TODO: Error screen or special naming
-	/*scene::Scene* s = ::aderite::Engine::getAssetManager()->create<scene::Scene>(name);
-	::aderite::Engine::getSceneManager()->setActive(s);*/
+	scene::Scene* s = new scene::Scene();
+	::aderite::Engine::getSerializer()->add(s);
+	::aderite::Engine::getSerializer()->save(s);
+	vfs::File* file = new vfs::File(name, s->getHandle(), editor::State::Project->getVfs()->getRoot());
+
+	::aderite::Engine::getSceneManager()->setActive(s);
 }
 
 void WindowsEditor::onStopGame() {
@@ -391,6 +398,33 @@ void WindowsEditor::onStartGame() {
 
 void WindowsEditor::onResetGameState() {
 	// TODO: Reset game state, by reloading all scripts or resetting their default parameters
+}
+
+WindowsEditor* WindowsEditor::getInstance() {
+	return m_instance;
+}
+
+void WindowsEditor::renderComponents() {
+	static bool show_demo_window = true;
+
+	// Components
+	StartupModal->render();
+
+	if (!StartupModal->isOpen() && editor::State::Project != nullptr) {
+		// Only render when open and a project exists
+		Inspector->render();
+		Menubar->render();
+		Toolbar->render();
+		SceneView->render();
+		SceneHierarchy->render();
+		AssetBrowser->render();
+		NodeEditor->render();	
+
+		// DEMO WINDOW
+		if (show_demo_window) {
+			ImGui::ShowDemoWindow(&show_demo_window);
+		}
+	}
 }
 
 ADERITE_EDITOR_ROOT_NAMESPACE_END

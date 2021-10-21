@@ -40,13 +40,6 @@ bool Engine::init(InitOptions options) {
 	m_fileHandler = new io::FileHandler();
 	m_loaderPool = new io::LoaderPool(2);
 
-	// Serializer
-	m_serializer = new io::Serializer();
-	if (!m_serializer->init()) {
-		LOG_ERROR("Aborting aderite initialization");
-		return false;
-	}
-
 	// Scene manager
 	m_sceneManager = new scene::SceneManager();
 	if (!m_sceneManager->init()) {
@@ -89,6 +82,13 @@ bool Engine::init(InitOptions options) {
 		return false;
 	}
 
+	// Serializer
+	m_serializer = new io::Serializer();
+	if (!m_serializer->init()) {
+		LOG_ERROR("Aborting aderite initialization");
+		return false;
+	}
+
 	// At this point there should be an editor if it is enabled
 #if MIDDLEWARE_ENABLED == 1
 	if (!m_middleware) {
@@ -105,12 +105,12 @@ void Engine::shutdown() {
 	MIDDLEWARE_ACTION(onRuntimeShutdown);
 
 	m_sceneManager->shutdown();
+	m_audioController->shutdown();
+	m_inputManager->shutdown();
 	m_serializer->shutdown();
 	m_physicsController->shutdown();
-	m_audioController->shutdown();
 	m_renderer->shutdown();
 	m_windowManager->shutdown();
-	m_inputManager->shutdown();
 
 	delete m_sceneManager;
 	delete m_physicsController;

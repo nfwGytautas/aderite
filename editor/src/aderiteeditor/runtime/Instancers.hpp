@@ -126,7 +126,7 @@ void linkInstancers() {
 
 	// Assets
 	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::RenderingPipelineAsset),
+		static_cast<::aderite::io::SerializableType>(::aderite::io::RuntimeSerializables::PIPELINE),
 		new ::aderite::io::Instancer<aderite::asset::RenderingPipeline>()
 	);
 

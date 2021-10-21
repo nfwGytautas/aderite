@@ -21,7 +21,11 @@ void TextureAsset::load(const io::Loader* loader) {
 		return;
 	}
 	else {
-		io::Loader::TextureLoadResult<unsigned char> result = loader->loadTexture(m_info.DataFile);
+		io::Loader::TextureLoadResult<unsigned char> result = loader->loadTexture(this->getHandle());
+		if (!result.Error.empty()) {
+			return;
+		}
+
 		m_handle = bgfx::createTexture2D(
 			static_cast<uint16_t>(result.Width),
 			static_cast<uint16_t>(result.Height),
@@ -45,20 +49,14 @@ io::SerializableType TextureAsset::getType() const {
 }
 
 bool TextureAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
-	emitter << YAML::Key << "Source" << YAML::Value << m_info.DataFile;
 	emitter << YAML::Key << "IsHDR" << YAML::Value << m_info.IsHDR;
 	emitter << YAML::Key << "IsCubemap" << YAML::Value << m_info.IsCubemap;
 	return true;
 }
 
 bool TextureAsset::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
-	if (data["Source"]) {
-		m_info.DataFile = data["Source"].as<io::LoadableHandle>();
-	}
-
 	m_info.IsHDR = data["IsHDR"].as<bool>();
 	m_info.IsCubemap = data["IsCubemap"].as<bool>();
-
 	return true;
 }
 

@@ -36,6 +36,8 @@ Clear graph on new select
 Constraints for number of nodes and deletion
 
 FPRP:
+Array operation
+Change pipeline when scene changes
 Operation resize events
 Base vertex shader compiling
 Varying generation
@@ -46,11 +48,7 @@ Move MaterialTypeAsset to editor
 Pipeline verification
 
 Rendering:
-Rethink camera architecture
-Views
-View names
 BGFX multithread encoder
-Optimize camera view and projection setting
 
 Audio:
 Rethink serialization
@@ -70,7 +68,19 @@ Broad-Phase callbacks
 Collision layers
 Rethink the collision callback architecture
 
+VFS:
+Refactor to be more intuitive
+Remove files that don't physically exist anymore
+
 Editor:
+Redo most of it
+Refactor drag and drop API
+Default pipeline for scenes
+Show if have a valid data source for texture and mesh
+Load last opened project
+On open directory show in navigator
+Directory renaming in tree node
+Navigator visual bug fixes
 Component architecture rethink
 Node editor middle mouse also moves scene view
 Copy bgfx shader includes to Raw/
@@ -94,6 +104,7 @@ Link studio Build dir with editor
 Detect unloaded bank files
 Free scene on new project create
 Rename dynamic text API
+Tooltips?
 
 Code:
 this for self invokes

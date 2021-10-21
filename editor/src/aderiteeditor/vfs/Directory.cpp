@@ -7,7 +7,11 @@ namespace vfs {
 
 Directory::Directory(const std::string& name, Directory* parent) 
 	: m_name(name), m_parent(parent)
-{}
+{
+	if (m_parent != nullptr) {
+		m_parent->m_directories.push_back(this);
+	}
+}
 
 Directory::~Directory() {
 	for (Directory* dir : m_directories) {
@@ -77,7 +81,6 @@ bool Directory::hasDirectory(const std::string& name) const {
 
 Directory* Directory::createDirectory(const std::string& name) {
 	Directory* d = new Directory(name, this);
-	m_directories.push_back(d);
 	return d;
 }
 
@@ -93,7 +96,7 @@ std::string Directory::getPath() const {
 		return "/";
 	}
 
-	return m_parent->getPath() + "/";
+	return m_parent->getPath() + "/" + m_name;
 }
 }
 }

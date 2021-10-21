@@ -1,5 +1,6 @@
 #include "AssetBrowser.hpp"
 
+#include <functional>
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
@@ -18,27 +19,14 @@
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
+#include "aderiteeditor/shared/DragDropObject.hpp"
 #include "aderiteeditor/vfs/VFS.hpp"
 #include "aderiteeditor/vfs/Directory.hpp"
 #include "aderiteeditor/vfs/File.hpp"
+#include "aderiteeditor/asset/RenderingPipeline.hpp"
+#include "aderiteeditor/runtime/EditorSerializables.hpp"
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
-
-/**
- * @brief Recusively collects all files from directory into a vector of paths, pushing paths relative to one point
-*/
-void recursiveFsCollect(std::vector<std::filesystem::path>& entries, std::filesystem::path dir, std::filesystem::path& relativeTo) {
-	for (auto& dir_entry : std::filesystem::directory_iterator(dir)) {
-		const auto& it = dir_entry.path();
-
-		if (std::filesystem::is_directory(it)) {
-			recursiveFsCollect(entries, it, relativeTo);
-		}
-		else {
-			entries.push_back(std::filesystem::relative(it, relativeTo));
-		}
-	}
-}
 
 AssetBrowser::AssetBrowser()
 {}
@@ -59,7 +47,7 @@ void AssetBrowser::render(){
 	// Display
 
 	// Navigator
-	if (ImGui::BeginTable("AssetBrowserTable", 2)) {
+	if (ImGui::BeginTable("AssetBrowserTable", 2, ImGuiTableFlags_BordersInnerV)) {
 		ImGui::TableSetupColumn("Navigator", ImGuiTableColumnFlags_WidthFixed, 200.0f);
 		ImGui::TableSetupColumn("Items", ImGuiTableColumnFlags_None);
 		ImGui::TableNextRow();
@@ -70,55 +58,17 @@ void AssetBrowser::render(){
 		ImGui::EndTable();
 	}
 
-	
-	//// Back button
-	//if (ImGui::Button("<", ImVec2(0.0f , c_status_button_height))) {
-	//	m_currentDir = m_currentDir->getParent();
-	//}
-
-	//ImGui::SameLine(0.0f, 0.0f);
-	//ImGui::Text("|");
-	//ImGui::SameLine(0.0f, 0.5f);
-
-	//// Path bar
-	//
-	//// The root
-	//if (ImGui::Button("/", ImVec2(0.0f, c_status_button_height))) {
-	//	m_currentDir = editor::State::Project->getVfs()->getRoot();
-	//}
-
-	//if (ImGui::BeginDragDropTarget()) {
-	//	targetHandler("");
-	//	ImGui::EndDragDropTarget();
-	//}
-
-	
-
-	/*std::filesystem::path namePath = m_currentDir->getPath();
-	std::filesystem::path it_path = "";
-	for (std::vector<std::string>::reverse_iterator i = namePath.rbegin(); i != namePath.rend(); ++i) {
-		it_path = it_path / *i;
-		
-		ImGui::SameLine(0.0f, 1.0f);
-		if (ImGui::Button((*i + "/").c_str(), ImVec2(0.0f, c_status_button_height))) {
-			m_currentDir = it_path;
-			resolveFs();
-			break;
-		}
-
-		if (ImGui::BeginDragDropTarget()) {
-			if (targetHandler(it_path)) {
-				resolveFs();
-			}
-			ImGui::EndDragDropTarget();
-		}
-	}*/
-
 	ImGui::End();
 }
 
 void AssetBrowser::renderNavigator() {
 	ImGui::Text("Navigator");
+
+	vfs::Directory* root = editor::State::Project->getVfs()->getRoot();
+
+	// Root is always open
+	ImGui::SetNextItemOpen(true);
+	this->renderDirectoryNode(root);
 }
 
 void AssetBrowser::renderItems() {
@@ -128,10 +78,10 @@ void AssetBrowser::renderItems() {
 	static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY;
 	static utility::InlineRename renamer;
 
-	float panelWidth = ImGui::GetContentRegionAvail().x;
-	int columnCount = (int)(panelWidth / cellSize);
+	const float panelWidth = ImGui::GetContentRegionAvail().x;
+	const int columnCount = (int)(panelWidth / cellSize);
 
-	if (ImGui::BeginTable("AssetBrowserTable", columnCount, flags)) {
+	if (ImGui::BeginTable("AssetItemBrowserTable", columnCount, flags)) {
 		// Context menu
 		if (ImGui::BeginPopupContextWindow())
 		{
@@ -153,60 +103,30 @@ void AssetBrowser::renderItems() {
 			if (ImGui::BeginPopupContextItem()) {
 				if (ImGui::MenuItem("Delete")) {
 					// TODO: Confirmation window
-					//editor::State::Project->getVfs()->remove(dir);
+					editor::State::Project->getVfs()->remove(dir);
 				}
 
 				ImGui::EndPopup();
 			}
 
 			if (ImGui::BeginDragDropTarget()) {
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__GenericAsset)) {
-					const char* asset_name = static_cast<const char*>(payload->Data);
-
-					// Get asset from manager and move it to the new directory
-					asset::Asset* asset = ::aderite::Engine::getAssetManager()->getByName(asset_name);
-					if (asset) {
-						std::string oldPath = asset->getName();
-						std::string newPath = (path / std::filesystem::path(asset->getName()).filename()).string();
-
-						if (newPath == asset->getName()) {
-							return false;
-						}
-
-						if (::aderite::Engine::getAssetManager()->has(newPath)) {
-							LOG_WARN("Asset {0} already exists", newPath);
-							return false;
-						}
-
-						asset->setName(newPath);
-
-						if (asset->type() == asset::AssetType::SCENE) {
-							if (shared::State::Project->getActiveScene() == asset_name) {
-								shared::State::Sink->onSaveProject();
-							}
-						}
-
-						// Move file
-						std::filesystem::rename(
-							::aderite::Engine::getAssetManager()->getResDir() / oldPath,
-							::aderite::Engine::getAssetManager()->getResDir() / newPath);
-
-					}
-				}
-
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__Directory)) {
-					const char* dir = static_cast<const char*>(payload->Data);
-
-					// TODO: Move entire directory and all it's assets
-					LOG_WARN("Directory moving is not implemented!");
-				}
-
+				this->directoryDragDropHandler(dir);
 				ImGui::EndDragDropTarget();
 			}
 
 			if (ImGui::BeginDragDropSource()) {
-				ImGui::SetDragDropPayload(shared::DDPayloadID__Directory, dir, sizeof(dir));
+				editor::DragDropObject obj{ dir };
+				ImGui::SetDragDropPayload(shared::DDPayloadID__Directory, &obj, sizeof(editor::DragDropObject));
 				ImGui::EndDragDropSource();
+			}
+
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+				m_currentDir = dir;
+			}
+
+			std::string path = dir->getPath();
+			if (renamer.renderUI(std::hash<std::string>()(dir->getPath()), dir->getName())) {
+				editor::State::Project->getVfs()->rename(dir, renamer.getValue());
 			}
 		}
 
@@ -222,7 +142,7 @@ void AssetBrowser::renderItems() {
 			if (ImGui::BeginPopupContextItem()) {
 				if (ImGui::MenuItem("Delete")) {
 					// TODO: Confirmation window
-					//editor::State::Project->getVfs()->remove(dir);
+					editor::State::Project->getVfs()->remove(file);
 				}
 
 				ImGui::EndPopup();
@@ -254,13 +174,18 @@ void AssetBrowser::renderItems() {
 					target = shared::DDPayloadID__MaterialType;
 					break;
 				}
+				case io::RuntimeSerializables::PIPELINE: {
+					target = shared::DDPayloadID__PipelineAsset;
+					break;
+				}
 				default: {
 					target = shared::DDPayloadID__GenericAsset;
 				}
 				}
 
 				if (!target.empty()) {
-					ImGui::SetDragDropPayload(target.c_str(), file, sizeof(file));
+					editor::DragDropObject obj{ file };
+					ImGui::SetDragDropPayload(target.c_str(), &obj, sizeof(editor::DragDropObject));
 				}
 
 				ImGui::EndDragDropSource();
@@ -268,54 +193,15 @@ void AssetBrowser::renderItems() {
 
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
 
-				switch (static_cast<io::RuntimeSerializables>(object->getType())) {
-				case io::RuntimeSerializables::SCENE:
-				{
-					// TODO: Error check
-					// TODO: Move to editor?
-					/*scene::Scene* scene = static_cast<scene::Scene*>(::aderite::Engine::getAssetManager()->getOrRead(node.Name));
-					::aderite::Engine::getSceneManager()->setActive(scene);*/
-					break;
+				if (static_cast<io::RuntimeSerializables>(object->getType()) == io::RuntimeSerializables::SCENE) {
+					::aderite::Engine::getSceneManager()->setActive(static_cast<scene::Scene*>(object));
 				}
-				case io::RuntimeSerializables::MATERIAL:
-				case io::RuntimeSerializables::MESH:
-				case io::RuntimeSerializables::TEXTURE:
-				case io::RuntimeSerializables::MAT_TYPE:
-				{
-					editor::State::LastSelectedObject = editor::SelectableObject(object);
-					break;
-				}
-				}
+
+				editor::State::LastSelectedObject = editor::SelectableObject(object);
 			}
 
-			if (current_renaming != node.Name) {
-				if (ImGui::Selectable(node.Stem.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
-					if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-						rename_value = node.Stem;
-						current_renaming = node.Name;
-						appearing = true;
-					}
-				}
-			}
-			else {
-				if (DynamicInputText("##rename", &rename_value, edit_flags)) {
-					current_renaming = "";
-
-					if (!rename_value.empty()) {
-						renameItem(node.Name, rename_value + node.Extension);
-						resolveFs();
-						break;
-					}
-				}
-
-				if (!ImGui::IsItemActive() && !appearing) {
-					current_renaming = "";
-				}
-
-				if (appearing) {
-					ImGui::SetKeyboardFocusHere();
-					appearing = false;
-				}
+			if (renamer.renderUI(object->getHandle(), file->getName())) {
+				editor::State::Project->getVfs()->rename(file, renamer.getValue());
 			}
 		}
 
@@ -324,34 +210,117 @@ void AssetBrowser::renderItems() {
 }
 
 void AssetBrowser::renderAddItemPopup() {
+	std::string newName = "";
+	io::SerializableObject* object = nullptr;
+
 	if (ImGui::MenuItem("New folder")) {
 		m_currentDir->createDirectory("New folder");
 	}
 
 	ImGui::Separator();
 
+	if (ImGui::MenuItem("Rendering pipeline")) {
+		object = new asset::RenderingPipeline();
+		newName = "New rendering pipeline";
+	}
+
 	if (ImGui::BeginMenu("New asset")) {
+
 		if (ImGui::MenuItem("Scene")) {
-			//createItem<scene::Scene>(m_currentDir, "New scene");
+			object = new scene::Scene();
+			newName = "New scene";
 		}
 
 		if (ImGui::MenuItem("Mesh")) {
-			//createItem<asset::MeshAsset>(m_currentDir, "New mesh");
+			object = new asset::MeshAsset();
+			newName = "New mesh";
 		}
 
 		if (ImGui::MenuItem("Material")) {
-			//createItem<asset::MaterialAsset>(m_currentDir, "New material");
+			object = new asset::MaterialAsset();
+			newName = "New material";
 		}
 
 		if (ImGui::MenuItem("Texture")) {
-			//createItem<asset::TextureAsset>(m_currentDir, "New texture");
+			object = new asset::TextureAsset();
+			newName = "New texture";
 		}
 
 		if (ImGui::MenuItem("Material type")) {
-			//createItem<asset::MaterialTypeAsset>(m_currentDir, "New material type");
+			object = new asset::MaterialTypeAsset();
+			newName = "New material type";
 		}
 
 		ImGui::EndMenu();
+	}
+
+	if (object != nullptr && !newName.empty()) {
+		::aderite::Engine::getSerializer()->add(object);
+		::aderite::Engine::getSerializer()->save(object);
+		vfs::File* file = new vfs::File(newName, object->getHandle(), m_currentDir);
+	}
+}
+
+void AssetBrowser::renderDirectoryNode(vfs::Directory* dir) {
+	static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+	ImGuiTreeNodeFlags node_flags = base_flags;
+	if (dir == m_currentDir) {
+		node_flags |= ImGuiTreeNodeFlags_Selected;
+	}
+
+	if (dir->getDirectories().size() == 0) {
+		node_flags |= ImGuiTreeNodeFlags_Leaf;
+	}
+	
+	bool open = ImGui::TreeNodeEx(dir->getName().c_str(), node_flags);
+	if (ImGui::IsItemClicked()) {
+		m_currentDir = dir;
+	}
+
+	if (ImGui::BeginDragDropTarget()) {
+		this->directoryDragDropHandler(dir);
+		ImGui::EndDragDropTarget();
+	}
+
+	if (ImGui::BeginDragDropSource()) {
+		editor::DragDropObject obj{ dir };
+		ImGui::SetDragDropPayload(shared::DDPayloadID__Directory, &obj, sizeof(editor::DragDropObject));
+		ImGui::EndDragDropSource();
+	}
+
+	if (ImGui::BeginPopupContextItem()) {
+		if (ImGui::MenuItem("Delete")) {
+			// TODO: Confirmation window
+			editor::State::Project->getVfs()->remove(dir);
+		}
+
+		ImGui::EndPopup();
+	}
+
+	if (open) {
+		for (vfs::Directory* subDir : dir->getDirectories()) {
+			this->renderDirectoryNode(subDir);
+		}
+
+		ImGui::TreePop();
+	}
+}
+
+void AssetBrowser::directoryDragDropHandler(vfs::Directory* dir) {
+	if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__GenericAsset)) {
+		vfs::File* file = static_cast<vfs::File*>(payload->Data);
+
+		// TODO: Message that already exists
+
+		// Get asset from manager and move it to the new directory
+		editor::State::Project->getVfs()->move(dir, file);
+	}
+
+	if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__Directory)) {
+		editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+		vfs::Directory* payloadDir = static_cast<vfs::Directory*>(ddo->Data);
+		editor::State::Project->getVfs()->move(dir, payloadDir);
 	}
 }
 

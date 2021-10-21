@@ -142,11 +142,52 @@ bool InlineRename::renderUI() {
 	return renamed;
 }
 
+bool InlineRename::renderUI(size_t index, std::string value) {
+	static ImGuiInputTextFlags edit_flags = ImGuiInputTextFlags_CallbackResize | ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_EnterReturnsTrue;
+	bool renamed = false;
+
+	if (m_idx != index) {
+		if (ImGui::Selectable(value.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
+			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+				value = "";
+				m_renaming = true;
+				m_appearing = true;
+				m_idx = index;
+			}
+		}
+	}
+	else {
+		if (DynamicInputText("##rename", &m_value, edit_flags)) {
+			m_renaming = false;
+
+			if (m_value.empty()) {
+				m_value = value;
+			}
+
+			renamed = true;
+			m_idx = -1;
+		}
+
+		if (!ImGui::IsItemActive() && !m_appearing) {
+			m_renaming = false;
+			m_idx = -1;
+		}
+
+		if (m_appearing) {
+			ImGui::SetKeyboardFocusHere();
+			m_appearing = false;
+		}
+	}
+
+	return renamed;
+}
+
 void InlineRename::setState(bool state) {
 	m_renaming = state;
 }
 
 void InlineRename::setValue(const std::string& value) {
+	m_initial = value;
 	m_value = value;
 }
 

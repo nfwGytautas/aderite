@@ -42,7 +42,14 @@ io::SerializableType Pipeline::getType() const {
 }
 
 bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
-	// TODO: Serialize
+	emitter << YAML::Key << "Operations" << YAML::BeginSeq;
+	for (size_t i = 0; i < m_operations.size(); i++) {
+		emitter << YAML::BeginMap;
+		
+		emitter << YAML::EndMap;
+	}
+	emitter << YAML::EndSeq;
+
 	return true;
 }
 

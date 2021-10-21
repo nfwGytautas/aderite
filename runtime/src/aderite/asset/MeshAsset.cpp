@@ -31,8 +31,10 @@ void MeshAsset::load(const io::Loader* loader) {
 
 	// Create handles
 	if (m_info.IsStatic) {
-		io::Loader::MeshLoadResult result = loader->loadMesh(m_info.DataFile);
-		ADERITE_DYNAMIC_ASSERT(!result.Error.empty(), "Failed to load mesh");
+		io::Loader::MeshLoadResult result = loader->loadMesh(this->getHandle());
+		if (!result.Error.empty()) {
+			return;
+		}
 
 		auto& positionData = result.Vertices;
 		auto& indicesData = result.Indices;
@@ -62,21 +64,13 @@ io::SerializableType MeshAsset::getType() const {
 }
 
 bool MeshAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
-	// Mesh
-	emitter << YAML::Key << "Source" << YAML::Value << m_info.DataFile;
-
 	// Layout
 	emitter << YAML::Key << "IsStatic" << YAML::Value << m_info.IsStatic;
 	return true;
 }
 
 bool MeshAsset::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
-	if (data["Source"]) {
-		m_info.DataFile = data["Source"].as<io::LoadableHandle>();
-	}
-
 	m_info.IsStatic = data["IsStatic"].as<bool>();
-
 	return true;
 }
 

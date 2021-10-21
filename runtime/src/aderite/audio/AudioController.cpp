@@ -195,11 +195,13 @@ void AudioController::update() {
 }
 
 void AudioController::loadMasterBank() {
-	io::DataChunk masterChunk = ::aderite::Engine::getFileHandler()->openLoadable(io::FileHandler::Reserved::MasterAudioBank);
-	io::DataChunk stringsChunk = ::aderite::Engine::getFileHandler()->openLoadable(io::FileHandler::Reserved::StringsAudioBank);
+	io::DataChunk masterChunk = ::aderite::Engine::getFileHandler()->openReservedLoadable(io::FileHandler::Reserved::MasterAudioBank);
+	io::DataChunk stringsChunk = ::aderite::Engine::getFileHandler()->openReservedLoadable(io::FileHandler::Reserved::StringsAudioBank);
 
-	ADERITE_DYNAMIC_ASSERT(masterChunk.Data.size() > 0, "loadMasterBank called when no master bank exists");
-	ADERITE_DYNAMIC_ASSERT(stringsChunk.Data.size() > 0, "loadMasterBank called when no strings bank exists");
+	if (masterChunk.Data.size() == 0 || stringsChunk.Data.size() == 0) {
+		LOG_WARN("Ignored loadMasterBank call, cause no master or strings bank was found");
+		return;
+	}
 
 	// Unload
 	if (m_stringBank != nullptr) {

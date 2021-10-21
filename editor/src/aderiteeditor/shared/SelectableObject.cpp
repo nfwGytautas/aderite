@@ -20,7 +20,7 @@ aderite::editor::SelectableObject::SelectableObject(scene::Entity entity)
 }
 
 SelectableObjectType aderite::editor::SelectableObject::getType() const {
-	return SelectableObjectType();
+	return m_type;
 }
 
 io::SerializableObject* aderite::editor::SelectableObject::getAsset() const {

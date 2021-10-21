@@ -42,6 +42,8 @@ void EditorRenderOperation::initialize() {
 	wfThickness = 4.0f;
 	updateUniform();
 
+	
+
 	// Since the editor should be hooked into the entity rendering, only clear the depth
 	bgfx::setViewClear(c_ViewId, BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
 	bgfx::setViewRect(c_ViewId, 0, 0, 1280, 720);

@@ -28,6 +28,11 @@ public:
 	 * @brief Unload the object
 	*/
 	virtual void unload() = 0;
+
+private:
+	bool m_loading = false;
+	friend class Loader;
+	friend class LoaderPool;
 };
 
 /**

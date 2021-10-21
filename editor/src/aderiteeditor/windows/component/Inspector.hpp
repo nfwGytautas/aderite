@@ -30,6 +30,7 @@ private:
 	void renderMaterial(io::SerializableObject* asset);
 	void renderMaterialType(io::SerializableObject* asset);
 	void renderScene(io::SerializableObject* asset);
+	void renderPipeline(io::SerializableObject* asset);
 };
 
 }

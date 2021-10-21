@@ -429,6 +429,12 @@ template<>
 void Scene::onComponentRemoved(Entity entity, components::MeshRendererComponent& component) {}
 
 template<>
+void Scene::onComponentRemoved(Entity entity, components::AudioSourceComponent& component) {}
+
+template<>
+void Scene::onComponentRemoved(Entity entity, components::AudioListenerComponent& component) {}
+
+template<>
 void Scene::onComponentRemoved<components::RigidbodyComponent>(Entity entity, components::RigidbodyComponent& component) {
 	// Convert to static
 	auto& colliders = entity.getComponent<components::CollidersComponent>();

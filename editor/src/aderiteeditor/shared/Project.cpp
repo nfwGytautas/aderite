@@ -41,9 +41,13 @@ bool Project::save() {
 	out << YAML::Key << "Name" << YAML::Value << m_name;
 	out << YAML::Key << "Type" << YAML::Value << "Project";
 
+	out << YAML::Key << "ActiveScene" << YAML::Value;
 	if (::aderite::Engine::getSceneManager()->getCurrentScene()) {
-		out << YAML::Key << "ActiveScene" << YAML::Value << ::aderite::Engine::getSceneManager()->getCurrentScene()->getHandle();
+		out << ::aderite::Engine::getSceneManager()->getCurrentScene()->getHandle();
 		m_activeScene = ::aderite::Engine::getSceneManager()->getCurrentScene()->getHandle();
+	}
+	else {
+		out << YAML::Null;
 	}
 
 	out << YAML::EndMap; // Root
@@ -79,8 +83,11 @@ Project* Project::load(const std::string& path) {
 	std::filesystem::path fs_path = std::filesystem::path(path);
 	Project* p = new Project(fs_path.parent_path().string(), fs_path.stem().string());
 
-	if (data["ActiveScene"]) {
+	if (!data["ActiveScene"].IsNull()) {
 		p->m_activeScene = data["ActiveScene"].as<io::SerializableHandle>();
+	}
+	else {
+		p->m_activeScene = c_InvalidHandle;
 	}
 
 	p->m_vfs = vfs::VFS::load(p->getRootDir());

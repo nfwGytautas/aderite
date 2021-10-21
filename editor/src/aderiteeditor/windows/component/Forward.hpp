@@ -23,6 +23,7 @@ namespace aderite {
 namespace editor_ui {
 
 class Inspector;
+class StartupModal;
 
 }
 }

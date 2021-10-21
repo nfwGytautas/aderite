@@ -146,6 +146,11 @@ public:
 	*/
 	void save(SerializableObject* object);
 
+	/**
+	 * @brief Utility method for saving all objects
+	*/
+	void saveAll();
+
 	auto begin() {
 		return m_objects.begin();
 	}

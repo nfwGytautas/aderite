@@ -75,6 +75,7 @@ void Loader::startup() {
 			ILoadable* loadable = m_pool->getNextLoadable();
 			if (loadable != nullptr) {
 				loadable->load(this);
+				loadable->m_loading = false;
 			}
 		}
 	});
@@ -178,7 +179,7 @@ Loader::TextureLoadResult<unsigned char> Loader::loadTexture(LoadableHandle hand
 	}
 
 	TextureLoadResult<unsigned char> result = {};
-	unsigned char* data = stbi_load_from_memory(chunk.Data.data(), chunk.Data.size(), &result.Width, &result.Height, &result.BPP, 4);
+	unsigned char* data = stbi_load_from_memory(chunk.Data.data(), chunk.Data.size(), &result.Width, &result.Height, &result.BPP, 0);
 
 	if (data == nullptr) {
 		result.Error = stbi_failure_reason();

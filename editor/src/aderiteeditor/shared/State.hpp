@@ -17,6 +17,7 @@ public:
 	static shared::Project* Project;
 	static shared::EditorCamera* EditorCamera;
 	static bgfx::FrameBufferHandle DebugRenderHandle;
+	static bgfx::FrameBufferHandle MeshPreviewHandle;
 	static SelectableObject LastSelectedObject;
 
 	/**

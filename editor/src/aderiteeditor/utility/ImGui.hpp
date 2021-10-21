@@ -40,6 +40,14 @@ public:
 	bool renderUI();
 
 	/**
+	 * @brief Renders ImGui ui, returns true if value was altered, method used for array operations,
+	 * for example having an array of renameable objects pass object index.
+	 * @param index Index of the current render
+	 * @param value Value of the selectable
+	*/
+	bool renderUI(size_t index, std::string value);
+
+	/**
 	 * @brief Sets the state of the element if true, then renaming will be initiated,
 	 * false renaming will be canceled
 	*/
@@ -60,6 +68,7 @@ private:
 	bool m_appearing = false;
 	std::string m_value = "";
 	std::string m_initial = "";
+	size_t m_idx = -1;
 };
 
 }

@@ -12,7 +12,7 @@ namespace io {
 */
 class DataChunk {
 public:
-	DataChunk(size_t offset, size_t size, const char* name, std::vector<unsigned char> data);
+	DataChunk(size_t offset, size_t size, std::string name, std::vector<unsigned char> data);
 
 	// Data of the chunk
 	std::vector<unsigned char> Data;
@@ -24,7 +24,7 @@ public:
 	const size_t OriginalSize;
 
 	// Name of the data chunk
-	const char* Name;
+	std::string Name;
 };
 
 /**
@@ -42,18 +42,25 @@ public:
 
 public:
 	/**
-	 * @brief Resolves the handle file and chunk, loads it and returns it, don't forget to call close
+	 * @brief Resolves the handle file and chunk, loads it and returns it
 	 * @param handle Handle to read
 	 * @return DataChunk instance
 	*/
 	DataChunk openSerializable(SerializableHandle handle) const;
 
 	/**
-	 * @brief Resolves the handle file and chunk, loads it and returns it, don't forget to call close
+	 * @brief Resolves the reserved handle file and chunk, loads it and returns it
 	 * @param handle Handle to read
 	 * @return DataChunk instance
 	*/
-	DataChunk openLoadable(LoadableHandle handle) const;
+	DataChunk openReservedLoadable(LoadableHandle handle) const;
+
+	/**
+	 * @brief Resolves the handle file and chunk, loads it and returns it
+	 * @param handle Handle to read
+	 * @return DataChunk instance
+	*/
+	DataChunk openLoadable(SerializableHandle handle) const;
 
 	/**
 	 * @brief Commit changes to the data chunk to it's respective file
@@ -66,6 +73,13 @@ public:
 	 * @param root New root directory
 	*/
 	void setRoot(const std::filesystem::path& root);
+
+	/**
+	 * @brief Writes physical file contents into a loadable file
+	 * @param handle Handle to write to
+	 * @param file Physical file to write
+	*/
+	void writePhysicalFile(LoadableHandle handle, const std::filesystem::path& file);
 private:
 	struct ChunkLocator {
 		size_t Offset;
