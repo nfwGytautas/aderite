@@ -9,6 +9,7 @@
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/io/LoaderPool.hpp"
+#include "aderite/reflection/Reflector.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/Scene.hpp"
@@ -89,6 +90,13 @@ bool Engine::init(InitOptions options) {
 		return false;
 	}
 
+	// Serializer
+	m_reflector = new reflection::Reflector();
+	if (!m_reflector->init()) {
+		LOG_ERROR("Aborting aderite initialization");
+		return false;
+	}
+
 	// At this point there should be an editor if it is enabled
 #if MIDDLEWARE_ENABLED == 1
 	if (!m_middleware) {
@@ -108,6 +116,7 @@ void Engine::shutdown() {
 	m_audioController->shutdown();
 	m_inputManager->shutdown();
 	m_serializer->shutdown();
+	m_reflector->shutdown();
 	m_physicsController->shutdown();
 	m_renderer->shutdown();
 	m_windowManager->shutdown();
@@ -121,6 +130,7 @@ void Engine::shutdown() {
 	delete m_serializer;
 	delete m_loaderPool;
 	delete m_fileHandler;
+	delete m_reflector;
 
 	delete m_middleware;
 }

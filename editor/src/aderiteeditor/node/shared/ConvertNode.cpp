@@ -1,8 +1,6 @@
 #include "ConvertNode.hpp"
 
 #include "aderite/utility/Log.hpp"
-#include "aderite/asset/property/Property.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
@@ -10,7 +8,7 @@
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/runtime/OperationArray.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 #include "aderite/rendering/operation/All.hpp"
 
@@ -92,8 +90,8 @@ bool ConvertNode::onConnectToOutput(OutputPin* target, InputPin* source) {
 	return true;
 }
 
-io::SerializableType ConvertNode::getType() const {
-	return static_cast<io::SerializableType>(io::EditorSerializables::ConvertNode);
+reflection::Type ConvertNode::getType() const {
+	return static_cast<reflection::Type>(reflection::EditorTypes::ConvertNode);
 }
 
 bool ConvertNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
@@ -139,7 +137,7 @@ void ConvertNode::applyArray(compiler::PipelineEvaluator* pe, PipelineConversion
 		pe->addOperation(converted);
 		result->addOperation(converted);
 	}
-	result->setDebugName("Convert (" + p_inputs[0]->getType() + "->" + p_outputs[0]->getType() + ")");
+	result->setName("Convert (" + p_inputs[0]->getType() + "->" + p_outputs[0]->getType() + ")");
 	p_outputs[0]->setValue(pe->addOperation(result));
 }
 

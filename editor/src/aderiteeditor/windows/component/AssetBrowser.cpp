@@ -8,12 +8,10 @@
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
-#include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/io/SerializableObject.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
 #include "aderiteeditor/utility/ImGui.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/shared/State.hpp"
@@ -24,7 +22,8 @@
 #include "aderiteeditor/vfs/Directory.hpp"
 #include "aderiteeditor/vfs/File.hpp"
 #include "aderiteeditor/asset/RenderingPipeline.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/asset/EditorMaterialType.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 
@@ -153,28 +152,28 @@ void AssetBrowser::renderItems() {
 				// Typed
 				std::string target = "";
 
-				switch (static_cast<io::RuntimeSerializables>(object->getType())) {
-				case io::RuntimeSerializables::SCENE: {
+				switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
+				case reflection::RuntimeTypes::SCENE: {
 					target = shared::DDPayloadID__SceneAsset;
 					break;
 				}
-				case io::RuntimeSerializables::MATERIAL: {
+				case reflection::RuntimeTypes::MATERIAL: {
 					target = shared::DDPayloadID__MaterialAsset;
 					break;
 				}
-				case io::RuntimeSerializables::MESH: {
+				case reflection::RuntimeTypes::MESH: {
 					target = shared::DDPayloadID__MeshAsset;
 					break;
 				}
-				case io::RuntimeSerializables::TEXTURE: {
+				case reflection::RuntimeTypes::TEXTURE: {
 					target = shared::DDPayloadID__TextureAsset;
 					break;
 				}
-				case io::RuntimeSerializables::MAT_TYPE: {
+				case reflection::RuntimeTypes::MAT_TYPE: {
 					target = shared::DDPayloadID__MaterialType;
 					break;
 				}
-				case io::RuntimeSerializables::PIPELINE: {
+				case reflection::RuntimeTypes::PIPELINE: {
 					target = shared::DDPayloadID__PipelineAsset;
 					break;
 				}
@@ -193,7 +192,7 @@ void AssetBrowser::renderItems() {
 
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
 
-				if (static_cast<io::RuntimeSerializables>(object->getType()) == io::RuntimeSerializables::SCENE) {
+				if (static_cast<reflection::RuntimeTypes>(object->getType()) == reflection::RuntimeTypes::SCENE) {
 					::aderite::Engine::getSceneManager()->setActive(static_cast<scene::Scene*>(object));
 				}
 
@@ -247,7 +246,7 @@ void AssetBrowser::renderAddItemPopup() {
 		}
 
 		if (ImGui::MenuItem("Material type")) {
-			object = new asset::MaterialTypeAsset();
+			object = new asset::EditorMaterialType();
 			newName = "New material type";
 		}
 

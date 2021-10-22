@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include "aderite/rendering/DrawCall.hpp"
+#include "aderite/rendering/PipelineState.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
 
@@ -12,23 +13,11 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
 */
 class EntityProvideOperation : public OperationBase {
 public:
-	using DrawCallList = std::vector<DrawCall>;
-
-	// TODO: Check if this can be a const return
-	/**
-	 * @brief Returns the draw call list
-	 * NOTE: The return is a reference which allows other operations to edit the draw call list, however
-	 *       these operations should make sure that the vector itself isn't modified
-	 */
-	DrawCallList& getDrawCalls();
-
 	// Inherited via OperationBase
-	virtual void execute() override;
-
-	ADERITE_DEBUG_SECTION
-	(
-		virtual const char* getOperationName() override { return "EntityProvideOperation"; }
-	)
+	virtual void execute(PipelineState* state) override;
+	virtual reflection::Type getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 public:
 	/**
 	 * @brief Validates entity

@@ -8,7 +8,7 @@
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/io/Serializer.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
+#include "aderite/reflection/RuntimeTypes.hpp"
 
 namespace aderite {
 namespace physics {
@@ -18,8 +18,10 @@ ColliderList::~ColliderList() {
 		delete c;
 	}
 
-	m_actor->release();
-	m_actor = nullptr;
+	if (m_actor) {
+		m_actor->release();
+		m_actor = nullptr;
+	}
 }
 
 ColliderList::ColliderList() {}
@@ -64,8 +66,8 @@ physx::PxRigidActor* ColliderList::getActor() const {
 	return m_actor;
 }
 
-io::SerializableType aderite::physics::ColliderList::getType() const {
-	return static_cast<io::SerializableType>(io::RuntimeSerializables::CLDR_LIST);
+reflection::Type aderite::physics::ColliderList::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::CLDR_LIST);
 }
 
 bool aderite::physics::ColliderList::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {

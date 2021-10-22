@@ -6,8 +6,10 @@
 
 #include "aderite/utility/Macros.hpp"
 
-ADERITE_PROPERTY_NAMESPACE_BEGIN
+namespace aderite {
+namespace asset {
 
 class Property;
 
-ADERITE_PROPERTY_NAMESPACE_END
+}
+}

@@ -3,6 +3,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
+#include "aderiteeditor/asset/property/Property.hpp"
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 
@@ -16,14 +17,8 @@ ShaderEvaluator::ShaderEvaluator(ShaderType type, const std::string& name)
 	m_mainScope = &m_functions[0];
 }
 
-EvaluatorValue ShaderEvaluator::getProperty(const asset::MaterialTypeAsset* material, const asset::prop::Property* prop) {
-	//std::string typeName = material->getName();
-	//std::replace_if(std::begin(typeName), std::end(typeName),
-	//	[](std::string::value_type v) { return v == '.'; },
-	//	'_');
-
-	//return createValue("u_" + typeName + "_" + prop->getName());
-	return 0;
+EvaluatorValue ShaderEvaluator::getProperty(const asset::MaterialTypeAsset* material, const asset::Property* prop) {
+	return createValue("u_" + std::to_string(material->getHandle()) + "_" + prop->getName());
 }
 
 EvaluatorValue ShaderEvaluator::add2DSamplingInstruction(const EvaluatorValue& texture) {

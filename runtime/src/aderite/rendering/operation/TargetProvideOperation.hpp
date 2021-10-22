@@ -64,12 +64,11 @@ public:
 	
 	// Inherited via OperationBase
 	virtual void initialize() override;
+	virtual void execute(PipelineState* state) override;
 	virtual void shutdown() override;
-
-	ADERITE_DEBUG_SECTION
-	(
-		virtual const char* getOperationName() override { return "TargetProvideOperation"; }
-	)
+	virtual reflection::Type getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	void createFramebuffer();
 private:

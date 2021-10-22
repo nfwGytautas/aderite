@@ -13,8 +13,8 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/YAML.hpp"
 #include "aderite/io/Loader.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
 #include "aderite/io/Serializer.hpp"
+#include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/asset/MeshAsset.hpp" 
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
@@ -300,8 +300,8 @@ void Scene::setPipeline(rendering::Pipeline* pipeline) {
 	m_pipeline = pipeline;
 }
 
-io::SerializableType Scene::getType() const {
-	return static_cast<io::SerializableType>(io::RuntimeSerializables::SCENE);
+reflection::Type Scene::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::SCENE);
 }
 
 bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {

@@ -13,11 +13,7 @@
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
-EntityProvideOperation::DrawCallList& EntityProvideOperation::getDrawCalls() {
-	return m_drawcalls;
-}
-
-void EntityProvideOperation::execute() {
+void EntityProvideOperation::execute(PipelineState* state) {
 	// Get current scene
 	scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 	if (!currentScene) {
@@ -63,6 +59,8 @@ void EntityProvideOperation::execute() {
 
 		(*m_lookup[hash]).Transformations.push_back(&transform);
 	}
+
+	state->setDrawCallList(&m_drawcalls);
 }
 
 bool EntityProvideOperation::validateEntity(scene::components::MetaComponent& meta, scene::components::MeshRendererComponent& mrenderer) {
@@ -106,6 +104,18 @@ void EntityProvideOperation::cleanList() {
 	for (DrawCall& dc : m_drawcalls) {
 		dc.Transformations.clear();
 	}
+}
+
+reflection::Type EntityProvideOperation::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_ENTITY);
+}
+
+bool EntityProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	return true;
+}
+
+bool EntityProvideOperation::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+	return true;
 }
 
 ADERITE_RENDERING_NAMESPACE_END

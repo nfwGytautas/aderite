@@ -12,8 +12,7 @@
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
-#include "aderite/asset/property/Property.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
+#include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/io/LoaderPool.hpp"
@@ -34,12 +33,14 @@
 #include "aderiteeditor/shared/IEventSink.hpp"
 #include "aderiteeditor/shared/DragDropObject.hpp"
 #include "aderiteeditor/asset/RenderingPipeline.hpp"
+#include "aderiteeditor/asset/EditorMaterialType.hpp"
+#include "aderiteeditor/asset/property/Property.hpp"
 #include "aderiteeditor/vfs/File.hpp"
 #include "aderiteeditor/vfs/VFS.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/node/Node.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/windows/WindowsEditor.hpp"
 #include "aderiteeditor/windows/component/FileDialog.hpp"
 #include "aderiteeditor/windows/component/NodeEditor.hpp"
@@ -377,8 +378,8 @@ void Inspector::renderColliders(scene::Entity entity) {
 	for (physics::Collider* c : *colliders.Colliders) {
 		bool remove = false;
 
-		switch (static_cast<io::RuntimeSerializables>(c->getType())) {
-		case io::RuntimeSerializables::BOX_CLDR: {
+		switch (static_cast<reflection::RuntimeTypes>(c->getType())) {
+		case reflection::RuntimeTypes::BOX_CLDR: {
 			ImGui::Text("Box collider");
 			break;
 		}
@@ -437,38 +438,33 @@ void Inspector::renderAsset() {
 
 	ImGui::Separator();
 
-	switch (static_cast<io::RuntimeSerializables>(object->getType())) {
-	case io::RuntimeSerializables::MESH: {
+	switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
+	case reflection::RuntimeTypes::MESH: {
 		this->renderMesh(object);
 		break;
 	}
-	case io::RuntimeSerializables::TEXTURE: {
+	case reflection::RuntimeTypes::TEXTURE: {
 		this->renderTexture(object);
 		break;
 	}
-	case io::RuntimeSerializables::MATERIAL: {
+	case reflection::RuntimeTypes::MATERIAL: {
 		this->renderMaterial(object);
 		break;
 	}
-	case io::RuntimeSerializables::MAT_TYPE: {
+	case reflection::RuntimeTypes::MAT_TYPE: {
 		this->renderMaterialType(object);
 		break;
 	}
-	case io::RuntimeSerializables::SCENE: {
+	case reflection::RuntimeTypes::SCENE: {
 		this->renderScene(object);
 		break;
 	}
-	default: {}
-	}
-
-	switch (static_cast<io::EditorSerializables>(object->getType())) {
-	case io::EditorSerializables::RenderingPipelineAsset: {
+	case reflection::RuntimeTypes::PIPELINE:
+	{
 		this->renderPipeline(object);
 		break;
 	}
-	default: {
-		return;
-	}
+	default: {}
 	}
 }
 
@@ -568,77 +564,82 @@ void Inspector::renderMaterial(io::SerializableObject* asset) {
 	ImGui::Separator();
 	ImGui::Text("Properties:");
 
+	asset::EditorMaterialType* type = static_cast<asset::EditorMaterialType*>(material->getFields().Type);
+
+	if (type == nullptr) {
+		ImGui::Text("Select material type...");
+		return;
+	}
+
 	if (ImGui::BeginTable("MaterialEditTable", 2)) {
 		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
 		ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
 
-		if (finfo.Type != nullptr) {
-			for (asset::prop::Property* p : finfo.Type->getFields().Properties) {
-				ImGui::TableNextRow();
+		for (asset::Property* p : type->getProperties()) {
+			ImGui::TableNextRow();
 
-				ImGui::TableSetColumnIndex(0);
-				ImGui::Text(p->getName().c_str());
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text(p->getName().c_str());
 
-				ImGui::TableSetColumnIndex(1);
-				ImGui::PushItemWidth(-FLT_MIN);
+			ImGui::TableSetColumnIndex(1);
+			ImGui::PushItemWidth(-FLT_MIN);
 
-				switch (p->getType()) {
-				case asset::prop::PropertyType::FLOAT: {
-					float* val = p->getValue(material->getPropertyData());
-					ImGui::InputFloat(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
-					break;
+			switch (p->getType()) {
+			case asset::PropertyType::FLOAT: {
+				float* val = p->getValue(material->getPropertyData());
+				ImGui::InputFloat(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+				break;
+			}
+			case asset::PropertyType::VEC2: {
+				float* val = p->getValue(material->getPropertyData());
+				ImGui::InputFloat2(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+				break;
+			}
+			case asset::PropertyType::VEC3: {
+				float* val = p->getValue(material->getPropertyData());
+				ImGui::InputFloat3(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+				break;
+			}
+			case asset::PropertyType::VEC4: {
+				float* val = p->getValue(material->getPropertyData());
+				ImGui::InputFloat4(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+				break;
+			}
+			case asset::PropertyType::TEXTURE_2D:
+			case asset::PropertyType::TEXTURE_CUBE: {
+				// TODO: Verify type
+				//asset::TextureAsset*& sampler = finfo.Samplers[p->getName()];
+
+				// TODO: Select sampler
+
+				/*if (sampler) {
+					ImGui::Button(sampler->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
 				}
-				case asset::prop::PropertyType::VEC2: {
-					float* val = p->getValue(material->getPropertyData());
-					ImGui::InputFloat2(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
-					break;
-				}
-				case asset::prop::PropertyType::VEC3: {
-					float* val = p->getValue(material->getPropertyData());
-					ImGui::InputFloat3(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
-					break;
-				}
-				case asset::prop::PropertyType::VEC4: {
-					float* val = p->getValue(material->getPropertyData());
-					ImGui::InputFloat4(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
-					break;
-				}
-				case asset::prop::PropertyType::TEXTURE_2D:
-				case asset::prop::PropertyType::TEXTURE_CUBE: {
-					// TODO: Verify type
-					asset::TextureAsset*& sampler = finfo.Samplers[p->getName()];
+				else {
+					ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+				}*/
 
-					// TODO: Select sampler
+				if (ImGui::BeginDragDropTarget()) {
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__TextureAsset)) {
+						std::string name = static_cast<const char*>(payload->Data);
+						/*asset::Asset* asset = ::aderite::Engine::getAssetManager()->getOrRead(name);
+						if (asset) {
+							sampler = static_cast<asset::TextureAsset*>(asset);
 
-					/*if (sampler) {
-						ImGui::Button(sampler->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-					}
-					else {
-						ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-					}*/
-
-					if (ImGui::BeginDragDropTarget()) {
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__TextureAsset)) {
-							std::string name = static_cast<const char*>(payload->Data);
-							/*asset::Asset* asset = ::aderite::Engine::getAssetManager()->getOrRead(name);
-							if (asset) {
-								sampler = static_cast<asset::TextureAsset*>(asset);
-
-								if (!sampler->isLoaded()) {
-									sampler->prepareLoad();
-									sampler->load();
-								}
-							}*/
-						}
-
-						ImGui::EndDragDropTarget();
+							if (!sampler->isLoaded()) {
+								sampler->prepareLoad();
+								sampler->load();
+							}
+						}*/
 					}
 
-					break;
+					ImGui::EndDragDropTarget();
 				}
-				default:
-					ImGui::Text("Unknown property type");
-				}
+
+				break;
+			}
+			default:
+				ImGui::Text("Unknown property type");
 			}
 		}
 
@@ -650,7 +651,7 @@ void Inspector::renderMaterialType(io::SerializableObject* asset) {
 	static const std::string types[] = { "Texture 2D", "Texture Cube", "Float", "Vec2", "Vec3", "Vec4" };
 	static const size_t typeCount = sizeof(types) / sizeof(*types);
 
-	asset::MaterialTypeAsset* type = static_cast<asset::MaterialTypeAsset*>(asset);
+	asset::EditorMaterialType* type = static_cast<asset::EditorMaterialType*>(asset);
 	asset::MaterialTypeAsset::fields& finfo = type->getFieldsMutable();
 
 	ImGui::Text("Properties:");
@@ -660,7 +661,7 @@ void Inspector::renderMaterialType(io::SerializableObject* asset) {
 		ImGui::TableSetupColumn("Spacing", ImGuiTableColumnFlags_WidthFixed, 10.0f);
 		ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_None);
 
-		for (asset::prop::Property* prop : finfo.Properties) {
+		for (asset::Property* prop : type->getProperties()) {
 			ImGui::TableNextRow();
 
 			ImGui::TableSetColumnIndex(0);
@@ -681,25 +682,23 @@ void Inspector::renderMaterialType(io::SerializableObject* asset) {
 
 	ImGui::Separator();
 	if (ImGui::Button("Open shader editor", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
-		// TODO: Set graph
-		//WindowsEditor::getInstance()->NodeEditor->setGraph(type->ge);
+		WindowsEditor::getInstance()->NodeEditor->setGraph(type->getGraph(), component::NodeEditor::NodeEditorType::MATERIAL);
 	}
 
 	ImGui::Separator();
 	if (ImGui::Button("Compile", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
-		// TODO: Compile
-		//compiler::Compiler::compileMaterialType(type);
+		type->compile();
 	}
 
 	ImGui::PopItemWidth();
 
-	if (ImGui::BeginPopup("SelectMaterialTypeProperty")) 	{
+	if (ImGui::BeginPopup("SelectMaterialTypeProperty")) {
 		ImGui::Text("Type");
 		ImGui::Separator();
 		for (int i = 0; i < typeCount; i++) {
 			if (ImGui::Selectable(types[i].c_str())) {
 				//selected_fish = i;
-				finfo.Properties.push_back(new asset::prop::Property(static_cast<asset::prop::PropertyType>(i), "NewProperty_" + aderite::utility::generateString(8)));
+				type->addProperty(new asset::Property(static_cast<asset::PropertyType>(i), "NewProperty_" + aderite::utility::generateString(8)));
 				type->recalculate();
 			}
 		}

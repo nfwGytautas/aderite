@@ -4,7 +4,7 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
 #include "aderite/io/Loader.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
+#include "aderite/reflection/RuntimeTypes.hpp"
 
 namespace aderite {
 namespace asset {
@@ -44,8 +44,8 @@ void TextureAsset::unload() {
 	}
 }
 
-io::SerializableType TextureAsset::getType() const {
-	return static_cast<io::SerializableType>(io::RuntimeSerializables::TEXTURE);
+reflection::Type TextureAsset::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::TEXTURE);
 }
 
 bool TextureAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {

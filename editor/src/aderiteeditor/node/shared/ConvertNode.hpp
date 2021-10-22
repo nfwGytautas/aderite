@@ -29,7 +29,7 @@ public:
 	virtual void evaluate(compiler::GraphEvaluator* evaluator) override;
 	virtual bool onConnectToInput(InputPin* target, OutputPin* source) override;
 	virtual bool onConnectToOutput(OutputPin* target, InputPin* source) override;
-	virtual io::SerializableType getType() const override;
+	virtual reflection::Type getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
 	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 private:

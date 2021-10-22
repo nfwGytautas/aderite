@@ -74,7 +74,7 @@ public:
 	void setPipeline(rendering::Pipeline* pipeline);
 
 	// Inherited via SerializableObject
-	virtual io::SerializableType getType() const override;
+	virtual reflection::Type getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
 	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 private:

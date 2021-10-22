@@ -30,7 +30,7 @@ public:
 	void setSize(const glm::vec3 size);
 
 	// Inherited via Collider
-	virtual io::SerializableType getType() const override;
+	virtual reflection::Type getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
 	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 private:

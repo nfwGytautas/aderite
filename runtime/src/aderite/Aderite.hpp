@@ -8,6 +8,7 @@
 #include "aderite/audio/Forward.hpp"
 #include "aderite/input/Forward.hpp"
 #include "aderite/io/Forward.hpp"
+#include "aderite/reflection/Forward.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
@@ -140,6 +141,7 @@ private:
 	ADERITE_SYSTEM_PTR(getInputManager, input::InputManager, m_inputManager)
 	ADERITE_SYSTEM_PTR(getFileHandler, io::FileHandler, m_fileHandler)
 	ADERITE_SYSTEM_PTR(getSerializer, io::Serializer, m_serializer)
+	ADERITE_SYSTEM_PTR(getReflector, reflection::Reflector, m_reflector)
 	ADERITE_SYSTEM_PTR(getLoaderPool, io::LoaderPool, m_loaderPool)
 	ADERITE_SYSTEM_PTR(getPhysicsController, physics::PhysicsController, m_physicsController)
 	ADERITE_SYSTEM_PTR(getAudioController, audio::AudioController, m_audioController)

@@ -6,7 +6,6 @@
 #include "aderite/utility/YAML.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/physics/PhysicsController.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
 
 namespace aderite {
 namespace physics {

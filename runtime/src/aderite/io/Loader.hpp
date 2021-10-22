@@ -75,6 +75,13 @@ public: // Loading operations
 		std::vector<unsigned int> Indices;
 	};
 
+	struct ShaderLoadResult {
+		std::string Error = "";
+
+		std::vector<unsigned char> VertexSource;
+		std::vector<unsigned char> FragmentSource;
+	};
+
 	struct BinaryLoadResult {
 		std::string Error = "";
 
@@ -101,6 +108,13 @@ public: // Loading operations
 	 * @return ImageLoadResult object
 	*/
 	TextureLoadResult<float> loadHdrTexture(LoadableHandle handle) const;
+
+	/**
+	 * @brief Loads shader content from specified file
+	 * @param handle Loadable handle
+	 * @return ShaderLoadResult object
+	*/
+	ShaderLoadResult loadShader(LoadableHandle handle) const;
 
 	/**
 	 * @brief Loads binary content from specified file

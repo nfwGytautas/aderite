@@ -4,6 +4,7 @@
 #include <yaml-cpp/yaml.h>
 #include "aderite/utility/Macros.hpp"
 #include "aderite/io/Forward.hpp"
+#include "aderite/reflection/Reflectable.hpp"
 
 namespace aderite {
 namespace io {
@@ -11,15 +12,9 @@ namespace io {
 /**
  * @brief Base class providing serializable interface
 */
-class ISerializable {
+class ISerializable : public reflection::Reflectable {
 public:
 	virtual ~ISerializable() {}
-
-	/**
-	 * @brief The type of the serializable object
-	 * @return SerializableType value
-	*/
-	virtual SerializableType getType() const = 0;
 
 	/**
 	 * @brief Serialize object to emmitter

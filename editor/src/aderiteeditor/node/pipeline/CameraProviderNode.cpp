@@ -1,13 +1,11 @@
 #include "CameraProviderNode.hpp"
 
-#include "aderite/asset/property/Property.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -31,8 +29,8 @@ void CameraProviderNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType CameraProviderNode::getType() const {
-    return static_cast<io::SerializableType>(io::EditorSerializables::CameraProviderNode);
+reflection::Type CameraProviderNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::CameraProviderNode);
 }
 
 bool CameraProviderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {

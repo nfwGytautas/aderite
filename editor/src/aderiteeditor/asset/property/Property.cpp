@@ -2,7 +2,8 @@
 
 #include "aderite/utility/Log.hpp"
 
-ADERITE_PROPERTY_NAMESPACE_BEGIN
+namespace aderite {
+namespace asset {
 
 uint8_t getElementCountForType(PropertyType type) {
 	switch (type) {
@@ -58,8 +59,7 @@ const char* getNameForType(PropertyType type) {
 }
 
 Property::Property(PropertyType type, const std::string& name)
-	: m_name(name), m_type(type)
-{}
+	: m_name(name), m_type(type) {}
 
 PropertyType Property::getType() const {
 	return m_type;
@@ -89,4 +89,5 @@ void Property::setName(const std::string& name) {
 	m_name = name;
 }
 
-ADERITE_PROPERTY_NAMESPACE_END
+}
+}

@@ -3,12 +3,12 @@
 #include "MaterialInputNode.hpp"
 
 #include "aderite/asset/MaterialTypeAsset.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
+#include "aderiteeditor/asset/property/Property.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -18,8 +18,8 @@ Sampler2DNode::Sampler2DNode()
     p_inputs.push_back(
         new InputPin(
             this,
-            asset::prop::getNameForType(
-                asset::prop::PropertyType::TEXTURE_2D), 
+            asset::getNameForType(
+                asset::PropertyType::TEXTURE_2D), 
                 "Texture"
         )
     );
@@ -27,8 +27,8 @@ Sampler2DNode::Sampler2DNode()
     p_outputs.push_back(
         new OutputPin(
             this,
-            asset::prop::getNameForType(
-                asset::prop::PropertyType::VEC4), 
+            asset::getNameForType(
+                asset::PropertyType::VEC4), 
             "Color"
         )
     );
@@ -46,8 +46,8 @@ void Sampler2DNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType Sampler2DNode::getType() const {
-    return static_cast<io::SerializableType>(io::EditorSerializables::Sampler2DNode);
+reflection::Type Sampler2DNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::Sampler2DNode);
 }
 
 bool Sampler2DNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {

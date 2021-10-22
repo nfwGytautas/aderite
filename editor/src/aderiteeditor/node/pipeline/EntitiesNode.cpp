@@ -1,13 +1,11 @@
 #include "EntitiesNode.hpp"
 
-#include "aderite/asset/property/Property.hpp"
 #include "aderite/rendering/operation/EntityProvideOperation.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -32,8 +30,8 @@ void EntitiesNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType EntitiesNode::getType() const {
-    return static_cast<io::SerializableType>(io::EditorSerializables::EntitiesNode);
+reflection::Type EntitiesNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::EntitiesNode);
 }
 
 bool EntitiesNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {

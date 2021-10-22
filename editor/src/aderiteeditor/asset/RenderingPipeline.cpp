@@ -6,7 +6,7 @@
 #include "aderite/io/Serializer.hpp"
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderiteeditor/node/Graph.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/node/pipeline/ScreenNode.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 

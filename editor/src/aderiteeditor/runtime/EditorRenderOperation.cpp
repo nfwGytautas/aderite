@@ -5,7 +5,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/physics/Collider.hpp"
@@ -16,11 +15,12 @@
 #include "aderiteeditor/runtime/data/Data.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_BEGIN
 
 EditorRenderOperation::EditorRenderOperation() {
-	p_debugName = "EditorRenderHook";
+	this->setName("EditorRenderHook");
 }
 
 EditorRenderOperation::~EditorRenderOperation() {
@@ -30,7 +30,7 @@ EditorRenderOperation::~EditorRenderOperation() {
 void EditorRenderOperation::initialize() {
 	ADERITE_DEBUG_SECTION
 	(
-		bgfx::setViewName(c_ViewId, p_debugName.c_str());
+		bgfx::setViewName(c_ViewId, this->getName().c_str());
 	)
 
 	// Load assets
@@ -40,18 +40,16 @@ void EditorRenderOperation::initialize() {
 	// Create data
 	m_editorUniform = bgfx::createUniform("u_editor", bgfx::UniformType::Vec4, 2);
 	wfThickness = 4.0f;
-	updateUniform();
-
-	
+	this->updateUniform();
 
 	// Since the editor should be hooked into the entity rendering, only clear the depth
 	bgfx::setViewClear(c_ViewId, BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
 	bgfx::setViewRect(c_ViewId, 0, 0, 1280, 720);
 }
 
-void EditorRenderOperation::execute() {
+void EditorRenderOperation::execute(rendering::PipelineState* state) {
 	bgfx::discard(BGFX_DISCARD_ALL);
-	renderPhysicsObjects();
+	this->renderPhysicsObjects();
 	bgfx::discard(BGFX_DISCARD_ALL);
 }
 
@@ -60,6 +58,18 @@ void EditorRenderOperation::shutdown() {
 	bgfx::destroy(m_wireframeShader);
 	bgfx::destroy(m_bcCube);
 	bgfx::destroy(m_bcCubeIbo);
+}
+
+reflection::Type EditorRenderOperation::getType() const {
+	return static_cast<reflection::Type>(reflection::EditorTypes::EditorRenderOp);
+}
+
+bool EditorRenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	return true;
+}
+
+bool EditorRenderOperation::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+	return true;
 }
 
 void EditorRenderOperation::updateUniform() {
@@ -93,9 +103,9 @@ void EditorRenderOperation::renderPhysicsObjects() {
 			scene::components::TransformComponent>(entity);
 
 		for (physics::Collider* collider : *colliders.Colliders) {
-			switch (static_cast<io::RuntimeSerializables>(collider->getType())) {
-			case io::RuntimeSerializables::BOX_CLDR: {
-				renderBoxCollider(static_cast<physics::BoxCollider*>(collider), transform);
+			switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {
+			case reflection::RuntimeTypes::BOX_CLDR: {
+				this->renderBoxCollider(static_cast<physics::BoxCollider*>(collider), transform);
 				break;
 			}
 			}
@@ -121,7 +131,7 @@ void EditorRenderOperation::renderBoxCollider(physics::BoxCollider* collider, co
 		wfColor[2] = 0.0f;
 		wfOpacity = 1.0f;
 	}
-	updateUniform();
+	this->updateUniform();
 
 	uint64_t state = 0
 		| BGFX_STATE_WRITE_RGB

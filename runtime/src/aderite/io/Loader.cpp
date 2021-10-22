@@ -248,6 +248,29 @@ Loader::TextureLoadResult<float> Loader::loadHdrTexture(LoadableHandle handle) c
 	return result;
 }
 
+Loader::ShaderLoadResult Loader::loadShader(LoadableHandle handle) const {
+	DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
+	if (chunk.Data.size() == 0) {
+		return {
+			"File doesn't exist"
+		};
+	}
+
+	// First std::uint64_t is the size of vertex shader, following it is fragment shader to the end
+	std::uint64_t vertexSize = 0;
+	std::memcpy(&vertexSize, chunk.Data.data(), sizeof(std::uint64_t));
+
+	ShaderLoadResult result = {};
+	const size_t fragmentSize =  chunk.Data.size() - sizeof(std::uint64_t) - vertexSize;
+	result.VertexSource.resize(vertexSize);
+	result.FragmentSource.resize(fragmentSize);
+
+	std::memcpy(result.VertexSource.data(), chunk.Data.data() + sizeof(std::uint64_t), vertexSize);
+	std::memcpy(result.FragmentSource.data(), chunk.Data.data() + sizeof(std::uint64_t) + vertexSize, fragmentSize);
+
+	return result;
+}
+
 Loader::BinaryLoadResult Loader::loadBinary(LoadableHandle handle) const {
 	DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
 	if (chunk.Data.size() == 0) {

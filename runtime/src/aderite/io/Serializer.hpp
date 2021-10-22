@@ -67,14 +67,6 @@ public:
 	void shutdown();
 
 	/**
-	 * @brief Links a type to an instancer, if a type already has a linked instancer, then
-	 * the instancer is overridden and a DEBUG message is logged
-	 * @param type Type to link
-	 * @param instancer Instancer instance to use (takes ownership)
-	*/
-	void linkInstancer(SerializableType type, InstancerBase* instancer);
-
-	/**
 	 * @brief Parses the type inside the current data scope and returns it
 	 * @param data Data node, must have Type and Handle keys
 	 * @return SerializableObject instance
@@ -151,6 +143,17 @@ public:
 	*/
 	void saveAll();
 
+	/**
+	 * @brief Allows to pass any data to subsequent callers
+	 * @param data Data to be passed
+	*/
+	void setData(void* data);
+
+	/**
+	 * @brief Returns the argument of setData
+	*/
+	void* getData() const;
+
 	auto begin() {
 		return m_objects.begin();
 	}
@@ -166,33 +169,19 @@ public:
 	auto end() const {
 		return m_objects.end();
 	}
-
-	ADERITE_DEBUG_SECTION(
-		/**
-		 * @brief Debug functionality to print what type is linked to what instancer
-		*/
-		void printInstancers();
-	);
 private:
 	Serializer() {}
 	friend class Engine;
 private:
-	/**
-	 * @brief Resolves an instancer for a type, asserts if a type doesn't have a type
-	 * @param type Type to get instancer for
-	 * @return Instancer instance
-	*/
-	InstancerBase* resolveInstancer(SerializableType type) const;
-
 	/**
 	 * @brief Returns the next available handle for an object, expanding the object vector as needed
 	 * @return Next available handle
 	*/
 	SerializableHandle nextAvailableHandle();
 private:
-	std::map<SerializableType, InstancerBase*> m_instancers;
 	std::vector<SerializableObject*> m_objects;
 	bool m_hasNull = false;
+	void* m_data = nullptr;
 };
 
 }

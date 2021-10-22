@@ -1,9 +1,8 @@
 #pragma once
 
 #include "aderite/Aderite.hpp"
-#include "aderite/io/Serializer.hpp"
-#include "aderite/io/Instancer.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderite/reflection/Reflector.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 // Nodes
 // Material
@@ -30,7 +29,14 @@
 
 // Assets
 #include "aderiteeditor/asset/RenderingPipeline.hpp"
+#include "aderiteeditor/asset/EditorMaterialType.hpp"
 #include "aderiteeditor/node/Graph.hpp"
+
+// Operations
+#include "aderiteeditor/runtime/EditorCameraOperation.hpp"
+#include "aderiteeditor/runtime/EditorRenderOperation.hpp"
+#include "aderiteeditor/runtime/EditorTargetOperation.hpp"
+#include "aderiteeditor/runtime/OperationArray.hpp"
 
 namespace aderite {
 namespace utility {
@@ -39,101 +45,40 @@ namespace utility {
  * @brief Utility function to link instancers
 */
 void linkInstancers() {
-	aderite::io::Serializer* serializer = aderite::Engine::getSerializer();
+	aderite::reflection::Reflector* reflector = aderite::Engine::getReflector();
 
 	// Material
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::AddNode),
-		new ::aderite::io::Instancer<node::AddNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::MaterialInputNode),
-		new ::aderite::io::Instancer<node::MaterialInputNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::MaterialOutputNode),
-		new ::aderite::io::Instancer<node::MaterialOutputNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::Sampler2DNode),
-		new ::aderite::io::Instancer<node::Sampler2DNode>()
-	);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::AddNode, reflection::EditorTypes::AddNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::MaterialInputNode, reflection::EditorTypes::MaterialInputNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::MaterialOutputNode, reflection::EditorTypes::MaterialOutputNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::Sampler2DNode, reflection::EditorTypes::Sampler2DNode);
 
 	// Pipeline
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::CameraProviderNode),
-		new ::aderite::io::Instancer<node::CameraProviderNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::ConcatObjectsNode),
-		new ::aderite::io::Instancer<node::ConcatObjectsNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::EditorCameraNode),
-		new ::aderite::io::Instancer<node::EditorCameraNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::EditorRenderNode),
-		new ::aderite::io::Instancer<node::EditorRenderNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::EditorTargetNode),
-		new ::aderite::io::Instancer<node::EditorTargetNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::EntitiesNode),
-		new ::aderite::io::Instancer<node::EntitiesNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::RenderNode),
-		new ::aderite::io::Instancer<node::RenderNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::RequireLockNode),
-		new ::aderite::io::Instancer<node::RequireLockNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::ScreenNode),
-		new ::aderite::io::Instancer<node::ScreenNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::SelectObjectNode),
-		new ::aderite::io::Instancer<node::SelectObjectNode>()
-	);
-
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::TargetProviderNode),
-		new ::aderite::io::Instancer<node::TargetProviderNode>()
-	);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::CameraProviderNode, reflection::EditorTypes::CameraProviderNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::ConcatObjectsNode, reflection::EditorTypes::ConcatObjectsNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EditorCameraNode, reflection::EditorTypes::EditorCameraNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EditorRenderNode, reflection::EditorTypes::EditorRenderNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EditorTargetNode, reflection::EditorTypes::EditorTargetNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EntitiesNode, reflection::EditorTypes::EntitiesNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::RenderNode, reflection::EditorTypes::RenderNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::RequireLockNode, reflection::EditorTypes::RequireLockNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::ScreenNode, reflection::EditorTypes::ScreenNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::SelectObjectNode, reflection::EditorTypes::SelectObjectNode);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::TargetProviderNode, reflection::EditorTypes::TargetProviderNode);
 
 	// Shared
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::ConvertNode),
-		new ::aderite::io::Instancer<node::ConvertNode>()
-	);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::ConvertNode, reflection::EditorTypes::ConvertNode);
 
 	// Assets
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::RuntimeSerializables::PIPELINE),
-		new ::aderite::io::Instancer<aderite::asset::RenderingPipeline>()
-	);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, asset::RenderingPipeline, reflection::RuntimeTypes::PIPELINE);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, asset::EditorMaterialType, reflection::RuntimeTypes::MAT_TYPE);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::Graph, reflection::EditorTypes::GraphAsset);
 
-	serializer->linkInstancer(
-		static_cast<::aderite::io::SerializableType>(::aderite::io::EditorSerializables::GraphAsset),
-		new ::aderite::io::Instancer<node::Graph>()
-	);
+	// Operations
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, runtime::EditorCameraOperation, reflection::EditorTypes::EditorCameraOp);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, runtime::EditorRenderOperation, reflection::EditorTypes::EditorRenderOp);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, runtime::EditorTargetOperation, reflection::EditorTypes::EditorTargetOp);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, runtime::OperationArray, reflection::EditorTypes::ArrayOp);
 }
 
 }

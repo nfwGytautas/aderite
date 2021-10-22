@@ -2,13 +2,15 @@
 
 #include <string>
 #include "aderite/utility/Macros.hpp"
+#include "aderite/rendering/Forward.hpp"
+#include "aderite/io/SerializableObject.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
 /**
  * @brief Rendering operation base class
 */
-class OperationBase {
+class OperationBase : public io::ISerializable {
 public:
 	virtual ~OperationBase() {};
 
@@ -20,24 +22,25 @@ public:
 	/**
 	 * @brief Execute the operation
 	*/
-	virtual void execute() {};
+	virtual void execute(PipelineState* state) {};
 
 	/**
 	 * @brief Free all resources
 	*/
 	virtual void shutdown() {};
 
-	ADERITE_DEBUG_SECTION
-	(
-		virtual const char* getOperationName() = 0;
-		std::string getDebugName() { return p_debugName; }
-		void setDebugName(const std::string& name) { p_debugName = name; }
-	)
-protected:
-	ADERITE_DEBUG_SECTION
-	(
-		std::string p_debugName = "";
-	)
+	/**
+	 * @brief Sets the name of the operation, should be unique pipeline wide
+	 * @param name New name of the operation
+	*/
+	void setName(const std::string& name);
+
+	/**
+	 * @brief Returns the name of the operation
+	*/
+	const std::string& getName() const;
+private:
+	std::string m_name = "";
 };
 
 ADERITE_RENDERING_NAMESPACE_END

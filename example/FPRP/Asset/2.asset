@@ -2,19 +2,147 @@ Version: 2021_10_15r1
 Type: 5
 Handle: 2
 Data:
+  Operations:
+    - Type: 24
+      Data:
+        Blittable: false
+        DepthAttachment: true
+        StencilAttachment: true
+        HDR: false
+    - Type: 21
+      Data:
+        {}
+    - Type: 20
+      Data:
+        {}
+    - Type: 200
+      Data:
+        {}
+    - Type: 202
+      Data:
+        Blittable: false
+        DepthAttachment: true
+        StencilAttachment: true
+        HDR: false
+    - Type: 23
+      Data:
+        ViewId: 0
+    - Type: 23
+      Data:
+        ViewId: 0
+    - Type: 201
+      Data:
+        {}
+    - Type: 22
+      Data:
+        {}
   Graph:
     Type: 151
     Data:
-      NextId: 1
+      NextId: 40
       LastNode: 0
       Nodes:
         - Type: 83
           Data:
-            InputPins: [-1, -1]
+            InputPins: [1, 2]
             OutputPins: []
             Position:
               X: 200
               Y: 200
             ID: 0
+        - Type: 75
+          Data:
+            InputPins: []
+            OutputPins: [4]
+            Position:
+              X: -190
+              Y: 99
+            ID: 3
+        - Type: 85
+          Data:
+            InputPins: []
+            OutputPins: [6]
+            Position:
+              X: -192
+              Y: 235
+            ID: 5
+        - Type: 76
+          Data:
+            PinType: Eye
+            InputPins: [8, 9]
+            OutputPins: [10]
+            Position:
+              X: -49
+              Y: 120
+            ID: 7
+        - Type: 81
+          Data:
+            IsArray: true
+            InputPins: [12, 13, 14, 15]
+            OutputPins: [16]
+            Position:
+              X: 148.484497
+              Y: 97.3370361
+            ID: 11
+        - Type: 78
+          Data:
+            InputPins: [18]
+            OutputPins: [19]
+            Position:
+              X: 317.484497
+              Y: 140.337036
+            ID: 17
+        - Type: 80
+          Data:
+            InputPins: []
+            OutputPins: [23]
+            Position:
+              X: -138.430603
+              Y: 10.3074036
+            ID: 22
+        - Type: 77
+          Data:
+            InputPins: []
+            OutputPins: [26]
+            Position:
+              X: -177.430603
+              Y: 165.307404
+            ID: 25
+        - Type: 79
+          Data:
+            InputPins: []
+            OutputPins: [31]
+            Position:
+              X: -172.430603
+              Y: 373.307404
+            ID: 30
+        - Type: 76
+          Data:
+            PinType: Target
+            InputPins: [33, 34]
+            OutputPins: [35]
+            Position:
+              X: -44.430603
+              Y: 319.307404
+            ID: 32
       Links:
-        []
+        - Out: 6
+          In: 33
+        - Out: 26
+          In: 9
+        - Out: 16
+          In: 18
+        - Out: 31
+          In: 34
+        - Out: 10
+          In: 13
+        - Out: 19
+          In: 2
+        - Out: 23
+          In: 12
+        - Out: 4
+          In: 8
+        - Out: 35
+          In: 14
+        - Out: 6
+          In: 1

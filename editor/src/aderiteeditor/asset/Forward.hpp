@@ -8,6 +8,7 @@ namespace aderite {
 namespace asset {
 
 class RenderingPipeline;
+class EditorMaterialType;
 
 }
 }

@@ -1,21 +1,21 @@
 #pragma once
 
 #include <string>
-#include "aderite/utility/Macros.hpp"
 
-ADERITE_PROPERTY_NAMESPACE_BEGIN
+namespace aderite {
+namespace asset {
 
 /**
  * @brief Supported types of properties
 */
 enum class PropertyType {
-	NONE			= -1,
-	TEXTURE_2D		=  0,
-	TEXTURE_CUBE	=  1,
-	FLOAT			=  2,
-	VEC2			=  3,
-	VEC3			=  4,
-	VEC4			=  5,
+	NONE = -1,
+	TEXTURE_2D = 0,
+	TEXTURE_CUBE = 1,
+	FLOAT = 2,
+	VEC2 = 3,
+	VEC3 = 4,
+	VEC4 = 5,
 };
 
 /**
@@ -41,8 +41,7 @@ const char* getNameForType(PropertyType type);
 /**
  * @brief Base class for material properties
 */
-class Property
-{
+class Property {
 public:
 	Property(PropertyType type, const std::string& name);
 	virtual ~Property() {};
@@ -68,7 +67,7 @@ public:
 
 	/**
 	 * @brief Returns the offset into data buffer
-	 * @return 
+	 * @return
 	*/
 	uint16_t getOffset() const;
 
@@ -82,7 +81,7 @@ public:
 	 * @brief Returns property name
 	*/
 	std::string getName() const;
-	
+
 	/**
 	 * @brief Sets the name of the property
 	 * @param name New name of the property
@@ -94,4 +93,5 @@ private:
 	PropertyType m_type;
 };
 
-ADERITE_PROPERTY_NAMESPACE_END
+}
+}

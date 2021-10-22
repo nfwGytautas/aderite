@@ -1,17 +1,17 @@
 #pragma once
 
 #include "aderite/io/Forward.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
+#include "aderite/reflection/RuntimeTypes.hpp"
 
 namespace aderite {
-namespace io {
+namespace reflection {
 
 /**
- * @brief Enum containing all serializable types that the editor has
+ * @brief Enum containing all types that the editor has
 */
-enum class EditorSerializables : SerializableType {
+enum class EditorTypes : Type {
 	// Nodes
-	AddNode = static_cast<int>(RuntimeSerializables::END),
+	AddNode = 50,
 	MaterialInputNode,
 	MaterialOutputNode,
 	Sampler2DNode,
@@ -30,8 +30,16 @@ enum class EditorSerializables : SerializableType {
 
 	ConvertNode = 125,
 
+	// Assets
 	RenderingPipelineAsset = 150,
 	GraphAsset,
+	TypeAsset,
+
+	// Operations
+	EditorCameraOp = 200,
+	EditorRenderOp = 201,
+	EditorTargetOp = 202,
+	ArrayOp = 203,
 };
 
 }

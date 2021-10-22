@@ -15,7 +15,8 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
 class Pipeline : public io::SerializableObject
 {
 public:
-	~Pipeline();
+	Pipeline();
+	virtual ~Pipeline();
 
 	/**
 	 * @brief Adds operation to the pipeline, the pipeline takes ownership of the operation
@@ -42,7 +43,7 @@ public:
 	void shutdown();
 
 	// Inherited via ISerializable
-	virtual io::SerializableType getType() const override;
+	virtual reflection::Type getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
 	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
 
@@ -52,6 +53,7 @@ public:
 	)
 private:
 	std::vector<OperationBase*> m_operations;
+	PipelineState* m_state = nullptr;
 };
 
 ADERITE_RENDERING_NAMESPACE_END

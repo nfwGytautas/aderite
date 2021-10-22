@@ -13,7 +13,6 @@ namespace io {
 // Classes
 class FileHandler;
 class Serializer;
-class InstancerBase;
 class ISerializable;
 class SerializableObject;
 class ILoadable;

@@ -1,10 +1,11 @@
 #pragma once
 
+#include <string>
 #include "aderite/utility/Macros.hpp"
-#include "aderite/io/Forward.hpp"
+#include "aderite/reflection/Forward.hpp"
 
 namespace aderite {
-namespace io {
+namespace reflection {
 
 /**
  * @brief Class used to map a serialized type identifier to serializable object instance.
@@ -15,22 +16,22 @@ public:
 	virtual ~InstancerBase() {}
 
 	/**
-	 * @brief Create SerializableObject instance
-	 * @return SerializableObject instance
+	 * @brief Create Reflectable instance
+	 * @return Reflectable instance
 	*/
-	virtual ISerializable* create() = 0;
+	virtual Reflectable* create() = 0;
 };
 
 /**
  * @brief Templated Instancer used to create object instance
- * @tparam T Instancer type, T must inherit from SerializableObject
+ * @tparam T Instancer type, T must inherit from Reflectable
 */
 template<typename T>
 class Instancer : public InstancerBase {
 public:
-	virtual ISerializable* create() override {
-		ADERITE_STATIC_ASSERT(std::is_base_of<ISerializable, T>::value, "Instancer can only be used with types that inherit from ISerializable");
-		return static_cast<ISerializable*>(new T());
+	virtual Reflectable* create() override {
+		ADERITE_STATIC_ASSERT(std::is_base_of<Reflectable, T>::value, "Instancer can only be used with types that inherit from Reflectable");
+		return static_cast<Reflectable*>(new T());
 	}
 };
 

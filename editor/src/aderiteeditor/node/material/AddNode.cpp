@@ -1,12 +1,11 @@
 #include "AddNode.hpp"
 
-#include "aderite/asset/property/Property.hpp"
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -50,8 +49,8 @@ void AddNode::evaluate(compiler::GraphEvaluator* evaluator) {
 	m_evaluated = true;
 }
 
-io::SerializableType AddNode::getType() const {
-	return static_cast<io::SerializableType>(io::EditorSerializables::AddNode);
+reflection::Type AddNode::getType() const {
+	return static_cast<reflection::Type>(reflection::EditorTypes::AddNode);
 }
 
 bool AddNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {

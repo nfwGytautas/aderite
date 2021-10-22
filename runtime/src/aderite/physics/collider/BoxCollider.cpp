@@ -6,7 +6,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/YAML.hpp"
 #include "aderite/physics/PhysicsController.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
+#include "aderite/reflection/RuntimeTypes.hpp"
 
 namespace aderite {
 namespace physics {
@@ -41,8 +41,8 @@ void BoxCollider::setSize(const glm::vec3 size) {
 	m_size = size;
 }
 
-io::SerializableType BoxCollider::getType() const {
-	return static_cast<io::SerializableType>(io::RuntimeSerializables::BOX_CLDR);
+reflection::Type BoxCollider::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::BOX_CLDR);
 }
 
 bool BoxCollider::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {

@@ -5,47 +5,13 @@
 #include "aderite/utility/Macros.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/FileHandler.hpp"
-#include "aderite/io/Instancer.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
-
-// Assets, needed for linking instancers
-#include "aderite/rendering/Pipeline.hpp"
-
-#include "aderite/asset/MeshAsset.hpp"
-#include "aderite/asset/MaterialAsset.hpp"
-#include "aderite/asset/MaterialTypeAsset.hpp"
-#include "aderite/asset/TextureAsset.hpp"
-#include "aderite/scene/Scene.hpp"
-
-#include "aderite/physics/ColliderList.hpp"
-#include "aderite/physics/Collider.hpp"
-#include "aderite/physics/collider/BoxCollider.hpp"
+#include "aderite/reflection/Reflector.hpp"
 
 namespace aderite {
 namespace io {
 
 bool Serializer::init() {
 	LOG_TRACE("Initializing serializer, current version {0}", c_CurrentVersion);
-
-	// Runtime instancers
-	LOG_TRACE("Setting runtime instancers");
-	// Assets
-	linkInstancer(static_cast<size_t>(RuntimeSerializables::MESH), new Instancer<asset::MeshAsset>());
-	linkInstancer(static_cast<size_t>(RuntimeSerializables::MATERIAL), new Instancer<asset::MaterialAsset>());
-	linkInstancer(static_cast<size_t>(RuntimeSerializables::TEXTURE), new Instancer<asset::TextureAsset>());
-	linkInstancer(static_cast<size_t>(RuntimeSerializables::SCENE), new Instancer<scene::Scene>());
-	linkInstancer(static_cast<size_t>(RuntimeSerializables::MAT_TYPE), new Instancer<asset::MaterialTypeAsset>());
-	linkInstancer(static_cast<size_t>(RuntimeSerializables::PIPELINE), new Instancer<rendering::Pipeline>());
-
-	// Colliders
-	linkInstancer(static_cast<size_t>(RuntimeSerializables::CLDR_LIST), new Instancer<physics::ColliderList>());
-	linkInstancer(static_cast<size_t>(RuntimeSerializables::BOX_CLDR), new Instancer<physics::BoxCollider>());
-
-	LOG_DEBUG("Registered {0} runtime instancers", m_instancers.size());
-	ADERITE_DEBUG_SECTION(
-		this->printInstancers();
-	);
-
 	return true;
 }
 
@@ -53,25 +19,6 @@ void Serializer::shutdown() {
 	for (auto obj : m_objects) {
 		delete obj;
 	}
-
-	for (auto instancer : m_instancers) {
-		delete instancer.second;
-	}
-}
-
-void Serializer::linkInstancer(SerializableType type, InstancerBase* instancer) {
-	auto it = m_instancers.find(type);
-	if (it != m_instancers.end()) {
-		// Already has mapped instancer
-		LOG_DEBUG("Instancer for type {0} has been overridden");
-
-		delete it->second;
-		it->second = instancer;
-
-		return;
-	}
-
-	m_instancers.insert_or_assign(type, instancer);
 }
 
 SerializableObject* Serializer::parseType(const YAML::Node& data) const {
@@ -80,14 +27,11 @@ SerializableObject* Serializer::parseType(const YAML::Node& data) const {
 	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
 
 	// Get resolver for type
-	SerializableType type = data["Type"].as<SerializableType>();
+	reflection::Type type = data["Type"].as<reflection::Type>();
 	SerializableHandle handle = data["Handle"].as<SerializableHandle>();
 
-	// Get instancer
-	InstancerBase* instancer = resolveInstancer(type);
-
 	// Create object
-	SerializableObject* instance = static_cast<SerializableObject*>(instancer->create());
+	SerializableObject* instance = ::aderite::Engine::getReflector()->reflect<SerializableObject>(type);
 	instance->m_handle = handle;
 
 	ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
@@ -99,7 +43,7 @@ SerializableObject* Serializer::parseType(const YAML::Node& data) const {
 }
 
 void Serializer::writeType(YAML::Emitter& emitter, SerializableObject* object) const {
-	ADERITE_DYNAMIC_ASSERT(object->getHandle() == c_InvalidHandle, "No handle specified in scope");
+	ADERITE_DYNAMIC_ASSERT(object->getHandle() == c_InvalidHandle, "Invalid handle passed to writeType");
 
 	emitter << YAML::BeginMap;
 	emitter << YAML::Key << "Type" << YAML::Value << object->getType();
@@ -114,14 +58,10 @@ ISerializable* Serializer::parseUntrackedType(const YAML::Node& data) const {
 	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
 	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
 
-	// Get resolver for type
-	SerializableType type = data["Type"].as<SerializableType>();
-
-	// Get instancer
-	InstancerBase* instancer = resolveInstancer(type);
+	reflection::Type type = data["Type"].as<reflection::Type>();
 
 	// Create object
-	ISerializable* instance = instancer->create();
+	SerializableObject* instance = ::aderite::Engine::getReflector()->reflect<SerializableObject>(type);
 
 	ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
 
@@ -226,30 +166,12 @@ void Serializer::saveAll() {
 	}
 }
 
-ADERITE_DEBUG_SECTION(
-	void Serializer::printInstancers() {
-		LOG_TRACE("");
-		LOG_TRACE("====================================================================================");
-		LOG_TRACE("                                    INSTANCERS                                      ");
-		LOG_TRACE("====================================================================================");
-		for (auto i : m_instancers) {
-			if (i.second != nullptr) {
-				ISerializable* temp = nullptr;
-				temp = i.second->create();
-				LOG_TRACE("Type: {0:03d} Instancer: {1:p} Created type: {2}", i.first, static_cast<void*>(i.second), temp->getType());
-			}
-			else {
-				LOG_TRACE("Type: {0:03d} Instancer: {1:p} Created type: UNKNOWN", i.first, static_cast<void*>(i.second));
-			}
-		}
-		LOG_TRACE("");
-	}
-)
+void Serializer::setData(void* data) {
+	m_data = data;
+}
 
-InstancerBase* Serializer::resolveInstancer(SerializableType type) const {
-	auto it = m_instancers.find(type);
-	ADERITE_DYNAMIC_ASSERT(it != m_instancers.end(), "Tried to resolve instancer for non registered type {0}", type);
-	return it->second;
+void* Serializer::getData() const {
+	return m_data;
 }
 
 SerializableHandle Serializer::nextAvailableHandle() {

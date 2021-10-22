@@ -4,13 +4,13 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
-#include "aderite/asset/property/Property.hpp"
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/Link.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
+#include "aderiteeditor/asset/property/Property.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -55,8 +55,8 @@ void Graph::connect(int outputPinId, int inputPinId) {
 		return;
 	}
 
-	if (ipin->getType() == asset::prop::getNameForType(asset::prop::PropertyType::NONE) ||
-		opin->getType() == asset::prop::getNameForType(asset::prop::PropertyType::NONE)) {
+	if (ipin->getType() == asset::getNameForType(asset::PropertyType::NONE) ||
+		opin->getType() == asset::getNameForType(asset::PropertyType::NONE)) {
 		// None type pins
 		return;
 	}
@@ -214,8 +214,8 @@ Node* Graph::findNode(int id) const {
 	return *it;
 }
 
-io::SerializableType Graph::getType() const {
-	return static_cast<io::SerializableType>(io::EditorSerializables::GraphAsset);
+reflection::Type Graph::getType() const {
+	return static_cast<reflection::Type>(reflection::EditorTypes::GraphAsset);
 }
 
 bool Graph::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {

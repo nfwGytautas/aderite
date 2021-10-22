@@ -2,9 +2,18 @@
 
 #include <bgfx/bgfx.h>
 #include "aderite/utility/Log.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
+#include "aderite/reflection/RuntimeTypes.hpp"
+#include "aderite/io/Serializer.hpp"
+
+#include "aderite/Aderite.hpp"
+#include "aderite/reflection/Reflector.hpp"
+#include "aderite/rendering/PipelineState.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
+
+Pipeline::Pipeline()
+	: m_state(new PipelineState())
+{}
 
 Pipeline::~Pipeline() {
 	this->shutdown();
@@ -12,6 +21,8 @@ Pipeline::~Pipeline() {
 	for (OperationBase* op : m_operations) {
 		delete op;
 	}
+
+	delete m_state;
 }
 
 void Pipeline::addOperation(OperationBase* operation) {
@@ -25,9 +36,10 @@ void Pipeline::initialize() {
 }
 
 void Pipeline::execute() const {
+	m_state->reset();
 	bgfx::discard(BGFX_DISCARD_ALL);
 	for (OperationBase* op : m_operations) {
-		op->execute();
+		op->execute(m_state);
 	}
 }
 
@@ -37,16 +49,14 @@ void Pipeline::shutdown() {
 	}
 }
 
-io::SerializableType Pipeline::getType() const {
-	return static_cast<io::SerializableType>(io::RuntimeSerializables::PIPELINE);
+reflection::Type Pipeline::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::PIPELINE);
 }
 
 bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
 	emitter << YAML::Key << "Operations" << YAML::BeginSeq;
 	for (size_t i = 0; i < m_operations.size(); i++) {
-		emitter << YAML::BeginMap;
-		
-		emitter << YAML::EndMap;
+		serializer->writeUntrackedType(emitter, m_operations[i]);
 	}
 	emitter << YAML::EndSeq;
 
@@ -54,7 +64,9 @@ bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitte
 }
 
 bool Pipeline::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
-	// TODO: Deserialize
+	for (const YAML::Node& node : data["Operations"]) {
+		m_operations.push_back(static_cast<OperationBase*>(serializer->parseUntrackedType(node)));
+	}
 	return true;
 }
 
@@ -66,7 +78,7 @@ void Pipeline::logPipeline() const {
 	LOG_TRACE("                                      PIPELINE                                      ");
 	LOG_TRACE("====================================================================================");
 	for (size_t i = 0; i < m_operations.size(); i++) {
-		LOG_TRACE("[{0:02d}] Operation: {1:<32} Debug name: {2}", i, m_operations[i]->getOperationName(), m_operations[i]->getDebugName());
+		LOG_TRACE("[{0:02d}] Operation: {1:<40} Name: {2}", i, ::aderite::Engine::getReflector()->reflectName(m_operations[i]->getType()) , m_operations[i]->getName());
 	}
 	LOG_TRACE("");
 }

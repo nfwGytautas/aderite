@@ -8,10 +8,13 @@
 namespace aderite {
 constexpr size_t c_InvalidHandle = 0xffffffffffffffffui64; // std::numeric_limits<size_t>::max() or ULLONG_MAX
 
+namespace reflection {
+using Type = size_t;
+}
+
 namespace io {
 using SerializableHandle = size_t;
 using LoadableHandle = size_t;
-using SerializableType = size_t;
 }
 
 namespace audio {

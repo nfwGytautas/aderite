@@ -34,6 +34,7 @@ Asset ref counting
 Node editor:
 Clear graph on new select
 Constraints for number of nodes and deletion
+Property for ALL items
 
 FPRP:
 Array operation
@@ -73,6 +74,7 @@ Refactor to be more intuitive
 Remove files that don't physically exist anymore
 
 Editor:
+Open graph when selecting apropriate asset
 Redo most of it
 Refactor drag and drop API
 Default pipeline for scenes

@@ -6,6 +6,7 @@
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/compiler/Forward.hpp"
 #include "aderiteeditor/compiler/GraphEvaluator.hpp"
+#include "aderiteeditor/asset/property/Forward.hpp"
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 
@@ -36,7 +37,7 @@ public:
 	 * @param prop Property instance
 	 * @return Variable name
 	*/
-	EvaluatorValue getProperty(const asset::MaterialTypeAsset* material, const asset::prop::Property* prop);
+	EvaluatorValue getProperty(const asset::MaterialTypeAsset* material, const asset::Property* prop);
 
 	/**
 	 * @brief Adds a 2D sampling instruction to the current scope

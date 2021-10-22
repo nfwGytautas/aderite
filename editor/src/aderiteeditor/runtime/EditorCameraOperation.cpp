@@ -1,22 +1,29 @@
 #include "EditorCameraOperation.hpp"
 
+#include "aderite/rendering/PipelineState.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_BEGIN
 
-const glm::mat4& EditorCameraOperation::getViewMatrix() const {
-	return editor::State::EditorCamera->getViewMatrix();
+void EditorCameraOperation::execute(rendering::PipelineState* state) {
+	state->pushEye({
+		editor::State::EditorCamera->getViewMatrix(),
+		editor::State::EditorCamera->getProjectionMatrix()
+	});
 }
 
-const glm::mat4& EditorCameraOperation::getProjectionMatrix() const {
-	return editor::State::EditorCamera->getProjectionMatrix();
+reflection::Type EditorCameraOperation::getType() const {
+	return static_cast<reflection::Type>(reflection::EditorTypes::EditorCameraOp);
 }
 
-bool EditorCameraOperation::isValid() const {
-	return editor::State::EditorCamera->isEnabled();
+bool EditorCameraOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	return true;
+}
+
+bool EditorCameraOperation::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+	return true;
 }
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_END
-
-
