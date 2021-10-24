@@ -3,11 +3,13 @@
 #include <bx/timer.h>
 
 #include "aderite/utility/Log.hpp"
-#include "aderite/asset/AssetManager.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/input/InputManager.hpp"
+#include "aderite/io/FileHandler.hpp"
 #include "aderite/io/Serializer.hpp"
+#include "aderite/io/LoaderPool.hpp"
+#include "aderite/reflection/Reflector.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/Scene.hpp"
@@ -34,19 +36,10 @@ bool Engine::init(InitOptions options) {
 	LOG_TRACE("Initializing aderite engine");
 	LOG_DEBUG("Version: {0}", EngineVersion);
 
-	// Asset manager
-	m_assetManager = new asset::AssetManager();
-	if (!m_assetManager->init()) {
-		LOG_ERROR("Aborting aderite initialization");
-		return false;
-	}
-
-	// Serializer
-	m_serializer = new io::Serializer();
-	if (!m_serializer->init()) {
-		LOG_ERROR("Aborting aderite initialization");
-		return false;
-	}
+	// Loader pool
+	// TODO: Configurable thread count
+	m_fileHandler = new io::FileHandler();
+	m_loaderPool = new io::LoaderPool(2);
 
 	// Scene manager
 	m_sceneManager = new scene::SceneManager();
@@ -90,6 +83,20 @@ bool Engine::init(InitOptions options) {
 		return false;
 	}
 
+	// Serializer
+	m_serializer = new io::Serializer();
+	if (!m_serializer->init()) {
+		LOG_ERROR("Aborting aderite initialization");
+		return false;
+	}
+
+	// Serializer
+	m_reflector = new reflection::Reflector();
+	if (!m_reflector->init()) {
+		LOG_ERROR("Aborting aderite initialization");
+		return false;
+	}
+
 	// At this point there should be an editor if it is enabled
 #if MIDDLEWARE_ENABLED == 1
 	if (!m_middleware) {
@@ -106,22 +113,24 @@ void Engine::shutdown() {
 	MIDDLEWARE_ACTION(onRuntimeShutdown);
 
 	m_sceneManager->shutdown();
-	m_assetManager->shutdown();
-	m_serializer->shutdown();
-	m_physicsController->shutdown();
 	m_audioController->shutdown();
+	m_inputManager->shutdown();
+	m_serializer->shutdown();
+	m_reflector->shutdown();
+	m_physicsController->shutdown();
 	m_renderer->shutdown();
 	m_windowManager->shutdown();
-	m_inputManager->shutdown();
 
 	delete m_sceneManager;
 	delete m_physicsController;
 	delete m_audioController;
-	delete m_assetManager;
 	delete m_renderer;
 	delete m_windowManager;
 	delete m_inputManager;
 	delete m_serializer;
+	delete m_loaderPool;
+	delete m_fileHandler;
+	delete m_reflector;
 
 	delete m_middleware;
 }

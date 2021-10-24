@@ -3,15 +3,14 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/io/Serializer.hpp"
-#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
-#include "aderite/asset/property/Property.hpp"
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/Link.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
+#include "aderiteeditor/asset/property/Property.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -56,8 +55,8 @@ void Graph::connect(int outputPinId, int inputPinId) {
 		return;
 	}
 
-	if (ipin->getType() == asset::prop::getNameForType(asset::prop::PropertyType::NONE) ||
-		opin->getType() == asset::prop::getNameForType(asset::prop::PropertyType::NONE)) {
+	if (ipin->getType() == asset::getNameForType(asset::PropertyType::NONE) ||
+		opin->getType() == asset::getNameForType(asset::PropertyType::NONE)) {
 		// None type pins
 		return;
 	}
@@ -139,6 +138,7 @@ void Graph::renderUI() {
 	for (Node* node : m_nodes) {
 		if (node->getId() == -1) {
 			node->setId(m_nextId++);
+			node->setPosition(glm::vec2(0, 0));
 		}
 
 		ImNodes::BeginNode(node->getId());
@@ -173,11 +173,26 @@ void Graph::renderUI() {
 			ImNodes::EndOutputAttribute();
 		}
 
+		ImVec2 npos = ImNodes::GetNodeGridSpacePos(node->getId());
+		node->setPosition({ npos.x, npos.y });
+
 		ImNodes::EndNode();
 	}
 
 	for (auto link : m_links) {
 		link.second->renderUI();
+	}
+}
+
+void Graph::prepareToDisplay() {
+	for (Node* n : m_nodes) {
+		n->prepareToDisplay();
+	}
+}
+
+void Graph::closingDisplay() {
+	for (Node* n : m_nodes) {
+		n->closingDisplay();
 	}
 }
 
@@ -215,8 +230,8 @@ Node* Graph::findNode(int id) const {
 	return *it;
 }
 
-io::SerializableType Graph::getType() {
-	return static_cast<io::SerializableType>(io::EditorSerializables::GraphAsset);
+reflection::Type Graph::getType() const {
+	return static_cast<reflection::Type>(reflection::EditorTypes::GraphAsset);
 }
 
 bool Graph::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
@@ -252,7 +267,7 @@ bool Graph::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
 	return true;
 }
 
-bool Graph::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool Graph::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	// Nodes
 	for (const YAML::Node& node : data["Nodes"]) {
 		Node* n = static_cast<Node*>(serializer->parseUntrackedType(node));

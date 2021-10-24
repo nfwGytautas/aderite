@@ -1,18 +1,15 @@
 #include "RenderNode.hpp"
 
 #include "aderite/utility/Log.hpp"
-#include "aderite/asset/property/Property.hpp"
 #include "aderite/rendering/operation/RenderOperation.hpp"
 #include "aderite/rendering/operation/EntityProvideOperation.hpp"
-#include "aderite/rendering/operation/EyeProvideOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/OperationArray.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -70,11 +67,7 @@ void RenderNode::evaluate(compiler::GraphEvaluator* evaluator) {
     compiler::PipelineEvaluator* pe = static_cast<compiler::PipelineEvaluator*>(evaluator);
 
     if (!m_array) {
-        rendering::RenderOperation* op = new rendering::RenderOperation(
-            static_cast<rendering::EntityProvideOperation*>(pe->getOperation(p_inputs[0]->getValue())),
-            static_cast<rendering::EyeProvideOperation*>(pe->getOperation(p_inputs[1]->getValue())),
-            static_cast<rendering::TargetProvideOperation*>(pe->getOperation(p_inputs[2]->getValue()))
-        );
+        rendering::RenderOperation* op = new rendering::RenderOperation();
         pe->addOperation(op);
     }
     else {
@@ -88,11 +81,7 @@ void RenderNode::evaluate(compiler::GraphEvaluator* evaluator) {
         }
         else {
             for (size_t i = 0; i < eyes->size(); i++) {
-                rendering::RenderOperation* op = new rendering::RenderOperation(
-                    entities,
-                    static_cast<rendering::EyeProvideOperation*>((*eyes)[i]),
-                    static_cast<rendering::TargetProvideOperation*>((*targets)[i])
-                );
+                rendering::RenderOperation* op = new rendering::RenderOperation();
                 pe->addOperation(op);
             }
         }
@@ -126,8 +115,8 @@ bool RenderNode::onConnectToInput(InputPin* target, OutputPin* source) {
     return true;
 }
 
-io::SerializableType RenderNode::getType() {
-    return static_cast<io::SerializableType>(io::EditorSerializables::RenderNode);
+reflection::Type RenderNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::RenderNode);
 }
 
 bool RenderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
@@ -136,7 +125,7 @@ bool RenderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emit
     return true;
 }
 
-bool RenderNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool RenderNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     m_array = data["IsArray"].as<bool>();
     if (m_array) {

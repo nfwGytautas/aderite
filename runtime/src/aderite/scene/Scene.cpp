@@ -12,19 +12,22 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/YAML.hpp"
-#include "aderite/asset/AssetManager.hpp"
+#include "aderite/io/Loader.hpp"
+#include "aderite/io/Serializer.hpp"
+#include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/asset/MeshAsset.hpp" 
+#include "aderite/asset/TextureAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/scene/Entity.hpp"
-#include "aderite/scene/EntityCamera.hpp"
 #include "aderite/scene/components/Components.hpp"
-#include "aderite/audio/AudioInstanceList.hpp"
+#include "aderite/audio/AudioController.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/ColliderList.hpp"
+#include "aderite/rendering/Pipeline.hpp"
 
-#include "aderite/asset/TextureAsset.hpp"
 
-ADERITE_SCENE_NAMESPACE_BEGIN
+namespace aderite {
+namespace scene {
 
 void serialize_entity(YAML::Emitter& out, Entity e) {
 	out << YAML::BeginMap; // Entity
@@ -69,11 +72,11 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 		components::MeshRendererComponent& MeshRendererComponent = e.getComponent<components::MeshRendererComponent>();
 
 		if (MeshRendererComponent.MeshHandle) {
-			out << YAML::Key << "Mesh" << MeshRendererComponent.MeshHandle->getName();
+			out << YAML::Key << "Mesh" << MeshRendererComponent.MeshHandle->getHandle();
 		}
 
 		if (MeshRendererComponent.MaterialHandle) {
-			out << YAML::Key << "Material" << MeshRendererComponent.MaterialHandle->getName();
+			out << YAML::Key << "Material" << MeshRendererComponent.MaterialHandle->getHandle();
 		}
 
 		out << YAML::EndMap; // MeshRenderer
@@ -86,8 +89,7 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 
 		components::CameraComponent& cameraComponent = e.getComponent<components::CameraComponent>();
 		
-		// TODO: Error check
-		cameraComponent.Camera->serialize(out);
+		// TODO: Serialize camera
 
 		out << YAML::EndMap; // Camera
 	}
@@ -114,22 +116,21 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 		components::CollidersComponent& collidersComponent = e.getComponent<components::CollidersComponent>();
 
 		// TODO: Error check
-		collidersComponent.Colliders->serialize(out);
+		::aderite::Engine::getSerializer()->writeUntrackedType(out, collidersComponent.Colliders);
 
 		out << YAML::EndSeq; // Colliders
 	}
 
 	// Audio sources
-	if (e.hasComponent<components::AudioSourcesComponent>()) {
-		out << YAML::Key << "AudioSources";
-		out << YAML::BeginSeq; // AudioSources
+	if (e.hasComponent<components::AudioSourceComponent>()) {
+		out << YAML::Key << "AudioSource";
+		out << YAML::BeginSeq; // AudioSource
 
-		components::AudioSourcesComponent& audioSourcesComponent = e.getComponent<components::AudioSourcesComponent>();
+		components::AudioSourceComponent& audioSourcesComponent = e.getComponent<components::AudioSourceComponent>();
 
-		// TODO: Error check
-		audioSourcesComponent.Instances->serialize(out);
+		// TODO: Serialize
 
-		out << YAML::EndSeq; // AudioSources
+		out << YAML::EndSeq; // AudioSource
 	}
 
 	// Audio listener
@@ -178,29 +179,15 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 		auto& MeshRendererComponent = e.addComponent<components::MeshRendererComponent>();
 		
 		if (mr_node["Mesh"]) {
-			const std::string name = mr_node["Mesh"].as<std::string>();
-			asset::Asset* pAsset = ::aderite::Engine::getAssetManager()->getOrRead(name);
-
-			if (pAsset) {
-				scene->useAsset(pAsset);
-				MeshRendererComponent.MeshHandle = static_cast<asset::MeshAsset*>(pAsset);
-			}
-			else {
-				LOG_WARN("Invalid asset handle received for mesh, probably the file {0} was deleted or moved externally", name);
-			}
+			const io::SerializableHandle handle = mr_node["Mesh"].as<io::SerializableHandle>();
+			MeshRendererComponent.MeshHandle = static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(handle));
+			ADERITE_DYNAMIC_ASSERT(MeshRendererComponent.MeshHandle != nullptr, "Tried to use a deleted asset");
 		}
 
 		if (mr_node["Material"]) {
-			const std::string name = mr_node["Material"].as<std::string>();
-			asset::Asset* pAsset = ::aderite::Engine::getAssetManager()->getOrRead(name);
-
-			if (pAsset) {
-				scene->useAsset(pAsset);
-				MeshRendererComponent.MaterialHandle = static_cast<asset::MaterialAsset*>(pAsset);
-			}
-			else {
-				LOG_WARN("Invalid asset handle received for material, probably the file {0} was deleted or moved externally", name);
-			}
+			const io::SerializableHandle handle = mr_node["Material"].as<io::SerializableHandle>();
+			MeshRendererComponent.MaterialHandle = static_cast<asset::MaterialAsset*>(::aderite::Engine::getSerializer()->getOrRead(handle));
+			ADERITE_DYNAMIC_ASSERT(MeshRendererComponent.MaterialHandle != nullptr, "Tried to use a deleted asset");
 		}
 	}
 
@@ -208,7 +195,8 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 	auto cam_node = e_node["Camera"];
 	if (cam_node) {
 		auto& cameraComponent = e.addComponent<components::CameraComponent>();
-		cameraComponent.Camera->deserialize(cam_node);
+		
+		// TODO: Deserialize camera
 	}
 
 	// Rigid body
@@ -232,14 +220,16 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 		auto& collidersComponent = e.getComponent<components::CollidersComponent>();
 
 		// TODO: Error check
-		collidersComponent.Colliders->deserialize(colliders);
+		collidersComponent.Colliders = static_cast<physics::ColliderList*>(::aderite::Engine::getSerializer()->parseUntrackedType(e_node));
 	}
 
 	// Audio sources
-	auto audioSources = e_node["AudioSources"];
+	auto audioSources = e_node["AudioSource"];
 	if (audioSources) {
-		auto& audioSourcesComponent = e.addComponent<components::AudioSourcesComponent>();
-		audioSourcesComponent.Instances->deserialize(audioSources);
+		auto& audioSourcesComponent = e.addComponent<components::AudioSourceComponent>();
+
+		// TODO: Deserialize
+		audioSourcesComponent.Instance = ::aderite::Engine::getAudioController()->createAudioInstance("TODO");
 	}
 
 	// Audio listener
@@ -261,18 +251,6 @@ Scene::~Scene() {
 		delete colliders.Colliders;
 	}
 
-	auto entities2 = m_registry.view<scene::components::AudioSourcesComponent>();
-	for (auto entity : entities2) {
-		auto [sources] = entities2.get(entity);
-		delete sources.Instances;
-	}
-
-	auto entities3 = m_registry.view<scene::components::CameraComponent>();
-	for (auto entity : entities3) {
-		auto [camera] = entities3.get(entity);
-		delete camera.Camera;
-	}
-
 	m_physicsScene->release();
 }
 
@@ -282,7 +260,8 @@ void Scene::update(float delta) {
 			entt::get<scene::components::TransformComponent>);
 	for (auto entity : cameraGroup) {
 		auto [camera, transform] = cameraGroup.get(entity);
-		camera.Camera->update(delta);
+
+		// TODO: Update entity cameras
 	}
 }
 
@@ -302,10 +281,6 @@ Entity Scene::createEntity(const components::MetaComponent& MetaComponent) {
 }
 
 void Scene::destroyEntity(Entity entity) {
-	if (entity.hasComponent<components::AudioSourcesComponent>()) {
-		delete entity.getComponent<components::AudioSourcesComponent>().Instances;
-	}
-
 	if (entity.hasComponent<components::CollidersComponent>()) {
 		delete entity.getComponent<components::CollidersComponent>().Colliders;
 	}
@@ -313,24 +288,25 @@ void Scene::destroyEntity(Entity entity) {
 	m_registry.destroy(entity);
 }
 
-void Scene::useAsset(asset::Asset* asset) {
-	// Check if this asset is not duplicate
-	for (auto usedAssets : m_assets) {
-		if (usedAssets == asset) {
-			return;
-		}
-	}
-
-	m_assets.push_back(asset);
+physx::PxScene* Scene::getPhysicsScene() const {
+	return m_physicsScene;
 }
 
-void Scene::removeAsset(asset::Asset* asset) {
-	m_assets.erase(std::find(m_assets.begin(), m_assets.end(), asset));
+rendering::Pipeline* Scene::getPipeline() const {
+	return m_pipeline;
 }
 
-bool Scene::serialize(YAML::Emitter& out) {
+void Scene::setPipeline(rendering::Pipeline* pipeline) {
+	m_pipeline = pipeline;
+}
+
+reflection::Type Scene::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::SCENE);
+}
+
+bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
 	// Entities
-	out << YAML::Key << "Entities" << YAML::BeginSeq;
+	emitter << YAML::Key << "Entities" << YAML::BeginSeq;
 
 	m_registry.each([&](auto entity_id) {
 		Entity e = Entity(entity_id, this);
@@ -340,17 +316,24 @@ bool Scene::serialize(YAML::Emitter& out) {
 		}
 
 		// TODO: Error check
-		serialize_entity(out, e);
+		serialize_entity(emitter, e);
 	});
 
-	out << YAML::EndSeq; // Entities
+	emitter << YAML::EndSeq; // Entities
+
+	emitter << YAML::Key << "Pipeline" << YAML::Value;
+	if (m_pipeline != nullptr) {
+		emitter << m_pipeline->getHandle();
+	}
+	else {
+		emitter << YAML::Null;
+	}
 
 	return true;
 }
 
-bool Scene::deserialize(YAML::Node& data) {
+bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	// Entities
-	m_assets.clear();
 	auto entities = data["Entities"];
 	if (entities) {
 		for (auto Entity : entities) {
@@ -359,14 +342,17 @@ bool Scene::deserialize(YAML::Node& data) {
 		}
 	}
 
+	if (!data["Pipeline"].IsNull()) {
+		setPipeline(static_cast<rendering::Pipeline*>(::aderite::Engine::getSerializer()->getOrRead(data["Pipeline"].as<io::SerializableHandle>())));
+	}
+
 	return true;
 }
 
-Scene::Scene(const std::string& name)
-	: Asset(name + ".scene")
-{
+Scene::Scene() {
 	auto physics = ::aderite::Engine::getPhysicsController()->getPhysics();
 
+	// TODO: Configure physics properties
 	physx::PxSceneDesc sceneDesc(physics->getTolerancesScale());
 	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 	sceneDesc.cpuDispatcher = ::aderite::Engine::getPhysicsController()->getDispatcher();
@@ -374,80 +360,7 @@ Scene::Scene(const std::string& name)
 	sceneDesc.simulationEventCallback = this;
 	//sceneDesc.flags = physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
 	m_physicsScene = physics->createScene(sceneDesc);
-
-	if (m_physicsScene == nullptr) {
-		LOG_ERROR("Failed to create a PhysX scene");
-		return;
-	}
-}
-
-physx::PxScene* Scene::getPhysicsScene() const {
-	return m_physicsScene;
-}
-
-void Scene::prepareLoad() {
-	for (asset::Asset* asset : m_assets) {
-		asset->prepareLoad();
-	}
-}
-
-bool Scene::isReadyToLoad() {
-	for (asset::Asset* asset : m_assets) {
-		if (!asset->isReadyToLoad()) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-void Scene::load() {
-	for (asset::Asset* asset : m_assets) {
-		if (!asset->isLoaded()) {
-			asset->load();
-		}
-	}
-}
-
-void Scene::unload() {
-	for (asset::Asset* asset : m_assets) {
-		asset->unload();
-	}
-}
-
-bool Scene::isPreparing() {
-	for (asset::Asset* asset : m_assets) {
-		if (!asset->isPreparing()) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool Scene::isLoaded() {
-	for (asset::Asset* asset : m_assets) {
-		if (!asset->isLoaded()) {
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-size_t Scene::hash() const {
-	return std::hash<std::string>{}(p_name);
-}
-
-asset::AssetType Scene::type() const {
-	return asset::AssetType::SCENE;
-}
-
-bool Scene::isInGroup(asset::AssetGroup group) const {
-	switch (group) {
-	default:
-		return false;
-	}
+	ADERITE_DYNAMIC_ASSERT(m_physicsScene != nullptr, "Failed to create a PhysX scene");
 }
 
 template<typename T>
@@ -467,6 +380,7 @@ void Scene::onComponentAdded<components::RigidbodyComponent>(Entity entity, comp
 	physx::PxRigidDynamic* actor = ::aderite::Engine::getPhysicsController()->createDynamicBody();
 
 	// Switch
+	actor->userData = &entity.getComponent<components::MetaComponent>();
 	m_physicsScene->removeActor(*colliders.Colliders->getActor());
 	colliders.Colliders->setActor(actor);
 	m_physicsScene->addActor(*actor);
@@ -474,15 +388,19 @@ void Scene::onComponentAdded<components::RigidbodyComponent>(Entity entity, comp
 
 template<>
 void Scene::onComponentAdded<components::CollidersComponent>(Entity entity, components::CollidersComponent& component) {
-	component.Colliders = new physics::ColliderList(entity);
+	component.Colliders = new physics::ColliderList();
 	physx::PxRigidStatic* actor = ::aderite::Engine::getPhysicsController()->createStaticBody();
+	actor->userData = &entity.getComponent<components::MetaComponent>();
 	component.Colliders->setActor(actor);
 	m_physicsScene->addActor(*actor);
 }
 
 template<>
-void Scene::onComponentAdded<components::AudioSourcesComponent>(Entity entity, components::AudioSourcesComponent& component) {
-	component.Instances = new audio::AudioInstanceList();
+void Scene::onComponentAdded<components::AudioSourceComponent>(Entity entity, components::AudioSourceComponent& component) {
+	// Add transform if don't have already
+	if (!entity.hasComponent<components::TransformComponent>()) {
+		entity.addComponent<components::TransformComponent>();
+	}
 }	
 
 template<>
@@ -499,8 +417,6 @@ void Scene::onComponentAdded<components::CameraComponent>(Entity entity, compone
 	if (!entity.hasComponent<components::TransformComponent>()) {
 		entity.addComponent<components::TransformComponent>();
 	}
-
-	component.Camera = new EntityCamera(entity);
 }
 
 template<typename T>
@@ -511,6 +427,12 @@ void Scene::onComponentRemoved(Entity entity, components::TransformComponent& co
 
 template<>
 void Scene::onComponentRemoved(Entity entity, components::MeshRendererComponent& component) {}
+
+template<>
+void Scene::onComponentRemoved(Entity entity, components::AudioSourceComponent& component) {}
+
+template<>
+void Scene::onComponentRemoved(Entity entity, components::AudioListenerComponent& component) {}
 
 template<>
 void Scene::onComponentRemoved<components::RigidbodyComponent>(Entity entity, components::RigidbodyComponent& component) {
@@ -535,16 +457,6 @@ void Scene::onComponentRemoved<components::CollidersComponent>(Entity entity, co
 	delete component.Colliders;
 }
 
-template<>
-void Scene::onComponentRemoved<components::AudioSourcesComponent>(Entity entity, components::AudioSourcesComponent& component) {
-	delete component.Instances;
-}
-
-template<>
-void Scene::onComponentRemoved<components::CameraComponent>(Entity entity, components::CameraComponent& component) {
-	delete component.Camera;
-}
-
 void Scene::onContact(
 	const physx::PxContactPairHeader& pairHeader,
 	const physx::PxContactPair* pairs,
@@ -556,19 +468,16 @@ void Scene::onContact(
 		physx::PxRigidActor* actor1 = pairHeader.actors[0];
 		physx::PxRigidActor* actor2 = pairHeader.actors[1];
 
-		Entity* e1 = static_cast<Entity*>(actor1->userData);
-		Entity* e2 = static_cast<Entity*>(actor2->userData);
-
-		auto& metaE1 = e1->getComponent<components::MetaComponent>();
-		auto& metaE2 = e2->getComponent<components::MetaComponent>();
+		components::MetaComponent* e1 = static_cast<components::MetaComponent*>(actor1->userData);
+		components::MetaComponent* e2 = static_cast<components::MetaComponent*>(actor2->userData);
 
 		if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
 			// Collision enter
-			LOG_INFO("{0} colliding with {1}", metaE1.Name, metaE2.Name);
+			LOG_INFO("{0} colliding with {1}", e1->Name, e2->Name);
 		}
 		else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
 			// Collision leave
-			LOG_INFO("{0} no longer colliding with {1}", metaE1.Name, metaE2.Name);
+			LOG_INFO("{0} no longer colliding with {1}", e1->Name, e2->Name);
 		}
 	}
 }
@@ -580,17 +489,14 @@ void Scene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) {
 		physx::PxRigidActor* actor = cp.otherActor;
 		physx::PxRigidActor* trigger = cp.triggerActor;
 
-		Entity* actorEntity = static_cast<Entity*>(actor->userData);
-		Entity* triggerEntity = static_cast<Entity*>(trigger->userData);
-
-		auto& metaActor = actorEntity->getComponent<components::MetaComponent>();
-		auto& metaTrigger = triggerEntity->getComponent<components::MetaComponent>();
+		components::MetaComponent* metaActor = static_cast<components::MetaComponent*>(actor->userData);
+		components::MetaComponent* metaTrigger = static_cast<components::MetaComponent*>(trigger->userData);
 
 		if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-			LOG_WARN("{0} entered {1} trigger", metaActor.Name, metaTrigger.Name);
+			LOG_WARN("{0} entered {1} trigger", metaActor->Name, metaTrigger->Name);
 		}
 		else if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-			LOG_WARN("{0} left {1} trigger", metaActor.Name, metaTrigger.Name);
+			LOG_WARN("{0} left {1} trigger", metaActor->Name, metaTrigger->Name);
 		}
 	}
 }
@@ -679,4 +585,5 @@ void Scene::syncPhysicsToEcs() {
 	}
 }
 
-ADERITE_SCENE_NAMESPACE_END
+}
+}

@@ -17,27 +17,6 @@ void SceneManager::shutdown() {
 }
 
 void SceneManager::setActive(Scene* scene) {
-	if (scene->isLoaded()) {
-		m_activeScene = scene;
-		return;
-	}
-
-	// Check if it's preparing to be loaded if not then prepare
-	if (!scene->isPreparing()) {
-		scene->prepareLoad();
-	}
-
-	// Wait until the scene 
-	while (!scene->isReadyToLoad()) {
-		// TODO: Rethink this, cause there should be some sort of loading screen probably
-		// Sleep for 1 second
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-	}
-
-	if (!scene->isLoaded()) {
-		scene->load();
-	}
-
 	// Notify engine
 	::aderite::Engine::get()->onSceneChanged(scene);
 	m_activeScene = scene;

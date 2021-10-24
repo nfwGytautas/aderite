@@ -3,20 +3,22 @@
 #include <bgfx/bgfx.h>
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/shared/Forward.hpp"
-#include "aderiteeditor/runtime/Resolver.hpp"
+#include "aderiteeditor/shared/SelectableObject.hpp"
 
-ADERITE_EDITOR_SHARED_NAMESPACE_BEGIN
+namespace aderite {
+namespace editor {
 
 /**
  * @brief Global(makes life so much easier in this case) State of the editor
 */
 class State {
 public:
-	static IEventSink* Sink;
-	static Project* Project;
-	static EditorCamera* EditorCamera;
+	static shared::IEventSink* Sink;
+	static shared::Project* Project;
+	static shared::EditorCamera* EditorCamera;
 	static bgfx::FrameBufferHandle DebugRenderHandle;
-	static io::MappedResolver* Resolver;
+	static bgfx::FrameBufferHandle MeshPreviewHandle;
+	static SelectableObject LastSelectedObject;
 
 	/**
 	 * @brief True if currently in game mode, false otherwise
@@ -24,4 +26,5 @@ public:
 	static bool IsGameMode;
 };
 
-ADERITE_EDITOR_SHARED_NAMESPACE_END
+}
+}

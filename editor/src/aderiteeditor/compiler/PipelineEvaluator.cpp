@@ -1,8 +1,10 @@
 #include "PipelineEvaluator.hpp"
 
+#include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
+#include "aderite/reflection/Reflector.hpp"
 #include "aderiteeditor/runtime/OperationArray.hpp"
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
@@ -24,22 +26,23 @@ rendering::OperationBase* PipelineEvaluator::getOperation(EvaluatorValue value) 
 	return m_operations[value];
 }
 
-rendering::Pipeline* PipelineEvaluator::constructPipeline() {
+void PipelineEvaluator::transferToPipeline(rendering::Pipeline* pipeline) {
 	if (m_pipelineConstructed) {
 		LOG_ERROR("Tried to construct pipeline a second time from the same evaluator");
-		return nullptr;
+		return;
 	}
+
 	LOG_TRACE("Constructing pipeline");
-	rendering::Pipeline* pipeline = new rendering::Pipeline();
 	int id = 0;
 	for (rendering::OperationBase* op : m_operations) {
 		ADERITE_DEBUG_SECTION
 		(
-			LOG_TRACE("[{0:02d}] Operation: {1:<32} Debug name: {2}", id++, op->getOperationName(), op->getDebugName());
+			LOG_TRACE("[{0:02d}] Operation: {1:<40} Name: {2}", id++, ::aderite::Engine::getReflector()->reflectName(op->getType()), op->getName());
 		)
 
 		if (dynamic_cast<runtime::OperationArray*>(op) != nullptr) {
 			// Filter construction helping operations
+			delete op;
 			continue;
 		}
 
@@ -52,7 +55,6 @@ rendering::Pipeline* PipelineEvaluator::constructPipeline() {
 	)
 
 	m_pipelineConstructed = true;
-	return pipeline;
 }
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_END

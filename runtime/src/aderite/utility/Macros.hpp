@@ -49,6 +49,8 @@
 #define ADERITE_MIDDLEWARE_SECTION(code)
 #endif
 
+#define ADERITE_STRINGIZE(var) #var
+
 // ---------------------------------
 // NAMESPACES
 // ---------------------------------

@@ -1,13 +1,11 @@
 #include "EditorCameraNode.hpp"
 
-#include "aderite/asset/property/Property.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorCameraOperation.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -16,8 +14,8 @@ EditorCameraNode::EditorCameraNode()
     // Output
     p_outputs.push_back(new OutputPin(
         this,
-        node::getTypeName(node::PropertyType::Camera),
-        "Camera"
+        node::getTypeName(node::PropertyType::Eye),
+        "Eye"
     ));
 }
 
@@ -33,8 +31,8 @@ void EditorCameraNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-io::SerializableType EditorCameraNode::getType() {
-    return static_cast<io::SerializableType>(io::EditorSerializables::EditorCameraNode);
+reflection::Type EditorCameraNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::EditorCameraNode);
 }
 
 bool EditorCameraNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
@@ -42,7 +40,7 @@ bool EditorCameraNode::serialize(const io::Serializer* serializer, YAML::Emitter
     return true;
 }
 
-bool EditorCameraNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool EditorCameraNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

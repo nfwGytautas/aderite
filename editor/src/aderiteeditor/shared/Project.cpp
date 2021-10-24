@@ -9,6 +9,8 @@
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/Scene.hpp"
 
+#include "aderiteeditor/vfs/VFS.hpp"
+
 // Previous versions:
 //	- 2021_07_31r1
 
@@ -17,7 +19,7 @@ constexpr const char* current_version = "2021_07_31r1";
 ADERITE_EDITOR_SHARED_NAMESPACE_BEGIN
 
 Project::Project(const std::string& dir, const std::string& name)
-	: m_directory(dir), m_name(name)
+	: m_directory(dir), m_name(name), m_vfs(new vfs::VFS())
 {}
 
 Project::~Project() {
@@ -39,14 +41,18 @@ bool Project::save() {
 	out << YAML::Key << "Name" << YAML::Value << m_name;
 	out << YAML::Key << "Type" << YAML::Value << "Project";
 
+	out << YAML::Key << "ActiveScene" << YAML::Value;
 	if (::aderite::Engine::getSceneManager()->getCurrentScene()) {
-		out << YAML::Key << "ActiveScene" << YAML::Value << ::aderite::Engine::getSceneManager()->getCurrentScene()->getName();
-		m_activeScene = ::aderite::Engine::getSceneManager()->getCurrentScene()->getName();
+		out << ::aderite::Engine::getSceneManager()->getCurrentScene()->getHandle();
+		m_activeScene = ::aderite::Engine::getSceneManager()->getCurrentScene()->getHandle();
+	}
+	else {
+		out << YAML::Null;
 	}
 
-	out << YAML::Key << "MasterBanksDirectory" << YAML::Value << m_masterBanksDir;
-
 	out << YAML::EndMap; // Root
+
+	m_vfs->save(this->getRootDir());
 
 	std::ofstream fout(root.append(m_name + ".aproj"));
 	fout << out.c_str();
@@ -77,13 +83,14 @@ Project* Project::load(const std::string& path) {
 	std::filesystem::path fs_path = std::filesystem::path(path);
 	Project* p = new Project(fs_path.parent_path().string(), fs_path.stem().string());
 
-	if (data["ActiveScene"]) {
-		p->m_activeScene = data["ActiveScene"].as<std::string>();
+	if (!data["ActiveScene"].IsNull()) {
+		p->m_activeScene = data["ActiveScene"].as<io::SerializableHandle>();
+	}
+	else {
+		p->m_activeScene = c_InvalidHandle;
 	}
 
-	if (data["MasterBanksDirectory"]) {
-		p->m_masterBanksDir = data["MasterBanksDirectory"].as<std::string>();
-	}
+	p->m_vfs = vfs::VFS::load(p->getRootDir());
 
 	return p;
 }
@@ -96,25 +103,21 @@ std::filesystem::path Project::getRootDir() const {
 	return m_directory;
 }
 
-std::string Project::getActiveScene() const {
+io::SerializableHandle Project::getActiveScene() const {
 	return m_activeScene;
 }
 
-std::string Project::getMasterBanksDir() const {
-	return m_masterBanksDir;
-}
-
-void Project::setMasterBanksDir(const std::string& masterBanksDir) {
-	m_masterBanksDir = masterBanksDir;
-}
-
 void Project::validate() {
-	if (::aderite::Engine::getSceneManager()->getCurrentScene() == nullptr && !m_activeScene.empty()) {
+	if (::aderite::Engine::getSceneManager()->getCurrentScene() == nullptr && m_activeScene != c_InvalidHandle) {
 		save();
 	}
-	else if (::aderite::Engine::getSceneManager()->getCurrentScene()->getName() != m_activeScene) {
+	else if (::aderite::Engine::getSceneManager()->getCurrentScene()->getHandle() != m_activeScene) {
 		save();
 	}
+}
+
+vfs::VFS* Project::getVfs() const {
+	return m_vfs;
 }
 
 ADERITE_EDITOR_SHARED_NAMESPACE_END

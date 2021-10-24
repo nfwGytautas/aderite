@@ -1,23 +1,23 @@
 #pragma once
 
 #include <bgfx/bgfx.h>
+#include "aderite/Handles.hpp"
 #include "aderite/utility/Macros.hpp"
-#include "aderite/asset/Asset.hpp"
-#include "aderite/asset/Forward.hpp"
+#include "aderite/io/SerializableObject.hpp"
+#include "aderite/io/Loader.hpp"
 
-ADERITE_ASSET_NAMESPACE_BEGIN
+namespace aderite {
+namespace asset {
 
 /**
  * @brief Texture asset implementation
 */
-class TextureAsset : public Asset {
+class TextureAsset : public io::SerializableObject, public io::ILoadable {
 public:
 	/**
 	 * @brief Editable fields of the asset, this information is stored inside the asset file
 	*/
 	struct fields {
-		std::string SourceFile = "";
-
 		// TODO: Encapsulate
 		bool IsHDR = false;
 		bool IsCubemap = false;
@@ -26,20 +26,18 @@ public:
 	~TextureAsset();
 
 	/**
-	 * @brief Returns texture handle of this asset
+	 * @brief Returns true if the texture is valid, false otherwise
 	*/
-	bgfx::TextureHandle getHandle();
+	bool isValid() const;
 
-	virtual AssetType type() const override;
-	virtual bool isInGroup(AssetGroup group) const override;
-
-	virtual void prepareLoad() override;
-	virtual bool isReadyToLoad() override;
-	virtual void load() override;
+	// Inherited via ILoadable
+	virtual void load(const io::Loader* loader) override;
 	virtual void unload() override;
-	virtual bool isPreparing() override;
-	virtual bool isLoaded() override;
-	virtual size_t hash() const override;
+
+	// Inherited via SerializableObject
+	virtual reflection::Type getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 	/**
 	 * @brief Returns the info of shader fields
@@ -54,21 +52,18 @@ public:
 	fields& getFieldsMutable() {
 		return m_info;
 	}
-protected:
-	TextureAsset(const std::string& name);
-	TextureAsset(const std::string& name, const fields& info);
 
-	virtual bool serialize(YAML::Emitter& out) override;
-	virtual bool deserialize(YAML::Node& data) override;
-
-	friend class AssetManager;
+	/**
+	 * @brief Returns texture handle of this asset
+	*/
+	bgfx::TextureHandle getTextureHandle() const {
+		return m_handle;
+	}
 private:
 	bgfx::TextureHandle m_handle = BGFX_INVALID_HANDLE;
 
 	fields m_info = {};
-	TextureSource* m_source = nullptr;
-
-	bool m_isBeingPrepared = false;
 };
 
-ADERITE_ASSET_NAMESPACE_END
+}
+}

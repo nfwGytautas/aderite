@@ -1,25 +1,17 @@
 #include "Serializer.hpp"
 
-#include <fstream>
+#include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
 #include "aderite/io/SerializableObject.hpp"
-#include "aderite/io/PathResolver.hpp"
-#include "aderite/io/Instancer.hpp"
-#include "aderite/io/RuntimeSerializables.hpp"
+#include "aderite/io/FileHandler.hpp"
+#include "aderite/reflection/Reflector.hpp"
 
 namespace aderite {
 namespace io {
 
 bool Serializer::init() {
 	LOG_TRACE("Initializing serializer, current version {0}", c_CurrentVersion);
-
-	// Runtime instancers
-	LOG_TRACE("Setting runtime instancers");
-	
-
-	// Check that no runtime serializables have been forgotten
-	ADERITE_DYNAMIC_ASSERT(m_instancers.size() == (static_cast<size_t>(RuntimeSerializables::END) - static_cast<size_t>(RuntimeSerializables::RESERVED) - 1), "Not all runtime serializables are linked");
 	return true;
 }
 
@@ -27,48 +19,34 @@ void Serializer::shutdown() {
 	for (auto obj : m_objects) {
 		delete obj;
 	}
-
-	for (auto instancer : m_instancers) {
-		delete instancer.second;
-	}
 }
 
-void Serializer::setResolver(PathResolver* resolver) {
-	m_resolver = resolver;
-}
-
-void Serializer::linkInstancer(SerializableType type, InstancerBase* instancer) {
-	auto it = m_instancers.find(type);
-	if (it != m_instancers.end()) {
-		// Already has mapped instancer
-		LOG_DEBUG("Instancer for type {0} has been overridden");
-
-		delete it->second;
-		it->second = instancer;
-
-		return;
-	}
-
-	m_instancers.insert_or_assign(type, instancer);
-}
-
-SerializableObject* Serializer::parseType(const YAML::Node& data) const {
+SerializableObject* Serializer::parseType(const YAML::Node& data) {
 	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in scope");
 	ADERITE_DYNAMIC_ASSERT(data["Handle"], "No handle specified in scope");
 	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
 
 	// Get resolver for type
-	SerializableType type = data["Type"].as<SerializableType>();
+	reflection::Type type = data["Type"].as<reflection::Type>();
 	SerializableHandle handle = data["Handle"].as<SerializableHandle>();
 
-	// Get instancer
-	InstancerBase* instancer = resolveInstancer(type);
-
 	// Create object
-	SerializableObject* instance = instancer->create();
+	SerializableObject* instance = ::aderite::Engine::getReflector()->reflect<SerializableObject>(type);
 	instance->m_handle = handle;
 
 	ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
+
+	// Insert the type and then start deserializing it's contents, this way children can get the type if they need to
+	if (instance->getHandle() + 1 > m_objects.size()) {
+		// Resize
+		m_objects.resize(instance->getHandle() + 1, nullptr);
+		m_hasNull = true;
+	}
+	else {
+		ADERITE_DYNAMIC_ASSERT(m_objects[instance->getHandle()] == nullptr, "Overwriting a already loaded object");
+	}
+
+	m_objects[instance->getHandle()] = instance;
 
 	// Deserialize
 	instance->deserialize(this, data["Data"]);
@@ -77,7 +55,7 @@ SerializableObject* Serializer::parseType(const YAML::Node& data) const {
 }
 
 void Serializer::writeType(YAML::Emitter& emitter, SerializableObject* object) const {
-	ADERITE_DYNAMIC_ASSERT(object->getHandle() == c_InvalidHandle, "No handle specified in scope");
+	ADERITE_DYNAMIC_ASSERT(object->getHandle() == c_InvalidHandle, "Invalid handle passed to writeType");
 
 	emitter << YAML::BeginMap;
 	emitter << YAML::Key << "Type" << YAML::Value << object->getType();
@@ -88,18 +66,14 @@ void Serializer::writeType(YAML::Emitter& emitter, SerializableObject* object) c
 	emitter << YAML::EndMap;
 }
 
-SerializableObject* Serializer::parseUntrackedType(const YAML::Node& data) const {
+ISerializable* Serializer::parseUntrackedType(const YAML::Node& data) {
 	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
 	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
 
-	// Get resolver for type
-	SerializableType type = data["Type"].as<SerializableType>();
-
-	// Get instancer
-	InstancerBase* instancer = resolveInstancer(type);
+	reflection::Type type = data["Type"].as<reflection::Type>();
 
 	// Create object
-	SerializableObject* instance = instancer->create();
+	SerializableObject* instance = ::aderite::Engine::getReflector()->reflect<SerializableObject>(type);
 
 	ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
 
@@ -109,7 +83,7 @@ SerializableObject* Serializer::parseUntrackedType(const YAML::Node& data) const
 	return instance;
 }
 
-void Serializer::writeUntrackedType(YAML::Emitter& emitter, SerializableObject* object) const {
+void Serializer::writeUntrackedType(YAML::Emitter& emitter, ISerializable* object) const {
 	emitter << YAML::BeginMap;
 	emitter << YAML::Key << "Type" << YAML::Value << object->getType();
 	emitter << YAML::Key << "Data" << YAML::BeginMap;
@@ -128,7 +102,6 @@ void Serializer::add(SerializableObject* object) {
 	ADERITE_DYNAMIC_ASSERT(object->getHandle() == c_InvalidHandle, "Tried to add an already existing object to Serializer");
 	SerializableHandle handle = this->nextAvailableHandle();
 	object->m_handle = handle;
-	m_resolver->store(object);
 	m_objects[handle] = object;
 }
 
@@ -145,35 +118,25 @@ SerializableObject* Serializer::getOrRead(SerializableHandle handle) {
 	}
 
 	// Resolve path and load
-	Path path = this->resolvePath(handle);
-	YAML::Node data = YAML::LoadFile(path.File.string());
+	DataChunk chunk = aderite::Engine::getFileHandler()->openSerializable(handle);
+	YAML::Node data = YAML::Load(reinterpret_cast<const char*>(chunk.Data.data()));
 
 	// Check version
 	ADERITE_DYNAMIC_ASSERT(data["Version"], "Tried to read a file without a specified version");
 
 	// TODO: Check version and upgrade if needed
 	SerializableObject* type = this->parseType(data);
-
-	if (type->getHandle() + 1 > m_objects.size()) {
-		// Resize
-		m_objects.resize(type->getHandle() + 1, nullptr);
-		m_hasNull = true;
-	}
-
-	m_objects[type->getHandle()] = type;
 	return type;
 }
 
 void Serializer::reread(SerializableObject* object) {
 	// Resolve path and load
-	Path path = this->resolvePath(object->getHandle());
-	YAML::Node data = YAML::LoadFile(path.File.string());
+	DataChunk chunk = aderite::Engine::getFileHandler()->openSerializable(object->getHandle());
+	YAML::Node data = YAML::Load(reinterpret_cast<const char*>(chunk.Data.data()));
 	object->deserialize(this, data["Data"]);
 }
 
 void Serializer::save(SerializableObject* object) {
-	ADERITE_DYNAMIC_ASSERT(m_resolver != nullptr, "No path resolver set");
-
 	YAML::Emitter out;
 
 	ADERITE_DYNAMIC_ASSERT(object->getHandle() != c_InvalidHandle, "SerializableObject with invalid handle passed");
@@ -195,40 +158,24 @@ void Serializer::save(SerializableObject* object) {
 	out << YAML::EndMap;
 
 	// Resolve where to store this object
-	Path path = this->resolvePath(object->getHandle());
-
-	std::ofstream fout(path.File);
-	fout << out.c_str();
+	DataChunk chunk = aderite::Engine::getFileHandler()->openSerializable(object->getHandle());
+	chunk.Data.resize(out.size());
+	std::memcpy(chunk.Data.data(), out.c_str(), chunk.Data.size());
+	aderite::Engine::getFileHandler()->commit(chunk);
 }
 
-ADERITE_DEBUG_SECTION(
-	void Serializer::printInstancers() {
-		LOG_TRACE("");
-		LOG_TRACE("====================================================================================");
-		LOG_TRACE("                                    INSTANCERS                                      ");
-		LOG_TRACE("====================================================================================");
-		for (auto i : m_instancers) {
-			if (i.second != nullptr) {
-				SerializableObject* temp = nullptr;
-				temp = i.second->create();
-				LOG_TRACE("Type: {0:03d} Instancer: {:p} Created type: {2}", i.first, static_cast<void*>(i.second), temp->getType());
-			}
-			else {
-				LOG_TRACE("Type: {0:03d} Instancer: {:p} Created type: UNKNOWN", i.first, static_cast<void*>(i.second));
-			}
-		}
+void Serializer::saveAll() {
+	for (SerializableObject* obj : m_objects) {
+		this->save(obj);
 	}
-)
-
-InstancerBase* Serializer::resolveInstancer(SerializableType type) const {
-	auto it = m_instancers.find(type);
-	ADERITE_DYNAMIC_ASSERT(it != m_instancers.end(), "Tried to resolve instancer for non registered type {0}", type);
-	return it->second;
 }
 
-Path Serializer::resolvePath(SerializableHandle handle) {
-	ADERITE_DYNAMIC_ASSERT(m_resolver != nullptr, "Tried to resolve path with no resolver");
-	return m_resolver->resolve(handle);
+void Serializer::setData(void* data) {
+	m_data = data;
+}
+
+void* Serializer::getData() const {
+	return m_data;
 }
 
 SerializableHandle Serializer::nextAvailableHandle() {

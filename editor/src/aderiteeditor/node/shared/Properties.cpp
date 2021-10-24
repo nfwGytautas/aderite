@@ -13,9 +13,6 @@ const char* getTypeName(PropertyType type) {
 	case PropertyType::Entity: {
 		return "Entity";
 	}
-	case PropertyType::Camera: {
-		return "Camera";
-	}
 	case PropertyType::Require: {
 		return "Require";
 	}

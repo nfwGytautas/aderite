@@ -1,8 +1,6 @@
 #include "ConvertNode.hpp"
 
 #include "aderite/utility/Log.hpp"
-#include "aderite/asset/property/Property.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
@@ -10,7 +8,7 @@
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/runtime/OperationArray.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 #include "aderite/rendering/operation/All.hpp"
 
@@ -92,8 +90,8 @@ bool ConvertNode::onConnectToOutput(OutputPin* target, InputPin* source) {
 	return true;
 }
 
-io::SerializableType ConvertNode::getType() {
-	return static_cast<io::SerializableType>(io::EditorSerializables::ConvertNode);
+reflection::Type ConvertNode::getType() const {
+	return static_cast<reflection::Type>(reflection::EditorTypes::ConvertNode);
 }
 
 bool ConvertNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
@@ -103,7 +101,7 @@ bool ConvertNode::serialize(const io::Serializer* serializer, YAML::Emitter& emi
 	return true;
 }
 
-bool ConvertNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool ConvertNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	deserializeData(data);
 	p_inputs[0]->setType(data["From"].as<std::string>());
 	p_outputs[0]->setType(data["To"].as<std::string>());
@@ -111,13 +109,7 @@ bool ConvertNode::deserialize(const io::Serializer* serializer, const YAML::Node
 }
 
 void ConvertNode::handlePipelineConvert(compiler::PipelineEvaluator* pe) {
-	if (node::isArrayOrType(p_inputs[0]->getType(), node::getTypeName(node::PropertyType::Camera))) {
-		if (node::isArrayOrType(p_outputs[0]->getType(), node::getTypeName(node::PropertyType::Eye))) {
-			convert(pe, &ConvertNode::eyeToCamera);
-			return;
-		}
-	}
-
+	
 	LOG_ERROR("Unknown conversion from {0} to {1}", p_inputs[0]->getType(), p_outputs[0]->getType());
 }
 
@@ -145,16 +137,8 @@ void ConvertNode::applyArray(compiler::PipelineEvaluator* pe, PipelineConversion
 		pe->addOperation(converted);
 		result->addOperation(converted);
 	}
-	result->setDebugName("Convert (" + p_inputs[0]->getType() + "->" + p_outputs[0]->getType() + ")");
+	result->setName("Convert (" + p_inputs[0]->getType() + "->" + p_outputs[0]->getType() + ")");
 	p_outputs[0]->setValue(pe->addOperation(result));
-}
-
-rendering::OperationBase* ConvertNode::eyeToCamera(rendering::OperationBase* from) {
-	rendering::EyeProvideOperation* op = new rendering::EyeProvideOperation();
-	op->provideFromCamera(
-		static_cast<rendering::CameraProvideOperation*>(from)
-	);
-	return op;
 }
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

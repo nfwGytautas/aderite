@@ -1,61 +1,33 @@
 #pragma once
 
-#include "aderite/scene/ICamera.hpp"
+#include <glm/glm.hpp>
+#include "aderite/scene/components/Components.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
 
-ADERITE_RENDERING_NAMESPACE_BEGIN
+namespace aderite {
+namespace rendering {
 
 /**
- * @brief Operation used to create an camera provider
+ * @brief Operation used to create an entity camera provider
 */
 class CameraProvideOperation : public OperationBase {
 public:
 	virtual ~CameraProvideOperation() {};
 
 	/**
-	 * @brief Returns the camera instance
+	 * @brief Figure out the main camera and set it
 	*/
-	interfaces::ICamera* getCamera() const;
+	virtual void execute(PipelineState* state) override;
 
-	ADERITE_DEBUG_SECTION
-	(
-		virtual const char* getOperationName() override { return "CameraProvideOperation"; }
-	)
-protected:
-	interfaces::ICamera* p_camera = nullptr;
+	// Inherited via OperationBase
+	virtual reflection::Type getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+private:
+	glm::mat4 m_viewMatrix;
+	glm::mat4 m_projMatrix;
 };
 
-/**
- * @brief Camera provide operation that finds the main camera and returns it
-*/
-class MainCameraProvideOperation : public CameraProvideOperation {
-public:
-	/**
-	 * @brief Figure out the main camera and set it 
-	*/
-	virtual void execute() override;
-
-	ADERITE_DEBUG_SECTION
-	(
-		virtual const char* getOperationName() override { return "MainCameraProvideOperation"; }
-	)
-};
-
-/**
- * @brief Camera provide operation that always returns the same camera
-*/
-class FreeCameraProvideOperation : public CameraProvideOperation {
-public:
-	/**
-	 * @brief Set the camera for provider
-	*/
-	void setCamera(interfaces::ICamera* camera);
-
-	ADERITE_DEBUG_SECTION
-	(
-		virtual const char* getOperationName() override { return "FreeCameraProvideOperation"; }
-	)
-};
-
-ADERITE_RENDERING_NAMESPACE_END
+}
+}

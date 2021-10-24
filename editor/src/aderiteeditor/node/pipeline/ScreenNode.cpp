@@ -1,13 +1,11 @@
 #include "ScreenNode.hpp"
 
-#include "aderite/asset/property/Property.hpp"
 #include "aderite/rendering/operation/OutputToScreenOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
-#include "aderiteeditor/runtime/EditorSerializables.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -36,15 +34,13 @@ const char* ScreenNode::getNodeName() const {
 void ScreenNode::evaluate(compiler::GraphEvaluator* evaluator) {
     evaluateDependencies(evaluator);
     compiler::PipelineEvaluator* pe = static_cast<compiler::PipelineEvaluator*>(evaluator);
-    rendering::OutputToScreenOperation* op = new rendering::OutputToScreenOperation(
-        static_cast<rendering::TargetProvideOperation*>(pe->getOperation(p_inputs[0]->getValue()))
-    );
+    rendering::OutputToScreenOperation* op = new rendering::OutputToScreenOperation();
     pe->addOperation(op);
     m_evaluated = true;
 }
 
-io::SerializableType ScreenNode::getType() {
-    return static_cast<io::SerializableType>(io::EditorSerializables::ScreenNode);
+reflection::Type ScreenNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::ScreenNode);
 }
 
 bool ScreenNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
@@ -52,7 +48,7 @@ bool ScreenNode::serialize(const io::Serializer* serializer, YAML::Emitter& emit
     return true;
 }
 
-bool ScreenNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool ScreenNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

@@ -1,27 +1,29 @@
 #include "EditorRenderOperation.hpp"
 
 #include <filesystem>
+#include <fstream>
 #include <bgfx/bgfx.h>
 #include <glm/gtc/type_ptr.hpp>
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
-#include "aderite/asset/AssetManager.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/ColliderList.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
-#include "aderiteeditor/compiler/Compiler.hpp"
 #include "aderiteeditor/runtime/data/Data.hpp"
 #include "aderiteeditor/shared/State.hpp"
+#include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
+#include "aderiteeditor/compiler/ShaderCompiler.hpp"
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_BEGIN
 
 EditorRenderOperation::EditorRenderOperation() {
-	p_debugName = "EditorRenderHook";
+	this->setName("EditorRenderHook");
 }
 
 EditorRenderOperation::~EditorRenderOperation() {
@@ -31,7 +33,7 @@ EditorRenderOperation::~EditorRenderOperation() {
 void EditorRenderOperation::initialize() {
 	ADERITE_DEBUG_SECTION
 	(
-		bgfx::setViewName(c_ViewId, p_debugName.c_str());
+		bgfx::setViewName(c_ViewId, this->getName().c_str());
 	)
 
 	// Load assets
@@ -41,16 +43,16 @@ void EditorRenderOperation::initialize() {
 	// Create data
 	m_editorUniform = bgfx::createUniform("u_editor", bgfx::UniformType::Vec4, 2);
 	wfThickness = 4.0f;
-	updateUniform();
+	this->updateUniform();
 
 	// Since the editor should be hooked into the entity rendering, only clear the depth
 	bgfx::setViewClear(c_ViewId, BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
 	bgfx::setViewRect(c_ViewId, 0, 0, 1280, 720);
 }
 
-void EditorRenderOperation::execute() {
+void EditorRenderOperation::execute(rendering::PipelineState* state) {
 	bgfx::discard(BGFX_DISCARD_ALL);
-	renderPhysicsObjects();
+	this->renderPhysicsObjects();
 	bgfx::discard(BGFX_DISCARD_ALL);
 }
 
@@ -61,20 +63,32 @@ void EditorRenderOperation::shutdown() {
 	bgfx::destroy(m_bcCubeIbo);
 }
 
+reflection::Type EditorRenderOperation::getType() const {
+	return static_cast<reflection::Type>(reflection::EditorTypes::EditorRenderOp);
+}
+
+bool EditorRenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	return true;
+}
+
+bool EditorRenderOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+	return true;
+}
+
 void EditorRenderOperation::updateUniform() {
 	bgfx::setUniform(m_editorUniform, &EditorParameters[0], 2);
 }
 
 void EditorRenderOperation::renderPhysicsObjects() {
 	// Bind state
-	bgfx::setViewFrameBuffer(c_ViewId, shared::State::DebugRenderHandle);
+	bgfx::setViewFrameBuffer(c_ViewId, editor::State::DebugRenderHandle);
 	bgfx::touch(c_ViewId);
 
 	// Set persistent matrices
 	bgfx::setViewTransform(
 		c_ViewId,
-		glm::value_ptr(shared::State::EditorCamera->computeViewMatrix()),
-		glm::value_ptr(shared::State::EditorCamera->computeProjectionMatrix()));
+		glm::value_ptr(editor::State::EditorCamera->getViewMatrix()),
+		glm::value_ptr(editor::State::EditorCamera->getProjectionMatrix()));
 
 	scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 
@@ -92,9 +106,9 @@ void EditorRenderOperation::renderPhysicsObjects() {
 			scene::components::TransformComponent>(entity);
 
 		for (physics::Collider* collider : *colliders.Colliders) {
-			switch (collider->getType()) {
-			case physics::ColliderType::BOX: {
-				renderBoxCollider(static_cast<physics::collider::BoxCollider*>(collider), transform);
+			switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {
+			case reflection::RuntimeTypes::BOX_CLDR: {
+				this->renderBoxCollider(static_cast<physics::BoxCollider*>(collider), transform);
 				break;
 			}
 			}
@@ -102,7 +116,7 @@ void EditorRenderOperation::renderPhysicsObjects() {
 	}
 }
 
-void EditorRenderOperation::renderBoxCollider(physics::collider::BoxCollider* collider, const scene::components::TransformComponent& transform) {
+void EditorRenderOperation::renderBoxCollider(physics::BoxCollider* collider, const scene::components::TransformComponent& transform) {
 	glm::vec3 extents = collider->getSize();
 
 	scene::components::TransformComponent tempTransform = transform;
@@ -120,7 +134,7 @@ void EditorRenderOperation::renderBoxCollider(physics::collider::BoxCollider* co
 		wfColor[2] = 0.0f;
 		wfOpacity = 1.0f;
 	}
-	updateUniform();
+	this->updateUniform();
 
 	uint64_t state = 0
 		| BGFX_STATE_WRITE_RGB
@@ -152,33 +166,62 @@ void EditorRenderOperation::loadMeshes() {
 }
 
 void EditorRenderOperation::loadShaders() {
-	static const std::filesystem::path cwd = std::filesystem::current_path();
-	static const std::filesystem::path res = cwd / "res/";
-	static const std::filesystem::path shaders = res / "shaders/";
-	static const std::filesystem::path bin = res / "bin/";
+	LOG_TRACE("Loading editor shaders");
+
+	const std::filesystem::path projectRoot = editor::State::Project->getRootDir();
+	const std::filesystem::path dataRoot = projectRoot / "Data";
+
+	// Create compilers
+	compiler::ShaderCompiler sc(dataRoot / "wireframe.vs", dataRoot / "wireframe.fs", dataRoot / "wireframe_varying.def.sc");
 
 	// Compile
-	static const std::filesystem::path wfShader = shaders / "wireframe/";
-	compiler::Compiler::compileShaderSource(wfShader, bin);
+	sc.compile();
 
 	// Load
-	std::vector<unsigned char> wffs = ::aderite::Engine::getAssetManager()->loadBinFile((bin / "wireframe.fs.bin").string());
-	std::vector<unsigned char> wfvs = ::aderite::Engine::getAssetManager()->loadBinFile((bin / "wireframe.vs.bin").string());
+	loadShader(dataRoot / "wireframe.vs", m_wireframeShader, "Wireframe");
+}
+
+void EditorRenderOperation::loadShader(const std::filesystem::path& base, bgfx::ProgramHandle& shader, const std::string& name) {
+	LOG_TRACE("Loading {0}", name);
+
+	const std::filesystem::path vPath = base.parent_path() / base.filename().replace_extension(".vs.bin");
+	const std::filesystem::path fPath = base.parent_path() / base.filename().replace_extension(".fs.bin");
+
+	std::ifstream vin(vPath, std::ios::binary);
+	std::ifstream fin(fPath, std::ios::binary);
+
+	size_t vSize = vin.seekg(0, std::ios::end).tellg();
+	size_t fSize = fin.seekg(0, std::ios::end).tellg();
+	
+	std::vector<unsigned char> vdata;
+	std::vector<unsigned char> fdata;
+
+	vdata.resize(vSize);
+	fdata.resize(fSize);
+
+	vin.seekg(0, std::ios::beg);
+	fin.seekg(0, std::ios::beg);
+
+	vin.read(reinterpret_cast<char*>(vdata.data()), vdata.size());
+	vdata.push_back('\0');
+
+	fin.read(reinterpret_cast<char*>(fdata.data()), fdata.size());
+	fdata.push_back('\0');
 
 	// Create memory objects
-	const bgfx::Memory* memWffs = bgfx::copy(wffs.data(), wffs.size() + 1);
-	memWffs->data[memWffs->size - 1] = '\0';
-	const bgfx::Memory* memWfvs = bgfx::copy(wfvs.data(), wfvs.size() + 1);
+	const bgfx::Memory* memWfvs = bgfx::copy(vdata.data(), vdata.size() + 1);
 	memWfvs->data[memWfvs->size - 1] = '\0';
+	const bgfx::Memory* memWffs = bgfx::copy(fdata.data(), fdata.size() + 1);
+	memWffs->data[memWffs->size - 1] = '\0';
 
 	// Create objects
 	bgfx::ShaderHandle vsh = bgfx::createShader(memWfvs);
 	bgfx::ShaderHandle fsh = bgfx::createShader(memWffs);
 
-	bgfx::setName(vsh, "Wireframe vertex shader");
-	bgfx::setName(fsh, "Wireframe fragment shader");
+	bgfx::setName(vsh, (name + " vertex shader").c_str());
+	bgfx::setName(fsh, (name + " fragment shader").c_str());
 
-	m_wireframeShader = bgfx::createProgram(vsh, fsh, true);
+	shader = bgfx::createProgram(vsh, fsh, true);
 }
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_END

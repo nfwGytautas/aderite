@@ -12,35 +12,22 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
 */
 class RenderOperation : public OperationBase {
 public:
-	RenderOperation(EntityProvideOperation* entities, EyeProvideOperation* eye, TargetProvideOperation* target);
+	RenderOperation();
 
 	// Inherited via OperationBase
 	virtual void initialize() override;
-	virtual void execute() override;
-
-	ADERITE_DEBUG_SECTION
-	(
-		virtual const char* getOperationName() override { return "RenderOperation"; }
-	)
+	virtual void execute(PipelineState* state) override;
+	virtual reflection::Type getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 private:
-	/**
-	 * @brief Validates child operations
-	 * @return True if valid and can render, false otherwise
-	*/
-	bool validateOperations();
-
 	/**
 	 * @brief Execute a single draw call
 	 * @param dc Draw call to execute
 	*/
 	void executeDrawCall(const DrawCall& dc);
 private:
-	// Dependencies
-	EntityProvideOperation* m_entities = nullptr;
-	EyeProvideOperation* m_eye = nullptr;
-	TargetProvideOperation* m_target = nullptr;
-
-	uint8_t m_viewId = 0;
+	uint8_t m_viewId = 0xFF;
 };
 
 ADERITE_RENDERING_NAMESPACE_END
