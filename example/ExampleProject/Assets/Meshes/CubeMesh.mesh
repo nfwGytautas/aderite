@@ -1,7 +1,0 @@
-Version: 2021_07_31r1
-Name: Meshes\CubeMesh.mesh
-Type: 3
-Source: Crate1.obj
-HasPosition: true
-IsStatic: true
-HasIndices: true

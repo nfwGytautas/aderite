@@ -1,27 +1,25 @@
 #include "ScreenNode.hpp"
 
-#include "aderite/asset/property/Property.hpp"
 #include "aderite/rendering/operation/OutputToScreenOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-ScreenNode::ScreenNode(int id, Graph* graph)
-    : Node(id)
+ScreenNode::ScreenNode()
 {
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Target),
+        node::getTypeName(node::PropertyType::Target),
         "Target"
     ));
 
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Require),
+        node::getTypeName(node::PropertyType::Require),
         "Require"
     ));
 
@@ -36,22 +34,21 @@ const char* ScreenNode::getNodeName() const {
 void ScreenNode::evaluate(compiler::GraphEvaluator* evaluator) {
     evaluateDependencies(evaluator);
     compiler::PipelineEvaluator* pe = static_cast<compiler::PipelineEvaluator*>(evaluator);
-    rendering::OutputToScreenOperation* op = new rendering::OutputToScreenOperation(
-        static_cast<rendering::TargetProvideOperation*>(pe->getOperation(p_inputs[0]->getValue()))
-    );
+    rendering::OutputToScreenOperation* op = new rendering::OutputToScreenOperation();
     pe->addOperation(op);
     m_evaluated = true;
 }
 
-bool ScreenNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "Screen";
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
+reflection::Type ScreenNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::ScreenNode);
 }
 
-bool ScreenNode::deserialize(YAML::Node& data) {
+bool ScreenNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    serializeData(emitter);
+    return true;
+}
+
+bool ScreenNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

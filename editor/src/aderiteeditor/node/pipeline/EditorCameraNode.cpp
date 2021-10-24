@@ -1,23 +1,21 @@
 #include "EditorCameraNode.hpp"
 
-#include "aderite/asset/property/Property.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorCameraOperation.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-EditorCameraNode::EditorCameraNode(int id, Graph* graph)
-    : Node(id)
+EditorCameraNode::EditorCameraNode()
 {
     // Output
-    p_outputs.push_back(graph->createOutputPin(
+    p_outputs.push_back(new OutputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Camera),
-        "Camera"
+        node::getTypeName(node::PropertyType::Eye),
+        "Eye"
     ));
 }
 
@@ -33,15 +31,16 @@ void EditorCameraNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool EditorCameraNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "EditorCamera";
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
+reflection::Type EditorCameraNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::EditorCameraNode);
 }
 
-bool EditorCameraNode::deserialize(YAML::Node& data) {
+bool EditorCameraNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    serializeData(emitter);
+    return true;
+}
+
+bool EditorCameraNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

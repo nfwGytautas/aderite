@@ -2,32 +2,15 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/asset/AssetManager.hpp"
+#include "aderite/io/Serializer.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
-#include "aderite/asset/property/Property.hpp"
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/Link.hpp"
-
-#include "aderiteeditor/node/ConvertNode.hpp"
-
-#include "aderiteeditor/node/AddNode.hpp"
-#include "aderiteeditor/node/MaterialInputNode.hpp"
-#include "aderiteeditor/node/MaterialOutputNode.hpp"
-#include "aderiteeditor/node/Sampler2DNode.hpp"
-
-#include "aderiteeditor/node/pipeline/EntitiesNode.hpp"
-#include "aderiteeditor/node/pipeline/CameraProviderNode.hpp"
-#include "aderiteeditor/node/pipeline/ScreenNode.hpp"
-#include "aderiteeditor/node/pipeline/RenderNode.hpp"
-#include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
-#include "aderiteeditor/node/pipeline/EditorRenderNode.hpp"
-#include "aderiteeditor/node/pipeline/EditorTargetNode.hpp"
-#include "aderiteeditor/node/pipeline/EditorCameraNode.hpp"
-#include "aderiteeditor/node/pipeline/RequireLockNode.hpp"
-#include "aderiteeditor/node/pipeline/ConcatObjectsNode.hpp"
-#include "aderiteeditor/node/pipeline/SelectObjectNode.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
+#include "aderiteeditor/windows/backend/node/imnodes.h"
+#include "aderiteeditor/asset/property/Property.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
@@ -43,18 +26,6 @@ Graph::~Graph() {
 	for (auto pair : m_links) {
 		delete pair.second;
 	}
-}
-
-OutputPin* Graph::createOutputPin(Node* node, const std::string& type, const std::string& name) {
-	OutputPin* result = new OutputPin(m_nextId++, node, type, name);
-	m_outputPins.push_back(result);
-	return result;
-}
-
-InputPin* Graph::createInputPin(Node* node, const std::string& type, const std::string& name) {
-	InputPin* result = new InputPin(m_nextId++, node, type, name);
-	m_inputPins.push_back(result);
-	return result;
 }
 
 void Graph::connect(int outputPinId, int inputPinId) {
@@ -84,8 +55,8 @@ void Graph::connect(int outputPinId, int inputPinId) {
 		return;
 	}
 
-	if (ipin->getType() == asset::prop::getNameForType(asset::prop::PropertyType::NONE) ||
-		opin->getType() == asset::prop::getNameForType(asset::prop::PropertyType::NONE)) {
+	if (ipin->getType() == asset::getNameForType(asset::PropertyType::NONE) ||
+		opin->getType() == asset::getNameForType(asset::PropertyType::NONE)) {
 		// None type pins
 		return;
 	}
@@ -165,7 +136,47 @@ void Graph::resetEvaluateFlag() const {
 
 void Graph::renderUI() {
 	for (Node* node : m_nodes) {
-		node->renderUI();
+		if (node->getId() == -1) {
+			node->setId(m_nextId++);
+			node->setPosition(glm::vec2(0, 0));
+		}
+
+		ImNodes::BeginNode(node->getId());
+
+		ImNodes::BeginNodeTitleBar();
+		ImGui::TextUnformatted(node->getNodeName());
+		ImNodes::EndNodeTitleBar();
+
+		node->renderBody();
+
+		for (InputPin* i : node->getInputPins()) {
+			if (i->getId() == -1) {
+				i->setId(m_nextId++);
+			}
+
+			ImNodes::BeginInputAttribute(i->getId());
+			ImGui::Text(i->getName().c_str());
+			ImGui::SameLine();
+			ImGui::Text(i->getType().c_str());
+			ImNodes::EndInputAttribute();
+		}
+
+		for (OutputPin* o : node->getOutputPins()) {
+			if (o->getId() == -1) {
+				o->setId(m_nextId++);
+			}
+
+			ImNodes::BeginOutputAttribute(o->getId());
+			ImGui::Text(o->getName().c_str());
+			ImGui::SameLine();
+			ImGui::Text(o->getType().c_str());
+			ImNodes::EndOutputAttribute();
+		}
+
+		ImVec2 npos = ImNodes::GetNodeGridSpacePos(node->getId());
+		node->setPosition({ npos.x, npos.y });
+
+		ImNodes::EndNode();
 	}
 
 	for (auto link : m_links) {
@@ -173,144 +184,38 @@ void Graph::renderUI() {
 	}
 }
 
-bool Graph::serialize(YAML::Emitter& out) {
-	out << YAML::Key << "NextId" << YAML::Value << m_nextId;
-
-	out << YAML::Key << "LastNode" << YAML::Value;
-	if (m_lastNode != nullptr) {
-		out << m_lastNode->getId();
+void Graph::prepareToDisplay() {
+	for (Node* n : m_nodes) {
+		n->prepareToDisplay();
 	}
-	else {
-		out << YAML::Null;
-	}
-
-	out << YAML::Key << "Nodes" << YAML::BeginSeq;
-	for (Node* node : m_nodes) {
-		node->serialize(out);
-	}
-	out << YAML::EndSeq;
-
-	out << YAML::Key << "Links" << YAML::BeginSeq;
-	for (auto pair : m_links) {
-		if (!pair.second->isValid()) {
-			continue;
-		}
-
-		out << YAML::BeginMap;
-		out << YAML::Key << "Out" << YAML::Value << pair.second->getOutputPin()->getId();
-		out << YAML::Key << "In" << YAML::Value << pair.second->getInputPin()->getId();
-		out << YAML::EndMap;
-	}
-	out << YAML::EndSeq;
-
-	return true;
 }
 
-bool Graph::deserialize(YAML::Node& data) {
-	// Nodes
-	for (YAML::Node& node : data["Nodes"]) {
-		std::string type = node["NodeType"].as<std::string>();
-		
-		Node* n = nullptr;
-		if (type == "MaterialInput") {
-			asset::MaterialTypeAsset* mta = static_cast<asset::MaterialTypeAsset*>(::aderite::Engine::getAssetManager()->getOrRead(node["Material"].as<std::string>()));
-			n = addNode<node::MaterialInputNode>(mta);
-		}
-		else if (type == "Add") {
-			n = addNode<node::AddNode>();
-		}
-		else if (type == "Sampler2D") {
-			n = addNode<node::Sampler2DNode>();
-		}
-		else if (type == "MaterialOutput") {
-			n = addNode<node::MaterialOutputNode>();
-		}
-		else if (type == "Convert") {
-			std::string from = node["From"].as<std::string>();
-			std::string to = node["To"].as<std::string>();
-			n = addNode<node::ConvertNode>(from, to);
-		}
-		else if (type == "Target") {
-			n = addNode<node::TargetProviderNode>();
-		}
-		else if (type == "Screen") {
-			n = addNode<node::ScreenNode>();
-		}
-		else if (type == "Render") {
-			n = addNode<node::RenderNode>();
-		}
-		else if (type == "Entities") {
-			n = addNode<node::EntitiesNode>();
-		}
-		else if (type == "Camera") {
-			n = addNode<node::CameraProviderNode>();
-		}
-		else if (type == "EditorRender") {
-			n = addNode<node::EditorRenderNode>();
-		}
-		else if (type == "EditorTarget") {
-			n = addNode<node::EditorTargetNode>();
-		}
-		else if (type == "EditorCamera") {
-			n = addNode<node::EditorCameraNode>();
-		}
-		else if (type == "RequireLock") {
-			n = addNode<node::RequireLockNode>();
-		}
-		else if (type == "SelectObject") {
-			n = addNode<node::SelectObjectNode>("Object");
-		}
-		else if (type == "ConcatObjects") {
-			n = addNode<node::ConcatObjectsNode>("Object");
-		}
-
-		if (n == nullptr) {
-			LOG_WARN("Unknown node {0}", type);
-			continue;
-		}
-
-		n->deserialize(node);
+void Graph::closingDisplay() {
+	for (Node* n : m_nodes) {
+		n->closingDisplay();
 	}
-
-	// Links
-	for (YAML::Node& link : data["Links"]) {
-		int outId = link["Out"].as<int>();
-		int inId = link["In"].as<int>();
-		connect(outId, inId);
-	}
-	
-	// Last because nodes will create ids
-	m_nextId = data["NextId"].as<int>();
-
-	if (!data["LastNode"].IsNull()) {
-		m_lastNode = findNode(data["LastNode"].as<int>());
-	}
-
-	return true;
 }
 
 OutputPin* Graph::findOutputPin(int id) const {
-	auto it = std::find_if(m_outputPins.begin(), m_outputPins.end(), [id](OutputPin* p) {
-		return p->getId() == id;
-	});
-
-	if (it == m_outputPins.end()) {
-		return nullptr;
+	for (Node* n : m_nodes) {
+		for (OutputPin* pin : n->getOutputPins()) {
+			if (pin->getId() == id) {
+				return pin;
+			}
+		}
 	}
-
-	return *it;
+	return nullptr;
 }
 
 InputPin* Graph::findInputPin(int id) const {
-	auto it = std::find_if(m_inputPins.begin(), m_inputPins.end(), [id](InputPin* p) {
-		return p->getId() == id;
-	});
-
-	if (it == m_inputPins.end()) {
-		return nullptr;
+	for (Node* n : m_nodes) {
+		for (InputPin* pin : n->getInputPins()) {
+			if (pin->getId() == id) {
+				return pin;
+			}
+		}
 	}
-
-	return *it;
+	return nullptr;
 }
 
 Node* Graph::findNode(int id) const {
@@ -323,6 +228,67 @@ Node* Graph::findNode(int id) const {
 	}
 
 	return *it;
+}
+
+reflection::Type Graph::getType() const {
+	return static_cast<reflection::Type>(reflection::EditorTypes::GraphAsset);
+}
+
+bool Graph::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	emitter << YAML::Key << "NextId" << YAML::Value << m_nextId;
+
+	emitter << YAML::Key << "LastNode" << YAML::Value;
+	if (m_lastNode != nullptr) {
+		emitter << m_lastNode->getId();
+	}
+	else {
+		emitter << YAML::Null;
+	}
+
+	emitter << YAML::Key << "Nodes" << YAML::BeginSeq;
+	for (Node* node : m_nodes) {
+		serializer->writeUntrackedType(emitter, node);
+	}
+	emitter << YAML::EndSeq;
+
+	emitter << YAML::Key << "Links" << YAML::BeginSeq;
+	for (auto pair : m_links) {
+		if (!pair.second->isValid()) {
+			continue;
+		}
+
+		emitter << YAML::BeginMap;
+		emitter << YAML::Key << "Out" << YAML::Value << pair.second->getOutputPin()->getId();
+		emitter << YAML::Key << "In" << YAML::Value << pair.second->getInputPin()->getId();
+		emitter << YAML::EndMap;
+	}
+	emitter << YAML::EndSeq;
+
+	return true;
+}
+
+bool Graph::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+	// Nodes
+	for (const YAML::Node& node : data["Nodes"]) {
+		Node* n = static_cast<Node*>(serializer->parseUntrackedType(node));
+		m_nodes.push_back(n);
+	}
+
+	// Links
+	for (const YAML::Node& link : data["Links"]) {
+		int outId = link["Out"].as<int>();
+		int inId = link["In"].as<int>();
+		connect(outId, inId);
+	}
+
+	// Last because nodes will create ids
+	m_nextId = data["NextId"].as<int>();
+
+	if (!data["LastNode"].IsNull()) {
+		m_lastNode = findNode(data["LastNode"].as<int>());
+	}
+
+	return true;
 }
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

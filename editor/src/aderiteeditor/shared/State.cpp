@@ -3,12 +3,15 @@
 #include "aderiteeditor/shared/IEventSink.hpp"
 #include "aderiteeditor/shared/project.hpp"
 
-ADERITE_EDITOR_SHARED_NAMESPACE_BEGIN
+namespace aderite {
+namespace editor {
 
-IEventSink* shared::State::Sink = nullptr;
-Project* shared::State::Project = nullptr;
-EditorCamera* shared::State::EditorCamera = nullptr;
-bgfx::FrameBufferHandle shared::State::DebugRenderHandle = BGFX_INVALID_HANDLE;
-bool shared::State::IsGameMode = false;
+shared::IEventSink* State::Sink = nullptr;
+shared::Project* State::Project = nullptr;
+shared::EditorCamera* State::EditorCamera = nullptr;
+bgfx::FrameBufferHandle State::DebugRenderHandle = BGFX_INVALID_HANDLE;
+SelectableObject State::LastSelectedObject = {};
+bool State::IsGameMode = false;
 
-ADERITE_EDITOR_SHARED_NAMESPACE_END
+}
+}

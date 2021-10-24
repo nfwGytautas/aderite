@@ -1,31 +1,29 @@
 #include "EditorRenderNode.hpp"
 
-#include "aderite/asset/property/Property.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorRenderOperation.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-EditorRenderNode::EditorRenderNode(int id, Graph* graph)
-    : Node(id)
+EditorRenderNode::EditorRenderNode()
 {
     // Inputs
-    p_inputs.push_back(graph->createInputPin(
+    p_inputs.push_back(new InputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Require),
+        node::getTypeName(node::PropertyType::Require),
         "Require"
     ));
 
     // Output
-    p_outputs.push_back(graph->createOutputPin(
+    p_outputs.push_back(new OutputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Require),
+        node::getTypeName(node::PropertyType::Require),
         "Require"
     ));
 }
@@ -42,15 +40,16 @@ void EditorRenderNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool EditorRenderNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "EditorRender";
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
+reflection::Type EditorRenderNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::EditorRenderNode);
 }
 
-bool EditorRenderNode::deserialize(YAML::Node& data) {
+bool EditorRenderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    serializeData(emitter);
+    return true;
+}
+
+bool EditorRenderNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

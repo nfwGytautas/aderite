@@ -11,8 +11,8 @@
 #include "aderite/utility/Macros.hpp"
 
  // Root namespace where all editor objects reside in
-#define ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN ADERITE_ROOT_NAMESPACE_BEGIN namespace editor {
-#define ADERITE_EDITOR_ROOT_NAMESPACE_END ADERITE_ROOT_NAMESPACE_END }
+#define ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN ADERITE_ROOT_NAMESPACE_BEGIN
+#define ADERITE_EDITOR_ROOT_NAMESPACE_END ADERITE_ROOT_NAMESPACE_END
 
 // Shared namespace where various functions and objects that are shared between multiple platforms is defined in
 #define ADERITE_EDITOR_SHARED_NAMESPACE_BEGIN ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN namespace shared {

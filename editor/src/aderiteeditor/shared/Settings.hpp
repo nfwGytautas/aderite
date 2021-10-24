@@ -1,7 +1,6 @@
 #pragma once
 
 #include "aderiteeditor/utility/Macros.hpp"
-#include "aderite/scene/ICamera.hpp"
 
 ADERITE_EDITOR_SHARED_NAMESPACE_BEGIN
 

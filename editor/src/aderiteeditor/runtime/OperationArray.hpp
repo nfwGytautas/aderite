@@ -49,10 +49,10 @@ public:
 		return m_operations.end();
 	}
 
-	ADERITE_DEBUG_SECTION
-	(
-		virtual const char* getOperationName() override { return "OperationArray"; }
-	)
+	// Inherited via OperationBase
+	virtual reflection::Type getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	std::vector<rendering::OperationBase*> m_operations;
 };

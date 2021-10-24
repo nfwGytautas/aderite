@@ -9,6 +9,8 @@
 #include "aderite/window/WindowManager.hpp"
 #include "aderite/rendering/DrawCall.hpp"
 #include "aderite/rendering/Pipeline.hpp"
+#include "aderite/scene/Scene.hpp"
+#include "aderite/scene/SceneManager.hpp"
 
 namespace impl {
 
@@ -81,9 +83,6 @@ bool Renderer::init() {
 	if (!bgfx::init(bgfxInit)) {
 		LOG_ERROR("Failed to initialize BGFX");
 	}
-	
-	// Clear color
-	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
 
 	// Initial view rect
 	auto windowSize = ::aderite::Engine::getWindowManager()->getSize();
@@ -123,17 +122,32 @@ void Renderer::render() {
 	if (!isReady()) {
 		return;
 	}
+	// TODO: Status in editor
+
+	scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+	if (currentScene == nullptr) {
+		return;
+	}
+
+	if (currentScene->getPipeline() != m_pipeline) {
+		this->setPipeline(::aderite::Engine::getSceneManager()->getCurrentScene()->getPipeline());
+	}
+
+	if (m_pipeline == nullptr) {
+		return;
+	}
 
 	m_pipeline->execute();
-	bgfx::discard(BGFX_DISCARD_ALL);
 }
 
 bool Renderer::isReady() {
-	return m_isInitialized && m_pipeline != nullptr;
+	return m_isInitialized;
 }
 
 void Renderer::setResolution(const glm::uvec2& size) {
 	bgfx::setViewRect(0, 0, 0, size.x, size.y);
+	bgfx::setViewRect(1, 0, 0, size.x, size.y);
+	bgfx::setViewRect(2, 0, 0, size.x, size.y);
 
 	// TODO: Forward to render passes	
 }

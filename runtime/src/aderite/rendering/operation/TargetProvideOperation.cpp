@@ -2,6 +2,7 @@
 
 #include <bx/string.h>
 #include "aderite/utility/Log.hpp"
+#include "aderite/rendering/PipelineState.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 
@@ -24,7 +25,7 @@ bgfx::TextureFormat::Enum findDepthFormat(uint64_t textureFlags, bool stencil = 
 	return depthFormat;
 }
 
-TargetProvideOperation::TargetProvideOperation(const TargetParams& params) 
+TargetProvideOperation::TargetProvideOperation(const TargetParams& params)
 	: m_params(params)
 {}
 
@@ -40,8 +41,32 @@ void TargetProvideOperation::initialize() {
 	createFramebuffer();
 }
 
+void TargetProvideOperation::execute(PipelineState* state) {
+	state->pushTarget(m_handle);
+}
+
 void TargetProvideOperation::shutdown() {
 	bgfx::destroy(m_handle);
+}
+
+reflection::Type TargetProvideOperation::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_TARGET);
+}
+
+bool TargetProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	emitter << YAML::Key << "Blittable" << YAML::Value << m_params.Blittable;
+	emitter << YAML::Key << "DepthAttachment" << YAML::Value << m_params.DepthAttachment;
+	emitter << YAML::Key << "StencilAttachment" << YAML::Value << m_params.StencilAttachment;
+	emitter << YAML::Key << "HDR" << YAML::Value << m_params.HDR;
+	return true;
+}
+
+bool TargetProvideOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+	m_params.Blittable = data["Blittable"].as<bool>();
+	m_params.DepthAttachment = data["DepthAttachment"].as<bool>();
+	m_params.StencilAttachment = data["StencilAttachment"].as<bool>();
+	m_params.HDR = data["HDR"].as<bool>();
+	return true;
 }
 
 void TargetProvideOperation::createFramebuffer() {
@@ -84,7 +109,7 @@ void TargetProvideOperation::createFramebuffer() {
 
 	ADERITE_DEBUG_SECTION
 	(
-		bgfx::setName(m_handle, p_debugName.c_str());
+		bgfx::setName(m_handle, this->getName().c_str());
 	)
 }
 

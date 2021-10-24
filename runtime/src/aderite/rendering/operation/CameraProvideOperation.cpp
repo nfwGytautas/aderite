@@ -4,21 +4,17 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
-#include "aderite/scene/EntityCamera.hpp"
+#include "aderite/rendering/PipelineState.hpp"
 
-ADERITE_RENDERING_NAMESPACE_BEGIN
+namespace aderite {
+namespace rendering {
 
-interfaces::ICamera* CameraProvideOperation::getCamera() const {
-	return p_camera;
-}
-
-void MainCameraProvideOperation::execute() {
+void CameraProvideOperation::execute(PipelineState* state) {
 	// Resolve the camera to use
-	
+
 	// Get current scene
 	scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 	if (!currentScene) {
-		p_camera = nullptr;
 		return;
 	}
 
@@ -26,22 +22,45 @@ void MainCameraProvideOperation::execute() {
 	auto cameras = currentScene->getEntityRegistry().group<
 		scene::components::CameraComponent
 	>
-	(
-		entt::get<scene::components::TransformComponent>
-	);
+		(
+			entt::get<scene::components::TransformComponent>
+			);
 
 	for (auto entity : cameras) {
 		auto [camera, transform] = cameras.get(entity);
 
 		if (camera.Main) {
-			p_camera = static_cast<interfaces::ICamera*>(camera.Camera);
+			// TODO: Calculate matrices
+			m_viewMatrix = glm::mat4(1);
+			m_projMatrix = glm::mat4(1);
+
+			state->pushEye({
+				m_viewMatrix,
+				m_projMatrix
+			});
 			return;
 		}
 	}
+
+	// Push invalid eye
+	state->pushEye({
+		glm::mat4(1),
+		glm::mat4(1), 
+		false
+	});
 }
 
-void FreeCameraProvideOperation::setCamera(interfaces::ICamera* camera) {
-	p_camera = camera;
+reflection::Type CameraProvideOperation::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_CAMERA);
 }
 
-ADERITE_RENDERING_NAMESPACE_END
+bool CameraProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	return true;
+}
+
+bool CameraProvideOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+	return true;
+}
+
+}
+}

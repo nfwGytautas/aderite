@@ -10,17 +10,13 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
 */
 class OutputToScreenOperation : public OperationBase {
 public:
-	OutputToScreenOperation(TargetProvideOperation* target);
+	OutputToScreenOperation();
 
 	// Inherited via OperationBase
-	virtual void execute() override;
-
-	ADERITE_DEBUG_SECTION
-	(
-		virtual const char* getOperationName() override { return "OutputToScreenOperation"; }
-	)
-private:
-	TargetProvideOperation* m_target;
+	virtual void execute(PipelineState* state) override;
+	virtual reflection::Type getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 };
 
 ADERITE_RENDERING_NAMESPACE_END

@@ -1,21 +1,19 @@
 #include "EntitiesNode.hpp"
 
-#include "aderite/asset/property/Property.hpp"
 #include "aderite/rendering/operation/EntityProvideOperation.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-EntitiesNode::EntitiesNode(int id, Graph* graph)
-    : Node(id)
+EntitiesNode::EntitiesNode()
 {
-    p_outputs.push_back(graph->createOutputPin(
+    p_outputs.push_back(new OutputPin(
         this,
-        std::string(pipeline::getTypeName(pipeline::PropertyType::Entity)) + "[]",
+        std::string(node::getTypeName(node::PropertyType::Entity)) + "[]",
         "Entities"
     ));
 }
@@ -32,15 +30,16 @@ void EntitiesNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool EntitiesNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "Entities";
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
+reflection::Type EntitiesNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::EntitiesNode);
 }
 
-bool EntitiesNode::deserialize(YAML::Node& data) {
+bool EntitiesNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    serializeData(emitter);
+    return true;
+}
+
+bool EntitiesNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

@@ -3,7 +3,8 @@
 #include "aderite/utility/Macros.hpp"
 #include "aderite/physics/Collider.hpp"
 
-ADERITE_COLLIDER_NAMESPACE_BEGIN
+namespace aderite {
+namespace physics {
 
 /**
  * @brief Simple box collider
@@ -29,11 +30,12 @@ public:
 	void setSize(const glm::vec3 size);
 
 	// Inherited via Collider
-	virtual bool serialize(YAML::Emitter& out) override;
-	virtual bool deserialize(YAML::Node& data) override;
-	virtual ColliderType getType() const override;
+	virtual reflection::Type getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	glm::vec3 m_size = glm::vec3(1.0f);
 };
 
-ADERITE_COLLIDER_NAMESPACE_END
+}
+}

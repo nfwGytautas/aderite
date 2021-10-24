@@ -1,11 +1,12 @@
 #pragma once
 
 #include <sstream>
-#include <fstream>
+#include <ostream>
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/compiler/Forward.hpp"
 #include "aderiteeditor/compiler/GraphEvaluator.hpp"
+#include "aderiteeditor/asset/property/Forward.hpp"
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 
@@ -28,15 +29,21 @@ public:
 		VERTEX		=  1,
 	};
 public:
-	ShaderEvaluator(ShaderType type, const std::string& name);
+	ShaderEvaluator(ShaderType type, asset::MaterialTypeAsset* material);
 
 	/**
 	 * @brief Returns an access variable for accessing object properties
-	 * @param material Material intance
 	 * @param prop Property instance
 	 * @return Variable name
 	*/
-	EvaluatorValue getProperty(const asset::MaterialTypeAsset* material, const asset::prop::Property* prop);
+	EvaluatorValue getProperty(const asset::Property* prop);
+
+	/**
+	 * @brief Returns an access variable for accessing object properties
+	 * @param samp Sampler instance
+	 * @return Variable name
+	*/
+	EvaluatorValue getSampler(const asset::Sampler* samp);
 
 	/**
 	 * @brief Adds a 2D sampling instruction to the current scope
@@ -61,9 +68,10 @@ public:
 	void addFragmentColorInstruction(const EvaluatorValue& value);
 
 	/**
-	 * @brief Write shader to the raw directory, the name will the name of the type + writer + ".sc"
+	 * @brief Write shader to the specified stream
+	 * @param stream Stream to write to
 	*/
-	void writeToFile();
+	void write(std::ostream& stream);
 
 	/**
 	 * @brief Returns the type of the writer
@@ -71,14 +79,14 @@ public:
 	ShaderType getType() const;
 private:
 	// Parts
-	void writeInputsOutputs(std::ofstream& of);
-	void writeGenerationComment(std::ofstream& of);
-	void writeLibraries(std::ofstream& of);
-	void writeConstants(std::ofstream& of);
-	void writeFunctions(std::ofstream& of);
+	void writeInputsOutputs(std::ostream& of);
+	void writeGenerationComment(std::ostream& of);
+	void writeLibraries(std::ostream& of);
+	void writeConstants(std::ostream& of);
+	void writeFunctions(std::ostream& of);
 
 	// Sub parts
-	void writeScope(std::ofstream& of, Function* scope);
+	void writeScope(std::ostream& of, Function* scope);
 
 	// Helpers
 	const char* getPrefix() const;
@@ -90,7 +98,7 @@ private:
 	EvaluatorValue createValue(const std::string& value);
 private:
 	ShaderType m_type = ShaderType::UNKNOWN;
-	std::string m_name;
+	asset::MaterialTypeAsset* m_material = nullptr;
 
 	std::vector<Function> m_functions;
 	Function* m_currentScope = nullptr;

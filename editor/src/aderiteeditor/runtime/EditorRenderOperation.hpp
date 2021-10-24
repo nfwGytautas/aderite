@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <filesystem>
+#include <string>
 #include <bgfx/bgfx.h>
 #include "aderite/physics/Forward.hpp"
 #include "aderite/physics/collider/Forward.hpp"
@@ -23,23 +25,22 @@ public:
 
 	// Inherited via OperationBase
 	virtual void initialize() override;
-	virtual void execute() override;
+	virtual void execute(rendering::PipelineState* state) override;
 	virtual void shutdown() override;
-
-	ADERITE_DEBUG_SECTION
-	(
-		virtual const char* getOperationName() override { return "EditorRenderOperation"; }
-	)
+	virtual reflection::Type getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	void updateUniform();
 
 	// Rendering operations
 	void renderPhysicsObjects();
-	void renderBoxCollider(physics::collider::BoxCollider* collider, const scene::components::TransformComponent& transform);
+	void renderBoxCollider(physics::BoxCollider* collider, const scene::components::TransformComponent& transform);
 
 	// Helpers
 	void loadMeshes();
 	void loadShaders();
+	void loadShader(const std::filesystem::path& base, bgfx::ProgramHandle& shader, const std::string& name);
 private:
 	bgfx::ProgramHandle m_wireframeShader = BGFX_INVALID_HANDLE;
 	bgfx::UniformHandle m_editorUniform = BGFX_INVALID_HANDLE;

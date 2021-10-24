@@ -7,12 +7,8 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MeshAsset.hpp"
-#include "aderite/asset/ShaderAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
-#include "aderite/audio/Bank.hpp"
-#include "aderite/audio/AudioEvent.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
 #include "aderiteeditor/windows/component/FileDialog.hpp"
@@ -40,7 +36,7 @@ void Menubar::render() {
 					m_textModal->setTitle("New project");
 					m_textModal->setText("Project name:");
 					m_textModal->setConfirmAction([&, project_dir](const std::string& value) {
-						shared::State::Sink->onNewProject(project_dir, value);
+						editor::State::Sink->onNewProject(project_dir, value);
 					});
 
 					m_textModal->show();
@@ -48,14 +44,14 @@ void Menubar::render() {
 			}
 
 			if (ImGui::MenuItem("Save project")) {
-				shared::State::Sink->onSaveProject();
+				editor::State::Sink->onSaveProject();
 			}
 
 			if (ImGui::MenuItem("Load project")) {
 				std::string file = FileDialog::selectFile("Select aderite project", { "Aderite project", "*.aproj" });
 
 				if (!file.empty()) {
-					shared::State::Sink->onLoadProject(file);
+					editor::State::Sink->onLoadProject(file);
 				}
 			}
 
@@ -72,7 +68,7 @@ void Menubar::render() {
 				m_textModal->setTitle("New scene");
 				m_textModal->setText("Scene name:");
 				m_textModal->setConfirmAction([&](const std::string& value) {
-					shared::State::Sink->onNewScene(value);
+					editor::State::Sink->onNewScene(value);
 				});
 
 				m_textModal->show();
@@ -82,17 +78,12 @@ void Menubar::render() {
 
 			if (ImGui::MenuItem("Optimize Raw folder")) {
 				// Removes unused files from Raw folder
-				std::vector<std::filesystem::path> used = {};
+				/*std::vector<std::filesystem::path> used = {};
 				for (asset::Asset* asset : *::aderite::Engine::getAssetManager()) {
 					if (asset->isInGroup(asset::AssetGroup::DEPENDS_ON_RAW)) {
 						switch (asset->type()) {
 						case asset::AssetType::MESH: {
 							used.push_back(::aderite::Engine::getAssetManager()->getRawDir() / static_cast<asset::MeshAsset*>(asset)->getFields().SourceFile);
-							break;
-						}
-						case asset::AssetType::SHADER: {
-							used.push_back(::aderite::Engine::getAssetManager()->getRawDir() / static_cast<asset::ShaderAsset*>(asset)->getFields().VertexPath);
-							used.push_back(::aderite::Engine::getAssetManager()->getRawDir() / static_cast<asset::ShaderAsset*>(asset)->getFields().FragmentPath);
 							break;
 						}
 						case asset::AssetType::SCENE:
@@ -113,7 +104,7 @@ void Menubar::render() {
 						LOG_TRACE("Removing {0}", file.path().string());
 						std::filesystem::remove(file.path());
 					}
-				}
+				}*/
 			}
 
 			if (ImGui::MenuItem("Recompile shaders")) {
@@ -122,17 +113,17 @@ void Menubar::render() {
 			}
 
 			if (ImGui::MenuItem("Reload FMOD audio banks")) {
-				::aderite::Engine::getAudioController()->loadMasterBank(::aderite::Engine::getAssetManager()->getRawDir());
+				//::aderite::Engine::getAudioController()->loadMasterBank(::aderite::Engine::getAssetManager()->getRawDir());
 
-				for (audio::Bank* bank : *::aderite::Engine::getAudioController()) {
-					for (audio::AudioEvent* e : *bank) {
-						if (e->isLoaded()) {
-							// Unload and load
-							e->unload();
-							e->load();
-						}
-					}
-				}
+				//for (audio::Bank* bank : *::aderite::Engine::getAudioController()) {
+				//	for (audio::AudioEvent* e : *bank) {
+				//		if (e->isLoaded()) {
+				//			// Unload and load
+				//			e->unload();
+				//			e->load();
+				//		}
+				//	}
+				//}
 			}
 			
 			ImGui::EndMenu();

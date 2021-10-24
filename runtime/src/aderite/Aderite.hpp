@@ -7,6 +7,8 @@
 #include "aderite/asset/Forward.hpp"
 #include "aderite/audio/Forward.hpp"
 #include "aderite/input/Forward.hpp"
+#include "aderite/io/Forward.hpp"
+#include "aderite/reflection/Forward.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
@@ -14,7 +16,7 @@
 
 #define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static class_name* public_name() { return ::aderite::Engine::get()->field_name; } private: class_name* field_name = nullptr;
 
-ADERITE_ROOT_NAMESPACE_BEGIN
+namespace aderite {
 
 /**
  * @brief Main aderite engine instance
@@ -122,6 +124,7 @@ private:
 	Engine() {}
 	Engine(const Engine& o) = delete;
 
+	// Update functions
 	void updateSystem(float delta);
 	void updateScenes(float delta);
 	void updatePhysics(float delta);
@@ -134,9 +137,12 @@ private:
 private:
 	ADERITE_SYSTEM_PTR(getWindowManager, window::WindowManager, m_windowManager)
 	ADERITE_SYSTEM_PTR(getRenderer, rendering::Renderer, m_renderer)
-	ADERITE_SYSTEM_PTR(getAssetManager, asset::AssetManager, m_assetManager)
 	ADERITE_SYSTEM_PTR(getSceneManager, scene::SceneManager, m_sceneManager)
 	ADERITE_SYSTEM_PTR(getInputManager, input::InputManager, m_inputManager)
+	ADERITE_SYSTEM_PTR(getFileHandler, io::FileHandler, m_fileHandler)
+	ADERITE_SYSTEM_PTR(getSerializer, io::Serializer, m_serializer)
+	ADERITE_SYSTEM_PTR(getReflector, reflection::Reflector, m_reflector)
+	ADERITE_SYSTEM_PTR(getLoaderPool, io::LoaderPool, m_loaderPool)
 	ADERITE_SYSTEM_PTR(getPhysicsController, physics::PhysicsController, m_physicsController)
 	ADERITE_SYSTEM_PTR(getAudioController, audio::AudioController, m_audioController)
 
@@ -145,4 +151,4 @@ private:
 #endif
 };
 
-ADERITE_ROOT_NAMESPACE_END
+}

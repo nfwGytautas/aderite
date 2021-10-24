@@ -1,22 +1,20 @@
 #include "EditorTargetNode.hpp"
 
-#include "aderite/asset/property/Property.hpp"
-#include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/node/pipeline/Properties.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorTargetOperation.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
 
 ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
-EditorTargetNode::EditorTargetNode(int id, Graph* graph)
-    : Node(id)
+EditorTargetNode::EditorTargetNode()
 {
     // Output
-    p_outputs.push_back(graph->createOutputPin(
+    p_outputs.push_back(new OutputPin(
         this,
-        pipeline::getTypeName(pipeline::PropertyType::Target),
+        node::getTypeName(node::PropertyType::Target),
         "Target"
     ));
 }
@@ -33,15 +31,16 @@ void EditorTargetNode::evaluate(compiler::GraphEvaluator* evaluator) {
     m_evaluated = true;
 }
 
-bool EditorTargetNode::serialize(YAML::Emitter& out) {
-    out << YAML::BeginMap;
-    out << YAML::Key << "NodeType" << YAML::Value << "EditorTarget";
-    serializeData(out);
-    out << YAML::EndMap;
-    return false;
+reflection::Type EditorTargetNode::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::EditorTargetNode);
 }
 
-bool EditorTargetNode::deserialize(YAML::Node& data) {
+bool EditorTargetNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    serializeData(emitter);
+    return true;
+}
+
+bool EditorTargetNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

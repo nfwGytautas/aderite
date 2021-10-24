@@ -15,12 +15,18 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 class OutputPin 
 {
 public:
-	OutputPin(int id, Node* node, const std::string& type, const std::string& name);
+	OutputPin(Node* node, const std::string& type, const std::string& name);
 
 	/**
 	 * @brief Returns the id of the pin
 	*/
 	int getId() const;
+
+	/**
+	 * @brief Sets the pin id
+	 * @param id New id of the pin
+	*/
+	void setId(int id);
 
 	/**
 	 * @brief Returns the type of the pin
@@ -41,14 +47,15 @@ public:
 	std::string getName() const;
 
 	/**
+	 * @brief Sets the name of the output pin
+	 * @param name Name of the pin
+	*/
+	void setName(const std::string& name);
+
+	/**
 	 * @brief Disconnects all pins connected to this one
 	*/
 	void disconnect();
-
-	/**
-	 * @brief Renders the pin
-	*/
-	void renderUI();
 
 	/**
 	 * @brief Set the value of the output pin
@@ -72,7 +79,7 @@ private:
 	friend class Link;
 	friend class Node;
 private:
-	int m_id;
+	int m_id = -1;
 	std::string m_type;
 	std::string m_name;
 	Node* m_node = nullptr;
