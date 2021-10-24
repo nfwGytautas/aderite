@@ -7,21 +7,24 @@
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
+#include "aderite/io/Serializer.hpp"
+#include "aderite/reflection/RuntimeTypes.hpp"
 
-ADERITE_PHYSICS_NAMESPACE_BEGIN
+namespace aderite {
+namespace physics {
 
 ColliderList::~ColliderList() {
 	for (Collider* c : m_colliders) {
 		delete c;
 	}
 
-	m_actor->release();
-	m_actor = nullptr;
+	if (m_actor) {
+		m_actor->release();
+		m_actor = nullptr;
+	}
 }
 
-ColliderList::ColliderList(scene::Entity entity) 
-	: m_entity(entity)
-{}
+ColliderList::ColliderList() {}
 
 void ColliderList::addCollider(Collider* collider) {
 	if (m_actor != nullptr) {
@@ -35,7 +38,7 @@ void ColliderList::removeCollider(Collider* collider) {
 	auto& it = std::find(m_colliders.begin(), m_colliders.end(), collider);
 
 	if (it != m_colliders.end()) {
-		delete *it;
+		delete* it;
 		m_colliders.erase(it);
 	}
 }
@@ -47,8 +50,6 @@ void ColliderList::setScale(const glm::vec3& scale) {
 }
 
 void ColliderList::setActor(physx::PxRigidActor* actor) {
-	actor->userData = &m_entity;
-
 	for (Collider* c : m_colliders) {
 		c->setActor(actor);
 	}
@@ -65,47 +66,26 @@ physx::PxRigidActor* ColliderList::getActor() const {
 	return m_actor;
 }
 
-bool ColliderList::serialize(YAML::Emitter& out) {
+reflection::Type aderite::physics::ColliderList::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::CLDR_LIST);
+}
+
+bool aderite::physics::ColliderList::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
 	for (Collider* c : m_colliders) {
-		out << YAML::BeginMap;
-		out << YAML::Key << "Type" << YAML::Value << static_cast<size_t>(c->getType());
-		c->serialize(out);
-		out << YAML::EndMap;
+		serializer->writeUntrackedType(emitter, c);
 	}
-	
 	return true;
 }
 
-bool ColliderList::deserialize(YAML::Node& data) {
-	if (!data.IsSequence()) {
-		return false;
-	}
-
+bool aderite::physics::ColliderList::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	for (auto colliderEntry : data) {
 		YAML::Node& colliderNode = colliderEntry;
-
-		// Resolve type
-		ColliderType type = static_cast<physics::ColliderType>((colliderNode["Type"].as<size_t>()));
-		Collider* collider = nullptr;
-		switch (type) {
-		case ColliderType::BOX: {
-			collider = new collider::BoxCollider();
-			break;
-		}
-		default: {
-			LOG_ERROR("Unsupported collider, aborting");
-			return false;
-		}
-		}
-
-		// Load it
-		if (!collider->deserialize(colliderNode)) {
-			return false;
-		}
+		Collider* collider = static_cast<Collider*>(serializer->parseUntrackedType(data));
 		addCollider(collider);
 	}
 
 	return true;
 }
 
-ADERITE_PHYSICS_NAMESPACE_END
+}
+}

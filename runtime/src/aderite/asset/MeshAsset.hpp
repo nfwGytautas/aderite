@@ -2,43 +2,42 @@
 
 #include <bgfx/bgfx.h>
 #include "aderite/utility/Macros.hpp"
-#include "aderite/rendering/IRenderable.hpp"
-#include "aderite/asset/Asset.hpp"
-#include "aderite/asset/Forward.hpp"
-#include "aderite/rendering/Forward.hpp"
+#include "aderite/io/SerializableObject.hpp"
+#include "aderite/io/Loader.hpp"
 
-ADERITE_ASSET_NAMESPACE_BEGIN
+namespace aderite {
+namespace asset {
 
 /**
- * @brief Mesh asset implementation, it just wraps around base mesh object, to provide interface with asset manager
+ * @brief Mesh asset implementation
 */
-class MeshAsset : public Asset, public interfaces::IRenderable {
+class MeshAsset : public io::SerializableObject, public io::ILoadable {
 public:
 	/**
 	 * @brief Editable fields of the asset, this information is stored inside the asset file
 	*/
 	struct fields {
-		std::string SourceFile = "";
 		bool IsStatic = true;
-		bool HasPosition = true;
-		bool HasIndices = true;
 	};
 public:
 	~MeshAsset();
 
-	virtual AssetType type() const override;
-	virtual bool isInGroup(AssetGroup group) const override;
+	/**
+	 * @brief Returns true if the mesh is valid
+	*/
+	bool isValid() const;
 
-	virtual void prepareLoad() override;
-	virtual bool isReadyToLoad() override;
-	virtual void load() override;
+	// Inherited via ILoadable
+	virtual void load(const io::Loader* loader) override;
 	virtual void unload() override;
-	virtual bool isPreparing() override;
-	virtual bool isLoaded() override;
-	virtual size_t hash() const override;
+
+	// Inherited via SerializableObject
+	virtual reflection::Type getType() const override;
+	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 	/**
-	 * @brief Returns the info of shader fields
+	 * @brief Returns the info of mesh fields
 	*/
 	fields getFields() const {
 		return m_info;
@@ -51,25 +50,20 @@ public:
 		return m_info;
 	}
 
-	// Inherited via irenderable
-	virtual void fillDrawCall(rendering::DrawCall* dc) override;
-protected:
-	MeshAsset(const std::string& name);
-	MeshAsset(const std::string& name, const fields& info);
+	bgfx::VertexBufferHandle getVboHandle() const {
+		return m_vbh;
+	}
 
-	virtual bool serialize(YAML::Emitter& out) override;
-	virtual bool deserialize(YAML::Node& data) override;
-
-	friend class AssetManager;
+	bgfx::IndexBufferHandle getIboHandle() const {
+		return m_ibh;
+	}
 private:
 	// BGFX resource handles
 	bgfx::VertexBufferHandle m_vbh = BGFX_INVALID_HANDLE;
 	bgfx::IndexBufferHandle m_ibh = BGFX_INVALID_HANDLE;
 
 	fields m_info = {};
-	MeshSource* m_source = nullptr;
-
-	bool m_isBeingPrepared = false;
 };
 
-ADERITE_ASSET_NAMESPACE_END
+}
+}

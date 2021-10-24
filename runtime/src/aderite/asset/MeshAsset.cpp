@@ -6,89 +6,51 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
-#include "aderite/asset/AssetManager.hpp"
-#include "aderite/asset/MeshSource.hpp"
-#include "aderite/rendering/DrawCall.hpp"
+#include "aderite/io/Loader.hpp"
+#include "aderite/reflection/RuntimeTypes.hpp"
+#include "aderite/asset/TextureAsset.hpp"
 
-ADERITE_ASSET_NAMESPACE_BEGIN
+namespace aderite {
+namespace asset {
 
 MeshAsset::~MeshAsset() {
 	// TODO: Check for either handle to be valid
 	if (bgfx::isValid(m_vbh)) {
-		LOG_WARN("Deleting a loaded mesh asset {0}", getName());
+		LOG_WARN("Deleting a loaded mesh asset {0}", getHandle());
 	}
 }
 
-AssetType MeshAsset::type() const {
-	return AssetType::MESH;
+bool MeshAsset::isValid() const {
+	return bgfx::isValid(m_vbh) && bgfx::isValid(m_ibh);
 }
 
-bool MeshAsset::serialize(YAML::Emitter& out) {
-	// Mesh
-	out << YAML::Key << "Source" << YAML::Value << m_info.SourceFile;
-	
-	// Layout
-	out << YAML::Key << "HasPosition" << YAML::Value << m_info.HasPosition;
-	out << YAML::Key << "IsStatic" << YAML::Value << m_info.IsStatic;
-	out << YAML::Key << "HasIndices" << YAML::Value << m_info.HasIndices;
-
-	return true;
-}
-
-bool MeshAsset::deserialize(YAML::Node& data) {
-	// TODO: Error check
-	
-	if (data["Source"]) {
-		m_info.SourceFile = data["Source"].as<std::string>();
-	}
-
-	m_info.HasPosition = data["HasPosition"].as<bool>();
-	m_info.HasIndices = data["HasIndices"].as<bool>();
-	m_info.IsStatic = data["IsStatic"].as<bool>();
-
-	return true;
-}
-
-void MeshAsset::fillDrawCall(rendering::DrawCall* dc) {
-	if (!isLoaded()) {
-		dc->Valid = false;
-		return;
-	}
-
-	dc->VBO = m_vbh;
-	dc->IBO = m_ibh;
-}
-
-void MeshAsset::load() {
-	if (isLoaded()) {
-		LOG_WARN("Loading an already loaded asset {0}, is this intended?", p_name);
-		unload();
-	}
+void MeshAsset::load(const io::Loader* loader) {
+	ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_vbh), "Tried to load already loaded mesh");
 
 	// Create layout
 	bgfx::VertexLayout layout;
 	layout.begin();
-
-	if (m_info.HasPosition) {
-		layout.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
-	}
-
+	layout.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float);
+	layout.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float);
+	layout.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float);
 	layout.end();
 
 	// Create handles
 	if (m_info.IsStatic) {
-		auto& positionData = m_source->getPositionData();
-		auto& indicesData = m_source->getIndicesData();
-		m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(positionData.data(), sizeof(float) * positionData.size()), layout);
-		m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
+		io::Loader::MeshLoadResult result = loader->loadMesh(this->getHandle());
+		if (!result.Error.empty()) {
+			return;
+		}
+
+		auto& positionData = result.Vertices;
+		auto& indicesData = result.Indices;
+		m_vbh = bgfx::createVertexBuffer(bgfx::copy(positionData.data(), sizeof(float) * positionData.size()), layout);
+		m_ibh = bgfx::createIndexBuffer(bgfx::copy(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
 	}
 	else {
 		LOG_ERROR("Unimplemented dynamic mesh");
-		m_isBeingPrepared = false;
 		return;
 	}
-
-	m_isBeingPrepared = false;
 }
 
 void MeshAsset::unload() {
@@ -101,69 +63,22 @@ void MeshAsset::unload() {
 		bgfx::destroy(m_ibh);
 		m_ibh = BGFX_INVALID_HANDLE;
 	}
-
-	if (m_source != nullptr) {
-		delete m_source;
-		m_source = nullptr;
-	}
 }
 
-bool MeshAsset::isPreparing() {
-	return m_isBeingPrepared;
+reflection::Type MeshAsset::getType() const {
+	return static_cast<reflection::Type>(reflection::RuntimeTypes::MESH);
 }
 
-bool MeshAsset::isLoaded() {
-	return bgfx::isValid(m_vbh);
+bool MeshAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	// Layout
+	emitter << YAML::Key << "IsStatic" << YAML::Value << m_info.IsStatic;
+	return true;
 }
 
-size_t MeshAsset::hash() const {
-	return std::hash<std::string>{}(p_name);
+bool MeshAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+	m_info.IsStatic = data["IsStatic"].as<bool>();
+	return true;
 }
 
-MeshAsset::MeshAsset(const std::string& name)
-	: Asset(name)
-{}
-
-MeshAsset::MeshAsset(const std::string& name, const fields& info)
-	: Asset(name), m_info(info)
-{}
-
-bool MeshAsset::isInGroup(AssetGroup group) const {
-	switch (group) {
-	case AssetGroup::DEPENDS_ON_RAW:
-	{
-		return true;
-	}
-	default:
-		return false;
-	}
 }
-
-void MeshAsset::prepareLoad() {
-	// Load sources
-	::aderite::Engine::getAssetManager()->loadMeshSource(m_info.SourceFile, [&](asset::MeshSource* source) {
-		if (m_info.HasPosition) {
-			source->requestPositionData();
-		}
-		
-		if (m_info.HasIndices) {
-			source->requestIndicesData();
-		}
-
-		// Start loading the data
-		source->load();
-
-		if (m_source != nullptr) {
-			delete m_source;
-		}
-
-		m_source = source;
-	});
-	m_isBeingPrepared = true;
 }
-
-bool MeshAsset::isReadyToLoad() {
-	return m_source != nullptr && (m_source->error() == asset::MeshSource::LoadError::NONE);
-}
-
-ADERITE_ASSET_NAMESPACE_END

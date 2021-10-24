@@ -37,26 +37,26 @@ public:
         // Error processing implementation
         switch (code) {
         case physx::PxErrorCode::Enum::eDEBUG_INFO: {
-            LOG_INFO("Physics: {0} in {1}", message, file);
+            LOG_INFO("PhysX: {0} in {1}", message, file);
             break;
         }
         case physx::PxErrorCode::Enum::ePERF_WARNING: {
-            LOG_WARN("Physics: performance warning {0} in {1}", message, file);
+            LOG_WARN("PhysX: performance warning {0} in {1}", message, file);
             break;
         }
         case physx::PxErrorCode::Enum::eDEBUG_WARNING: {
-            LOG_WARN("Physics: {0} in {1}", message, file);
+            LOG_WARN("PhysX: {0} in {1}", message, file);
             break;
         }
         case physx::PxErrorCode::Enum::eINVALID_OPERATION:
         case physx::PxErrorCode::Enum::eOUT_OF_MEMORY:
         case physx::PxErrorCode::Enum::eINVALID_PARAMETER: {
-            LOG_ERROR("Physics: {0} in {1}", message, file);
+            LOG_ERROR("PhysX: {0} in {1}", message, file);
             break;
         }
         case physx::PxErrorCode::Enum::eABORT:
         case physx::PxErrorCode::Enum::eINTERNAL_ERROR: {
-            LOG_FATAL("Physics: Uncoverable error {0} in {1}", message, file);
+            LOG_FATAL("PhysX: Uncoverable error {0} in {1}", message, file);
             break;
         }
         }

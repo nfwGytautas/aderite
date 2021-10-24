@@ -25,7 +25,7 @@ public:
 	void shutdown();
 
 	/**
-	 * @brief Sets the specified scene as active, if the new scene isn't loaded yet than this call will block until it is loaded
+	 * @brief Sets the specified scene as active, if the new scene isn't fully loaded, then the engine defaults to the loading screen
 	 * @param scene New active scene
 	*/
 	void setActive(Scene* scene);

@@ -5,7 +5,7 @@
 
 int main(int argc, char** argv) {
 	// Create and attach editor
-	aderite::interfaces::IEngineMiddleware* editor = aderite::editor::createEditor(argc, argv);
+	aderite::interfaces::IEngineMiddleware* editor = aderite::createEditor(argc, argv);
 	::aderite::Engine::get()->attachMiddleware(editor);
 
 	if (::aderite::Engine::get()->init({})) {

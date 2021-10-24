@@ -8,56 +8,73 @@
 #include <pfd/portable-file-dialogs.h>
 
 #include "aderiteeditor/windows/backend/bgfx/backend_bgfx.hpp"
+#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
-#include "aderite/utility/bgfx.hpp"
 #include "aderite/rendering/Renderer.hpp"
-#include "aderite/asset/AssetManager.hpp"
+#include "aderite/rendering/Pipeline.hpp"
+#include "aderite/rendering/operation/CameraProvideOperation.hpp"
+#include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/window/WindowManager.hpp"
 #include "aderite/input/InputManager.hpp"
+#include "aderite/io/Serializer.hpp"
+#include "aderite/io/FileHandler.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
+#include "aderiteeditor/windows/StartupModal.hpp"
+#include "aderiteeditor/windows/component/Inspector.hpp"
 #include "aderiteeditor/windows/component/Menubar.hpp"
 #include "aderiteeditor/windows/component/Toolbar.hpp"
 #include "aderiteeditor/windows/component/SceneView.hpp"
 #include "aderiteeditor/windows/component/SceneHierarchy.hpp"
-#include "aderiteeditor/windows/component/EntityEditor.hpp"
 #include "aderiteeditor/windows/component/AssetBrowser.hpp"
-#include "aderiteeditor/windows/component/AssetEditor.hpp"
+#include "aderiteeditor/windows/component/NodeEditor.hpp"
+#include "aderiteeditor/runtime/Instancers.hpp"
+#include "aderiteeditor/vfs/File.hpp"
+#include "aderiteeditor/vfs/VFS.hpp"
 
 
 #define EVENT_ROUTE(e, dst) event_router::e = std::bind(&WindowsEditor::dst, this, std::placeholders::_1)
 
 ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN
 
+WindowsEditor* WindowsEditor::m_instance = nullptr;
+
 WindowsEditor::WindowsEditor(int argc, char** argv) {
-	m_menubar = new component::Menubar();
-	m_toolbar = new component::Toolbar();
-	m_sceneView = new component::SceneView();
-	m_sceneHierarchy = new component::SceneHierarchy();
-	m_propertyEditor = new component::EntityEditor();
-	m_assetBrowser = new component::AssetBrowser();
-	m_assetEditor = new component::AssetEditor();
+	StartupModal = new editor_ui::StartupModal();
+
+	Inspector = new editor_ui::Inspector();
+	Menubar = new component::Menubar();
+	Toolbar = new component::Toolbar();
+	SceneView = new component::SceneView();
+	SceneHierarchy = new component::SceneHierarchy();
+	AssetBrowser = new component::AssetBrowser();
+	NodeEditor = new component::NodeEditor();
+
+	editor::State::EditorCamera = new shared::EditorCamera();
 
 	// Setup event router
-	shared::State::Sink = this;
-	shared::State::Project = nullptr;
+	editor::State::Sink = this;
+	editor::State::Project = nullptr;
+	m_instance = this;
 }
 
 WindowsEditor::~WindowsEditor() {
-	delete m_menubar;
-	delete m_toolbar;
-	delete m_sceneView;
-	delete m_sceneHierarchy;
-	delete m_propertyEditor;
-	delete m_assetBrowser;
-	delete m_assetEditor;
+	delete Inspector;
+	delete Menubar;
+	delete Toolbar;
+	delete SceneView;
+	delete SceneHierarchy;
+	delete AssetBrowser;
+	delete NodeEditor;
+
+	delete StartupModal;
 }
 
 void WindowsEditor::onRuntimeInitialized() {
@@ -73,8 +90,8 @@ void WindowsEditor::onRuntimeInitialized() {
 	// By default disable game updates
 	onStopGame();
 
-	// TODO: Startup dialog e.g. create new project, load project, etc.
-	this->onLoadProject("../example/ExampleProject/ExampleProject.aproj");
+	// Setup instancers for serializer
+	utility::linkInstancers();
 }
 
 void WindowsEditor::onRendererInitialized() {
@@ -83,6 +100,7 @@ void WindowsEditor::onRendererInitialized() {
 	// Initialize ImGui
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImNodes::CreateContext();
 
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
@@ -134,37 +152,30 @@ void WindowsEditor::onRendererInitialized() {
 	}
 	backend::ImGui_Implbgfx_Init(255);
 
-	// Init debug render output
-	shared::State::DebugRenderHandle = utility::createFrameBuffer();
-
 	// Components
-	m_menubar->init();
-	m_toolbar->init();
-	m_sceneView->init();
-	m_sceneHierarchy->init();
-	m_propertyEditor->init();
-	m_assetBrowser->init();
-	m_assetEditor->init();
+	StartupModal->init();
+	Inspector->init();
+	Menubar->init();
+	Toolbar->init();
+	SceneView->init();
+	SceneHierarchy->init();
+	AssetBrowser->init();
+	NodeEditor->init();
+
+	// Show the startup modal
+	StartupModal->show();
 }
 
 void WindowsEditor::onStartRender() {
-	// Render all colliders and triggers
-	//::aderite::Engine::getRenderer()->debugRenderCollidersAndTriggers(shared::State::EditorCamera->getOutputHandle());
+	
 }
 
 void WindowsEditor::onPreRenderCommit() {
-	// Render all colliders and triggers
-	//::aderite::Engine::getRenderer()->debugRenderCollidersAndTriggers(shared::State::EditorCamera->getOutputHandle());
-	//::aderite::Engine::getRenderer()->combineOutputs(shared::State::DebugRenderHandle, {shared::State::EditorCamera->getOutputHandle()}, false);
+	
 }
 
 void WindowsEditor::onEndRender() {
 	// Render ImGui
-
-	// State
-	bool show_demo_window = true;
-	bool show_another_window = false;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	// Start the Dear ImGui frame
 	backend::ImGui_Implbgfx_NewFrame();
@@ -226,19 +237,7 @@ void WindowsEditor::onEndRender() {
 
 	// Dockspace components start here
 
-	// Components
-	m_menubar->render();
-	m_toolbar->render();
-	m_sceneView->render();
-	m_sceneHierarchy->render();
-	m_propertyEditor->render();
-	m_assetBrowser->render();
-	m_assetEditor->render();
-
-	// DEMO WINDOW
-	if (show_demo_window) {
-		ImGui::ShowDemoWindow(&show_demo_window);
-	}
+	this->renderComponents();
 
 	// Dockspace components end here
 
@@ -265,125 +264,122 @@ void WindowsEditor::onRuntimeShutdown() {
 		//onSaveProject();
 	}
 
-	m_menubar->shutdown();
-	m_toolbar->shutdown();
-	m_sceneView->shutdown();
-	m_sceneHierarchy->shutdown();
-	m_propertyEditor->shutdown();
-	m_assetBrowser->shutdown();
-	m_assetEditor->shutdown();
+	StartupModal->shutdown();
+	Inspector->shutdown();
+	Menubar->shutdown();
+	Toolbar->shutdown();
+	SceneView->shutdown();
+	SceneHierarchy->shutdown();
+	AssetBrowser->shutdown();
+	NodeEditor->shutdown();
 
 	// Shutdown ImGui
 	backend::ImGui_Implbgfx_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
+	ImNodes::DestroyContext();
 	ImGui::DestroyContext();
 
-	delete shared::State::Project;
-}
-
-void WindowsEditor::onSelectedEntityChanged(scene::Entity& Entity) {
-	m_sceneHierarchy->setActiveEntity(Entity);
-	m_propertyEditor->setActiveEntity(Entity);
+	delete editor::State::Project;
 }
 
 void WindowsEditor::onNewProject(const std::string& dir, const std::string& name) {
 	LOG_TRACE("New project name: {0} at directory {1}", name, dir);
 	::aderite::Engine::get()->getWindowManager()->setTitle(name);
 	
-	if (shared::State::Project) {
-		delete shared::State::Project;
+	if (editor::State::Project) {
+		delete editor::State::Project;
 	}
 
-	shared::State::Project = new shared::Project(dir, name);
+	editor::State::Project = new shared::Project(dir, name);
+
+	// Create directories
+	if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Asset/")) {
+		std::filesystem::create_directory(editor::State::Project->getRootDir() / "Asset/");
+	}
+
+	if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Data/")) {
+		std::filesystem::create_directory(editor::State::Project->getRootDir() / "Data/");
+	}
+
+	// Copy shader libs, and aderite editor shaders
+	this->copyShaderSources();
 
 	// Setup asset manager
-	::aderite::Engine::getAssetManager()->setRootDir(shared::State::Project->getRootDir().string());
+	::aderite::Engine::getFileHandler()->setRoot(editor::State::Project->getRootDir());
+
+	// Create new scene
+	onNewScene("Untitled scene");
+
+	// Save
+	editor::State::Project->save();
 }
 
 void WindowsEditor::onSaveProject() {
-	if (!shared::State::Project) {
+	if (!editor::State::Project) {
 		// TODO: Create new project?
 		return;
 	}
 
 	// Save all assets
-	for (asset::Asset* asset : *::aderite::Engine::getAssetManager()) {
-		::aderite::Engine::getAssetManager()->saveAsset(asset);
-	}
-
-	shared::State::Project->save();
+	::aderite::Engine::getSerializer()->saveAll();
+	editor::State::Project->save();
 }
 
 void WindowsEditor::onLoadProject(const std::string& path) {
 	LOG_TRACE("Loading project {0}", path);
-	if (shared::State::Project) {
+	if (editor::State::Project) {
 		// TODO: Ask for saving if there are changes
-		delete shared::State::Project;
+		delete editor::State::Project;
 	}
 
 	// Unload all assets
-	::aderite::Engine::getAssetManager()->unloadAll();
+	//::aderite::Engine::getAssetManager()->unloadAll();
 
 	// TODO: Verify all assets are in their name directories
 
-	shared::State::Project = shared::Project::load(path);
+	editor::State::Project = shared::Project::load(path);
 
-	::aderite::Engine::get()->getWindowManager()->setTitle(shared::State::Project->getName());
+	// Copy shader libs, just in case they were updated
+	this->copyShaderSources();
+
+	::aderite::Engine::get()->getWindowManager()->setTitle(editor::State::Project->getName());
 
 	// Setup asset manager
-	::aderite::Engine::getAssetManager()->setRootDir(shared::State::Project->getRootDir().string());
+	::aderite::Engine::getFileHandler()->setRoot(editor::State::Project->getRootDir());
 
 	// Setup audio controller
-	if (!shared::State::Project->getMasterBanksDir().empty()) {
-		::aderite::Engine::getAudioController()->loadMasterBank(shared::State::Project->getMasterBanksDir());
-	}
+	::aderite::Engine::getAudioController()->loadMasterBank();
 
-	if (shared::State::Project->getActiveScene().empty()) {
-		onNewScene("Untitled 1");
-	}
-	else {
+	if (editor::State::Project->getActiveScene() != c_InvalidHandle) {
 		// Read scene
-		::aderite::Engine::getAssetManager()->getOrRead(shared::State::Project->getActiveScene());
-
-		if (!shared::State::Project->getActiveScene().empty()) {
-			// Should have been read
-			scene::Scene* s = static_cast<scene::Scene*>(::aderite::Engine::getAssetManager()->getByName(shared::State::Project->getActiveScene()));
-			::aderite::Engine::getSceneManager()->setActive(s);
-		}
+		scene::Scene* s = static_cast<scene::Scene*>(::aderite::Engine::getSerializer()->getOrRead(editor::State::Project->getActiveScene()));
+		::aderite::Engine::getSceneManager()->setActive(s);
 	}
 }
 
 void WindowsEditor::onSceneChanged(scene::Scene* scene) {
 	// Attach editor camera
-	shared::State::EditorCamera = createEditorCamera();
-	scene->attachCamera(shared::State::EditorCamera);
-	m_sceneView->onSceneChanged(scene);
+	SceneView->onSceneChanged(scene);
 }
 
 void WindowsEditor::onSystemUpdate(float delta) {
-	shared::State::EditorCamera->update(delta);
+	editor::State::EditorCamera->update(delta);
+}
+
+void WindowsEditor::onPipelineChanged(rendering::Pipeline* pipeline) {	
+	
 }
 
 void WindowsEditor::onNewScene(const std::string& name) {
 	LOG_TRACE("New scene with name: {0}", name);
 
 	// TODO: Error screen or special naming
-	scene::Scene* s = ::aderite::Engine::getAssetManager()->create<scene::Scene>(name);
+	scene::Scene* s = new scene::Scene();
+	::aderite::Engine::getSerializer()->add(s);
+	::aderite::Engine::getSerializer()->save(s);
+	vfs::File* file = new vfs::File(name, s->getHandle(), editor::State::Project->getVfs()->getRoot());
+
 	::aderite::Engine::getSceneManager()->setActive(s);
-}
-
-void WindowsEditor::onCreateEntity(const std::string& name) {
-	scene::Scene* s = ::aderite::Engine::getSceneManager()->getCurrentScene();
-	s->createEntity(::aderite::scene::components::MetaComponent(name));
-}
-
-void WindowsEditor::onDestroyEntity(const scene::Entity& Entity) {
-	scene::Scene* s = ::aderite::Engine::getSceneManager()->getCurrentScene();
-	s->destroyEntity(Entity);
-}
-
-void WindowsEditor::onSelectedAssetChanged(asset::Asset* asset) {
-	m_assetEditor->setActiveAsset(asset);
 }
 
 void WindowsEditor::onStopGame() {
@@ -391,7 +387,7 @@ void WindowsEditor::onStopGame() {
 	Engine::get()->stopScriptUpdates();
 	Engine::get()->stopSceneUpdates();
 	Engine::getAudioController()->disable(true);
-	shared::State::IsGameMode = false;
+	editor::State::IsGameMode = false;
 
 	// TODO: Disable all cameras in scene
 }
@@ -401,7 +397,7 @@ void WindowsEditor::onStartGame() {
 	Engine::get()->startScriptUpdates();
 	Engine::get()->startSceneUpdates();
 	Engine::getAudioController()->disable(false);
-	shared::State::IsGameMode = true;
+	editor::State::IsGameMode = true;
 
 	// TODO: Enable all cameras in scene
 }
@@ -410,8 +406,38 @@ void WindowsEditor::onResetGameState() {
 	// TODO: Reset game state, by reloading all scripts or resetting their default parameters
 }
 
-shared::EditorCamera* WindowsEditor::createEditorCamera() {
-	return new shared::EditorCamera();
+WindowsEditor* WindowsEditor::getInstance() {
+	return m_instance;
+}
+
+void WindowsEditor::renderComponents() {
+	static bool show_demo_window = true;
+
+	// Components
+	StartupModal->render();
+
+	if (!StartupModal->isOpen() && editor::State::Project != nullptr) {
+		// Only render when open and a project exists
+		Inspector->render();
+		Menubar->render();
+		Toolbar->render();
+		SceneView->render();
+		SceneHierarchy->render();
+		AssetBrowser->render();
+		NodeEditor->render();	
+
+		// DEMO WINDOW
+		if (show_demo_window) {
+			ImGui::ShowDemoWindow(&show_demo_window);
+		}
+	}
+}
+
+void WindowsEditor::copyShaderSources() {
+	const auto copyOptions = std::filesystem::copy_options::overwrite_existing;
+
+	std::filesystem::copy("res/shaders/include/", editor::State::Project->getRootDir() / "Data/", copyOptions);
+	std::filesystem::copy("res/shaders/wireframe/", editor::State::Project->getRootDir() / "Data/", copyOptions);
 }
 
 ADERITE_EDITOR_ROOT_NAMESPACE_END

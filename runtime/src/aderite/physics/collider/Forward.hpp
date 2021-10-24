@@ -5,10 +5,11 @@
 */
 
 #include "aderite/utility/Macros.hpp"
-#include "aderite/physics/ColliderType.hpp"
 
-ADERITE_COLLIDER_NAMESPACE_BEGIN
+namespace aderite {
+namespace physics {
 
 class BoxCollider;
 
-ADERITE_COLLIDER_NAMESPACE_END
+}
+}

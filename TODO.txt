@@ -1,38 +1,64 @@
 General:
 Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
-Shader tool
-All shaders in one source
 Animations
-More defined pipeline for rendering (Frustum culling, etc.)
-Rethink scene useAsset and removeAsset functions
 Scripting
 Include BGFX stats to ImGui
-Textures
 Fix dependencies folder and CMake
 Optimize component include
 Memory manager
 Propogate physics events
 BGFX leaks
 Event system?
+Recovery from failure
+Move Property and MaterialType to editor, cause they are not mutable during runtime
+Rework pin type to be enum
+Profiling
+Compiler switch to disable some setters in runtime
+Namespace refactoring
+Move objects for editor so that they don't get destroyed on pipeline change
+
+ECS:
+Parent
+
+Licensing:
+FMOD splash screen
+PhysX splash screen
+bgfx splash screen
+
+Serialization:
+Name resolve
 
 Asset manager:
-Load caching
-Thread pool asset loading
-IWorkerThread
-IAssetLoader
-Rework ILoadable
+Asset ref counting
+
+Node editor:
+Clear graph on new select
+Constraints for number of nodes and deletion
+Property for ALL items
+
+FPRP:
+Array operation
+Change pipeline when scene changes
+Operation resize events
+Base vertex shader compiling
+Varying generation
+Compiling shaders from C++ code
+Move MaterialTypeAsset::recalculate to editor
+Move MaterialAsset::setType to editor
+Move MaterialTypeAsset to editor
+Pipeline verification
 
 Rendering:
-Clustered
-IBL
-Shadow maps
-Textures
-View names
-Blending
 BGFX multithread encoder
 
 Audio:
+Fix inspector selection
+Rethink serialization
 3D audio
+
+Components:
+Meta enabled field
+Handle to ColliderList, audio list etc., managers take care of these lists
 
 Physics:
 Multithreading
@@ -42,8 +68,26 @@ Disable/enable actors at runtime
 Disable/enable colliders at runtime
 Broad-Phase callbacks
 Collision layers
+Rethink the collision callback architecture
+
+VFS:
+Refactor to be more intuitive
+Remove files that don't physically exist anymore
 
 Editor:
+Block from naming properties the same name
+Open graph when selecting apropriate asset
+Redo most of it
+Refactor drag and drop API
+Default pipeline for scenes
+Show if have a valid data source for texture and mesh
+Load last opened project
+On open directory show in navigator
+Directory renaming in tree node
+Navigator visual bug fixes
+Component architecture rethink
+Node editor middle mouse also moves scene view
+Copy bgfx shader includes to Raw/
 Internal system UI windows (loaded assets, asset manager, etc.)
 Unexpected exit or corrupted save restoration
 Fix modal architecture
@@ -62,15 +106,23 @@ Reset game state on game mode switch
 Master banks dir
 Link studio Build dir with editor
 Detect unloaded bank files
+Free scene on new project create
+Rename dynamic text API
+Tooltips?
 
 Code:
+this for self invokes
+Middleware sections
+Remove virtual from places that don't need it
 Add consts where no modifications are done
 Add final to classes
+Add inline
 Utility operators for types
 Asserts
 Error checking
 Check memory leaks
 Case surround with braces
-Mesh loading API optmization
 Move enums to files
 Move logger to engine system
+More verbose logging
+Remove pointers where not needed

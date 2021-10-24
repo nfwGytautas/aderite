@@ -1,11 +1,9 @@
 #pragma once
 
-#include <vector>
 #include <bgfx/bgfx.h>
 #include <glm/glm.hpp>
 #include "aderite/config.hpp"
 #include "aderite/window/Forward.hpp"
-#include "aderite/scene/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
@@ -37,13 +35,12 @@ public:
 	 * @param newWidth New width of the window
 	 * @param newHeight New height of the window
 	*/
-	void onWindowResized(unsigned int newWidth, unsigned int newHeight);
+	void onWindowResized(unsigned int newWidth, unsigned int newHeight, bool reset = true);
 
 	/**
-	 * @brief Submit a scene to be rendered
-	 * @param scene Scene to render
+	 * @brief Executes the rendering pipeline
 	*/
-	void renderScene(scene::Scene* scene);
+	void render();
 
 	/**
 	 * @brief Returns true if Renderer ready to render
@@ -57,35 +54,27 @@ public:
 	void setResolution(const glm::uvec2& size);
 
 	/**
-	 * @brief Renders output of a framebuffer to screen
-	 * @param image Image to display
-	*/
-	void displayFrame(bgfx::FrameBufferHandle image);
-
-	/**
 	 * @brief Advances to next frame
 	*/
 	void commit();
 
-#if DEBUG_RENDER == 1
 	/**
-	 * @brief Returns the debug renderer instance
+	 * @brief Returns the rendering pipeline instance
+	 * @return Pipeline instance
 	*/
-	DebugRenderer* getDebugRenderer() {
-		return m_debugRenderer;
-	}
-#endif
+	Pipeline* getPipeline() const;
+
+	/**
+	 * @brief Set the pipeline for the renderer to use
+	 * @param pipeline Pipeline to use
+	*/
+	void setPipeline(Pipeline* pipeline);
 private:
 	Renderer() {}
 	friend class Engine;
-
-	void executeDrawCall(DrawCall& dc);
 private:
+	Pipeline* m_pipeline = nullptr;
 	bool m_isInitialized = false;
-
-#if DEBUG_RENDER == 1
-	DebugRenderer* m_debugRenderer = nullptr;
-#endif
 };
 
 ADERITE_RENDERING_NAMESPACE_END

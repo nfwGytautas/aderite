@@ -4,6 +4,8 @@
  * @brief This file contains all macros defined by the aderite engine
  */
 
+#include "aderite/Config.hpp"
+
  // ---------------------------------
  // PLATFORM
  // ---------------------------------
@@ -30,6 +32,24 @@
 
 // Helper define for logging when a unimplemented method is called
 #define ADERITE_UNIMPLEMENTED LOG_WARN("Function {0} in {1}, on line {2} not yet implemented", __func__, __FILE__, __LINE__);
+
+#ifdef _DEBUG
+#include <cassert>
+#define ADERITE_DEBUG_SECTION(code) code
+#define ADERITE_STATIC_ASSERT(check, message) static_assert(check, message)
+#define ADERITE_DYNAMIC_ASSERT(check, message) assert(((void)message, check))
+#else
+#define ADERITE_DEBUG_SECTION(code) 
+#define ADERITE_STATIC_ASSERT(check, message) 
+#endif
+
+#if MIDDLEWARE_ENABLED == 1
+#define ADERITE_MIDDLEWARE_SECTION(code) code
+#else
+#define ADERITE_MIDDLEWARE_SECTION(code)
+#endif
+
+#define ADERITE_STRINGIZE(var) #var
 
 // ---------------------------------
 // NAMESPACES
@@ -83,3 +103,14 @@
 #define ADERITE_AUDIO_NAMESPACE_BEGIN ADERITE_ROOT_NAMESPACE_BEGIN namespace audio {
 #define ADERITE_AUDIO_NAMESPACE_END ADERITE_ROOT_NAMESPACE_END }
 
+// Pass namespace where various render passes are defined in
+#define ADERITE_PASS_NAMESPACE_BEGIN ADERITE_RENDERING_NAMESPACE_BEGIN namespace pass {
+#define ADERITE_PASS_NAMESPACE_END ADERITE_RENDERING_NAMESPACE_END }
+
+// Uniform namespace where various uniforms are defined in
+#define ADERITE_UNIFORM_NAMESPACE_BEGIN ADERITE_RENDERING_NAMESPACE_BEGIN namespace uniform {
+#define ADERITE_UNIFORM_NAMESPACE_END ADERITE_RENDERING_NAMESPACE_END }
+
+// Property namespace where all material type properties are defined in
+#define ADERITE_PROPERTY_NAMESPACE_BEGIN ADERITE_ASSET_NAMESPACE_BEGIN namespace prop {
+#define ADERITE_PROPERTY_NAMESPACE_END ADERITE_ASSET_NAMESPACE_END }

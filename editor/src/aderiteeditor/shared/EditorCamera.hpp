@@ -4,11 +4,10 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "aderiteeditor/utility/Macros.hpp"
-#include "aderite/scene/ICamera.hpp"
 
 ADERITE_EDITOR_SHARED_NAMESPACE_BEGIN
 
-class EditorCamera : public interfaces::ICamera {
+class EditorCamera {
 public:
 	EditorCamera();
 	virtual ~EditorCamera();
@@ -19,13 +18,26 @@ public:
 	*/
 	void onViewportResize(const glm::uvec2& size);
 
-	// Inherited via ICamera
-	virtual bgfx::FrameBufferHandle getOutputHandle() override;
-	virtual glm::mat4 computeViewMatrix() override;
-	virtual glm::mat4 computeProjectionMatrix() override;
-	virtual void update(float delta) override;
-	virtual bool isEnabled() override;
+	/**
+	 * @brief Returns the view matrix of the editor camera
+	*/
+	const glm::mat4& getViewMatrix() const;
 
+	/**
+	 * @brief Returns the projection matrix of the editor camera
+	*/
+	const glm::mat4& getProjectionMatrix() const;
+
+	/**
+	 * @brief Updates the editor camera
+	 * @param delta Delta of the last frame
+	*/
+	void update(float delta);
+
+	/**
+	 * @brief Returns true if the editor camera is currently enabled, false otherwise
+	*/
+	bool isEnabled() const;
 private:
 	glm::vec3 getUpDirection() const;
 	glm::vec3 getRightDirection() const;
@@ -38,7 +50,6 @@ private:
 	float zoomSpeed() const;
 	glm::vec2 panSpeed() const;
 private:
-	bgfx::FrameBufferHandle m_target = BGFX_INVALID_HANDLE;
 	glm::uvec2 m_viewportSize = {};
 	glm::mat4 m_projectionMatrix;
 	glm::mat4 m_viewMatrix;

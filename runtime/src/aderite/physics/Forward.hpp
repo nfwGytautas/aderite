@@ -5,7 +5,6 @@
 */
 
 #include "aderite/utility/Macros.hpp"
-#include "aderite/physics/ColliderType.hpp"
 
 ADERITE_PHYSICS_NAMESPACE_BEGIN
 

@@ -1,31 +1,16 @@
 #include "Renderer.hpp"
 
-#include <unordered_map>
-
-#include <glm/gtc/type_ptr.hpp>
-
 #include <bgfx/bgfx.h>
 #include <bx/string.h>
 
 #include "aderite/Config.hpp"
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/utility/bgfx.hpp"
-#include "aderite/utility/Utility.hpp"
 #include "aderite/window/WindowManager.hpp"
-#include "aderite/asset/MeshAsset.hpp"
-#include "aderite/asset/MaterialAsset.hpp"
-#include "aderite/asset/ShaderAsset.hpp"
-#include "aderite/scene/SceneManager.hpp"
-#include "aderite/scene/Scene.hpp"
-#include "aderite/scene/components/Components.hpp"
 #include "aderite/rendering/DrawCall.hpp"
-
-#include "aderite/rendering/InlineShaders.hpp"
-
-#if DEBUG_RENDER == 1
-#include "aderite/rendering/debug/DebugRenderer.hpp"
-#endif
+#include "aderite/rendering/Pipeline.hpp"
+#include "aderite/scene/Scene.hpp"
+#include "aderite/scene/SceneManager.hpp"
 
 namespace impl {
 
@@ -99,17 +84,9 @@ bool Renderer::init() {
 		LOG_ERROR("Failed to initialize BGFX");
 	}
 
-	// Now create some defaults
-#if DEBUG_RENDER == 1
-	m_debugRenderer = new DebugRenderer();
-#endif
-
-	// Clear color
-	bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
-
 	// Initial view rect
 	auto windowSize = ::aderite::Engine::getWindowManager()->getSize();
-	onWindowResized(windowSize.x, windowSize.y);
+	onWindowResized(windowSize.x, windowSize.y, false);
 
 	// Finish any queued operations
 	bgfx::frame();
@@ -120,9 +97,9 @@ bool Renderer::init() {
 }
 
 void Renderer::shutdown() {
-#if DEBUG_RENDER == 1
-	delete m_debugRenderer;
-#endif
+	if (m_pipeline) {
+		m_pipeline->shutdown();
+	}
 
 	bgfx::shutdown();
 }
@@ -131,94 +108,36 @@ void Renderer::setVsync(bool enabled) {
 	ADERITE_UNIMPLEMENTED;
 }
 
-void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight) {
-	bgfx::setViewRect(0, 0, 0, newWidth, newHeight);
+void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight, bool reset) {
+	setResolution(glm::uvec2(newWidth, newHeight));
 
-#if DEBUG_RENDER == 1
-	// TODO: Event system?
-	m_debugRenderer->onWindowResized(newWidth, newHeight);
-#endif
 
-	bgfx::reset(newWidth, newHeight);
+
+	if (reset) {
+		bgfx::reset(newWidth, newHeight);
+	}
 }
 
-void Renderer::renderScene(scene::Scene* scene) {
-	// TODO: Sorting
-
+void Renderer::render() {
 	if (!isReady()) {
 		return;
 	}
+	// TODO: Status in editor
 
-	std::unordered_map<size_t, DrawCall> drawCalls;
-	size_t drawCallIdx = 0;
-
-	// Resize
-	//drawCalls.reserve(m_lastRenderDrawCalls);
-
-	// Construct draw calls
-	auto group = scene->getEntityRegistry().group<scene::components::TransformComponent>(entt::get<scene::components::MeshRendererComponent>);
-	for (auto entity : group) {
-		// TODO: Layers
-		auto [TransformComponent, mr] = group.get<scene::components::TransformComponent, scene::components::MeshRendererComponent>(entity);
-
-		if (mr.MeshHandle == nullptr || mr.MaterialHandle == nullptr) {
-			continue;
-		}
-
-		// Check if draw call already exists
-		size_t hash = utility::combineHash(mr.MeshHandle->hash(), mr.MaterialHandle->hash());
-		DrawCall& dc = drawCalls[hash];
-
-		if (!bgfx::isValid(dc.VBO) || !bgfx::isValid(dc.Shader)) {
-			mr.MeshHandle->fillDrawCall(&dc);
-			mr.MaterialHandle->fillDrawCall(&dc);
-		}
-
-		glm::mat4 tmat = scene::components::TransformComponent::computeTransform(TransformComponent);
-		dc.Transformations.push_back(tmat);
+	scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+	if (currentScene == nullptr) {
+		return;
 	}
 
-	// View 0 clear
-	bgfx::touch(0);
-
-	// Skip rendering if there are no draw calls
-	if (drawCalls.size() > 0) {
-		// Execute draw calls for all cameras
-		for (interfaces::ICamera* camera : scene->getCameras()) {
-			if (!camera->isEnabled()) {
-				// Skip disabled cameras
-				continue;
-			}
-
-			auto& outputHandle = camera->getOutputHandle();
-			if (!bgfx::isValid(outputHandle)) {
-				// Skip invalid handles
-				continue;
-			}
-
-			// Set persistent matrices
-			bgfx::setViewTransform(0, glm::value_ptr(camera->computeViewMatrix()), glm::value_ptr(camera->computeProjectionMatrix()));
-			
-			// Bind state
-			bgfx::setViewFrameBuffer(0, camera->getOutputHandle());
-			
-			for (auto& dc : drawCalls) {
-				executeDrawCall(dc.second);
-			}
-			
-			// Discard this draw call information
-			bgfx::discard(BGFX_DISCARD_ALL);
-
-			// TODO: Move this
-			bgfx::setViewTransform(200, glm::value_ptr(camera->computeViewMatrix()), glm::value_ptr(camera->computeProjectionMatrix()));
-			m_debugRenderer->setTarget(outputHandle);
-			m_debugRenderer->begin();
-			m_debugRenderer->drawCollidersAndTriggers();
-			m_debugRenderer->end();
-		}
+	if (currentScene->getPipeline() != m_pipeline) {
+		this->setPipeline(::aderite::Engine::getSceneManager()->getCurrentScene()->getPipeline());
 	}
 
-	bgfx::discard(BGFX_DISCARD_ALL);
+	if (m_pipeline == nullptr) {
+		return;
+	}
+
+	m_pipeline->execute();
 }
 
 bool Renderer::isReady() {
@@ -227,44 +146,38 @@ bool Renderer::isReady() {
 
 void Renderer::setResolution(const glm::uvec2& size) {
 	bgfx::setViewRect(0, 0, 0, size.x, size.y);
-}
+	bgfx::setViewRect(1, 0, 0, size.x, size.y);
+	bgfx::setViewRect(2, 0, 0, size.x, size.y);
 
-void Renderer::displayFrame(bgfx::FrameBufferHandle image) {
-	LOG_ERROR("displayFrame() not implemented yet");
+	// TODO: Forward to render passes	
 }
 
 void Renderer::commit() {
 	// Commit
 	bgfx::frame(false);
+	// TODO: Display stats in editor
 	//const bgfx::Stats* stats = bgfx::getStats();
 	//LOG_INFO("Commiting {0} draw calls", stats->numDraw);
 }
 
-void Renderer::executeDrawCall(DrawCall& dc) {
-	// Check if valid draw call
-	if (!dc.Valid) {
-		return;
+Pipeline* Renderer::getPipeline() const {
+	return m_pipeline;
+}
+
+void Renderer::setPipeline(Pipeline* pipeline) {
+	// Shutdown previous
+	if (m_pipeline) {
+		m_pipeline->shutdown();
 	}
 
-	// Bind buffers
-	bgfx::setVertexBuffer(0, dc.VBO);
+	m_pipeline = pipeline;
 
-	if (bgfx::isValid(dc.IBO)) {
-		bgfx::setIndexBuffer(dc.IBO);
+	// Initialize new
+	if (m_pipeline) {
+		m_pipeline->initialize();
 	}
 
-	if (dc.Instanced) {
-		LOG_WARN("Instanced rendering not implemented yet");
-	}
-	else {
-		for (auto& transform : dc.Transformations) {
-			bgfx::setTransform(glm::value_ptr(transform));
-
-			// Submit draw call
-			uint8_t flags = BGFX_DISCARD_ALL & ~(BGFX_DISCARD_BINDINGS | BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS);
-			bgfx::submit(0, dc.Shader, 0, flags);
-		}
-	}
+	::aderite::Engine::get()->onPipelineChanged(m_pipeline);
 }
 
 ADERITE_RENDERING_NAMESPACE_END

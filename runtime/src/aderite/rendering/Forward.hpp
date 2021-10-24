@@ -10,9 +10,7 @@ ADERITE_RENDERING_NAMESPACE_BEGIN
 
 class Renderer;
 class DrawCall;
-
-#if DEBUG_RENDER == 1
-class DebugRenderer;
-#endif
+class Pipeline;
+class PipelineState;
 
 ADERITE_RENDERING_NAMESPACE_END

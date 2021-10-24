@@ -6,13 +6,13 @@
 
 #include "aderite/utility/Macros.hpp"
 
-ADERITE_ASSET_NAMESPACE_BEGIN
+namespace aderite {
+namespace asset {
 
-class AssetManager;
-class Asset;
 class MaterialAsset;
+class MaterialTypeAsset;
 class MeshAsset;
-class MeshSource;
-class ShaderAsset;
+class TextureAsset;
 
-ADERITE_ASSET_NAMESPACE_END
+}
+}

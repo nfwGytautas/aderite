@@ -12,9 +12,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+#include "aderite/Handles.hpp"
 #include "aderite/utility/Macros.hpp"
 #include "aderite/asset/Forward.hpp"
-#include "aderite/audio/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/physics/Forward.hpp"
 
@@ -78,7 +78,7 @@ struct MeshRendererComponent {
  * @brief Camera component, which references ICamera object
 */
 struct CameraComponent {
-	EntityCamera* Camera = nullptr;
+	bool Main = true;
 
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent&) = default;
@@ -112,13 +112,14 @@ struct CollidersComponent {
 };
 
 /**
- * @brief Component containing information about audio sources on an entity
+ * @brief Component containing information about audio source on an entity (1 per entity)
 */
-struct AudioSourcesComponent {
-	audio::AudioInstanceList* Instances = nullptr;
+struct AudioSourceComponent {
+	audio::AudioInstanceId Instance = c_InvalidHandle;
+	bool PlayOnStart = false;
 
-	AudioSourcesComponent() = default;
-	AudioSourcesComponent(const AudioSourcesComponent&) = default;
+	AudioSourceComponent() = default;
+	AudioSourceComponent(const AudioSourceComponent&) = default;
 };
 
 /**

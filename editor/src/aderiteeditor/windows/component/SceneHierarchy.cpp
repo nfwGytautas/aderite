@@ -8,9 +8,10 @@
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderiteeditor/shared/State.hpp"
-#include "aderiteeditor/shared/IEventSink.hpp"
+#include "aderiteeditor/shared/Project.hpp"
+#include "aderiteeditor/vfs/VFS.hpp"
+#include "aderiteeditor/vfs/File.hpp"
 #include "aderiteeditor/windows/component/Modals.hpp"
-#include "aderiteeditor/windows/component/ComponentUtility.hpp"
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 			
@@ -22,12 +23,9 @@ SceneHierarchy::~SceneHierarchy() {
 	delete m_textModal;
 }
 
-void SceneHierarchy::setActiveEntity(scene::Entity& Entity) {
-	m_selectedEntity = Entity;
-}
-
 void SceneHierarchy::render() {
 	static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+	static vfs::File* cacheFile = nullptr;
 
 	if (!ImGui::Begin("Scene hierarchy")) {
 		ImGui::End();
@@ -42,18 +40,28 @@ void SceneHierarchy::render() {
 		return;
 	}
 
+	if (cacheFile == nullptr || cacheFile->getHandle() != currentScene->getHandle()) {
+		cacheFile = editor::State::Project->getVfs()->getFile(currentScene->getHandle());
+	}
+
 	// Context menu
 	if (ImGui::BeginPopupContextWindow())
 	{
 		if (ImGui::Selectable("Create Entity")) {
 			// TODO: Make sure that this is actually unique
-			shared::State::Sink->onCreateEntity(utility::generateString(16));
+			currentScene->createEntity(::aderite::scene::components::MetaComponent(utility::generateString(16)));
+		}
+
+		ImGui::Separator();
+
+		if (ImGui::Selectable("Edit")) {
+			editor::State::LastSelectedObject = editor::SelectableObject(currentScene);
 		}
 
 		ImGui::EndPopup();
 	}
 
-	ImGui::Text("%s", currentScene->getName().c_str());
+	ImGui::Text("%s", cacheFile->getName().c_str());
 
 	// Actual tree
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 2));
@@ -71,23 +79,21 @@ void SceneHierarchy::render() {
 			// If this is a single Entity
 			ImGuiTreeNodeFlags node_flags = base_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
-			if (m_selectedEntity == Entity) {
+			if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Entity && editor::State::LastSelectedObject.getEntity() == Entity) {
 				node_flags |= ImGuiTreeNodeFlags_Selected;
 			}
 
 			ImGui::TreeNodeEx((void*)(intptr_t)(uint32_t)Entity, node_flags, "%s", MetaComponent.Name.c_str());
 
 			if (ImGui::IsItemClicked()) {
-				shared::State::Sink->onSelectedEntityChanged(e);
+				editor::State::LastSelectedObject = editor::SelectableObject(e);
 			}
 		}
 
 		// Context menu
 		if (ImGui::BeginPopupContextItem()) {
-			shared::State::Sink->onSelectedEntityChanged(e);
-
 			if (ImGui::Selectable("Delete")) {
-				shared::State::Sink->onDestroyEntity(e);
+				currentScene->destroyEntity(e);
 			}
 
 			ImGui::EndPopup();

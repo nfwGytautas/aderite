@@ -5,7 +5,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "aderite/utility/bgfx.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/Aderite.hpp"
 #include "aderite/input/InputManager.hpp"
@@ -15,15 +14,10 @@
 ADERITE_EDITOR_SHARED_NAMESPACE_BEGIN
 
 EditorCamera::EditorCamera() {
-	// Create framebuffer
-	m_target = utility::createFrameBuffer();
-
 	updateViewMatrix();
 }
 
-EditorCamera::~EditorCamera() {
-	bgfx::destroy(m_target);
-}
+EditorCamera::~EditorCamera() {}
 
 void EditorCamera::onViewportResize(const glm::uvec2& size) {
 	if (size.x == 0 || size.y == 0) {
@@ -32,21 +26,17 @@ void EditorCamera::onViewportResize(const glm::uvec2& size) {
 
 	m_viewportSize = size;
 	m_projectionMatrix = glm::perspective(
-		glm::radians(Settings::EditorCameraFov), 
-		(float)m_viewportSize.x / (float)m_viewportSize.y, 
-		0.1f, 
+		glm::radians(Settings::EditorCameraFov),
+		(float)m_viewportSize.x / (float)m_viewportSize.y,
+		0.1f,
 		1000.0f);
 }
 
-bgfx::FrameBufferHandle EditorCamera::getOutputHandle() {
-	return m_target;
-}
-
-glm::mat4 EditorCamera::computeViewMatrix() {
+const glm::mat4& EditorCamera::getViewMatrix() const {
 	return m_viewMatrix;
 }
 
-glm::mat4 EditorCamera::computeProjectionMatrix() {
+const glm::mat4& EditorCamera::getProjectionMatrix() const {
 	return m_projectionMatrix;
 }
 
@@ -61,8 +51,7 @@ void EditorCamera::update(float delta) {
 
 		if (scrollDelta != 0.0) {
 			m_distance -= delta * scrollDelta * zoomSpeed();
-			if (m_distance < 1.0f)
-			{
+			if (m_distance < 1.0f) 			{
 				m_focalpoint += getForwardDirection();
 				m_distance = 1.0f;
 			}
@@ -80,7 +69,7 @@ void EditorCamera::update(float delta) {
 
 			wasUpdated = true;
 		}
-	} 
+	}
 	else {
 		// Rotate
 		if (inputManager->isMouseKeyPressed(input::MouseKey::MIDDLE)) {
@@ -99,7 +88,7 @@ void EditorCamera::update(float delta) {
 	}
 }
 
-bool EditorCamera::isEnabled() {
+bool EditorCamera::isEnabled() const {
 	//return !State::IsGameMode;
 	return true;
 }
