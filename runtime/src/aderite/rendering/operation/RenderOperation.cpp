@@ -15,7 +15,9 @@ static uint8_t nextViewId = 0;
 RenderOperation::RenderOperation() {}
 
 void RenderOperation::initialize() {
-	m_viewId = nextViewId++;
+	if (m_viewId == 0xFF) {
+		m_viewId = nextViewId++;
+	}
 	bgfx::setViewClear(m_viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x252525FF, 1.0f, 0);
 
 	ADERITE_DEBUG_SECTION
@@ -49,7 +51,7 @@ void RenderOperation::execute(PipelineState* state) {
 	// Execute draw calls
 
 	for (const DrawCall& dc : *state->getDrawCallList()) {
-		//bgfx::discard(BGFX_DISCARD_ALL);
+		bgfx::discard(BGFX_DISCARD_ALL);
 		executeDrawCall(dc);
 	}
 }
@@ -63,7 +65,7 @@ bool RenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter&
 	return true;
 }
 
-bool RenderOperation::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool RenderOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	m_viewId = data["ViewId"].as<uint8_t>();
 
 	if (m_viewId > nextViewId) {

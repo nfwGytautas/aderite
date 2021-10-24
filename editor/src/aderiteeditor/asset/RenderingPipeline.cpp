@@ -46,7 +46,7 @@ bool RenderingPipeline::serialize(const io::Serializer* serializer, YAML::Emitte
 	return true;
 }
 
-bool RenderingPipeline::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool RenderingPipeline::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	Pipeline::deserialize(serializer, data);
 
 	delete m_graph;

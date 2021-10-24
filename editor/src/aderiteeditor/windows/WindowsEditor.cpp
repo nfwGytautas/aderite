@@ -301,6 +301,9 @@ void WindowsEditor::onNewProject(const std::string& dir, const std::string& name
 		std::filesystem::create_directory(editor::State::Project->getRootDir() / "Data/");
 	}
 
+	// Copy shader libs, and aderite editor shaders
+	this->copyShaderSources();
+
 	// Setup asset manager
 	::aderite::Engine::getFileHandler()->setRoot(editor::State::Project->getRootDir());
 
@@ -335,6 +338,9 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 	// TODO: Verify all assets are in their name directories
 
 	editor::State::Project = shared::Project::load(path);
+
+	// Copy shader libs, just in case they were updated
+	this->copyShaderSources();
 
 	::aderite::Engine::get()->getWindowManager()->setTitle(editor::State::Project->getName());
 
@@ -425,6 +431,13 @@ void WindowsEditor::renderComponents() {
 			ImGui::ShowDemoWindow(&show_demo_window);
 		}
 	}
+}
+
+void WindowsEditor::copyShaderSources() {
+	const auto copyOptions = std::filesystem::copy_options::overwrite_existing;
+
+	std::filesystem::copy("res/shaders/include/", editor::State::Project->getRootDir() / "Data/", copyOptions);
+	std::filesystem::copy("res/shaders/wireframe/", editor::State::Project->getRootDir() / "Data/", copyOptions);
 }
 
 ADERITE_EDITOR_ROOT_NAMESPACE_END

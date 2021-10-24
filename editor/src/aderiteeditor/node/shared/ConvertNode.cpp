@@ -101,7 +101,7 @@ bool ConvertNode::serialize(const io::Serializer* serializer, YAML::Emitter& emi
 	return true;
 }
 
-bool ConvertNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool ConvertNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	deserializeData(data);
 	p_inputs[0]->setType(data["From"].as<std::string>());
 	p_outputs[0]->setType(data["To"].as<std::string>());

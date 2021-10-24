@@ -70,7 +70,7 @@ bool SelectObjectNode::serialize(const io::Serializer* serializer, YAML::Emitter
     return true;
 }
 
-bool SelectObjectNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool SelectObjectNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     if (m_currentType != data["PinType"].as<std::string>()) {
         this->setType(data["PinType"].as<std::string>());

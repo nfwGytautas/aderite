@@ -20,7 +20,7 @@ bool OutputToScreenOperation::serialize(const io::Serializer* serializer, YAML::
 	return true;
 }
 
-bool OutputToScreenOperation::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool OutputToScreenOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	return true;
 }
 

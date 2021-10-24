@@ -10,6 +10,7 @@ namespace aderite {
 namespace asset {
 
 class Property;
+class Sampler;
 
 }
 }

@@ -40,7 +40,7 @@ bool EditorCameraNode::serialize(const io::Serializer* serializer, YAML::Emitter
     return true;
 }
 
-bool EditorCameraNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool EditorCameraNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

@@ -49,7 +49,7 @@ bool EditorRenderNode::serialize(const io::Serializer* serializer, YAML::Emitter
     return true;
 }
 
-bool EditorRenderNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool EditorRenderNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

@@ -19,7 +19,7 @@ Sampler2DNode::Sampler2DNode()
         new InputPin(
             this,
             asset::getNameForType(
-                asset::PropertyType::TEXTURE_2D), 
+                asset::SamplerType::TEXTURE_2D), 
                 "Texture"
         )
     );
@@ -55,7 +55,7 @@ bool Sampler2DNode::serialize(const io::Serializer* serializer, YAML::Emitter& e
     return true;
 }
 
-bool Sampler2DNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool Sampler2DNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

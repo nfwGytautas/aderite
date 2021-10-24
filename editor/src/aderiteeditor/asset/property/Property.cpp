@@ -9,9 +9,6 @@ uint8_t getElementCountForType(PropertyType type) {
 	switch (type) {
 	case PropertyType::FLOAT:
 		return 1;
-	case PropertyType::TEXTURE_2D:
-	case PropertyType::TEXTURE_CUBE:
-		return 0;
 	case PropertyType::VEC2:
 		return 2;
 	case PropertyType::VEC3:
@@ -26,24 +23,10 @@ uint8_t getElementCountForType(PropertyType type) {
 	}
 }
 
-bool isSampler(PropertyType type) {
-	switch (type) {
-	case PropertyType::TEXTURE_2D:
-	case PropertyType::TEXTURE_CUBE:
-		return true;
-	default:
-		return false;
-	}
-}
-
 const char* getNameForType(PropertyType type) {
 	switch (type) {
 	case PropertyType::FLOAT:
 		return "float";
-	case PropertyType::TEXTURE_2D:
-		return "Texture 2D";
-	case PropertyType::TEXTURE_CUBE:
-		return "Texture Cube";
 	case PropertyType::VEC2:
 		return "vec2";
 	case PropertyType::VEC3:
@@ -54,6 +37,18 @@ const char* getNameForType(PropertyType type) {
 		return "None";
 	default:
 		LOG_ERROR("Unknown property type passed to getNameForType");
+		return "";
+	}
+}
+
+const char* getNameForType(SamplerType type) {
+	switch (type) {
+	case SamplerType::TEXTURE_2D:
+		return "Texture 2D";
+	case SamplerType::TEXTURE_CUBE:
+		return "Texture Cube";
+	default:
+		LOG_ERROR("Unknown sampler type passed to getNameForType");
 		return "";
 	}
 }
@@ -86,6 +81,22 @@ std::string Property::getName() const {
 }
 
 void Property::setName(const std::string& name) {
+	m_name = name;
+}
+
+Sampler::Sampler(SamplerType type, const std::string& name)
+	: m_type(type), m_name(name)
+{}
+
+SamplerType Sampler::getType() const {
+	return m_type;
+}
+
+std::string Sampler::getName() const {
+	return m_name;
+}
+
+void Sampler::setName(const std::string& name) {
 	m_name = name;
 }
 

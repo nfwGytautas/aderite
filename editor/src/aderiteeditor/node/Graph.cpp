@@ -138,6 +138,7 @@ void Graph::renderUI() {
 	for (Node* node : m_nodes) {
 		if (node->getId() == -1) {
 			node->setId(m_nextId++);
+			node->setPosition(glm::vec2(0, 0));
 		}
 
 		ImNodes::BeginNode(node->getId());
@@ -172,11 +173,26 @@ void Graph::renderUI() {
 			ImNodes::EndOutputAttribute();
 		}
 
+		ImVec2 npos = ImNodes::GetNodeGridSpacePos(node->getId());
+		node->setPosition({ npos.x, npos.y });
+
 		ImNodes::EndNode();
 	}
 
 	for (auto link : m_links) {
 		link.second->renderUI();
+	}
+}
+
+void Graph::prepareToDisplay() {
+	for (Node* n : m_nodes) {
+		n->prepareToDisplay();
+	}
+}
+
+void Graph::closingDisplay() {
+	for (Node* n : m_nodes) {
+		n->closingDisplay();
 	}
 }
 
@@ -251,7 +267,7 @@ bool Graph::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
 	return true;
 }
 
-bool Graph::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool Graph::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	// Nodes
 	for (const YAML::Node& node : data["Nodes"]) {
 		Node* n = static_cast<Node*>(serializer->parseUntrackedType(node));

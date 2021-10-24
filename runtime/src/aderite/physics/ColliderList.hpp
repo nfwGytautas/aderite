@@ -47,6 +47,18 @@ public:
 	*/
 	physx::PxRigidActor* getActor() const;
 
+	Collider* get(size_t idx) const {
+		return m_colliders[idx];
+	}
+
+	Collider* operator[](size_t idx) const {
+		return m_colliders[idx];
+	}
+
+	size_t size() const {
+		return m_colliders.size();
+	}
+
 	auto begin() const {
 		return m_colliders.begin();
 	}
@@ -58,7 +70,7 @@ public:
 	// Inherited via ISerializable
 	virtual reflection::Type getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
-	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	std::vector<Collider*> m_colliders;
 

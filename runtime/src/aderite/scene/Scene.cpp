@@ -332,7 +332,7 @@ bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
 	return true;
 }
 
-bool Scene::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	// Entities
 	auto entities = data["Entities"];
 	if (entities) {

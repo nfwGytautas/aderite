@@ -125,6 +125,14 @@ void NodeEditor::render() {
 }
 
 void NodeEditor::setGraph(node::Graph* graph, NodeEditorType type) {
+    if (m_graph != nullptr) {
+        m_graph->closingDisplay();
+    }
+
+    if (graph != nullptr) {
+        graph->prepareToDisplay();
+    }
+
     m_graph = graph;
     m_type = type;
 }

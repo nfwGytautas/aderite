@@ -63,7 +63,7 @@ bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitte
 	return true;
 }
 
-bool Pipeline::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool Pipeline::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	for (const YAML::Node& node : data["Operations"]) {
 		m_operations.push_back(static_cast<OperationBase*>(serializer->parseUntrackedType(node)));
 	}

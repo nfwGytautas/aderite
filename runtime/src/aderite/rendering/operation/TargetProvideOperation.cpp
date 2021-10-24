@@ -61,7 +61,7 @@ bool TargetProvideOperation::serialize(const io::Serializer* serializer, YAML::E
 	return true;
 }
 
-bool TargetProvideOperation::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool TargetProvideOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	m_params.Blittable = data["Blittable"].as<bool>();
 	m_params.DepthAttachment = data["DepthAttachment"].as<bool>();
 	m_params.StencilAttachment = data["StencilAttachment"].as<bool>();

@@ -51,6 +51,12 @@ private:
 	*/
 	ILoadable* getNextLoadable();
 
+	/**
+	 * @brief Invoked when a worker finished loading this asset
+	 * @param loadable Loadable object
+	*/
+	void onLoaded(ILoadable* loadable);
+
 	friend class Loader;
 private:
 	std::vector<Loader*> m_loaders;

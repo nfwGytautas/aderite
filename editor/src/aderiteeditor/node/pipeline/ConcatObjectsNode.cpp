@@ -81,7 +81,7 @@ bool ConcatObjectsNode::serialize(const io::Serializer* serializer, YAML::Emitte
     return true;
 }
 
-bool ConcatObjectsNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool ConcatObjectsNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     if (m_currentType != data["PinType"].as<std::string>()) {
         this->setType(data["PinType"].as<std::string>());

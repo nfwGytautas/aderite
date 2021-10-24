@@ -9,7 +9,6 @@ ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
 
 Node::Node() {}
 
-
 Node::Node(int id)
 	: m_id(id)
 {}
@@ -40,8 +39,15 @@ std::vector<OutputPin*> Node::getOutputPins() const {
 	return p_outputs;
 }
 
-void Node::renderUI() {
-	
+void Node::prepareToDisplay() {
+	ImVec2 position = { m_position.x, m_position.y };
+	ImNodes::SetNodeGridSpacePos(m_id, position);
+}
+
+void Node::closingDisplay() {
+	ImVec2 pos = ImNodes::GetNodeGridSpacePos(m_id);
+	m_position.x = pos.x;
+	m_position.y = pos.y;
 }
 
 void Node::evaluate(compiler::GraphEvaluator* evaluator) {
@@ -69,6 +75,14 @@ void Node::resetEvaluateFlag() {
 	m_evaluated = false;
 }
 
+void Node::setPosition(glm::vec2 position) {
+	m_position = position;
+}
+
+glm::vec2 Node::getPosition() const {
+	return m_position;
+}
+
 void Node::serializeData(YAML::Emitter& out) {
 	out << YAML::Key << "InputPins" << YAML::Flow << YAML::BeginSeq;
 	for (InputPin* pin : getInputPins()) {
@@ -83,9 +97,8 @@ void Node::serializeData(YAML::Emitter& out) {
 	out << YAML::EndSeq;
 
 	out << YAML::Key << "Position" << YAML::BeginMap;
-	ImVec2 pos = ImNodes::GetNodeGridSpacePos(m_id);
-	out << YAML::Key << "X" << YAML::Value << pos.x;
-	out << YAML::Key << "Y" << YAML::Value << pos.y;
+	out << YAML::Key << "X" << YAML::Value << m_position.x;
+	out << YAML::Key << "Y" << YAML::Value << m_position.y;
 	out << YAML::EndMap;
 
 	out << YAML::Key << "ID" << YAML::Value << m_id;
@@ -105,10 +118,8 @@ void Node::deserializeData(const YAML::Node& data) {
 		idx++;
 	}
 
-	ImVec2 position;
-	position.x = data["Position"]["X"].as<float>();
-	position.y = data["Position"]["Y"].as<float>();
-	ImNodes::SetNodeGridSpacePos(m_id, position);
+	m_position.x = data["Position"]["X"].as<float>();
+	m_position.y = data["Position"]["Y"].as<float>();
 }
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

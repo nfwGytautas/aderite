@@ -48,7 +48,7 @@ bool ScreenNode::serialize(const io::Serializer* serializer, YAML::Emitter& emit
     return true;
 }
 
-bool ScreenNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool ScreenNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

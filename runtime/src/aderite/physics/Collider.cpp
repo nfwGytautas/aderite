@@ -71,7 +71,7 @@ bool Collider::serialize(const io::Serializer* serializer, YAML::Emitter& emitte
 	return true;
 }
 
-bool Collider::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool Collider::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	setTrigger(data["IsTrigger"].as<bool>());
 	return true;
 }

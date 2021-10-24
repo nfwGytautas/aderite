@@ -22,7 +22,7 @@ bool EditorCameraOperation::serialize(const io::Serializer* serializer, YAML::Em
 	return true;
 }
 
-bool EditorCameraOperation::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool EditorCameraOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	return true;
 }
 

@@ -30,7 +30,7 @@ public:
 	 * @param data Data node
 	 * @return True if deserialized, false otherwise
 	*/
-	virtual bool deserialize(const Serializer* serializer, const YAML::Node& data) = 0;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) = 0;
 };
 
 /**

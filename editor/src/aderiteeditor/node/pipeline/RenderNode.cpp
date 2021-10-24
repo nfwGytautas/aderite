@@ -125,7 +125,7 @@ bool RenderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emit
     return true;
 }
 
-bool RenderNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool RenderNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     m_array = data["IsArray"].as<bool>();
     if (m_array) {

@@ -58,7 +58,7 @@ bool CameraProvideOperation::serialize(const io::Serializer* serializer, YAML::E
 	return true;
 }
 
-bool CameraProvideOperation::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool CameraProvideOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	return true;
 }
 

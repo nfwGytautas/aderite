@@ -9,3 +9,11 @@ Root:
       Content: 1
     - Name: Pipeline
       Content: 2
+    - Name: ColoredTexturedMaterial
+      Content: 3
+    - Name: RedContainer
+      Content: 4
+    - Name: CubeMesh
+      Content: 5
+    - Name: GreenContainer
+      Content: 6

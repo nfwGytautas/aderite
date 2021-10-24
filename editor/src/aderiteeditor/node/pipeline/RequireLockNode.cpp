@@ -54,7 +54,7 @@ bool RequireLockNode::serialize(const io::Serializer* serializer, YAML::Emitter&
     return true;
 }
 
-bool RequireLockNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool RequireLockNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

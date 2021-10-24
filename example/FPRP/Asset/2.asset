@@ -26,10 +26,10 @@ Data:
         HDR: false
     - Type: 23
       Data:
-        ViewId: 0
+        ViewId: 2
     - Type: 23
       Data:
-        ViewId: 0
+        ViewId: 3
     - Type: 201
       Data:
         {}
@@ -47,8 +47,8 @@ Data:
             InputPins: [1, 2]
             OutputPins: []
             Position:
-              X: 200
-              Y: 200
+              X: 481
+              Y: 258
             ID: 0
         - Type: 75
           Data:

@@ -59,7 +59,7 @@ bool AddNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter
 	return true;
 }
 
-bool AddNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool AddNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	setType(data["ElementType"].as<std::string>());
 	deserializeData(data);
 	return true;
@@ -78,7 +78,7 @@ bool AddNode::onConnectToOutput(OutputPin* target, InputPin* source) {
 		setType(source->getType());
 	}
 
-	return false;
+	return true;
 }
 
 ADERITE_EDITOR_NODE_NAMESPACE_END

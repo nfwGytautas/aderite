@@ -63,7 +63,7 @@ bool MaterialAsset::serialize(const io::Serializer* serializer, YAML::Emitter& e
 	return true;
 }
 
-bool MaterialAsset::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool MaterialAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	if (!data["MaterialType"]) {
 		return true;
 

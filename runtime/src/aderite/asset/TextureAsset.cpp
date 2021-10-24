@@ -15,7 +15,13 @@ TextureAsset::~TextureAsset() {
 	}
 }
 
+bool TextureAsset::isValid() const {
+	return bgfx::isValid(m_handle);
+}
+
 void TextureAsset::load(const io::Loader* loader) {
+	ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_handle), "Tried to load already loaded texture type");
+
 	if (m_info.IsCubemap) {
 		LOG_ERROR("Cubemap not implemented");
 		return;
@@ -54,7 +60,7 @@ bool TextureAsset::serialize(const io::Serializer* serializer, YAML::Emitter& em
 	return true;
 }
 
-bool TextureAsset::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool TextureAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	m_info.IsHDR = data["IsHDR"].as<bool>();
 	m_info.IsCubemap = data["IsCubemap"].as<bool>();
 	return true;

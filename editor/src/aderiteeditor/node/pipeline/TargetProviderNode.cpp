@@ -39,7 +39,7 @@ bool TargetProviderNode::serialize(const io::Serializer* serializer, YAML::Emitt
     return true;
 }
 
-bool TargetProviderNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool TargetProviderNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

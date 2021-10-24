@@ -51,7 +51,7 @@ bool BoxCollider::serialize(const io::Serializer* serializer, YAML::Emitter& emi
 	return true;
 }
 
-bool BoxCollider::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool BoxCollider::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	Collider::deserialize(serializer, data);
 	glm::vec3 size = data["Size"].as<glm::vec3>();
 	setSize(size);

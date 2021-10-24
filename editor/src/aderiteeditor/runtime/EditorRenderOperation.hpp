@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <filesystem>
+#include <string>
 #include <bgfx/bgfx.h>
 #include "aderite/physics/Forward.hpp"
 #include "aderite/physics/collider/Forward.hpp"
@@ -27,7 +29,7 @@ public:
 	virtual void shutdown() override;
 	virtual reflection::Type getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
-	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	void updateUniform();
 
@@ -38,6 +40,7 @@ private:
 	// Helpers
 	void loadMeshes();
 	void loadShaders();
+	void loadShader(const std::filesystem::path& base, bgfx::ProgramHandle& shader, const std::string& name);
 private:
 	bgfx::ProgramHandle m_wireframeShader = BGFX_INVALID_HANDLE;
 	bgfx::UniformHandle m_editorUniform = BGFX_INVALID_HANDLE;

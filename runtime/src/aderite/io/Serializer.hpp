@@ -71,7 +71,7 @@ public:
 	 * @param data Data node, must have Type and Handle keys
 	 * @return SerializableObject instance
 	*/
-	SerializableObject* parseType(const YAML::Node& data) const;
+	SerializableObject* parseType(const YAML::Node& data);
 
 	/**
 	 * @brief Write an object to the specified emitter
@@ -89,7 +89,7 @@ public:
 	 * @param data Data node, must have Type key
 	 * @return ISerializable instance
 	*/
-	ISerializable* parseUntrackedType(const YAML::Node& data) const;
+	ISerializable* parseUntrackedType(const YAML::Node& data);
 
 	/**
 	 * @brief Write an untracked object to the specified emitter

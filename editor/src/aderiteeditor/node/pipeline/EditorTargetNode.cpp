@@ -40,7 +40,7 @@ bool EditorTargetNode::serialize(const io::Serializer* serializer, YAML::Emitter
     return true;
 }
 
-bool EditorTargetNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool EditorTargetNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

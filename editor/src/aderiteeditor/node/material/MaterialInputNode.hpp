@@ -20,17 +20,18 @@ public:
 	*/
 	void setType(asset::EditorMaterialType* type);
 
+	/**
+	 * @brief Generates the pins for the node
+	*/
+	void generatePins();
+
 	// Inherited via Node
 	virtual const char* getNodeName() const override;
 	virtual void renderBody() override;
 	virtual void evaluate(compiler::GraphEvaluator* evaluator) override;
 	virtual reflection::Type getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
-	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
-
-private:
-	void generatePins();
-
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	asset::EditorMaterialType* m_material = nullptr;
 };

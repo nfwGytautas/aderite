@@ -39,7 +39,7 @@ bool EntitiesNode::serialize(const io::Serializer* serializer, YAML::Emitter& em
     return true;
 }
 
-bool EntitiesNode::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool EntitiesNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     deserializeData(data);
     return true;
 }

@@ -33,7 +33,7 @@ public:
 	// Inherited via SerializableObject
 	virtual reflection::Type getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
-	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 	/**
 	 * @brief Sets the type of the material

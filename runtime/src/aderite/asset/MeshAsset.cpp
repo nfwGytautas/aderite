@@ -20,7 +20,13 @@ MeshAsset::~MeshAsset() {
 	}
 }
 
+bool MeshAsset::isValid() const {
+	return bgfx::isValid(m_vbh) && bgfx::isValid(m_ibh);
+}
+
 void MeshAsset::load(const io::Loader* loader) {
+	ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_vbh), "Tried to load already loaded mesh");
+
 	// Create layout
 	bgfx::VertexLayout layout;
 	layout.begin();
@@ -38,8 +44,8 @@ void MeshAsset::load(const io::Loader* loader) {
 
 		auto& positionData = result.Vertices;
 		auto& indicesData = result.Indices;
-		m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(positionData.data(), sizeof(float) * positionData.size()), layout);
-		m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
+		m_vbh = bgfx::createVertexBuffer(bgfx::copy(positionData.data(), sizeof(float) * positionData.size()), layout);
+		m_ibh = bgfx::createIndexBuffer(bgfx::copy(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
 	}
 	else {
 		LOG_ERROR("Unimplemented dynamic mesh");
@@ -69,7 +75,7 @@ bool MeshAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitt
 	return true;
 }
 
-bool MeshAsset::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool MeshAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	m_info.IsStatic = data["IsStatic"].as<bool>();
 	return true;
 }

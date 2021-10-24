@@ -21,7 +21,7 @@ void Serializer::shutdown() {
 	}
 }
 
-SerializableObject* Serializer::parseType(const YAML::Node& data) const {
+SerializableObject* Serializer::parseType(const YAML::Node& data) {
 	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in scope");
 	ADERITE_DYNAMIC_ASSERT(data["Handle"], "No handle specified in scope");
 	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
@@ -35,6 +35,18 @@ SerializableObject* Serializer::parseType(const YAML::Node& data) const {
 	instance->m_handle = handle;
 
 	ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
+
+	// Insert the type and then start deserializing it's contents, this way children can get the type if they need to
+	if (instance->getHandle() + 1 > m_objects.size()) {
+		// Resize
+		m_objects.resize(instance->getHandle() + 1, nullptr);
+		m_hasNull = true;
+	}
+	else {
+		ADERITE_DYNAMIC_ASSERT(m_objects[instance->getHandle()] == nullptr, "Overwriting a already loaded object");
+	}
+
+	m_objects[instance->getHandle()] = instance;
 
 	// Deserialize
 	instance->deserialize(this, data["Data"]);
@@ -54,7 +66,7 @@ void Serializer::writeType(YAML::Emitter& emitter, SerializableObject* object) c
 	emitter << YAML::EndMap;
 }
 
-ISerializable* Serializer::parseUntrackedType(const YAML::Node& data) const {
+ISerializable* Serializer::parseUntrackedType(const YAML::Node& data) {
 	ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
 	ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
 
@@ -114,14 +126,6 @@ SerializableObject* Serializer::getOrRead(SerializableHandle handle) {
 
 	// TODO: Check version and upgrade if needed
 	SerializableObject* type = this->parseType(data);
-
-	if (type->getHandle() + 1 > m_objects.size()) {
-		// Resize
-		m_objects.resize(type->getHandle() + 1, nullptr);
-		m_hasNull = true;
-	}
-
-	m_objects[type->getHandle()] = type;
 	return type;
 }
 

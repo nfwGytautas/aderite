@@ -20,12 +20,13 @@ namespace asset {
 class EditorMaterialType : public asset::MaterialTypeAsset {
 public:
 	using Properties = std::vector<Property*>;
+	using Samplers = std::vector<Sampler*>;
 public:
 	EditorMaterialType();
 	~EditorMaterialType();
 
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
-	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 	/**
 	 * @brief Returns this pipeline graph representation
@@ -49,12 +50,60 @@ public:
 	Properties getProperties() const;
 
 	/**
+	 * @brief Returns the samplers of the material type
+	*/
+	Samplers getSamplers() const;
+
+	/**
 	 * @brief Adds a property to material type
 	 * @param prop Property to add
 	*/
 	void addProperty(Property* prop);
+
+	/**
+	 * @brief Adds a sampler to material type
+	 * @param sampler Sampler to add
+	*/
+	void addSampler(Sampler* sampler);
+
+	/**
+	 * @brief Removes the specified property from the type
+	 * @param prop Property to remove
+	*/
+	void removeProperty(Property* prop);
+
+	/**
+	 * @brief Removes the specified sampler from the type
+	 * @param sampler Sampler to remove
+	*/
+	void removeSampler(Sampler* sampler);
+private:
+	/**
+	 * @brief Generates a material header for this type and outputs it into the specified stream
+	 * @param os Stream to output to
+	*/
+	void generateMaterialHeader(std::ostream& os);
+
+	/**
+	 * @brief Generates varying.def.sc file for this material type and outputs it into the specified stream
+	 * @param os Stream to output to
+	*/
+	void generateVarying(std::ostream& os);
+
+	/**
+	 * @brief Generates the fragment shader for this material type and outputs it into the specified stream
+	 * @param os Stream to output to
+	*/
+	void generateFragment(std::ostream& os);
+
+	/**
+	 * @brief Generates the vertex shader for this material type and outputs it into the specified stream
+	 * @param os Stream to output to
+	*/
+	void generateVertex(std::ostream& os);
 private:
 	Properties m_properties;
+	Samplers m_samplers;
 	node::Graph* m_graph = nullptr;
 };
 

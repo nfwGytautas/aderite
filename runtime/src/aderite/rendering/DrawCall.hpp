@@ -5,6 +5,7 @@
 #include <vector>
 #include "aderite/utility/Macros.hpp"
 #include "aderite/scene/components/Forward.hpp"
+#include "aderite/asset/Forward.hpp"
 
 ADERITE_RENDERING_NAMESPACE_BEGIN
 

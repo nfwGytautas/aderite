@@ -26,7 +26,7 @@ public:
 	virtual void renderBody() override;
 	virtual reflection::Type getType() const override;
 	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
-	virtual bool deserialize(const io::Serializer* serializer, const YAML::Node& data) override;
+	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 private:
 	std::string m_currentType;
 	size_t m_index = 0;

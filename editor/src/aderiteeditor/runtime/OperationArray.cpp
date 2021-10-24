@@ -23,7 +23,7 @@ bool OperationArray::serialize(const io::Serializer* serializer, YAML::Emitter& 
 	return true;
 }
 
-bool OperationArray::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool OperationArray::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	return true;
 }
 

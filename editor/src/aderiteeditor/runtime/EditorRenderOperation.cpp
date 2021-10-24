@@ -1,6 +1,7 @@
 #include "EditorRenderOperation.hpp"
 
 #include <filesystem>
+#include <fstream>
 #include <bgfx/bgfx.h>
 #include <glm/gtc/type_ptr.hpp>
 #include "aderite/Aderite.hpp"
@@ -14,8 +15,10 @@
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderiteeditor/runtime/data/Data.hpp"
 #include "aderiteeditor/shared/State.hpp"
+#include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
+#include "aderiteeditor/compiler/ShaderCompiler.hpp"
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_BEGIN
 
@@ -68,7 +71,7 @@ bool EditorRenderOperation::serialize(const io::Serializer* serializer, YAML::Em
 	return true;
 }
 
-bool EditorRenderOperation::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool EditorRenderOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	return true;
 }
 
@@ -163,33 +166,62 @@ void EditorRenderOperation::loadMeshes() {
 }
 
 void EditorRenderOperation::loadShaders() {
-	//static const std::filesystem::path cwd = std::filesystem::current_path();
-	//static const std::filesystem::path res = cwd / "res/";
-	//static const std::filesystem::path shaders = res / "shaders/";
-	//static const std::filesystem::path bin = res / "bin/";
+	LOG_TRACE("Loading editor shaders");
 
-	//// Compile
-	//static const std::filesystem::path wfShader = shaders / "wireframe/";
-	//compiler::Compiler::compileShaderSource(wfShader, bin);
+	const std::filesystem::path projectRoot = editor::State::Project->getRootDir();
+	const std::filesystem::path dataRoot = projectRoot / "Data";
 
-	//// Load
-	//std::vector<unsigned char> wffs = ::aderite::Engine::getAssetManager()->loadBinFile((bin / "wireframe.fs.bin").string());
-	//std::vector<unsigned char> wfvs = ::aderite::Engine::getAssetManager()->loadBinFile((bin / "wireframe.vs.bin").string());
+	// Create compilers
+	compiler::ShaderCompiler sc(dataRoot / "wireframe.vs", dataRoot / "wireframe.fs", dataRoot / "wireframe_varying.def.sc");
 
-	//// Create memory objects
-	//const bgfx::Memory* memWffs = bgfx::copy(wffs.data(), wffs.size() + 1);
-	//memWffs->data[memWffs->size - 1] = '\0';
-	//const bgfx::Memory* memWfvs = bgfx::copy(wfvs.data(), wfvs.size() + 1);
-	//memWfvs->data[memWfvs->size - 1] = '\0';
+	// Compile
+	sc.compile();
 
-	//// Create objects
-	//bgfx::ShaderHandle vsh = bgfx::createShader(memWfvs);
-	//bgfx::ShaderHandle fsh = bgfx::createShader(memWffs);
+	// Load
+	loadShader(dataRoot / "wireframe.vs", m_wireframeShader, "Wireframe");
+}
 
-	//bgfx::setName(vsh, "Wireframe vertex shader");
-	//bgfx::setName(fsh, "Wireframe fragment shader");
+void EditorRenderOperation::loadShader(const std::filesystem::path& base, bgfx::ProgramHandle& shader, const std::string& name) {
+	LOG_TRACE("Loading {0}", name);
 
-	//m_wireframeShader = bgfx::createProgram(vsh, fsh, true);
+	const std::filesystem::path vPath = base.parent_path() / base.filename().replace_extension(".vs.bin");
+	const std::filesystem::path fPath = base.parent_path() / base.filename().replace_extension(".fs.bin");
+
+	std::ifstream vin(vPath, std::ios::binary);
+	std::ifstream fin(fPath, std::ios::binary);
+
+	size_t vSize = vin.seekg(0, std::ios::end).tellg();
+	size_t fSize = fin.seekg(0, std::ios::end).tellg();
+	
+	std::vector<unsigned char> vdata;
+	std::vector<unsigned char> fdata;
+
+	vdata.resize(vSize);
+	fdata.resize(fSize);
+
+	vin.seekg(0, std::ios::beg);
+	fin.seekg(0, std::ios::beg);
+
+	vin.read(reinterpret_cast<char*>(vdata.data()), vdata.size());
+	vdata.push_back('\0');
+
+	fin.read(reinterpret_cast<char*>(fdata.data()), fdata.size());
+	fdata.push_back('\0');
+
+	// Create memory objects
+	const bgfx::Memory* memWfvs = bgfx::copy(vdata.data(), vdata.size() + 1);
+	memWfvs->data[memWfvs->size - 1] = '\0';
+	const bgfx::Memory* memWffs = bgfx::copy(fdata.data(), fdata.size() + 1);
+	memWffs->data[memWffs->size - 1] = '\0';
+
+	// Create objects
+	bgfx::ShaderHandle vsh = bgfx::createShader(memWfvs);
+	bgfx::ShaderHandle fsh = bgfx::createShader(memWffs);
+
+	bgfx::setName(vsh, (name + " vertex shader").c_str());
+	bgfx::setName(fsh, (name + " fragment shader").c_str());
+
+	shader = bgfx::createProgram(vsh, fsh, true);
 }
 
 ADERITE_EDITOR_RUNTIME_NAMESPACE_END

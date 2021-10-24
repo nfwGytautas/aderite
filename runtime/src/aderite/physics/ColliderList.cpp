@@ -77,7 +77,7 @@ bool aderite::physics::ColliderList::serialize(const io::Serializer* serializer,
 	return true;
 }
 
-bool aderite::physics::ColliderList::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool aderite::physics::ColliderList::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	for (auto colliderEntry : data) {
 		YAML::Node& colliderNode = colliderEntry;
 		Collider* collider = static_cast<Collider*>(serializer->parseUntrackedType(data));

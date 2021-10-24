@@ -3,13 +3,24 @@ Type: 3
 Handle: 0
 Data:
   Entities:
-    - Entity: 0
+    - Entity: 1
       Meta:
-        Name: Cube
+        Name: RedCube
       Transform:
-        Position: [0, 0, 0]
+        Position: [0, 0, -2]
         Rotation: [1, 0, 0, 0]
         Scale: [1, 1, 1]
       MeshRenderer:
-        {}
+        Mesh: 5
+        Material: 4
+    - Entity: 0
+      Meta:
+        Name: GreenCube
+      Transform:
+        Position: [0, 0, 2]
+        Rotation: [1, 0, 0, 0]
+        Scale: [1, 1, 1]
+      MeshRenderer:
+        Mesh: 5
+        Material: 6
   Pipeline: 2

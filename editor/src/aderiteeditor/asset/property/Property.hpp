@@ -10,12 +10,20 @@ namespace asset {
 */
 enum class PropertyType {
 	NONE = -1,
+	FLOAT = 0,
+	VEC2 = 1,
+	VEC3 = 2,
+	VEC4 = 3,
+	COUNT,
+};
+
+/**
+ * @brief Supported types of samplers
+*/
+enum class SamplerType {
 	TEXTURE_2D = 0,
 	TEXTURE_CUBE = 1,
-	FLOAT = 2,
-	VEC2 = 3,
-	VEC3 = 4,
-	VEC4 = 5,
+	COUNT,
 };
 
 /**
@@ -26,17 +34,18 @@ enum class PropertyType {
 uint8_t getElementCountForType(PropertyType type);
 
 /**
- * @brief Returns true if the passed type is of sampler type
- * @param type Type of property
-*/
-bool isSampler(PropertyType type);
-
-/**
  * @brief Returns the string representation of the property type
  * @param type Property type
  * @return String representation
 */
 const char* getNameForType(PropertyType type);
+
+/**
+ * @brief Returns the string representation of the sampler type
+ * @param type Sampler type
+ * @return String representation
+*/
+const char* getNameForType(SamplerType type);
 
 /**
  * @brief Base class for material properties
@@ -91,6 +100,34 @@ private:
 	std::string m_name;
 	uint16_t m_offset = 0;
 	PropertyType m_type;
+};
+
+/**
+ * @brief Sampler object for material types
+*/
+class Sampler {
+public:
+	Sampler(SamplerType type, const std::string& name);
+	virtual ~Sampler() {};
+
+	/**
+	 * @brief Returns the type of the property
+	*/
+	SamplerType getType() const;
+
+	/**
+	 * @brief Returns property name
+	*/
+	std::string getName() const;
+
+	/**
+	 * @brief Sets the name of the property
+	 * @param name New name of the property
+	*/
+	void setName(const std::string& name);
+private:
+	std::string m_name;
+	SamplerType m_type;
 };
 
 }

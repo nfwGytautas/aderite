@@ -15,7 +15,19 @@ MaterialTypeAsset::~MaterialTypeAsset() {
 
 }
 
+bool MaterialTypeAsset::isValid() const {
+	for (bgfx::UniformHandle uh : m_samplers) {
+		if (bgfx::isValid(uh)) {
+			return false;
+		}
+	}
+
+	return bgfx::isValid(m_shaderHandle) && bgfx::isValid(m_uniformHandle);
+}
+
 void MaterialTypeAsset::load(const io::Loader* loader) {
+	ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_shaderHandle), "Tried to load already loaded material type");
+
 	io::Loader::ShaderLoadResult slr = loader->loadShader(this->getHandle());
 	if (!slr.Error.empty()) {
 		return;
@@ -36,9 +48,10 @@ void MaterialTypeAsset::load(const io::Loader* loader) {
 		m_info.Size);
 
 	// Create samplers
+	m_samplers.resize(m_info.NumSamplers);
 	for (size_t i = 0; i < m_info.NumSamplers; i++) {
 		m_samplers[i] = bgfx::createUniform(
-			("s_" + typeName + "_" + std::to_string(i)).c_str(),
+			("u_" + typeName + "_" + std::to_string(i)).c_str(),
 			bgfx::UniformType::Sampler,
 			1);
 	}
@@ -74,7 +87,7 @@ bool MaterialTypeAsset::serialize(const io::Serializer* serializer, YAML::Emitte
 	return true;
 }
 
-bool MaterialTypeAsset::deserialize(const io::Serializer* serializer, const YAML::Node& data) {
+bool MaterialTypeAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	m_info.Size = data["DataSize"].as<size_t>();
 	m_info.NumSamplers = data["SamplerCount"].as<size_t>();
 	return true;

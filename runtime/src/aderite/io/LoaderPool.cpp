@@ -82,9 +82,13 @@ ILoadable* LoaderPool::getNextLoadable() {
 		loadable = m_lowQueue.front();
 		m_lowQueue.pop();
 	}
-
 	ADERITE_DYNAMIC_ASSERT(loadable != nullptr, "Nullptr loadable being passed from a pool that is not terminated");
 	return loadable;
+}
+
+void LoaderPool::onLoaded(ILoadable* loadable) {
+	std::unique_lock<std::mutex> latch(m_lock);
+	loadable->m_loading = false;
 }
 
 }

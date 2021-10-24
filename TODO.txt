@@ -52,6 +52,7 @@ Rendering:
 BGFX multithread encoder
 
 Audio:
+Fix inspector selection
 Rethink serialization
 3D audio
 
@@ -74,6 +75,7 @@ Refactor to be more intuitive
 Remove files that don't physically exist anymore
 
 Editor:
+Block from naming properties the same name
 Open graph when selecting apropriate asset
 Redo most of it
 Refactor drag and drop API

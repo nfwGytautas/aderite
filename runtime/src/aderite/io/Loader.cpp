@@ -75,7 +75,7 @@ void Loader::startup() {
 			ILoadable* loadable = m_pool->getNextLoadable();
 			if (loadable != nullptr) {
 				loadable->load(this);
-				loadable->m_loading = false;
+				m_pool->onLoaded(loadable);
 			}
 		}
 	});
@@ -109,7 +109,8 @@ Loader::MeshLoadResult Loader::loadMesh(LoadableHandle handle) const {
 	const aiScene* scene = m_impl->Importer.ReadFileFromMemory(
 		chunk.Data.data(),
 		chunk.Data.size(),
-		flags
+		flags,
+		"obj"
 	);
 
 	// Sanity checks
