@@ -30,7 +30,7 @@ DataChunk FileHandler::openSerializable(SerializableHandle handle) const {
 }
 
 DataChunk FileHandler::openReservedLoadable(LoadableHandle handle) const {
-    const std::filesystem::path path = m_rootDir / "Data" / (std::to_string(handle) + ".data");
+    const std::filesystem::path path = m_rootDir / "Data" / ("_" + std::to_string(handle) + ".data");
 
     if (!std::filesystem::exists(path)) {
         return DataChunk(0, 0, ("Data/_" + std::to_string(handle) + ".data").c_str(), {});
@@ -45,6 +45,10 @@ DataChunk FileHandler::openReservedLoadable(LoadableHandle handle) const {
     in.read(reinterpret_cast<char*>(data.data()), data.size());
     data.push_back('\0');
     return DataChunk(offset, size, ("Data/_" + std::to_string(handle) + ".data").c_str(), data);
+}
+
+std::filesystem::path FileHandler::pathToReserved(LoadableHandle handle) const {
+    return m_rootDir / "Data" / ("_" + std::to_string(handle) + ".data");
 }
 
 DataChunk FileHandler::openLoadable(SerializableHandle handle) const {

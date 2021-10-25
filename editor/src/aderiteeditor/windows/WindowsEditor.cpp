@@ -293,16 +293,10 @@ void WindowsEditor::onNewProject(const std::string& dir, const std::string& name
 	editor::State::Project = new shared::Project(dir, name);
 
 	// Create directories
-	if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Asset/")) {
-		std::filesystem::create_directory(editor::State::Project->getRootDir() / "Asset/");
-	}
-
-	if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Data/")) {
-		std::filesystem::create_directory(editor::State::Project->getRootDir() / "Data/");
-	}
+	this->createDirectories();
 
 	// Copy shader libs, and aderite editor shaders
-	this->copyShaderSources();
+	this->copyLibFiles();
 
 	// Setup asset manager
 	::aderite::Engine::getFileHandler()->setRoot(editor::State::Project->getRootDir());
@@ -340,7 +334,7 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 	editor::State::Project = shared::Project::load(path);
 
 	// Copy shader libs, just in case they were updated
-	this->copyShaderSources();
+	this->copyLibFiles();
 
 	::aderite::Engine::get()->getWindowManager()->setTitle(editor::State::Project->getName());
 
@@ -433,11 +427,32 @@ void WindowsEditor::renderComponents() {
 	}
 }
 
-void WindowsEditor::copyShaderSources() {
+void WindowsEditor::copyLibFiles() {
 	const auto copyOptions = std::filesystem::copy_options::overwrite_existing;
 
+	// Shader files
 	std::filesystem::copy("res/shaders/include/", editor::State::Project->getRootDir() / "Data/", copyOptions);
 	std::filesystem::copy("res/shaders/wireframe/", editor::State::Project->getRootDir() / "Data/", copyOptions);
+
+	// Scriptlib
+	std::filesystem::copy( "aderite_scriptlib.dll", 
+		editor::State::Project->getRootDir() / 
+		("Data/_" + std::to_string(aderite::io::FileHandler::Reserved::ScriptLibCode) + ".data"), 
+		copyOptions);
+}
+
+void WindowsEditor::createDirectories() {
+	if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Asset/")) {
+		std::filesystem::create_directory(editor::State::Project->getRootDir() / "Asset/");
+	}
+
+	if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Data/")) {
+		std::filesystem::create_directory(editor::State::Project->getRootDir() / "Data/");
+	}
+
+	if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Scripts/")) {
+		std::filesystem::create_directory(editor::State::Project->getRootDir() / "Scripts/");
+	}
 }
 
 ADERITE_EDITOR_ROOT_NAMESPACE_END

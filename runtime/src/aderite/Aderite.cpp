@@ -14,6 +14,7 @@
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/window/WindowManager.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
 
 
 #if MIDDLEWARE_ENABLED == 1
@@ -90,9 +91,16 @@ bool Engine::init(InitOptions options) {
 		return false;
 	}
 
-	// Serializer
+	// Reflection library
 	m_reflector = new reflection::Reflector();
 	if (!m_reflector->init()) {
+		LOG_ERROR("Aborting aderite initialization");
+		return false;
+	}
+
+	// Script manager
+	m_scriptManager = new scripting::ScriptManager();
+	if (!m_scriptManager->init()) {
 		LOG_ERROR("Aborting aderite initialization");
 		return false;
 	}
@@ -112,6 +120,7 @@ bool Engine::init(InitOptions options) {
 void Engine::shutdown() {
 	MIDDLEWARE_ACTION(onRuntimeShutdown);
 
+	m_scriptManager->shutdown();
 	m_sceneManager->shutdown();
 	m_audioController->shutdown();
 	m_inputManager->shutdown();
@@ -131,6 +140,7 @@ void Engine::shutdown() {
 	delete m_loaderPool;
 	delete m_fileHandler;
 	delete m_reflector;
+	delete m_scriptManager;
 
 	delete m_middleware;
 }
@@ -254,6 +264,8 @@ void Engine::updateScripts(float delta) {
 	if (!m_willUpdateScripts) {
 		return;
 	}
+
+	m_scriptManager->update(delta);
 
 	MIDDLEWARE_ACTION(onScriptUpdate, delta);
 }

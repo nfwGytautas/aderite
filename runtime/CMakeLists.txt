@@ -34,7 +34,7 @@ else()
 endif()
 
 # Same name
-target_link_libraries(aderite_runtime PUBLIC glfw3 glad )
+target_link_libraries(aderite_runtime PUBLIC glfw3 glad mono-2.0-sgen libmono-static-sgen libmonoruntime-sgen)
 
 # Some MSVC flags
 set_property(TARGET aderite_runtime PROPERTY

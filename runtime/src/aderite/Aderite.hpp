@@ -13,6 +13,7 @@
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/window/Forward.hpp"
+#include "aderite/scripting/Forward.hpp"
 
 #define ADERITE_SYSTEM_PTR(public_name, class_name, field_name) public: static class_name* public_name() { return ::aderite::Engine::get()->field_name; } private: class_name* field_name = nullptr;
 
@@ -145,6 +146,7 @@ private:
 	ADERITE_SYSTEM_PTR(getLoaderPool, io::LoaderPool, m_loaderPool)
 	ADERITE_SYSTEM_PTR(getPhysicsController, physics::PhysicsController, m_physicsController)
 	ADERITE_SYSTEM_PTR(getAudioController, audio::AudioController, m_audioController)
+	ADERITE_SYSTEM_PTR(getScriptManager, scripting::ScriptManager, m_scriptManager)
 
 #if MIDDLEWARE_ENABLED == 1
 	ADERITE_SYSTEM_PTR(getMiddleware, interfaces::IEngineMiddleware, m_middleware)

@@ -1,16 +1,17 @@
 cmake_minimum_required(VERSION 3.16.2 FATAL_ERROR)
 
-project(aderite)
+project(aderite LANGUAGES CXX CSharp)
 
 # Init
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $<1:${CMAKE_BINARY_DIR}/bin>)
+set(ADERITE_OUTPUT_DIR ${CMAKE_BINARY_DIR}/bin)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${ADERITE_OUTPUT_DIR}/$<0:>)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ADERITE_OUTPUT_DIR}/$<0:>)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ADERITE_OUTPUT_DIR}/$<0:>)
 
 option(BUILD_RELEASE "If specified then release version of aderite will be built" OFF)
 
-message(STATUS "Build release: " BUILD_RELEASE)
+message(STATUS "Build release: " ${BUILD_RELEASE})
 
 # Export all library symbols
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
@@ -21,6 +22,7 @@ set(PHYSX_LIBS LowLevel_static_64 LowLevelAABB_static_64 LowLevelDynamics_static
 message(STATUS "PhysX libs ${PHYSX_LIBS}")
 
 add_subdirectory(runtime)
+add_subdirectory(scriptlib)
 add_subdirectory(editor)
 
 # Copy dlls to output
@@ -34,6 +36,6 @@ endif()
 
 message(STATUS "Copying dll files ${DLL_FILES}")
 
-file(COPY ${DLL_FILES} DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/ DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/res/)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tools/ DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/tools/)
+file(COPY ${DLL_FILES} DESTINATION ${ADERITE_OUTPUT_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/ DESTINATION ${ADERITE_OUTPUT_DIR}/res/)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/tools/ DESTINATION ${ADERITE_OUTPUT_DIR}/tools/)

@@ -38,6 +38,8 @@ public:
 	struct Reserved {
 		static constexpr LoadableHandle MasterAudioBank = 0;
 		static constexpr LoadableHandle StringsAudioBank = 1;
+		static constexpr LoadableHandle ScriptLibCode = 2;
+		static constexpr LoadableHandle GameCode = 3;
 	};
 
 public:
@@ -54,6 +56,13 @@ public:
 	 * @return DataChunk instance
 	*/
 	DataChunk openReservedLoadable(LoadableHandle handle) const;
+	
+	/**
+	 * @brief Returns the path to the reserved loadable handle
+	 * @param handle Reserved handle
+	 * @return Path (not guaranteed to exist)
+	*/
+	std::filesystem::path pathToReserved(LoadableHandle handle) const;
 
 	/**
 	 * @brief Resolves the handle file and chunk, loads it and returns it

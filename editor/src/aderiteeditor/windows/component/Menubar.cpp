@@ -9,10 +9,12 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
 #include "aderiteeditor/windows/component/FileDialog.hpp"
 #include "aderiteeditor/windows/component/Modals.hpp"
+#include "aderiteeditor/compiler/ScriptCompiler.hpp"
 
 ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
 
@@ -126,6 +128,23 @@ void Menubar::render() {
 				//}
 			}
 			
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Scripting")) {
+			if (ImGui::MenuItem("Compile scripts")) {
+				LOG_TRACE("Compiling project scripts");
+				compiler::ScriptCompiler sc;
+				// TODO: Results, errors, warnings, etc.
+				sc.compile();
+			}
+
+			if (ImGui::MenuItem("Reload")) {
+				LOG_TRACE("Reloading assemblies");
+				::aderite::Engine::getScriptManager()->loadAssemblies();
+			}
+
+
 			ImGui::EndMenu();
 		}
 

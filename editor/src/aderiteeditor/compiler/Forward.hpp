@@ -11,5 +11,7 @@ ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
 class GraphEvaluator;
 class PipelineEvaluator;
 class ShaderEvaluator;
+class ShaderCompiler;
+class ScriptCompiler;
 
 ADERITE_EDITOR_COMPILER_NAMESPACE_END

@@ -28,3 +28,6 @@
 [submodule ".\\dependencies\\imnodes"]
 	path = .\\dependencies\\imnodes
 	url = https://github.com/Nelarius/imnodes
+[submodule ".\\dependencies\\mono"]
+	path = .\\dependencies\\mono
+	url = https://github.com/mono/mono

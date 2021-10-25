@@ -53,7 +53,8 @@ public:
 	static WindowsEditor* getInstance();
 private:
 	void renderComponents();
-	void copyShaderSources();
+	void copyLibFiles();
+	void createDirectories();
 private:
 	/**
 	 * @brief Flag that is true when the user requests to exit the editor otherwise the

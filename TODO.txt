@@ -74,7 +74,15 @@ VFS:
 Refactor to be more intuitive
 Remove files that don't physically exist anymore
 
+Scripting:
+Generate .csproj file for easier coding
+Dont kill entire editor on script run error
+Override mono log to aderite log
+Load on project open
+Thunks
+
 Editor:
+Speed up load time on project load
 Block from naming properties the same name
 Open graph when selecting apropriate asset
 Redo most of it
