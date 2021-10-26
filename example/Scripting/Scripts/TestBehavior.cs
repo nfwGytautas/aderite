@@ -5,7 +5,7 @@ namespace Scripts
     [ScriptedBehavior]
     public class TestBehavior
     {
-        public float TestValue { get; set; }
+        public float TestValue;
 
         void Update(float delta)
         {

@@ -82,6 +82,8 @@ Load on project open
 Thunks
 
 Editor:
+Shared drag drop fields API (MeshDragDrop, MaterialDragDrop, etc.) elements
+Modal base class
 Speed up load time on project load
 Block from naming properties the same name
 Open graph when selecting apropriate asset

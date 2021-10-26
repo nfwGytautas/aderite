@@ -13,6 +13,15 @@ Data:
       MeshRenderer:
         Mesh: 5
         Material: 4
+      Scripts:
+        Type: 40
+        Data:
+          Scripts:
+            - Type: 41
+              Data:
+                Name: Scripts.TestBehavior
+                Fields:
+                  TestValue: 15.3000002
     - Entity: 0
       Meta:
         Name: GreenCube

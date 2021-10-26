@@ -17,6 +17,7 @@
 #include "aderite/asset/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/physics/Forward.hpp"
+#include "aderite/scripting/Forward.hpp"
 
 ADERITE_COMPONENTS_NAMESPACE_BEGIN
 
@@ -130,6 +131,16 @@ struct AudioListenerComponent {
 
 	AudioListenerComponent() = default;
 	AudioListenerComponent(const AudioListenerComponent&) = default;
+};
+
+/**
+ * @brief Component used to specify that this entity has ScriptableBehaviors applied to it
+*/
+struct ScriptsComponent {
+	scripting::ScriptList* Scripts = nullptr;
+
+	ScriptsComponent() = default;
+	ScriptsComponent(const ScriptsComponent&) = default;
 };
 
 ADERITE_COMPONENTS_NAMESPACE_END

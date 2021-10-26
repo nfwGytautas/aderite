@@ -133,17 +133,16 @@ void Menubar::render() {
 
 		if (ImGui::BeginMenu("Scripting")) {
 			if (ImGui::MenuItem("Compile scripts")) {
+				// Compile
 				LOG_TRACE("Compiling project scripts");
 				compiler::ScriptCompiler sc;
 				// TODO: Results, errors, warnings, etc.
 				sc.compile();
-			}
 
-			if (ImGui::MenuItem("Reload")) {
-				LOG_TRACE("Reloading assemblies");
+				// Reload
+				LOG_TRACE("Reloading scripts");
 				::aderite::Engine::getScriptManager()->loadAssemblies();
 			}
-
 
 			ImGui::EndMenu();
 		}

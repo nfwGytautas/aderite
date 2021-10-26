@@ -1,9 +1,11 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
+#include "aderite/scripting/Forward.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -36,6 +38,18 @@ public:
 	 * @brief Returns the current domain
 	*/
 	MonoDomain* getDomain() const;
+
+	/**
+	 * @brief Returns all behaviors that the script manager knows off
+	*/
+	std::vector<BehaviorWrapper*> getAllBehaviors() const;
+
+	/**
+	 * @brief Returns the behavior instance with the specified name
+	 * @param name Name of the behavior
+	 * @return BehaviorWrapper instance or nullptr if doesn't exist
+	*/
+	BehaviorWrapper* getBehavior(const std::string& name);
 private:
 	/**
 	 * @brief Resolves all Behavior classes in the loaded assembly
@@ -56,6 +70,11 @@ private:
 	 * @brief Returns true if the specified class has ScriptedBehavior attribute
 	*/
 	bool classMarkedAsBehavior(MonoClass* klass);
+
+	/**
+	 * @brief Cleans up all data
+	*/
+	void clean();
 private:
 	ScriptManager() {}
 	friend class Engine;
@@ -75,7 +94,7 @@ private:
 	MonoAssembly* m_codeAssembly = nullptr;
 	MonoImage* m_codeImage = nullptr;
 
-	std::vector<MonoClass*> m_behaviors;
+	std::vector<BehaviorWrapper*> m_behaviors;
 };
 
 }

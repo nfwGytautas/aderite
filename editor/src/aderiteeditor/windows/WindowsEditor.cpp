@@ -24,6 +24,7 @@
 #include "aderite/input/InputManager.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/io/FileHandler.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
@@ -343,6 +344,9 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 
 	// Setup audio controller
 	::aderite::Engine::getAudioController()->loadMasterBank();
+
+	// Load assemblies
+	::aderite::Engine::getScriptManager()->loadAssemblies();
 
 	if (editor::State::Project->getActiveScene() != c_InvalidHandle) {
 		// Read scene

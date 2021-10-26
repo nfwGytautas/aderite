@@ -23,6 +23,7 @@ private:
 	void renderAudioListener(scene::Entity entity);
 	void renderAudioSource(scene::Entity entity);
 	void renderColliders(scene::Entity entity);
+	void renderScripts(scene::Entity entity);
 
 	void renderAsset();
 	void renderMesh(io::SerializableObject* asset);

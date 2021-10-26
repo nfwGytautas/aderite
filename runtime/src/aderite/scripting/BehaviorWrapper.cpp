@@ -11,6 +11,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/scripting/FieldWrapper.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -22,17 +23,30 @@ BehaviorWrapper::BehaviorWrapper(MonoImage* image, MonoClass* klass)
 	printClassMethods(klass);
 
 	// Gather meta information
-	m_updateMethod = resolveMethod(MethodSignature{
-		mono_class_get_namespace(klass),
-		mono_class_get_name(klass),
+	const std::string nSpace = std::string(mono_class_get_namespace(klass));
+	const std::string name = std::string(mono_class_get_name(klass));
+	m_name = nSpace + (!nSpace.empty() ? "." : "") + name;
+
+	m_updateMethod = this->resolveMethod(MethodSignature{
+		nSpace,
+		name,
 		"Update",
 		{{ "single" }},
 		false
 	}.value());
 
+	// Resolve fields
+	this->resolveFields();
+
 	// Create thunks for frequent functions
-	if (hasUpdateFunction()) {
+	if (this->hasUpdateFunction()) {
 		m_updateThunk = static_cast<UpdateThunkFn*>(mono_method_get_unmanaged_thunk(m_updateMethod));
+	}
+}
+
+BehaviorWrapper::~BehaviorWrapper() {
+	for (FieldWrapper* fw : m_fields) {
+		delete fw;
 	}
 }
 
@@ -40,13 +54,34 @@ bool BehaviorWrapper::hasUpdateFunction() const {
 	return m_updateMethod != nullptr;
 }
 
-void BehaviorWrapper::invokeUpdate(MonoObject* instance, float delta) const {
+void BehaviorWrapper::update(MonoObject* instance, float delta) const{
+	// TODO: Handle exception
 	MonoException* ex = nullptr;
 	m_updateThunk(instance, delta, &ex);
 }
 
 MonoObject* BehaviorWrapper::createInstance() {
 	return mono_object_new(::aderite::Engine::getScriptManager()->getDomain(), m_class);
+}
+
+const std::vector<FieldWrapper*>& BehaviorWrapper::getFields() const {
+	return m_fields;
+}
+
+FieldWrapper* BehaviorWrapper::getField(const std::string& fieldName) const {
+	auto it = std::find_if(m_fields.begin(), m_fields.end(), [fieldName](FieldWrapper* fw) {
+		return fw->getName() == fieldName;
+	});
+
+	if (it == m_fields.end()) {
+		return nullptr;
+	}
+
+	return *it;
+}
+
+std::string BehaviorWrapper::getName() const {
+	return m_name;
 }
 
 MonoMethod* BehaviorWrapper::resolveMethod(const std::string& signature) {
@@ -60,6 +95,14 @@ MonoMethod* BehaviorWrapper::resolveMethod(const std::string& signature) {
 	mono_method_desc_free(methodDesc);
 
 	return method;
+}
+
+void BehaviorWrapper::resolveFields() {
+	void* iter = NULL;
+	MonoClassField* field;
+	while (field = mono_class_get_fields(m_class, &iter)) {
+		m_fields.push_back(new FieldWrapper(field));
+	}
 }
 
 }

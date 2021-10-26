@@ -10,6 +10,10 @@
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/scripting/InternalCalls.hpp"
 #include "aderite/scripting/BehaviorWrapper.hpp"
+#include "aderite/scripting/ScriptList.hpp"
+#include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/Scene.hpp"
+#include "aderite/scene/components/Components.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -18,6 +22,7 @@ bool ScriptManager::init() {
 	LOG_TRACE("Initializing script manager");
 
 	// Set directories
+	// TODO: Change this to dependencies
 	const char* libDir = "C:/Program Files/Mono/lib/";
 	const char* etcDir = "C:/Program Files/Mono/etc/";
 	LOG_DEBUG("Setting directories to {0} {1}", libDir, etcDir);
@@ -37,6 +42,8 @@ bool ScriptManager::init() {
 }
 
 void ScriptManager::shutdown() {
+	this->clean();
+
 	mono_jit_cleanup(m_jitDomain);
 	//mono_domain_unload(m_jitDomain);
 
@@ -45,10 +52,17 @@ void ScriptManager::shutdown() {
 }
 
 void ScriptManager::update(float delta) {
-	// TEMP
-	static BehaviorWrapper bw(m_codeImage, m_behaviors[0]);
-	static MonoObject* testInstance = bw.createInstance();
-	bw.invokeUpdate(testInstance, delta);
+	scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+
+	if (currentScene == nullptr) {
+		return;
+	}
+
+	auto scriptableView = currentScene->getEntityRegistry().view<scene::components::ScriptsComponent>();
+	for (auto entity : scriptableView) {
+		auto [script] = scriptableView.get(entity);
+		script.Scripts->update(delta);
+	}
 }
 
 void ScriptManager::loadAssemblies() {
@@ -60,8 +74,7 @@ void ScriptManager::loadAssemblies() {
 	}
 
 	if (m_currentDomain != nullptr) {
-		// TODO: Unload first
-
+		this->clean();
 	}
 
 	// Create domain
@@ -80,7 +93,21 @@ void ScriptManager::loadAssemblies() {
 		return;
 	}
 
+	// Get behaviors
     this->resolveBehaviors();
+}
+
+BehaviorWrapper* ScriptManager::getBehavior(const std::string& name) {
+	auto it = std::find_if(m_behaviors.begin(), m_behaviors.end(), [name](BehaviorWrapper* bw) {
+		return bw->getName() == name;
+	});
+
+	if (it == m_behaviors.end()) {
+		LOG_WARN("Failed to find behavior with name {0}", name);
+		return nullptr;
+	}
+
+	return *it;
 }
 
 void ScriptManager::resolveBehaviors() {
@@ -108,7 +135,7 @@ void ScriptManager::resolveBehaviors() {
 
 			if (this->classMarkedAsBehavior(monoClass)) {
 				LOG_TRACE("Found behavior. Namespace: {1}, name: {0}", name, nSpace);
-				m_behaviors.push_back(monoClass);
+				m_behaviors.push_back(new BehaviorWrapper(m_codeImage, monoClass));
 			}
 		}
 	}
@@ -210,8 +237,26 @@ bool ScriptManager::classMarkedAsBehavior(MonoClass* klass) {
 	return false;
 }
 
+void ScriptManager::clean() {
+	// TODO: Don't delete just reconfigure its meta data
+	for (BehaviorWrapper* bw : m_behaviors) {
+		delete bw;
+		bw = nullptr;
+	}
+
+	m_behaviors.clear();
+
+	// TODO: Invoke GC
+
+	// TODO: Unload domain
+}
+
 MonoDomain* ScriptManager::getDomain() const {
 	return m_currentDomain;
+}
+
+std::vector<BehaviorWrapper*> ScriptManager::getAllBehaviors() const {
+	return m_behaviors;
 }
 
 }

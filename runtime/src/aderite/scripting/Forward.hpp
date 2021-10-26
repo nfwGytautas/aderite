@@ -10,6 +10,9 @@ namespace scripting {
 
 class ScriptManager;
 class BehaviorWrapper;
+class ScriptList;
+class Script;
+class FieldWrapper;
 
 }
 }

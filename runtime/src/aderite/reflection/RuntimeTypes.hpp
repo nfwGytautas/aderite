@@ -32,6 +32,10 @@ enum class RuntimeTypes : Type {
 	OP_RENDER	= 23,
 	OP_TARGET	= 24,
 
+	// Scripting
+	SCRIPT_LIST = 40,
+	SCRIPT		= 41,
+
 	// Last element of runtime types, used to specify the end runtime serializables
 	RESERVED = 50,
 	// END used to extend runtime types

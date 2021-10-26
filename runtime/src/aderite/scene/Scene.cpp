@@ -24,6 +24,7 @@
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/ColliderList.hpp"
 #include "aderite/rendering/Pipeline.hpp"
+#include "aderite/scripting/ScriptList.hpp"
 
 
 namespace aderite {
@@ -111,14 +112,10 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 	// Colliders
 	if (e.hasComponent<components::CollidersComponent>()) {
 		out << YAML::Key << "Colliders";
-		out << YAML::BeginSeq; // Colliders
-
 		components::CollidersComponent& collidersComponent = e.getComponent<components::CollidersComponent>();
 
 		// TODO: Error check
 		::aderite::Engine::getSerializer()->writeUntrackedType(out, collidersComponent.Colliders);
-
-		out << YAML::EndSeq; // Colliders
 	}
 
 	// Audio sources
@@ -143,6 +140,15 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 		out << YAML::Key << "IsEnabled" << audioListenerComponent.IsEnabled;
 
 		out << YAML::EndMap; // AudioListener
+	}
+
+	// Script
+	if (e.hasComponent<components::ScriptsComponent>()) {
+		out << YAML::Key << "Scripts";
+		components::ScriptsComponent& scriptsComponent = e.getComponent<components::ScriptsComponent>();
+
+		// TODO: Error check
+		::aderite::Engine::getSerializer()->writeUntrackedType(out, scriptsComponent.Scripts);
 	}
 
 	out << YAML::EndMap; // Entity
@@ -220,7 +226,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 		auto& collidersComponent = e.getComponent<components::CollidersComponent>();
 
 		// TODO: Error check
-		collidersComponent.Colliders = static_cast<physics::ColliderList*>(::aderite::Engine::getSerializer()->parseUntrackedType(e_node));
+		collidersComponent.Colliders = static_cast<physics::ColliderList*>(::aderite::Engine::getSerializer()->parseUntrackedType(colliders));
 	}
 
 	// Audio sources
@@ -239,6 +245,19 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 
 		// TODO: Error check
 		rbodyComponent.IsEnabled = al_node["IsEnabled"].as<bool>();
+	}
+
+	// Colliders
+	auto scripts = e_node["Scripts"];
+	if (scripts) {
+		if (!e.hasComponent<components::ScriptsComponent>()) {
+			e.addComponent<components::ScriptsComponent>();
+		}
+
+		auto& scriptComponent = e.getComponent<components::ScriptsComponent>();
+
+		// TODO: Error check
+		scriptComponent.Scripts = static_cast<scripting::ScriptList*>(::aderite::Engine::getSerializer()->parseUntrackedType(scripts));
 	}
 
 	return e;
@@ -283,6 +302,10 @@ Entity Scene::createEntity(const components::MetaComponent& MetaComponent) {
 void Scene::destroyEntity(Entity entity) {
 	if (entity.hasComponent<components::CollidersComponent>()) {
 		delete entity.getComponent<components::CollidersComponent>().Colliders;
+	}
+
+	if (entity.hasComponent<components::ScriptsComponent>()) {
+		delete entity.getComponent<components::ScriptsComponent>().Scripts;
 	}
 
 	m_registry.destroy(entity);
@@ -396,6 +419,11 @@ void Scene::onComponentAdded<components::CollidersComponent>(Entity entity, comp
 }
 
 template<>
+void Scene::onComponentAdded<components::ScriptsComponent>(Entity entity, components::ScriptsComponent& component) {
+	component.Scripts = new scripting::ScriptList();
+}
+
+template<>
 void Scene::onComponentAdded<components::AudioSourceComponent>(Entity entity, components::AudioSourceComponent& component) {
 	// Add transform if don't have already
 	if (!entity.hasComponent<components::TransformComponent>()) {
@@ -455,6 +483,11 @@ void Scene::onComponentRemoved<components::CollidersComponent>(Entity entity, co
 	}
 	m_physicsScene->removeActor(*component.Colliders->getActor());
 	delete component.Colliders;
+}
+
+template<>
+void Scene::onComponentRemoved<components::ScriptsComponent>(Entity entity, components::ScriptsComponent& component) {
+	delete component.Scripts;
 }
 
 void Scene::onContact(

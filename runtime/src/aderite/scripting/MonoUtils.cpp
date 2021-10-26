@@ -66,5 +66,9 @@ void printClassMethods(MonoClass* klass) {
 	}
 }
 
+void* unbox(MonoObject* object) {
+	return mono_object_unbox(object);
+}
+
 }
 }

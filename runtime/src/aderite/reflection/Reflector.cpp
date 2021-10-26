@@ -23,6 +23,9 @@
 #include "aderite/rendering/operation/RenderOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
 
+#include "aderite/scripting/ScriptList.hpp"
+#include "aderite/scripting/Script.hpp"
+
 namespace aderite {
 namespace reflection {
 
@@ -48,6 +51,10 @@ bool Reflector::init() {
 	ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::OutputToScreenOperation, RuntimeTypes::OP_SCREEN);
 	ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::RenderOperation, RuntimeTypes::OP_RENDER);
 	ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::TargetProvideOperation, RuntimeTypes::OP_TARGET);
+
+	// Scripts
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scripting::ScriptList, RuntimeTypes::SCRIPT_LIST);
+	ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scripting::Script, RuntimeTypes::SCRIPT);
 
 	LOG_DEBUG("Registered {0} runtime instancers", m_instancers.size());
 	ADERITE_DEBUG_SECTION(
@@ -85,7 +92,7 @@ std::string Reflector::reflectName(Type type) const {
 
 InstancerBase* Reflector::resolveInstancer(Type type) const {
 	auto it = m_instancers.find(type);
-	ADERITE_DYNAMIC_ASSERT(it != m_instancers.end(), "Tried to resolve instancer for non registered type {0}", type);
+	ADERITE_DYNAMIC_ASSERT(it != m_instancers.end(), "Tried to resolve instancer for non registered type");
 	return it->second;
 }
 

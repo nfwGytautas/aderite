@@ -71,14 +71,17 @@ reflection::Type aderite::physics::ColliderList::getType() const {
 }
 
 bool aderite::physics::ColliderList::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+	emitter << YAML::Key << "Colliders";
+	emitter << YAML::BeginSeq;
 	for (Collider* c : m_colliders) {
 		serializer->writeUntrackedType(emitter, c);
 	}
+	emitter << YAML::EndSeq;
 	return true;
 }
 
 bool aderite::physics::ColliderList::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-	for (auto colliderEntry : data) {
+	for (auto colliderEntry : data["Colliders"]) {
 		YAML::Node& colliderNode = colliderEntry;
 		Collider* collider = static_cast<Collider*>(serializer->parseUntrackedType(data));
 		addCollider(collider);

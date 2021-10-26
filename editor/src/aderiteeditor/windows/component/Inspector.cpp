@@ -23,6 +23,10 @@
 #include "aderite/physics/ColliderList.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
+#include "aderite/scripting/ScriptList.hpp"
+#include "aderite/scripting/Script.hpp"
+#include "aderite/scripting/BehaviorWrapper.hpp"
+#include "aderite/scripting/FieldWrapper.hpp"
 
 #include "aderiteeditor/utility/Utility.hpp"
 #include "aderiteeditor/utility/ImGui.hpp"
@@ -42,6 +46,7 @@
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/windows/WindowsEditor.hpp"
+#include "aderiteeditor/windows/SelectScriptModal.hpp"
 #include "aderiteeditor/windows/component/FileDialog.hpp"
 #include "aderiteeditor/windows/component/NodeEditor.hpp"
 
@@ -101,6 +106,7 @@ void Inspector::render() {
 
 void Inspector::renderEntity() {
 	static utility::InlineRename renamer;
+	static editor_ui::SelectScriptModal ssm;
 
 	scene::Entity entity = editor::State::LastSelectedObject.getEntity();
 
@@ -152,6 +158,11 @@ void Inspector::renderEntity() {
 		this->renderColliders(entity);
 	}
 
+	bool hasScripts = entity.hasComponent<scene::components::ScriptsComponent>();
+	if (hasScripts) {
+		this->renderScripts(entity);
+	}
+
 	// Add component
 	ImGui::Separator();
 
@@ -197,7 +208,31 @@ void Inspector::renderEntity() {
 			ImGui::CloseCurrentPopup();
 		}
 
+		if (ImGui::MenuItem("Script")) {
+			ssm.show();
+			ImGui::CloseCurrentPopup();
+		}
+
 		ImGui::EndPopup();
+	}
+
+	ssm.render();
+
+	if (ssm.getSelectedBehavior() != nullptr) {
+		if (!entity.hasComponent<::aderite::scene::components::ScriptsComponent>()) {
+			entity.addComponent<::aderite::scene::components::ScriptsComponent>();
+		}
+
+		// TODO: Block from adding same script again
+
+		// Add script
+		auto& scriptsComponent = entity.getComponent<::aderite::scene::components::ScriptsComponent>();
+		scripting::Script* s = new scripting::Script();
+		s->setName(ssm.getSelectedBehavior()->getName());
+		scriptsComponent.Scripts->addScript(s);
+
+		// Reset the selector
+		ssm.reset();
 	}
 }
 
@@ -409,6 +444,67 @@ void Inspector::renderColliders(scene::Entity entity) {
 
 	for (physics::Collider* c : toRemove) {
 		colliders.Colliders->removeCollider(c);
+	}
+}
+
+void Inspector::renderScripts(scene::Entity entity) {
+	auto& scripts = entity.getComponent<scene::components::ScriptsComponent>();
+	std::vector<scripting::Script*> toRemove;
+
+	// Colliders
+	for (size_t i = 0; i < scripts.Scripts->size(); i++) {
+		bool remove = false;
+
+		bool open = false;
+		render_component_shared("Script " + std::to_string(i), scripts.Scripts->get(i)->getName(), open, remove);
+
+		if (open) {
+			auto script = static_cast<scripting::Script*>(scripts.Scripts->get(i));
+			
+			if (ImGui::BeginTable((scripts.Scripts->get(i)->getName() + "EditTable").c_str(), 2)) {
+				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+				ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+				// Render fields
+				for (scripting::FieldWrapper* fw : script->getBehavior()->getFields()) {
+					ImGui::TableNextRow();
+
+					ImGui::TableSetColumnIndex(0);
+					ImGui::Text(fw->getName().c_str());
+
+					ImGui::TableSetColumnIndex(1);
+					ImGui::PushItemWidth(-FLT_MIN);
+
+					switch (fw->getType()) {
+					case scripting::FieldType::Float: {
+						float val = 0.0f;
+						fw->getValue(script->getInstance(), &val);
+						if (ImGui::InputFloat(std::string("#" + fw->getName()).c_str(), &val, NULL)) {
+							fw->setValue(script->getInstance(), &val);
+						}
+						break;
+					}
+					default: {
+						ImGui::Text("Unknown field type");
+					}
+					}
+
+					ImGui::PopItemWidth();
+				}
+
+				ImGui::EndTable();
+			}
+
+			ImGui::TreePop();
+		}
+
+		if (remove) {
+			toRemove.push_back(scripts.Scripts->get(i));
+		}
+	}
+
+	for (scripting::Script* s : toRemove) {
+		scripts.Scripts->removeScript(s);
 	}
 }
 
