@@ -70,5 +70,14 @@ void* unbox(MonoObject* object) {
 	return mono_object_unbox(object);
 }
 
+std::string toString(MonoObject* object) {
+	// TODO: Handle exception
+	MonoString* pMonoStr = mono_object_to_string(object, nullptr);
+	char* pStr = mono_string_to_utf8(pMonoStr);
+	std::string str = reinterpret_cast<std::string::value_type*>(pStr);
+	mono_free(pStr);
+	return str;
+}
+
 }
 }

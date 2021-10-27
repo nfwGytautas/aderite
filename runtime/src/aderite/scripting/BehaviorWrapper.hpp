@@ -4,6 +4,7 @@
 #include <vector>
 #include <mono/jit/jit.h>
 #include "aderite/scripting/Forward.hpp"
+#include "aderite/scene/Entity.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -23,6 +24,17 @@ public:
 	 * @brief Returns true if the behavior has an Update function defined
 	*/
 	bool hasUpdateFunction() const;
+
+	/**
+	 * @brief Returns true if the behavior has an Init function defined
+	*/
+	bool hasInitFunction() const;
+
+	/**
+	 * @brief Invokes Init function on the specified instance
+	 * @param instance Object to call Init on
+	*/
+	void init(MonoObject* instance) const;
 
 	/**
 	 * @brief Invokes the update method on all instances of the behavior class
@@ -49,6 +61,13 @@ public:
 	FieldWrapper* getField(const std::string& fieldName) const;
 
 	/**
+	 * @brief Pair mono instance with entity
+	 * @param entity Entity to pair
+	 * @param instance MonoObject instance to pair
+	*/
+	void pair(scene::Entity entity, MonoObject* instance);
+
+	/**
 	 * @brief Returns the name of the behavior
 	*/
 	std::string getName() const;
@@ -70,6 +89,8 @@ private:
 
 	MonoMethod* m_updateMethod = nullptr;
 	UpdateThunkFn* m_updateThunk = nullptr;
+
+	MonoMethod* m_initMethod = nullptr;
 
 	std::vector<FieldWrapper*> m_fields;
 

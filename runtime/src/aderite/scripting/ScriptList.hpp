@@ -4,6 +4,7 @@
 
 #include "aderite/scripting/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
+#include "aderite/scene/Entity.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -33,6 +34,12 @@ public:
 	 * @param script Script to remove
 	*/
 	void removeScript(Script* script);
+
+	/**
+	 * @brief Pairs scripts with the specified entity
+	 * @param entity Entity to pair with
+	*/
+	void pair(scene::Entity entity);
 
 	Script* get(size_t idx) const {
 		return m_scripts[idx];

@@ -39,6 +39,7 @@
 #include "aderiteeditor/runtime/Instancers.hpp"
 #include "aderiteeditor/vfs/File.hpp"
 #include "aderiteeditor/vfs/VFS.hpp"
+#include "aderiteeditor/compiler/ScriptCompiler.hpp"
 
 
 #define EVENT_ROUTE(e, dst) event_router::e = std::bind(&WindowsEditor::dst, this, std::placeholders::_1)
@@ -346,6 +347,8 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 	::aderite::Engine::getAudioController()->loadMasterBank();
 
 	// Load assemblies
+	compiler::ScriptCompiler sc;
+	sc.compile();
 	::aderite::Engine::getScriptManager()->loadAssemblies();
 
 	if (editor::State::Project->getActiveScene() != c_InvalidHandle) {

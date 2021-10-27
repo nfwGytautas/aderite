@@ -36,6 +36,13 @@ void Script::update(float delta) const {
 	}
 }
 
+void Script::pair(scene::Entity entity) {
+	if (m_behavior != nullptr && m_instance != nullptr) {
+		mono_runtime_object_init(m_instance);
+		m_behavior->pair(entity, m_instance);
+	}
+}
+
 BehaviorWrapper* Script::getBehavior() const {
 	return m_behavior;
 }
@@ -74,6 +81,12 @@ bool Script::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	m_name = data["Name"].as<std::string>();
 
 	m_behavior = ::aderite::Engine::getScriptManager()->getBehavior(m_name);
+
+	if (m_behavior == nullptr) {
+		// Assembly probably changed ignore
+		return true;
+	}
+
 	m_instance = m_behavior->createInstance();
 
 	for (auto& fieldData : data["Fields"]) {

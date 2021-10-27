@@ -82,6 +82,7 @@ Load on project open
 Thunks
 
 Editor:
+Dont load scripts if they are out of date
 Shared drag drop fields API (MeshDragDrop, MaterialDragDrop, etc.) elements
 Modal base class
 Speed up load time on project load

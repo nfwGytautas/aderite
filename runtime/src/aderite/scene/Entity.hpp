@@ -72,6 +72,13 @@ public:
 	}
 
 	/**
+	 * @brief Returns the handle of this entity
+	*/
+	entt::entity getHandle() const {
+		return m_handle;
+	}
+
+	/**
 	 * @brief Returns empty Entity
 	*/
 	static Entity null() {

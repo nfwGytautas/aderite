@@ -6,6 +6,7 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include "aderite/scripting/Forward.hpp"
+#include "aderite/scene/Entity.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -50,6 +51,18 @@ public:
 	 * @return BehaviorWrapper instance or nullptr if doesn't exist
 	*/
 	BehaviorWrapper* getBehavior(const std::string& name);
+
+	/**
+	 * @brief Creates a C# script Entity object from C++ entity
+	 * @param entity Entity from which to create
+	 * @return MonoObject instance
+	*/
+	MonoObject* createEntityObject(scene::Entity entity);
+
+	/**
+	 * @brief Returns the ScriptedBehavior.Entity field
+	*/
+	MonoClassField* getBehaviorEntityField() const;
 private:
 	/**
 	 * @brief Resolves all Behavior classes in the loaded assembly
@@ -88,7 +101,12 @@ private:
 	MonoAssembly* m_scriptlibAssembly = nullptr;
 	MonoImage* m_scriptlibImage = nullptr;
 
-	MonoClass* m_sbAttributeClass = nullptr; // ScriptedBehaviorAttribute
+	MonoClass* m_sbClass = nullptr; // ScriptedBehavior
+	MonoClassField* m_sbEntityField = nullptr;
+
+	MonoClass* m_entityClass = nullptr; // Entity
+	MonoClassField* m_entitySceneField = nullptr;
+	MonoClassField* m_entityEntityField = nullptr;
 	
 	// Code assemblies
 	MonoAssembly* m_codeAssembly = nullptr;

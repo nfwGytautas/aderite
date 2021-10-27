@@ -258,6 +258,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 
 		// TODO: Error check
 		scriptComponent.Scripts = static_cast<scripting::ScriptList*>(::aderite::Engine::getSerializer()->parseUntrackedType(scripts));
+		scriptComponent.Scripts->pair(e);
 	}
 
 	return e;

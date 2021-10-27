@@ -3,6 +3,7 @@
 #include <mono/jit/jit.h>
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/scripting/Forward.hpp"
+#include "aderite/scene/Entity.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -31,6 +32,12 @@ public:
 	 * @param delta Frame delta time
 	*/
 	void update(float delta) const;
+
+	/**
+	 * @brief Pair the script with entity instance
+	 * @param entity Entity with which to pair
+	*/
+	void pair(scene::Entity entity);
 
 	/**
 	 * @brief Returns the behavior wrapper of this script

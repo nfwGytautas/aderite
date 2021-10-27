@@ -35,6 +35,14 @@ BehaviorWrapper::BehaviorWrapper(MonoImage* image, MonoClass* klass)
 		false
 	}.value());
 
+	m_initMethod = this->resolveMethod(MethodSignature{
+		nSpace,
+		name,
+		"Init",
+		{},
+		false
+		}.value());
+
 	// Resolve fields
 	this->resolveFields();
 
@@ -52,6 +60,16 @@ BehaviorWrapper::~BehaviorWrapper() {
 
 bool BehaviorWrapper::hasUpdateFunction() const {
 	return m_updateMethod != nullptr;
+}
+
+bool BehaviorWrapper::hasInitFunction() const {
+	return m_initMethod != nullptr;
+}
+
+void BehaviorWrapper::init(MonoObject* instance) const {
+	// TODO: Handle exception
+	MonoObject* ex = nullptr;
+	mono_runtime_invoke(m_initMethod, instance, nullptr, &ex);
 }
 
 void BehaviorWrapper::update(MonoObject* instance, float delta) const{
@@ -80,6 +98,18 @@ FieldWrapper* BehaviorWrapper::getField(const std::string& fieldName) const {
 	return *it;
 }
 
+void BehaviorWrapper::pair(scene::Entity entity, MonoObject* instance) {
+	MonoObject* obj = ::aderite::Engine::getScriptManager()->createEntityObject(entity);
+	MonoClassField* entityField = ::aderite::Engine::getScriptManager()->getBehaviorEntityField();
+
+	mono_field_set_value(instance, entityField, obj);
+
+	// Initialize
+	if (this->hasInitFunction()) {
+		this->init(instance);
+	}
+}
+
 std::string BehaviorWrapper::getName() const {
 	return m_name;
 }
@@ -101,7 +131,9 @@ void BehaviorWrapper::resolveFields() {
 	void* iter = NULL;
 	MonoClassField* field;
 	while (field = mono_class_get_fields(m_class, &iter)) {
-		m_fields.push_back(new FieldWrapper(field));
+		if (mono_field_get_flags(field) & MONO_FIELD_ATTR_PUBLIC) {
+			m_fields.push_back(new FieldWrapper(field));
+		}
 	}
 }
 

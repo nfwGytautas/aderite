@@ -33,6 +33,12 @@ void ScriptList::removeScript(Script* script) {
 	m_scripts.erase(it);
 }
 
+void ScriptList::pair(scene::Entity entity) {
+	for (Script* s : m_scripts) {
+		s->pair(entity);
+	}
+}
+
 reflection::Type ScriptList::getType() const {
 	return static_cast<reflection::Type>(reflection::RuntimeTypes::SCRIPT_LIST);
 }

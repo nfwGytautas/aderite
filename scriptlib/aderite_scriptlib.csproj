@@ -91,6 +91,10 @@
   <ItemGroup>
     <Compile Include="C:\dev\aderite\scriptlib\src\Log.cs" />
     <Compile Include="src\Behavior.cs" />
+    <Compile Include="src\components\Transform.cs" />
+    <Compile Include="src\Entity.cs" />
+    <Compile Include="src\Quaternion.cs" />
+    <Compile Include="src\Vector.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\dev\aderite\ZERO_CHECK.vcxproj">

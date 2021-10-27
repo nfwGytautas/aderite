@@ -110,6 +110,23 @@ BehaviorWrapper* ScriptManager::getBehavior(const std::string& name) {
 	return *it;
 }
 
+MonoObject* ScriptManager::createEntityObject(scene::Entity entity) {
+	MonoObject* object = mono_object_new(m_currentDomain, m_entityClass);
+	entt::entity e = entity.getHandle();
+	scene::Scene* scene = entity.getScene();
+
+	mono_runtime_object_init(object);
+
+	mono_field_set_value(object, m_entitySceneField, &scene);
+	mono_field_set_value(object, m_entityEntityField, &e);
+
+	return object;
+}
+
+MonoClassField* ScriptManager::getBehaviorEntityField() const {
+	return m_sbEntityField;
+}
+
 void ScriptManager::resolveBehaviors() {
     LOG_TRACE("Resolving behaviors");
 
@@ -170,9 +187,33 @@ bool ScriptManager::setupEngineAssemblies() {
 	}
 
 	// Find meta classes
-	m_sbAttributeClass = mono_class_from_name(m_scriptlibImage, "Aderite", "ScriptedBehaviorAttribute");
-	if (m_sbAttributeClass == nullptr) {
-		LOG_ERROR("Failed to find ScriptedBehaviorAttribute class");
+	m_sbClass = mono_class_from_name(m_scriptlibImage, "Aderite", "ScriptedBehavior");
+	if (m_sbClass == nullptr) {
+		LOG_ERROR("Failed to find ScriptedBehavior class");
+		return false;
+	}
+
+	m_sbEntityField = mono_class_get_field_from_name(m_sbClass, "Entity");
+	if (m_sbEntityField == nullptr) {
+		LOG_ERROR("Failed to find ScriptedBehavior.Entity field");
+		return false;
+	}
+
+	m_entityClass = mono_class_from_name(m_scriptlibImage, "Aderite", "Entity");
+	if (m_entityClass == nullptr) {
+		LOG_ERROR("Failed to find Entity class");
+		return false;
+	}
+
+	m_entitySceneField = mono_class_get_field_from_name(m_entityClass, "scene");
+	if (m_entitySceneField == nullptr) {
+		LOG_ERROR("Failed to find Entity.scene field");
+		return false;
+	}
+
+	m_entityEntityField = mono_class_get_field_from_name(m_entityClass, "entity");
+	if (m_entityEntityField == nullptr) {
+		LOG_ERROR("Failed to find Entity.entity field");
 		return false;
 	}
 
@@ -211,29 +252,35 @@ bool ScriptManager::setupCodeAssemblies() {
 }
 
 bool ScriptManager::classMarkedAsBehavior(MonoClass* klass) {
-	// Get attributes
-	MonoCustomAttrInfo* attrInfo = mono_custom_attrs_from_class(klass);
+	//// Get attributes
+	//MonoCustomAttrInfo* attrInfo = mono_custom_attrs_from_class(klass);
 
-	// Check if there are any attributes
-	if (attrInfo == nullptr) {
-		return false;
+	//// Check if there are any attributes
+	//if (attrInfo == nullptr) {
+	//	return false;
+	//}
+
+	//// Iterate over attributes
+	//for (int i = 0; i < attrInfo->num_attrs; i++) 	{
+	//	// Get attribute class
+	//	MonoClass* attrClass = mono_method_get_class(attrInfo->attrs[i].ctor);
+
+	//	if (attrClass == m_sbAttributeClass) {
+	//		mono_custom_attrs_free(attrInfo);
+	//		return true;
+	//	}
+	//}
+
+	//// Free memory
+	//mono_custom_attrs_free(attrInfo);
+
+	//// Return the attributes
+	//return false;
+
+	if (mono_class_get_parent(klass) == m_sbClass) {
+		return true;
 	}
 
-	// Iterate over attributes
-	for (int i = 0; i < attrInfo->num_attrs; i++) 	{
-		// Get attribute class
-		MonoClass* attrClass = mono_method_get_class(attrInfo->attrs[i].ctor);
-
-		if (attrClass == m_sbAttributeClass) {
-			mono_custom_attrs_free(attrInfo);
-			return true;
-		}
-	}
-
-	// Free memory
-	mono_custom_attrs_free(attrInfo);
-
-	// Return the attributes
 	return false;
 }
 

@@ -51,5 +51,12 @@ void printClassMethods(MonoClass* klass);
 */
 void* unbox(MonoObject* object);
 
+/**
+ * @brief Converts a MonoObject(string object) to std::string
+ * @param object Object to convert
+ * @return std::string instance
+*/
+std::string toString(MonoObject* object);
+
 }
 }
