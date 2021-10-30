@@ -21,14 +21,24 @@ FieldWrapper::FieldWrapper(MonoClassField* field)
 	m_name = mono_field_get_name(field);
 
 	MonoType* type = mono_field_get_type(field);
+
+	// Check for value types
 	switch (mono_type_get_type(type)) {
 	case MONO_TYPE_R4: {
 		m_type = FieldType::Float;
 		break;
 	}
 	default: {
-		LOG_WARN("Unknown field type");
+		// Check for engine classes
+		MonoClass* klass = mono_type_get_class(type);
 		m_type = FieldType::Null;
+
+		if (klass == ::aderite::Engine::getScriptManager()->getMeshClass()) {
+			m_type = FieldType::Mesh;
+		}
+		else if (klass == ::aderite::Engine::getScriptManager()->getMaterialClass()) {
+			m_type = FieldType::Material;
+		}
 	}
 	}
 }

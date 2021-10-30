@@ -61,6 +61,7 @@ Meta enabled field
 Handle to ColliderList, audio list etc., managers take care of these lists
 
 Physics:
+Static/Dynamic PhysicsActor component
 Multithreading
 Substeps
 Physics material asset
@@ -75,13 +76,15 @@ Refactor to be more intuitive
 Remove files that don't physically exist anymore
 
 Scripting:
+Set fields after initializing object
 Generate .csproj file for easier coding
 Dont kill entire editor on script run error
-Override mono log to aderite log
 Load on project open
-Thunks
+Improve engine class finding
 
 Editor:
+Don't compile when loading project
+Loading bar
 Dont load scripts if they are out of date
 Shared drag drop fields API (MeshDragDrop, MaterialDragDrop, etc.) elements
 Modal base class

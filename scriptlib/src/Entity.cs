@@ -23,8 +23,11 @@ namespace Aderite
             // Locate
             if (type.Equals(typeof(Transform)))
             {
-                Log.Trace($"{scene} {entity}");
                 return new Transform(scene, entity) as T;
+            }
+            else if (type.Equals(typeof(MeshRenderer)))
+            {
+                return new MeshRenderer(scene, entity) as T;
             }
             else
             {

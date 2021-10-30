@@ -3,6 +3,21 @@ Type: 3
 Handle: 0
 Data:
   Entities:
+    - Entity: 3
+      Meta:
+        Name: TriggerZone
+      Transform:
+        Position: [0, -2, 0]
+        Rotation: [1, 0, 0, 0]
+        Scale: [5, 0.100000001, 5]
+      Colliders:
+        Type: 10
+        Data:
+          Colliders:
+            - Type: 11
+              Data:
+                IsTrigger: true
+                Size: [1, 1, 1]
     - Entity: 2
       Meta:
         Name: Plane
@@ -74,4 +89,5 @@ Data:
                 Name: Scripts.JumpBehavior
                 Fields:
                   JumpForce: 2
+                  OnTriggerMaterial: 6
   Pipeline: 2

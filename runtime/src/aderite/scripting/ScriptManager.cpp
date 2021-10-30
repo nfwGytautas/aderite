@@ -11,6 +11,7 @@
 #include "aderite/scripting/InternalCalls.hpp"
 #include "aderite/scripting/BehaviorWrapper.hpp"
 #include "aderite/scripting/ScriptList.hpp"
+#include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/components/Components.hpp"
@@ -123,6 +124,26 @@ MonoObject* ScriptManager::createEntityObject(scene::Entity entity) {
 	return object;
 }
 
+MonoObject* ScriptManager::createMeshObject(asset::MeshAsset* mesh) {
+	// TODO: Handle exception
+	void* args[1];
+	args[0] = &mesh;
+	MonoObject* object = mono_object_new(m_currentDomain, m_meshClass);
+	MonoObject* ex = nullptr;
+	mono_runtime_invoke(m_meshCtor, object, args, &ex);
+	return object;
+}
+
+MonoObject* ScriptManager::createMaterialObject(asset::MaterialAsset* material) {
+	// TODO: Handle exception
+	void* args[1];
+	args[0] = &material;
+	MonoObject* object = mono_object_new(m_currentDomain, m_materialClass);
+	MonoObject* ex = nullptr;
+	mono_runtime_invoke(m_materialCtor, object, args, &ex);
+	return object;
+}
+
 MonoClassField* ScriptManager::getBehaviorEntityField() const {
 	return m_sbEntityField;
 }
@@ -214,6 +235,30 @@ bool ScriptManager::setupEngineAssemblies() {
 	m_entityEntityField = mono_class_get_field_from_name(m_entityClass, "entity");
 	if (m_entityEntityField == nullptr) {
 		LOG_ERROR("Failed to find Entity.entity field");
+		return false;
+	}
+
+	m_meshClass = mono_class_from_name(m_scriptlibImage, "Aderite", "Mesh");
+	if (m_meshClass == nullptr) {
+		LOG_ERROR("Failed to find Mesh class");
+		return false;
+	}
+
+	m_meshCtor = mono_class_get_method_from_name(m_meshClass, ".ctor", 1);
+	if (m_meshCtor == nullptr) {
+		LOG_ERROR("Failed to find Mesh constructor method");
+		return false;
+	}
+
+	m_materialClass = mono_class_from_name(m_scriptlibImage, "Aderite", "Material");
+	if (m_materialClass == nullptr) {
+		LOG_ERROR("Failed to find Material class");
+		return false;
+	}
+
+	m_materialCtor = mono_class_get_method_from_name(m_materialClass, ".ctor", 1);
+	if (m_materialCtor == nullptr) {
+		LOG_ERROR("Failed to find Material constructor method");
 		return false;
 	}
 

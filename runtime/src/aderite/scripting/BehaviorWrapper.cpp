@@ -43,12 +43,60 @@ BehaviorWrapper::BehaviorWrapper(MonoImage* image, MonoClass* klass)
 		false
 		}.value());
 
+	m_triggerEnterMethod = this->resolveMethod(MethodSignature{
+		nSpace,
+		name,
+		"OnTriggerEnter",
+		{{ "Aderite.Entity" }},
+		false
+		}.value());
+
+	m_triggerLeaveMethod = this->resolveMethod(MethodSignature{
+		nSpace,
+		name,
+		"OnTriggerLeave",
+		{{ "Aderite.Entity" }},
+		false
+		}.value());
+
+	m_collisionEnterMethod = this->resolveMethod(MethodSignature{
+		nSpace,
+		name,
+		"OnCollisionEnter",
+		{{ "Aderite.Entity" }},
+		false
+		}.value());
+
+	m_collisionLeaveMethod = this->resolveMethod(MethodSignature{
+		nSpace,
+		name,
+		"OnCollisionLeave",
+		{{ "Aderite.Entity" }},
+		false
+		}.value());
+
 	// Resolve fields
 	this->resolveFields();
 
 	// Create thunks for frequent functions
 	if (this->hasUpdateFunction()) {
 		m_updateThunk = static_cast<UpdateThunkFn*>(mono_method_get_unmanaged_thunk(m_updateMethod));
+	}
+
+	if (this->hasTriggerEnterFunction()) {
+		m_triggerEnterThunk = static_cast<TriggerThunkFn*>(mono_method_get_unmanaged_thunk(m_triggerEnterMethod));
+	}
+
+	if (this->hasTriggerLeaveFunction()) {
+		m_triggerLeaveThunk = static_cast<TriggerThunkFn*>(mono_method_get_unmanaged_thunk(m_triggerLeaveMethod));
+	}
+
+	if (this->hasCollisionEnterFunction()) {
+		m_collisionEnterThunk = static_cast<TriggerThunkFn*>(mono_method_get_unmanaged_thunk(m_collisionEnterMethod));
+	}
+
+	if (this->hasCollisionLeaveFunction()) {
+		m_collisionLeaveThunk = static_cast<TriggerThunkFn*>(mono_method_get_unmanaged_thunk(m_collisionLeaveMethod));
 	}
 }
 
@@ -66,6 +114,22 @@ bool BehaviorWrapper::hasInitFunction() const {
 	return m_initMethod != nullptr;
 }
 
+bool BehaviorWrapper::hasTriggerEnterFunction() const {
+	return m_triggerEnterMethod != nullptr;
+}
+
+bool BehaviorWrapper::hasTriggerLeaveFunction() const {
+	return m_triggerLeaveMethod != nullptr;
+}
+
+bool BehaviorWrapper::hasCollisionEnterFunction() const {
+	return m_collisionEnterMethod != nullptr;
+}
+
+bool BehaviorWrapper::hasCollisionLeaveFunction() const {
+	return m_collisionLeaveMethod != nullptr;
+}
+
 void BehaviorWrapper::init(MonoObject* instance) const {
 	// TODO: Handle exception
 	MonoObject* ex = nullptr;
@@ -76,6 +140,30 @@ void BehaviorWrapper::update(MonoObject* instance, float delta) const{
 	// TODO: Handle exception
 	MonoException* ex = nullptr;
 	m_updateThunk(instance, delta, &ex);
+}
+
+void BehaviorWrapper::onTriggerEnter(MonoObject* instance, MonoObject* trigger) const {
+	// TODO: Handle exception
+	MonoException* ex = nullptr;
+	m_triggerEnterThunk(instance, trigger, &ex);
+}
+
+void BehaviorWrapper::onTriggerLeave(MonoObject* instance, MonoObject* trigger) const {
+	// TODO: Handle exception
+	MonoException* ex = nullptr;
+	m_triggerLeaveThunk(instance, trigger, &ex);
+}
+
+void BehaviorWrapper::onCollisionEnter(MonoObject* instance, MonoObject* collision) const {
+	// TODO: Handle exception
+	MonoException* ex = nullptr;
+	m_collisionEnterThunk(instance, collision, &ex);
+}
+
+void BehaviorWrapper::onCollisionLeave(MonoObject* instance, MonoObject* collision) const {
+	// TODO: Handle exception
+	MonoException* ex = nullptr;
+	m_collisionLeaveThunk(instance, collision, &ex);
 }
 
 MonoObject* BehaviorWrapper::createInstance() {
@@ -116,7 +204,7 @@ std::string BehaviorWrapper::getName() const {
 
 MonoMethod* BehaviorWrapper::resolveMethod(const std::string& signature) {
 	//Build a method description object
-	MonoMethodDesc* methodDesc = mono_method_desc_new(signature.c_str(), NULL);
+	MonoMethodDesc* methodDesc = mono_method_desc_new(signature.c_str(), 1);
 
 	//Search the method in the image
 	MonoMethod* method = mono_method_desc_search_in_image(methodDesc, m_image);

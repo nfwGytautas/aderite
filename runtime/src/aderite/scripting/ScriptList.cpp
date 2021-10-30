@@ -39,6 +39,30 @@ void ScriptList::pair(scene::Entity entity) {
 	}
 }
 
+void ScriptList::onTriggerEnter(scene::Entity trigger) {
+	for (Script* s : m_scripts) {
+		s->onTriggerEnter(trigger);
+	}
+}
+
+void ScriptList::onTriggerLeave(scene::Entity trigger) {
+	for (Script* s : m_scripts) {
+		s->onTriggerLeave(trigger);
+	}
+}
+
+void ScriptList::onCollisionEnter(scene::Entity collision) {
+	for (Script* s : m_scripts) {
+		s->onCollisionEnter(collision);
+	}
+}
+
+void ScriptList::onCollisionLeave(scene::Entity collision) {
+	for (Script* s : m_scripts) {
+		s->onCollisionLeave(collision);
+	}
+}
+
 reflection::Type ScriptList::getType() const {
 	return static_cast<reflection::Type>(reflection::RuntimeTypes::SCRIPT_LIST);
 }

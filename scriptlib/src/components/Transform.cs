@@ -8,47 +8,46 @@ namespace Aderite
     /// </summary>
     public class Transform
     {
-        IntPtr instance = IntPtr.Zero;
+        IntPtr scene = IntPtr.Zero;
+        UIntPtr entity = UIntPtr.Zero;
 
         /// <summary>
         /// Position of the transform component
         /// </summary>
-        public Vector3 Position { get { return __GetPosition(instance); } set { __SetPosition(instance, value); } }
+        public Vector3 Position { get { return __GetPosition(scene, entity); } set { __SetPosition(scene, entity, value); } }
 
         /// <summary>
         /// Rotation of the transform component, encoded as a quaternion vector
         /// </summary>
-        public Quaternion Rotation { get { return __GetRotation(instance); } set { __SetRotation(instance, value); } }
+        public Quaternion Rotation { get { return __GetRotation(scene, entity); } set { __SetRotation(scene, entity, value); } }
 
         /// <summary>
         /// Scale of the transform component
         /// </summary>
-        public Vector3 Scale { get { return __GetScale(instance); } set { __SetScale(instance, value); } }
+        public Vector3 Scale { get { return __GetScale(scene, entity); } set { __SetScale(scene, entity, value); } }
 
         internal Transform(IntPtr scene, UIntPtr entity)
         {
-            instance = __GetInstance(scene, entity);
+            this.scene = scene;
+            this.entity = entity;
         }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static IntPtr __GetInstance(IntPtr scene, UIntPtr entity);
+        private extern static Vector3 __GetPosition(IntPtr scene, UIntPtr entity);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static Vector3 __GetPosition(IntPtr instance);
+        private extern static void __SetPosition(IntPtr scene, UIntPtr entity, Vector3 value);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static void __SetPosition(IntPtr instance, Vector3 value);
+        private extern static Quaternion __GetRotation(IntPtr scene, UIntPtr entity);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static Quaternion __GetRotation(IntPtr instance);
+        private extern static void __SetRotation(IntPtr scene, UIntPtr entity, Quaternion value);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static void __SetRotation(IntPtr instance, Quaternion value);
+        private extern static Vector3 __GetScale(IntPtr scene, UIntPtr entity);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static Vector3 __GetScale(IntPtr instance);
-
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static void __SetScale(IntPtr instance, Vector3 value);
+        private extern static void __SetScale(IntPtr scene, UIntPtr entity, Vector3 value);
     }
 }

@@ -13,6 +13,8 @@ enum class FieldType {
 	Null,
 	Float,
 	Object,
+	Mesh,
+	Material,
 };
 
 /**

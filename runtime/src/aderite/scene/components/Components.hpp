@@ -6,6 +6,7 @@
 
 #include <string>
 
+#include <entt/entt.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -26,6 +27,7 @@ ADERITE_COMPONENTS_NAMESPACE_BEGIN
 */
 struct MetaComponent {
 	std::string Name;
+	entt::entity This;
 
 	MetaComponent() = default;
 	MetaComponent(const MetaComponent&) = default;

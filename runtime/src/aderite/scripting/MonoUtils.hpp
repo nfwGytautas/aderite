@@ -9,6 +9,7 @@
 #include <mono/metadata/mono-gc.h>
 #include <mono/metadata/threads.h>
 #include <mono/metadata/tokentype.h>
+#include "aderite/asset/Forward.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -57,6 +58,20 @@ void* unbox(MonoObject* object);
  * @return std::string instance
 */
 std::string toString(MonoObject* object);
+
+/**
+ * @brief Extract mesh field from mono object
+ * @param object Object to extract from
+ * @param mesh Pointer where to store value
+*/
+void extractMesh(MonoObject* object, asset::MeshAsset*& mesh);
+
+/**
+ * @brief Extract material field from mono object
+ * @param object Object to extract from
+ * @param material Pointer where to store value
+*/
+void extractMaterial(MonoObject* object, asset::MaterialAsset*& material);
 
 }
 }

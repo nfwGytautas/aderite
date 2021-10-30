@@ -11,6 +11,7 @@
 #include <mono/metadata/tokentype.h>
 
 #include "aderite/utility/Log.hpp"
+#include "aderite/scripting/FieldWrapper.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -62,7 +63,7 @@ void printClassMethods(MonoClass* klass) {
 	MonoMethod* method;
 	LOG_TRACE("Methods for {0}:", mono_class_get_name(klass));
 	while (method = mono_class_get_methods(klass, &iter)) {
-		LOG_TRACE("Method: {0}", mono_method_full_name(method, 1));
+		LOG_TRACE("\tMethod: {0}", mono_method_full_name(method, 1));
 	}
 }
 
@@ -77,6 +78,16 @@ std::string toString(MonoObject* object) {
 	std::string str = reinterpret_cast<std::string::value_type*>(pStr);
 	mono_free(pStr);
 	return str;
+}
+
+void extractMesh(MonoObject* object, asset::MeshAsset*& mesh) {
+	static FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"));
+	return fw.getValue(object, &mesh);
+}
+
+void extractMaterial(MonoObject* object, asset::MaterialAsset*& material) {
+	static FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"));
+	return fw.getValue(object, &material);
 }
 
 }

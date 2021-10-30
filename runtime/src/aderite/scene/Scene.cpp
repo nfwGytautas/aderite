@@ -296,7 +296,7 @@ void Scene::fixedUpdate(float step) {
 Entity Scene::createEntity(const components::MetaComponent& MetaComponent) {
 	// TODO: Check for name conflicts
 	Entity e = Entity(m_registry.create(), this);
-	e.addComponent<components::MetaComponent>(MetaComponent);
+	e.addComponent<components::MetaComponent>(MetaComponent).This = e.getHandle();
 	return e;
 }
 
@@ -505,13 +505,28 @@ void Scene::onContact(
 		components::MetaComponent* e1 = static_cast<components::MetaComponent*>(actor1->userData);
 		components::MetaComponent* e2 = static_cast<components::MetaComponent*>(actor2->userData);
 
-		if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-			// Collision enter
-			LOG_INFO("{0} colliding with {1}", e1->Name, e2->Name);
+		Entity a1Entity = Entity(e1->This, this);
+		Entity a2Entity = Entity(e2->This, this);
+		if (a1Entity.hasComponent<components::ScriptsComponent>()) {
+			components::ScriptsComponent& scriptsActor = a1Entity.getComponent<components::ScriptsComponent>();
+
+			if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
+				scriptsActor.Scripts->onCollisionEnter(a2Entity);
+			}
+			else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
+				scriptsActor.Scripts->onCollisionLeave(a2Entity);
+			}
 		}
-		else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-			// Collision leave
-			LOG_INFO("{0} no longer colliding with {1}", e1->Name, e2->Name);
+
+		if (a2Entity.hasComponent<components::ScriptsComponent>()) {
+			components::ScriptsComponent& scriptsActor = a2Entity.getComponent<components::ScriptsComponent>();
+
+			if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
+				scriptsActor.Scripts->onCollisionEnter(a1Entity);
+			}
+			else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
+				scriptsActor.Scripts->onCollisionLeave(a1Entity);
+			}
 		}
 	}
 }
@@ -526,11 +541,17 @@ void Scene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) {
 		components::MetaComponent* metaActor = static_cast<components::MetaComponent*>(actor->userData);
 		components::MetaComponent* metaTrigger = static_cast<components::MetaComponent*>(trigger->userData);
 
-		if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-			LOG_WARN("{0} entered {1} trigger", metaActor->Name, metaTrigger->Name);
-		}
-		else if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-			LOG_WARN("{0} left {1} trigger", metaActor->Name, metaTrigger->Name);
+		Entity actorEntity = Entity(metaActor->This, this);
+		Entity triggerEntity = Entity(metaTrigger->This, this);
+		if (actorEntity.hasComponent<components::ScriptsComponent>()) {
+			components::ScriptsComponent& scriptsActor = actorEntity.getComponent<components::ScriptsComponent>();
+
+			if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
+				scriptsActor.Scripts->onTriggerEnter(triggerEntity);
+			}
+			else if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
+				scriptsActor.Scripts->onTriggerLeave(triggerEntity);
+			}
 		}
 	}
 }

@@ -41,6 +41,30 @@ public:
 	*/
 	void pair(scene::Entity entity);
 
+	/**
+	 * @brief Function invokes scripts OnTriggerEnter method
+	 * @param trigger Trigger that was entered
+	*/
+	void onTriggerEnter(scene::Entity trigger);
+
+	/**
+	 * @brief Function invokes scripts OnTriggerLeave method
+	 * @param trigger Trigger that was left
+	*/
+	void onTriggerLeave(scene::Entity trigger);
+
+	/**
+	 * @brief Function invokes scripts OnTriggerEnter method
+	 * @param collision Collision that was entered
+	*/
+	void onCollisionEnter(scene::Entity collision);
+
+	/**
+	 * @brief Function invokes scripts OnTriggerLeave method
+	 * @param collision Collision that was left
+	*/
+	void onCollisionLeave(scene::Entity collision);
+
 	Script* get(size_t idx) const {
 		return m_scripts[idx];
 	}

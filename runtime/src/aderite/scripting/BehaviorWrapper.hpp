@@ -14,8 +14,9 @@ namespace scripting {
 */
 class BehaviorWrapper final {
 private:
-	using UpdateThunkFn = void(MonoObject*, float delta, MonoException**);
-
+	using UpdateThunkFn = void(MonoObject*, float, MonoException**);
+	using TriggerThunkFn = void(MonoObject*, MonoObject*, MonoException**);
+	using CollisionThunkFn = void(MonoObject*, MonoObject*, MonoException**);
 public:
 	BehaviorWrapper(MonoImage* image, MonoClass* klass);
 	~BehaviorWrapper();
@@ -31,6 +32,26 @@ public:
 	bool hasInitFunction() const;
 
 	/**
+	 * @brief Returns true if the behavior has a OnTriggerEnter function defined
+	*/
+	bool hasTriggerEnterFunction() const;
+
+	/**
+	 * @brief Returns true if the behavior has a OnTriggerLeave function defined
+	*/
+	bool hasTriggerLeaveFunction() const;
+
+	/**
+	 * @brief Returns true if the behavior has a OnCollisionEnter function defined
+	*/
+	bool hasCollisionEnterFunction() const;
+
+	/**
+	 * @brief Returns true if the behavior has a OnCollisionLeave function defined
+	*/
+	bool hasCollisionLeaveFunction() const;
+
+	/**
 	 * @brief Invokes Init function on the specified instance
 	 * @param instance Object to call Init on
 	*/
@@ -42,6 +63,34 @@ public:
 	 * @param delta Frame delta value
 	*/
 	void update(MonoObject* instance, float delta) const;
+
+	/**
+	 * @brief Invokes on trigger method on the specified instance, passing the specified trigger object
+	 * @param instance Instance of the object for which to invoke
+	 * @param trigger Trigger entity
+	*/
+	void onTriggerEnter(MonoObject* instance, MonoObject* trigger) const;
+
+	/**
+	 * @brief Invokes on trigger method on the specified instance, passing the specified trigger object
+	 * @param instance Instance of the object for which to invoke
+	 * @param trigger Trigger entity
+	*/
+	void onTriggerLeave(MonoObject* instance, MonoObject* trigger) const;
+
+	/**
+	 * @brief Invokes on collision method on the specified instance, passing the specified collision object
+	 * @param instance Instance of the object for which to invoke
+	 * @param collision Collision entity
+	*/
+	void onCollisionEnter(MonoObject* instance, MonoObject* collision) const;
+
+	/**
+	 * @brief Invokes on collision method on the specified instance, passing the specified collision object
+	 * @param instance Instance of the object for which to invoke
+	 * @param collision Collision entity
+	*/
+	void onCollisionLeave(MonoObject* instance, MonoObject* collision) const;
 
 	/**
 	 * @brief Creates an instance of this behavior
@@ -91,6 +140,18 @@ private:
 	UpdateThunkFn* m_updateThunk = nullptr;
 
 	MonoMethod* m_initMethod = nullptr;
+
+	MonoMethod* m_triggerEnterMethod = nullptr;
+	TriggerThunkFn* m_triggerEnterThunk = nullptr;
+
+	MonoMethod* m_triggerLeaveMethod = nullptr;
+	TriggerThunkFn* m_triggerLeaveThunk = nullptr;
+
+	MonoMethod* m_collisionEnterMethod = nullptr;
+	TriggerThunkFn* m_collisionEnterThunk = nullptr;
+
+	MonoMethod* m_collisionLeaveMethod = nullptr;
+	TriggerThunkFn* m_collisionLeaveThunk = nullptr;
 
 	std::vector<FieldWrapper*> m_fields;
 

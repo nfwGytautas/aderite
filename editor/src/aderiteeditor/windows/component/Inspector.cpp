@@ -23,10 +23,12 @@
 #include "aderite/physics/ColliderList.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/ScriptList.hpp"
 #include "aderite/scripting/Script.hpp"
 #include "aderite/scripting/BehaviorWrapper.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
+#include "aderite/scripting/MonoUtils.hpp"
 
 #include "aderiteeditor/utility/Utility.hpp"
 #include "aderiteeditor/utility/ImGui.hpp"
@@ -481,6 +483,59 @@ void Inspector::renderScripts(scene::Entity entity) {
 						fw->getValue(script->getInstance(), &val);
 						if (ImGui::InputFloat(std::string("#" + fw->getName()).c_str(), &val, NULL)) {
 							fw->setValue(script->getInstance(), &val);
+						}
+						break;
+					}
+					case scripting::FieldType::Mesh: {
+						MonoObject* mesh = fw->getValueObject(script->getInstance());
+
+						if (mesh) {
+							asset::MeshAsset* meshHandle = nullptr;
+							scripting::extractMesh(mesh, meshHandle);
+
+							vfs::File* materialFile = editor::State::Project->getVfs()->getFile(meshHandle->getHandle());
+							ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+						}
+						else {
+							ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+						}
+
+						if (ImGui::BeginDragDropTarget()) {
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__MeshAsset)) {
+								editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+								vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+								asset::MeshAsset* newMeshHandle = static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
+								fw->setValue(script->getInstance(), ::aderite::Engine::getScriptManager()->createMeshObject(newMeshHandle));
+							}
+
+							ImGui::EndDragDropTarget();
+						}
+						break;
+					}
+					case scripting::FieldType::Material: {
+						MonoObject* material = nullptr;
+						fw->getValue(script->getInstance(), &material);
+
+						if (material) {
+							asset::MaterialAsset* materialHandle = nullptr;
+							scripting::extractMaterial(material, materialHandle);
+
+							vfs::File* materialFile = editor::State::Project->getVfs()->getFile(materialHandle->getHandle());
+							ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+						}
+						else {
+							ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+						}
+
+						if (ImGui::BeginDragDropTarget()) {
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(shared::DDPayloadID__MaterialAsset)) {
+								editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+								vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+								asset::MaterialAsset* newMaterialHandle = static_cast<asset::MaterialAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
+								fw->setValue(script->getInstance(), ::aderite::Engine::getScriptManager()->createMaterialObject(newMaterialHandle));
+							}
+
+							ImGui::EndDragDropTarget();
 						}
 						break;
 					}

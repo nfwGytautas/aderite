@@ -11,6 +11,9 @@
 namespace aderite {
 namespace scripting {
 
+/**
+ * @brief The class responsible for handling all scripting related functionality
+*/
 class ScriptManager final {
 public:
 	/**
@@ -60,9 +63,37 @@ public:
 	MonoObject* createEntityObject(scene::Entity entity);
 
 	/**
+	 * @brief Creates a C# mesh object from C++ asset
+	 * @param mesh Mesh from which to create
+	 * @return MonoObject instance
+	*/
+	MonoObject* createMeshObject(asset::MeshAsset* mesh);
+
+	/**
+	 * @brief Creates a C# material object from C++ asset
+	 * @param material Material from which to create
+	 * @return MonoObject instance
+	*/
+	MonoObject* createMaterialObject(asset::MaterialAsset* material);
+
+	/**
 	 * @brief Returns the ScriptedBehavior.Entity field
 	*/
 	MonoClassField* getBehaviorEntityField() const;
+
+	/**
+	 * @brief Returns the Mesh class
+	*/
+	MonoClass* getMeshClass() const {
+		return m_meshClass;
+	}
+
+	/**
+	 * @brief Returns the Material class
+	*/
+	MonoClass* getMaterialClass() const {
+		return m_materialClass;
+	}
 private:
 	/**
 	 * @brief Resolves all Behavior classes in the loaded assembly
@@ -107,6 +138,11 @@ private:
 	MonoClass* m_entityClass = nullptr; // Entity
 	MonoClassField* m_entitySceneField = nullptr;
 	MonoClassField* m_entityEntityField = nullptr;
+
+	MonoClass* m_meshClass = nullptr;
+	MonoMethod* m_meshCtor = nullptr;
+	MonoClass* m_materialClass = nullptr;
+	MonoMethod* m_materialCtor = nullptr;
 	
 	// Code assemblies
 	MonoAssembly* m_codeAssembly = nullptr;

@@ -90,7 +90,10 @@
   </Target>
   <ItemGroup>
     <Compile Include="C:\dev\aderite\scriptlib\src\Log.cs" />
+    <Compile Include="src\asset\Material.cs" />
+    <Compile Include="src\asset\Mesh.cs" />
     <Compile Include="src\Behavior.cs" />
+    <Compile Include="src\components\MeshRenderer.cs" />
     <Compile Include="src\components\Transform.cs" />
     <Compile Include="src\Entity.cs" />
     <Compile Include="src\Input.cs" />
