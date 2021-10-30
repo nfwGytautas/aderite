@@ -1,6 +1,7 @@
 #include "Script.hpp"
 
 #include "aderite/Aderite.hpp"
+#include "aderite/utility/Log.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/BehaviorWrapper.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
@@ -84,6 +85,7 @@ bool Script::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 
 	if (m_behavior == nullptr) {
 		// Assembly probably changed ignore
+		LOG_WARN("Script {0}, no longer exists in assembly", m_name);
 		return true;
 	}
 

@@ -27,14 +27,17 @@ glm::vec3 GetScale(scene::components::TransformComponent* transform) {
 
 void SetPosition(scene::components::TransformComponent* transform, glm::vec3 position) {
 	transform->Position = position;
+	transform->WasAltered = true;
 }
 
 void SetRotation(scene::components::TransformComponent* transform, glm::quat rotation) {
 	transform->Rotation = rotation;
+	transform->WasAltered = true;
 }
 
 void SetScale(scene::components::TransformComponent* transform, glm::vec3 scale) {
 	transform->Scale = scale;
+	transform->WasAltered = true;
 }
 
 void componentInternals() {

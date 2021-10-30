@@ -20,7 +20,7 @@ bool TextureAsset::isValid() const {
 }
 
 void TextureAsset::load(const io::Loader* loader) {
-	ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_handle), "Tried to load already loaded texture type");
+	ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_handle), "Tried to load already loaded texture");
 
 	if (m_info.IsCubemap) {
 		LOG_ERROR("Cubemap not implemented");
@@ -48,6 +48,10 @@ void TextureAsset::unload() {
 		bgfx::destroy(m_handle);
 		m_handle = BGFX_INVALID_HANDLE;
 	}
+}
+
+bool TextureAsset::needsLoading() {
+	return !this->isValid();
 }
 
 reflection::Type TextureAsset::getType() const {

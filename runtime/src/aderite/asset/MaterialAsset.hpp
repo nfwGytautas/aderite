@@ -29,6 +29,7 @@ public:
 	// Inherited via ILoadable
 	virtual void load(const io::Loader* loader) override;
 	virtual void unload() override;
+	virtual bool needsLoading() override;
 
 	// Inherited via SerializableObject
 	virtual reflection::Type getType() const override;

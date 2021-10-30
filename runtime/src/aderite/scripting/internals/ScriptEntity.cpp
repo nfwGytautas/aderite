@@ -36,7 +36,7 @@ MonoObject* ResolveBehavior(scene::Scene* scene, entt::entity* entityHandle, Mon
 }
 
 void entityInternals() {
-	mono_add_internal_call("Aderite.Log::__ResolveBehavior(intptr,uintptr,System.Type)", ResolveBehavior);
+	mono_add_internal_call("Aderite.Entity::__ResolveBehavior(intptr,uintptr,System.Type)", ResolveBehavior);
 }
 
 }

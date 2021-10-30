@@ -93,6 +93,7 @@
     <Compile Include="src\Behavior.cs" />
     <Compile Include="src\components\Transform.cs" />
     <Compile Include="src\Entity.cs" />
+    <Compile Include="src\Input.cs" />
     <Compile Include="src\Quaternion.cs" />
     <Compile Include="src\Vector.cs" />
   </ItemGroup>

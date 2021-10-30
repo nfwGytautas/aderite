@@ -3,7 +3,7 @@ Root:
   Directories:
     []
   Files:
-    - Name: FPRPScene
+    - Name: ScriptScene
       Content: 0
     - Name: ContainerTexture
       Content: 1
@@ -17,3 +17,5 @@ Root:
       Content: 5
     - Name: GreenContainer
       Content: 6
+    - Name: PlaneMaterial
+      Content: 7

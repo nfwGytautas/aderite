@@ -2,9 +2,9 @@
 
 namespace Scripts
 {
-    public class TestBehavior : ScriptedBehavior
+    public class JumpBehavior : ScriptedBehavior
     {
-        public float TestValue;
+        public float JumpForce;
 
         private Transform Transform;
 
@@ -15,15 +15,13 @@ namespace Scripts
 
         void Update(float delta)
         {
-            Log.Trace($"From behavior update, test value {TestValue}, delta {delta}");
-
-            Vector3 scale = Transform.Scale;
-            Log.Trace($"Old scale x: {scale.x} y: {scale.y} z: {scale.z}");
-
-            scale = new Vector3(TestValue);
-            Log.Trace($"New scale x: {scale.x} y: {scale.y} z: {scale.z}");
-
-            Transform.Scale = scale;
+            if (Input.IsKeyDown(Key.SPACE))
+            {
+                Log.Trace("Space pressed");
+                Vector3 newPosition = Transform.Position;
+                newPosition.y += JumpForce * delta;
+                Transform.Position = newPosition;
+            }
         }
     }
 }

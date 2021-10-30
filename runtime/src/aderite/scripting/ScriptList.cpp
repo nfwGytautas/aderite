@@ -56,7 +56,9 @@ bool ScriptList::serialize(const io::Serializer* serializer, YAML::Emitter& emit
 bool ScriptList::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 	for (const YAML::Node& scriptNode : data["Scripts"]) {
 		Script* script = static_cast<Script*>(serializer->parseUntrackedType(scriptNode));
-		addScript(script);
+		if (script->getBehavior() != nullptr) {
+			addScript(script);
+		}
 	}
 	return true;
 }

@@ -77,6 +77,10 @@ void MaterialTypeAsset::unload() {
 	m_samplers.clear();
 }
 
+bool MaterialTypeAsset::needsLoading() {
+	return !this->isValid();
+}
+
 reflection::Type MaterialTypeAsset::getType() const {
 	return static_cast<reflection::Type>(reflection::RuntimeTypes::MAT_TYPE);
 }

@@ -29,8 +29,11 @@ public:
 	*/
 	virtual void unload() = 0;
 
+	/**
+	 * @brief Returns true if the object needs loading, false otherwise
+	*/
+	virtual bool needsLoading() = 0;
 private:
-	bool m_loading = false;
 	friend class Loader;
 	friend class LoaderPool;
 };
@@ -52,6 +55,11 @@ public: // Thread handling
 	 * @brief Terminate the worker thread
 	*/
 	void terminate();
+
+	/**
+	 * @brief Returns the current loadable of the loader
+	*/
+	ILoadable* current() const;
 
 public: // Loading operations
 	template<class T>

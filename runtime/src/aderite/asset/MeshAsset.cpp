@@ -65,6 +65,10 @@ void MeshAsset::unload() {
 	}
 }
 
+bool MeshAsset::needsLoading() {
+	return !this->isValid();
+}
+
 reflection::Type MeshAsset::getType() const {
 	return static_cast<reflection::Type>(reflection::RuntimeTypes::MESH);
 }

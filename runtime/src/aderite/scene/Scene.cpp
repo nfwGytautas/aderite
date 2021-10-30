@@ -142,7 +142,7 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
 		out << YAML::EndMap; // AudioListener
 	}
 
-	// Script
+	// Scripts
 	if (e.hasComponent<components::ScriptsComponent>()) {
 		out << YAML::Key << "Scripts";
 		components::ScriptsComponent& scriptsComponent = e.getComponent<components::ScriptsComponent>();
@@ -226,7 +226,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 		auto& collidersComponent = e.getComponent<components::CollidersComponent>();
 
 		// TODO: Error check
-		collidersComponent.Colliders = static_cast<physics::ColliderList*>(::aderite::Engine::getSerializer()->parseUntrackedType(colliders));
+		collidersComponent.Colliders->deserialize(::aderite::Engine::getSerializer(), colliders["Data"]);
 	}
 
 	// Audio sources
@@ -247,7 +247,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 		rbodyComponent.IsEnabled = al_node["IsEnabled"].as<bool>();
 	}
 
-	// Colliders
+	// Scripts
 	auto scripts = e_node["Scripts"];
 	if (scripts) {
 		if (!e.hasComponent<components::ScriptsComponent>()) {
@@ -257,7 +257,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
 		auto& scriptComponent = e.getComponent<components::ScriptsComponent>();
 
 		// TODO: Error check
-		scriptComponent.Scripts = static_cast<scripting::ScriptList*>(::aderite::Engine::getSerializer()->parseUntrackedType(scripts));
+		scriptComponent.Scripts->deserialize(::aderite::Engine::getSerializer(), scripts["Data"]);
 		scriptComponent.Scripts->pair(e);
 	}
 
@@ -565,7 +565,7 @@ void Scene::syncEcsToPhysics() {
 			scene::components::TransformComponent>(entity);
 
 		physx::PxRigidDynamic* actor = static_cast<physx::PxRigidDynamic*>(colliders.Colliders->getActor());
-		if (transform.WasAltered || rigidbody.WasAltered) {
+		if (actor != nullptr && (transform.WasAltered || rigidbody.WasAltered)) {
 			// Sync ECS -> PhysX
 			syncActorToEcs(actor, colliders, transform);
 
@@ -589,7 +589,7 @@ void Scene::syncEcsToPhysics() {
 			scene::components::TransformComponent>(entity);
 
 		physx::PxRigidStatic* actor = static_cast<physx::PxRigidStatic*>(colliders.Colliders->getActor());
-		if (transform.WasAltered) {
+		if (actor != nullptr && transform.WasAltered) {
 			LOG_WARN("Altered position of static physics entity");
 
 			// Sync ECS -> PhysX

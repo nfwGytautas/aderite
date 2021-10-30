@@ -52,10 +52,10 @@ private:
 	ILoadable* getNextLoadable();
 
 	/**
-	 * @brief Invoked when a worker finished loading this asset
-	 * @param loadable Loadable object
+	 * @brief Returns true if the specified loadable is already in load queue, false otherwise
+	 * @param loadable Loadable to check
 	*/
-	void onLoaded(ILoadable* loadable);
+	bool isLoading(ILoadable* loadable);
 
 	friend class Loader;
 private:
@@ -64,9 +64,8 @@ private:
 	std::condition_variable m_cvAdded;
 	bool m_terminated = false;
 
-	std::queue<ILoadable*> m_lowQueue;
-	std::queue<ILoadable*> m_normalQueue;
-	std::queue<ILoadable*> m_highQueue;
+	size_t m_highEnd = 0;
+	std::vector<ILoadable*> m_queue;
 };
 
 }

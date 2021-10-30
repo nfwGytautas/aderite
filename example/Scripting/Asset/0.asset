@@ -3,26 +3,25 @@ Type: 3
 Handle: 0
 Data:
   Entities:
-    - Entity: 1
+    - Entity: 2
       Meta:
-        Name: RedCube
+        Name: Plane
       Transform:
-        Position: [0, 0, -2]
+        Position: [0, -5, 0]
         Rotation: [1, 0, 0, 0]
-        Scale: [1, 1, 1]
+        Scale: [10, 0.100000001, 10]
       MeshRenderer:
         Mesh: 5
-        Material: 4
-      Scripts:
-        Type: 40
+        Material: 7
+      Colliders:
+        Type: 10
         Data:
-          Scripts:
-            - Type: 41
+          Colliders:
+            - Type: 11
               Data:
-                Name: Scripts.TestBehavior
-                Fields:
-                  TestValue: 15.3000002
-    - Entity: 0
+                IsTrigger: false
+                Size: [1, 1, 1]
+    - Entity: 1
       Meta:
         Name: GreenCube
       Transform:
@@ -32,4 +31,47 @@ Data:
       MeshRenderer:
         Mesh: 5
         Material: 6
+      Rigidbody:
+        IsKinematic: false
+        HasGravity: true
+        Mass: 1
+      Colliders:
+        Type: 10
+        Data:
+          Colliders:
+            - Type: 11
+              Data:
+                IsTrigger: false
+                Size: [1, 1, 1]
+    - Entity: 0
+      Meta:
+        Name: RedCube
+      Transform:
+        Position: [0, 0, -2]
+        Rotation: [1, 0, 0, 0]
+        Scale: [1, 1, 1]
+      MeshRenderer:
+        Mesh: 5
+        Material: 4
+      Rigidbody:
+        IsKinematic: false
+        HasGravity: true
+        Mass: 1
+      Colliders:
+        Type: 10
+        Data:
+          Colliders:
+            - Type: 11
+              Data:
+                IsTrigger: false
+                Size: [1, 1, 1]
+      Scripts:
+        Type: 40
+        Data:
+          Scripts:
+            - Type: 41
+              Data:
+                Name: Scripts.JumpBehavior
+                Fields:
+                  JumpForce: 2
   Pipeline: 2

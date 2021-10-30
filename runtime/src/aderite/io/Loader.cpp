@@ -53,6 +53,7 @@ namespace io {
 class Loader::LoaderImpl {
 public:
 	Assimp::Importer Importer;
+	ILoadable* Current = nullptr;
 };
 
 Loader::Loader(LoaderPool* pool) 
@@ -74,8 +75,9 @@ void Loader::startup() {
 		while (!m_terminated) {
 			ILoadable* loadable = m_pool->getNextLoadable();
 			if (loadable != nullptr) {
+				m_impl->Current = loadable;
 				loadable->load(this);
-				m_pool->onLoaded(loadable);
+				m_impl->Current = nullptr;
 			}
 		}
 	});
@@ -83,6 +85,10 @@ void Loader::startup() {
 
 void Loader::terminate() {
 	m_terminated = true;
+}
+
+ILoadable* Loader::current() const {
+	return m_impl->Current;
 }
 
 Loader::MeshLoadResult Loader::loadMesh(LoadableHandle handle) const {

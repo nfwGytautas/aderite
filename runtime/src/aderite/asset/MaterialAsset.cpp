@@ -28,6 +28,10 @@ void MaterialAsset::unload() {
 	// TODO: Rework cause this is reference counted
 }
 
+bool MaterialAsset::needsLoading() {
+	return false;
+}
+
 reflection::Type MaterialAsset::getType() const {
 	return static_cast<reflection::Type>(reflection::RuntimeTypes::MATERIAL);
 }
