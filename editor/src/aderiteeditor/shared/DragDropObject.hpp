@@ -5,11 +5,11 @@ namespace editor {
 
 /**
  * @brief Object passed to imgui, because imgui can't handle pointers correctly
-*/
+ */
 class DragDropObject {
 public:
-	void* Data;
+    void* Data;
 };
 
-}
-}
+} // namespace editor
+} // namespace aderite

@@ -1,71 +1,71 @@
 #include "InputPin.hpp"
 
 #include "aderite/utility/Log.hpp"
-#include "aderiteeditor/node/OutputPin.hpp"
+
 #include "aderiteeditor/node/Link.hpp"
+#include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/windows/backend/node/imnodes.h"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
-InputPin::InputPin(Node* node, const std::string& type, const std::string& name)
-	: m_node(node), m_type(type), m_name(name)
-{}
+InputPin::InputPin(Node* node, const std::string& type, const std::string& name) : m_node(node), m_type(type), m_name(name) {}
 
 int InputPin::getId() const {
-	return m_id;
+    return m_id;
 }
 
 void InputPin::setId(int id) {
-	m_id = id;
+    m_id = id;
 }
 
 std::string InputPin::getType() const {
-	return m_type;
+    return m_type;
 }
 
 void InputPin::setType(const std::string& type) {
-	m_type = type;
-	disconnect();
+    m_type = type;
+    disconnect();
 }
 
 std::string InputPin::getName() const {
-	return m_name;
+    return m_name;
 }
 
 OutputPin* InputPin::getConnection() const {
-	if (m_link == nullptr) {
-		return nullptr;
-	}
+    if (m_link == nullptr) {
+        return nullptr;
+    }
 
-	return m_link->getOutputPin();
+    return m_link->getOutputPin();
 }
 
 void InputPin::disconnect() {
-	if (m_link) {
-		m_link->destroy();
-	}
+    if (m_link) {
+        m_link->destroy();
+    }
 }
 
 compiler::EvaluatorValue InputPin::getValue() const {
-	OutputPin* pin = getConnection();
-	if (!pin) {
-		return 0;
-	}
-	else {
-		return pin->getValue();
-	}
+    OutputPin* pin = getConnection();
+    if (!pin) {
+        return 0;
+    } else {
+        return pin->getValue();
+    }
 }
 
 Node* InputPin::getNode() const {
-	return m_node;
+    return m_node;
 }
 
 bool InputPin::isOptional() const {
-	return m_optional;
+    return m_optional;
 }
 
 void InputPin::setOptional(bool optional) {
-	m_optional = optional;
+    m_optional = optional;
 }
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
+} // namespace node
+} // namespace aderite

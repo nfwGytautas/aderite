@@ -2,12 +2,14 @@
 
 /**
  * @brief This file is used to define forward declarations for all windowing types
-*/
+ */
 
 #include "aderite/utility/Macros.hpp"
 
-ADERITE_WINDOW_NAMESPACE_BEGIN
+namespace aderite {
+namespace window {
 
 class WindowManager;
 
-ADERITE_WINDOW_NAMESPACE_END
+}
+} // namespace aderite

@@ -1,0 +1,21 @@
+Root:
+  Name: /
+  Directories:
+    []
+  Files:
+    - Name: ScriptScene
+      Content: 0
+    - Name: ContainerTexture
+      Content: 1
+    - Name: Pipeline
+      Content: 2
+    - Name: ColoredTexturedMaterial
+      Content: 3
+    - Name: RedContainer
+      Content: 4
+    - Name: CubeMesh
+      Content: 5
+    - Name: GreenContainer
+      Content: 6
+    - Name: PlaneMaterial
+      Content: 7

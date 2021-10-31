@@ -1,39 +1,27 @@
 #include "RequireLockNode.hpp"
 
-#include "EntitiesNode.hpp"
-
 #include "aderite/rendering/operation/EntityProvideOperation.hpp"
+
+#include "EntitiesNode.hpp"
+#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
-#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
-RequireLockNode::RequireLockNode()
-{
+RequireLockNode::RequireLockNode() {
     // Inputs
-    p_inputs.push_back(new InputPin(
-        this,
-        std::string(node::getTypeName(node::PropertyType::Require)),
-        "Require"
-    ));
+    p_inputs.push_back(new InputPin(this, std::string(node::getTypeName(node::PropertyType::Require)), "Require"));
 
-    p_inputs.push_back(new InputPin(
-        this,
-        std::string(node::getTypeName(node::PropertyType::Require)),
-        "Require"
-    ));
+    p_inputs.push_back(new InputPin(this, std::string(node::getTypeName(node::PropertyType::Require)), "Require"));
 
     // TODO: Add more dynamically
 
     // Output
-    p_outputs.push_back(new OutputPin(
-        this,
-        std::string(node::getTypeName(node::PropertyType::Require)),
-        "Require"
-    ));
+    p_outputs.push_back(new OutputPin(this, std::string(node::getTypeName(node::PropertyType::Require)), "Require"));
 }
 
 const char* RequireLockNode::getNodeName() const {
@@ -59,4 +47,5 @@ bool RequireLockNode::deserialize(io::Serializer* serializer, const YAML::Node& 
     return true;
 }
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
+} // namespace node
+} // namespace aderite

@@ -1,27 +1,27 @@
 #include "OutputToScreenOperation.hpp"
 
-#include "aderite/utility/Log.hpp"
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
+#include "aderite/utility/Log.hpp"
 
-ADERITE_RENDERING_NAMESPACE_BEGIN
+namespace aderite {
+namespace rendering {
 
 OutputToScreenOperation::OutputToScreenOperation() {}
 
-void OutputToScreenOperation::execute(PipelineState* state) {
-
-}
+void OutputToScreenOperation::execute(PipelineState* state) {}
 
 reflection::Type OutputToScreenOperation::getType() const {
-	return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_SCREEN);
+    return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_SCREEN);
 }
 
 bool OutputToScreenOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
-	return true;
+    return true;
 }
 
 bool OutputToScreenOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-	return true;
+    return true;
 }
 
-ADERITE_RENDERING_NAMESPACE_END
+} // namespace rendering
+} // namespace aderite

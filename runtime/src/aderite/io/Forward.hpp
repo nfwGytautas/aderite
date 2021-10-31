@@ -1,9 +1,9 @@
 #pragma once
 
 /**
- * @brief This file is used to define forward declarations for all 
+ * @brief This file is used to define forward declarations for all
  * serialization related objects
-*/
+ */
 
 #include "aderite/Handles.hpp"
 
@@ -19,5 +19,5 @@ class ILoadable;
 class Loader;
 class LoaderPool;
 
-}
-}
+} // namespace io
+} // namespace aderite

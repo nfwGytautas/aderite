@@ -1,9 +1,11 @@
 #include "Utility.hpp"
 
-ADERITE_UTILITY_NAMESPACE_BEGIN
+namespace aderite {
+namespace utility {
 
 size_t combineHash(const size_t& l, const size_t& r) {
-	return l ^ (r << 1);
+    return l ^ (r << 1);
 }
 
-ADERITE_UTILITY_NAMESPACE_END
+} // namespace utility
+} // namespace aderite

@@ -1,21 +1,24 @@
 #pragma once
 
-#include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
+#include "aderite/rendering/operation/TargetProvideOperation.hpp"
+
 #include "aderiteeditor/utility/Macros.hpp"
 
-ADERITE_EDITOR_RUNTIME_NAMESPACE_BEGIN
+namespace aderite {
+namespace editor {
 
 /**
  * @brief Operation used to provide editor target
-*/
+ */
 class EditorTargetOperation : public rendering::TargetProvideOperation {
 public:
-	EditorTargetOperation();
+    EditorTargetOperation();
 
-	// Inherited from TargetProvideOperation
-	virtual void initialize() override;
-	virtual reflection::Type getType() const override;
+    // Inherited from TargetProvideOperation
+    virtual void initialize() override;
+    virtual reflection::Type getType() const override;
 };
 
-ADERITE_EDITOR_RUNTIME_NAMESPACE_END
+} // namespace editor
+} // namespace aderite

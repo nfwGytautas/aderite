@@ -1,22 +1,18 @@
 #include "EditorTargetNode.hpp"
 
+#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
-#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorTargetOperation.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
-EditorTargetNode::EditorTargetNode()
-{
+EditorTargetNode::EditorTargetNode() {
     // Output
-    p_outputs.push_back(new OutputPin(
-        this,
-        node::getTypeName(node::PropertyType::Target),
-        "Target"
-    ));
+    p_outputs.push_back(new OutputPin(this, node::getTypeName(node::PropertyType::Target), "Target"));
 }
 
 const char* EditorTargetNode::getNodeName() const {
@@ -26,7 +22,7 @@ const char* EditorTargetNode::getNodeName() const {
 void EditorTargetNode::evaluate(compiler::GraphEvaluator* evaluator) {
     evaluateDependencies(evaluator);
     compiler::PipelineEvaluator* pe = static_cast<compiler::PipelineEvaluator*>(evaluator);
-    runtime::EditorTargetOperation* op = new runtime::EditorTargetOperation();
+    editor::EditorTargetOperation* op = new editor::EditorTargetOperation();
     p_outputs[0]->setValue(pe->addOperation(op));
     m_evaluated = true;
 }
@@ -45,4 +41,5 @@ bool EditorTargetNode::deserialize(io::Serializer* serializer, const YAML::Node&
     return true;
 }
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
+} // namespace node
+} // namespace aderite

@@ -1,36 +1,37 @@
 #include "PhysicsController.hpp"
 
-#include <PxPhysics.h>
+#include <PxActor.h>
 #include <PxFoundation.h>
+#include <PxMaterial.h>
+#include <PxPhysics.h>
 #include <PxPhysicsVersion.h>
-#include <PxScene.h>
-#include <PxSceneDesc.h>
 #include <PxRigidDynamic.h>
 #include <PxRigidStatic.h>
-#include <PxMaterial.h>
-#include <PxActor.h>
-#include <pvd/PxPvd.h>
-#include <pvd/PxPvdTransport.h>
-#include <cooking/PxCooking.h>
+#include <PxScene.h>
+#include <PxSceneDesc.h>
 #include <common/PxTolerancesScale.h>
-#include <extensions/PxExtensionsAPI.h>
+#include <cooking/PxCooking.h>
 #include <extensions/PxDefaultAllocator.h>
+#include <extensions/PxExtensionsAPI.h>
+#include <foundation/PxAllocatorCallback.h>
 #include <foundation/PxErrorCallback.h>
 #include <foundation/PxErrors.h>
-#include <foundation/PxAllocatorCallback.h>
+#include <pvd/PxPvd.h>
+#include <pvd/PxPvdTransport.h>
 
 #include "aderite/Aderite.hpp"
-#include "aderite/utility/Log.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/ColliderList.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/utility/Log.hpp"
 
-ADERITE_PHYSICS_NAMESPACE_BEGIN
+namespace aderite {
+namespace physics {
 
 /**
  * @brief Class used to interface PhysX logging to SPDLOG aderite interface
-*/
+ */
 class PhysXErrorCallback : public physx::PxErrorCallback {
 public:
     virtual void reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line) {
@@ -75,7 +76,7 @@ bool PhysicsController::init() {
     }
 
     physx::PxTolerancesScale scale = physx::PxTolerancesScale();
-    
+
     // PVD
     m_pvd = physx::PxCreatePvd(*m_foundation);
     if (m_pvd == nullptr) {
@@ -119,7 +120,7 @@ bool PhysicsController::init() {
     // Configure collision filter
     physx::PxSetGroupCollisionFlag(0, 0, true);
 
-	return true;
+    return true;
 }
 
 void PhysicsController::shutdown() {
@@ -146,7 +147,8 @@ physx::PxRigidStatic* PhysicsController::createStaticBody() {
 }
 
 physx::PxRigidDynamic* PhysicsController::createDynamicBody() {
-    return m_physics->createRigidDynamic(physx::PxTransform(physx::PxVec3(0)));;
+    return m_physics->createRigidDynamic(physx::PxTransform(physx::PxVec3(0)));
+    ;
 }
 
 physx::PxPhysics* PhysicsController::getPhysics() {
@@ -161,14 +163,12 @@ physx::PxMaterial* PhysicsController::getDefaultMaterial() {
     return m_defaultMaterial;
 }
 
-physx::PxFilterFlags PhysicsController::filterShader(
-    physx::PxFilterObjectAttributes attributes0, physx::PxFilterData filterData0,
-    physx::PxFilterObjectAttributes attributes1, physx::PxFilterData filterData1,
-    physx::PxPairFlags& pairFlags, const void* constantBlock, physx::PxU32 constantBlockSize)
-{
+physx::PxFilterFlags PhysicsController::filterShader(physx::PxFilterObjectAttributes attributes0, physx::PxFilterData filterData0,
+                                                     physx::PxFilterObjectAttributes attributes1, physx::PxFilterData filterData1,
+                                                     physx::PxPairFlags& pairFlags, const void* constantBlock,
+                                                     physx::PxU32 constantBlockSize) {
     // Let triggers through
-    if (physx::PxFilterObjectIsTrigger(attributes0) || physx::PxFilterObjectIsTrigger(attributes1))
-    {
+    if (physx::PxFilterObjectIsTrigger(attributes0) || physx::PxFilterObjectIsTrigger(attributes1)) {
         pairFlags = physx::PxPairFlag::eTRIGGER_DEFAULT;
         return physx::PxFilterFlag::eDEFAULT;
     }
@@ -180,4 +180,5 @@ physx::PxFilterFlags PhysicsController::filterShader(
     return physx::PxFilterFlag::eDEFAULT;
 }
 
-ADERITE_PHYSICS_NAMESPACE_END
+} // namespace physics
+} // namespace aderite

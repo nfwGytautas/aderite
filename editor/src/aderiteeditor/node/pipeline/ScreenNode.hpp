@@ -2,22 +2,23 @@
 
 #include "aderiteeditor/node/Node.hpp"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
 /**
- * @brief Output node for render pipeline 
-*/
-class ScreenNode : public Node
-{
+ * @brief Output node for render pipeline
+ */
+class ScreenNode : public Node {
 public:
-	ScreenNode();
+    ScreenNode();
 
-	// Inherited via Node
-	virtual const char* getNodeName() const override;
-	virtual void evaluate(compiler::GraphEvaluator* evaluator) override;
-	virtual reflection::Type getType() const override;
-	virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
-	virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    // Inherited via Node
+    virtual const char* getNodeName() const override;
+    virtual void evaluate(compiler::GraphEvaluator* evaluator) override;
+    virtual reflection::Type getType() const override;
+    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 };
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
+} // namespace node
+} // namespace aderite

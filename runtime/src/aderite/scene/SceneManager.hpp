@@ -2,44 +2,48 @@
 
 #include <vector>
 
-#include "aderite/utility/Macros.hpp"
 #include "aderite/scene/Forward.hpp"
+#include "aderite/utility/Macros.hpp"
 
-ADERITE_SCENE_NAMESPACE_BEGIN
+namespace aderite {
+class Engine;
 
+namespace scene {
 /**
  * @brief Scene manager for aderite
-*/
+ */
 class SceneManager {
 public:
-	// TODO: Queue scene load API
+    // TODO: Queue scene load API
 
-	/**
-	 * @brief Initializes the scene manager
-	*/
-	bool init();
+    /**
+     * @brief Initializes the scene manager
+     */
+    bool init();
 
-	/**
-	 * @brief Frees all scene manager information
-	*/
-	void shutdown();
+    /**
+     * @brief Frees all scene manager information
+     */
+    void shutdown();
 
-	/**
-	 * @brief Sets the specified scene as active, if the new scene isn't fully loaded, then the engine defaults to the loading screen
-	 * @param scene New active scene
-	*/
-	void setActive(Scene* scene);
+    /**
+     * @brief Sets the specified scene as active, if the new scene isn't fully loaded, then the engine defaults to the loading screen
+     * @param scene New active scene
+     */
+    void setActive(Scene* scene);
 
-	/**
-	 * @brief Returns the current active scene or nullptr if no active scene
-	*/
-	Scene* getCurrentScene() const;
-private:
-	SceneManager() {}
-	friend class Engine;
+    /**
+     * @brief Returns the current active scene or nullptr if no active scene
+     */
+    Scene* getCurrentScene() const;
 
 private:
-	Scene* m_activeScene = nullptr;
+    SceneManager() {}
+    friend Engine;
+
+private:
+    Scene* m_activeScene = nullptr;
 };
 
-ADERITE_SCENE_NAMESPACE_END
+} // namespace scene
+} // namespace aderite

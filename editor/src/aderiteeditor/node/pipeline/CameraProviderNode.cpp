@@ -1,20 +1,18 @@
 #include "CameraProviderNode.hpp"
 
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
+
+#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
-#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
 CameraProviderNode::CameraProviderNode() {
-    p_outputs.push_back(new OutputPin(
-        this,
-        node::getTypeName(node::PropertyType::Eye),
-        "Eye"
-    ));
+    p_outputs.push_back(new OutputPin(this, node::getTypeName(node::PropertyType::Eye), "Eye"));
 }
 
 const char* CameraProviderNode::getNodeName() const {
@@ -43,5 +41,5 @@ bool CameraProviderNode::deserialize(io::Serializer* serializer, const YAML::Nod
     return true;
 }
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
-
+} // namespace node
+} // namespace aderite

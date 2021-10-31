@@ -1,15 +1,17 @@
 #include "FileHandler.hpp"
-
 #include <fstream>
+
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace io {
 
-DataChunk::DataChunk(size_t offset, size_t size, std::string name, std::vector<unsigned char> data)
-    : Offset(offset), OriginalSize(size), Name(name), Data(std::move(data))
-{}
+DataChunk::DataChunk(size_t offset, size_t size, std::string name, std::vector<unsigned char> data) :
+    Offset(offset),
+    OriginalSize(size),
+    Name(name),
+    Data(std::move(data)) {}
 
 DataChunk FileHandler::openSerializable(SerializableHandle handle) const {
     const std::filesystem::path path = m_rootDir / "Asset" / (std::to_string(handle) + ".asset");
@@ -30,7 +32,7 @@ DataChunk FileHandler::openSerializable(SerializableHandle handle) const {
 }
 
 DataChunk FileHandler::openReservedLoadable(LoadableHandle handle) const {
-    const std::filesystem::path path = m_rootDir / "Data" / (std::to_string(handle) + ".data");
+    const std::filesystem::path path = m_rootDir / "Data" / ("_" + std::to_string(handle) + ".data");
 
     if (!std::filesystem::exists(path)) {
         return DataChunk(0, 0, ("Data/_" + std::to_string(handle) + ".data").c_str(), {});
@@ -45,6 +47,10 @@ DataChunk FileHandler::openReservedLoadable(LoadableHandle handle) const {
     in.read(reinterpret_cast<char*>(data.data()), data.size());
     data.push_back('\0');
     return DataChunk(offset, size, ("Data/_" + std::to_string(handle) + ".data").c_str(), data);
+}
+
+std::filesystem::path FileHandler::pathToReserved(LoadableHandle handle) const {
+    return m_rootDir / "Data" / ("_" + std::to_string(handle) + ".data");
 }
 
 DataChunk FileHandler::openLoadable(SerializableHandle handle) const {
@@ -94,5 +100,5 @@ void FileHandler::writePhysicalFile(LoadableHandle handle, const std::filesystem
     this->commit(chunk);
 }
 
-}
-}
+} // namespace io
+} // namespace aderite

@@ -2,15 +2,17 @@
 
 /**
  * @brief This file is used to define forward declarations for all rendering types
-*/
+ */
 
 #include "aderite/utility/Macros.hpp"
 
-ADERITE_RENDERING_NAMESPACE_BEGIN
+namespace aderite {
+namespace rendering {
 
 class Renderer;
 class DrawCall;
 class Pipeline;
 class PipelineState;
 
-ADERITE_RENDERING_NAMESPACE_END
+} // namespace rendering
+} // namespace aderite

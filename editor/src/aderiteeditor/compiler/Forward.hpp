@@ -2,14 +2,18 @@
 
 /**
  * @brief This file is used to define forward declarations for all compiler functionality
-*/
+ */
 
 #include "aderiteeditor/utility/Macros.hpp"
 
-ADERITE_EDITOR_COMPILER_NAMESPACE_BEGIN
+namespace aderite {
+namespace compiler {
 
 class GraphEvaluator;
 class PipelineEvaluator;
 class ShaderEvaluator;
+class ShaderCompiler;
+class ScriptCompiler;
 
-ADERITE_EDITOR_COMPILER_NAMESPACE_END
+} // namespace compiler
+} // namespace aderite

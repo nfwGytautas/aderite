@@ -16,7 +16,8 @@
 
 #include "aderiteeditor/utility/Macros.hpp"
 
-ADERITE_EDITOR_BACKEND_NAMESPACE_BEGIN
+namespace aderite {
+namespace backend {
 
 void ImGui_Implbgfx_Init(int view);
 void ImGui_Implbgfx_Shutdown();
@@ -27,4 +28,5 @@ void ImGui_Implbgfx_RenderDrawLists(struct ImDrawData* draw_data);
 void ImGui_Implbgfx_InvalidateDeviceObjects();
 bool ImGui_Implbgfx_CreateDeviceObjects();
 
-ADERITE_EDITOR_BACKEND_NAMESPACE_END
+} // namespace backend
+} // namespace aderite

@@ -2,6 +2,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/reflection/Reflector.hpp"
+
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 
 // Nodes
@@ -28,8 +29,8 @@
 #include "aderiteeditor/node/shared/ConvertNode.hpp"
 
 // Assets
-#include "aderiteeditor/asset/RenderingPipeline.hpp"
 #include "aderiteeditor/asset/EditorMaterialType.hpp"
+#include "aderiteeditor/asset/RenderingPipeline.hpp"
 #include "aderiteeditor/node/Graph.hpp"
 
 // Operations
@@ -43,43 +44,43 @@ namespace utility {
 
 /**
  * @brief Utility function to link instancers
-*/
+ */
 void linkInstancers() {
-	aderite::reflection::Reflector* reflector = aderite::Engine::getReflector();
+    aderite::reflection::Reflector* reflector = aderite::Engine::getReflector();
 
-	// Material
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::AddNode, reflection::EditorTypes::AddNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::MaterialInputNode, reflection::EditorTypes::MaterialInputNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::MaterialOutputNode, reflection::EditorTypes::MaterialOutputNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::Sampler2DNode, reflection::EditorTypes::Sampler2DNode);
+    // Material
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::AddNode, reflection::EditorTypes::AddNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::MaterialInputNode, reflection::EditorTypes::MaterialInputNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::MaterialOutputNode, reflection::EditorTypes::MaterialOutputNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::Sampler2DNode, reflection::EditorTypes::Sampler2DNode);
 
-	// Pipeline
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::CameraProviderNode, reflection::EditorTypes::CameraProviderNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::ConcatObjectsNode, reflection::EditorTypes::ConcatObjectsNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EditorCameraNode, reflection::EditorTypes::EditorCameraNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EditorRenderNode, reflection::EditorTypes::EditorRenderNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EditorTargetNode, reflection::EditorTypes::EditorTargetNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EntitiesNode, reflection::EditorTypes::EntitiesNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::RenderNode, reflection::EditorTypes::RenderNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::RequireLockNode, reflection::EditorTypes::RequireLockNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::ScreenNode, reflection::EditorTypes::ScreenNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::SelectObjectNode, reflection::EditorTypes::SelectObjectNode);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::TargetProviderNode, reflection::EditorTypes::TargetProviderNode);
+    // Pipeline
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::CameraProviderNode, reflection::EditorTypes::CameraProviderNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::ConcatObjectsNode, reflection::EditorTypes::ConcatObjectsNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EditorCameraNode, reflection::EditorTypes::EditorCameraNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EditorRenderNode, reflection::EditorTypes::EditorRenderNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EditorTargetNode, reflection::EditorTypes::EditorTargetNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::EntitiesNode, reflection::EditorTypes::EntitiesNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::RenderNode, reflection::EditorTypes::RenderNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::RequireLockNode, reflection::EditorTypes::RequireLockNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::ScreenNode, reflection::EditorTypes::ScreenNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::SelectObjectNode, reflection::EditorTypes::SelectObjectNode);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::TargetProviderNode, reflection::EditorTypes::TargetProviderNode);
 
-	// Shared
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::ConvertNode, reflection::EditorTypes::ConvertNode);
+    // Shared
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::ConvertNode, reflection::EditorTypes::ConvertNode);
 
-	// Assets
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, asset::RenderingPipeline, reflection::RuntimeTypes::PIPELINE);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, asset::EditorMaterialType, reflection::RuntimeTypes::MAT_TYPE);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::Graph, reflection::EditorTypes::GraphAsset);
+    // Assets
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, asset::RenderingPipeline, reflection::RuntimeTypes::PIPELINE);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, asset::EditorMaterialType, reflection::RuntimeTypes::MAT_TYPE);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, node::Graph, reflection::EditorTypes::GraphAsset);
 
-	// Operations
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, runtime::EditorCameraOperation, reflection::EditorTypes::EditorCameraOp);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, runtime::EditorRenderOperation, reflection::EditorTypes::EditorRenderOp);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, runtime::EditorTargetOperation, reflection::EditorTypes::EditorTargetOp);
-	ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, runtime::OperationArray, reflection::EditorTypes::ArrayOp);
+    // Operations
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, editor::EditorCameraOperation, reflection::EditorTypes::EditorCameraOp);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, editor::EditorRenderOperation, reflection::EditorTypes::EditorRenderOp);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, editor::EditorTargetOperation, reflection::EditorTypes::EditorTargetOp);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, editor::OperationArray, reflection::EditorTypes::ArrayOp);
 }
 
-}
-}
+} // namespace utility
+} // namespace aderite

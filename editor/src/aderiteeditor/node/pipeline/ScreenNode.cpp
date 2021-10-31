@@ -2,26 +2,19 @@
 
 #include "aderite/rendering/operation/OutputToScreenOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
+
+#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
-#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
-ScreenNode::ScreenNode()
-{
-    p_inputs.push_back(new InputPin(
-        this,
-        node::getTypeName(node::PropertyType::Target),
-        "Target"
-    ));
+ScreenNode::ScreenNode() {
+    p_inputs.push_back(new InputPin(this, node::getTypeName(node::PropertyType::Target), "Target"));
 
-    p_inputs.push_back(new InputPin(
-        this,
-        node::getTypeName(node::PropertyType::Require),
-        "Require"
-    ));
+    p_inputs.push_back(new InputPin(this, node::getTypeName(node::PropertyType::Require), "Require"));
 
     // Make require optional
     p_inputs[1]->setOptional(true);
@@ -53,5 +46,5 @@ bool ScreenNode::deserialize(io::Serializer* serializer, const YAML::Node& data)
     return true;
 }
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
-
+} // namespace node
+} // namespace aderite

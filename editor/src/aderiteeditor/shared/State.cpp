@@ -6,12 +6,12 @@
 namespace aderite {
 namespace editor {
 
-shared::IEventSink* State::Sink = nullptr;
-shared::Project* State::Project = nullptr;
-shared::EditorCamera* State::EditorCamera = nullptr;
+editor::IEventSink* State::Sink = nullptr;
+editor::Project* State::Project = nullptr;
+editor::EditorCamera* State::EditorCamera = nullptr;
 bgfx::FrameBufferHandle State::DebugRenderHandle = BGFX_INVALID_HANDLE;
 SelectableObject State::LastSelectedObject = {};
 bool State::IsGameMode = false;
 
-}
-}
+} // namespace editor
+} // namespace aderite

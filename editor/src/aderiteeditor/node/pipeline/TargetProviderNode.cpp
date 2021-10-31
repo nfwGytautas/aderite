@@ -1,21 +1,18 @@
 #include "TargetProviderNode.hpp"
 
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
+
+#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
-#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
-TargetProviderNode::TargetProviderNode()
-{
-    p_outputs.push_back(new OutputPin(
-        this,
-        node::getTypeName(node::PropertyType::Target),
-        "Target"
-    ));
+TargetProviderNode::TargetProviderNode() {
+    p_outputs.push_back(new OutputPin(this, node::getTypeName(node::PropertyType::Target), "Target"));
 }
 
 const char* TargetProviderNode::getNodeName() const {
@@ -44,5 +41,5 @@ bool TargetProviderNode::deserialize(io::Serializer* serializer, const YAML::Nod
     return true;
 }
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
-
+} // namespace node
+} // namespace aderite

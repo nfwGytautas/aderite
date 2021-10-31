@@ -61,6 +61,7 @@ Meta enabled field
 Handle to ColliderList, audio list etc., managers take care of these lists
 
 Physics:
+Static/Dynamic PhysicsActor component
 Multithreading
 Substeps
 Physics material asset
@@ -74,7 +75,20 @@ VFS:
 Refactor to be more intuitive
 Remove files that don't physically exist anymore
 
+Scripting:
+Set fields after initializing object
+Generate .csproj file for easier coding
+Dont kill entire editor on script run error
+Load on project open
+Improve engine class finding
+
 Editor:
+Don't compile when loading project
+Loading bar
+Dont load scripts if they are out of date
+Shared drag drop fields API (MeshDragDrop, MaterialDragDrop, etc.) elements
+Modal base class
+Speed up load time on project load
 Block from naming properties the same name
 Open graph when selecting apropriate asset
 Redo most of it
@@ -111,6 +125,7 @@ Rename dynamic text API
 Tooltips?
 
 Code:
+DLLs instead of static libs
 this for self invokes
 Middleware sections
 Remove virtual from places that don't need it
@@ -126,3 +141,4 @@ Move enums to files
 Move logger to engine system
 More verbose logging
 Remove pointers where not needed
+Some files start with lowercase
