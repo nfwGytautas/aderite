@@ -1,37 +1,23 @@
 #include "Sampler2DNode.hpp"
 
-#include "MaterialInputNode.hpp"
-
 #include "aderite/asset/MaterialTypeAsset.hpp"
+
+#include "MaterialInputNode.hpp"
+#include "aderiteeditor/asset/property/Property.hpp"
+#include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
-#include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
-#include "aderiteeditor/asset/property/Property.hpp"
+#include "aderiteeditor/windows/backend/node/imnodes.h"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
-Sampler2DNode::Sampler2DNode()
-{
+Sampler2DNode::Sampler2DNode() {
     // Create pins
-    p_inputs.push_back(
-        new InputPin(
-            this,
-            asset::getNameForType(
-                asset::SamplerType::TEXTURE_2D), 
-                "Texture"
-        )
-    );
+    p_inputs.push_back(new InputPin(this, asset::getNameForType(asset::SamplerType::TEXTURE_2D), "Texture"));
 
-    p_outputs.push_back(
-        new OutputPin(
-            this,
-            asset::getNameForType(
-                asset::PropertyType::VEC4), 
-            "Color"
-        )
-    );
+    p_outputs.push_back(new OutputPin(this, asset::getNameForType(asset::PropertyType::VEC4), "Color"));
 }
 
 const char* Sampler2DNode::getNodeName() const {
@@ -60,5 +46,5 @@ bool Sampler2DNode::deserialize(io::Serializer* serializer, const YAML::Node& da
     return true;
 }
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
-
+} // namespace node
+} // namespace aderite

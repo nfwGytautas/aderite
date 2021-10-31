@@ -6,44 +6,44 @@ namespace aderite {
 namespace rendering {
 
 void PipelineState::setDrawCallList(DrawCallList* dcl) {
-	m_drawCalls = dcl;
+    m_drawCalls = dcl;
 }
 
 DrawCallList* PipelineState::getDrawCallList() const {
-	return m_drawCalls;
+    return m_drawCalls;
 }
 
 void PipelineState::pushTarget(bgfx::FrameBufferHandle target) {
-	m_targets.push(target);
+    m_targets.push(target);
 }
 
 void PipelineState::pushEye(EyeInformation eye) {
-	m_eyes.push(eye);
+    m_eyes.push(eye);
 }
 
 bgfx::FrameBufferHandle PipelineState::popTarget() {
-	bgfx::FrameBufferHandle handle = m_targets.top();
-	m_targets.pop();
-	return handle;
+    bgfx::FrameBufferHandle handle = m_targets.top();
+    m_targets.pop();
+    return handle;
 }
 
 EyeInformation PipelineState::popEye() {
-	EyeInformation eye = m_eyes.top();
-	m_eyes.pop();
-	return eye;
+    EyeInformation eye = m_eyes.top();
+    m_eyes.pop();
+    return eye;
 }
 
 void PipelineState::reset() {
-	if (m_eyes.size() > 0) {
-		LOG_WARN("Not all eyes was used in last pipeline cycle");
-		m_eyes = {};
-	}
+    if (m_eyes.size() > 0) {
+        LOG_WARN("Not all eyes was used in last pipeline cycle");
+        m_eyes = {};
+    }
 
-	if (m_targets.size() > 0) {
-		LOG_WARN("Not all targets was used in last pipeline cycle");
-		m_targets = {};
-	}
+    if (m_targets.size() > 0) {
+        LOG_WARN("Not all targets was used in last pipeline cycle");
+        m_targets = {};
+    }
 }
 
-}
-}
+} // namespace rendering
+} // namespace aderite

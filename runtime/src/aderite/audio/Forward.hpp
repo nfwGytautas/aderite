@@ -1,7 +1,7 @@
 #pragma once
 
-#include "aderite/utility/Macros.hpp"
 #include "aderite/Handles.hpp"
+#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace audio {
@@ -9,4 +9,4 @@ namespace audio {
 class AudioController;
 
 }
-}
+} // namespace aderite

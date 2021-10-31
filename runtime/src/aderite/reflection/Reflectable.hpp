@@ -8,16 +8,16 @@ namespace reflection {
 
 /**
  * @brief Reflectable object used to make an interface for reflection system
-*/
+ */
 class Reflectable {
 public:
-	virtual ~Reflectable() {}
+    virtual ~Reflectable() {}
 
-	/**
-	 * @brief Returns the type of the reflectable
-	*/
-	virtual Type getType() const = 0;
+    /**
+     * @brief Returns the type of the reflectable
+     */
+    virtual Type getType() const = 0;
 };
 
-}
-}
+} // namespace reflection
+} // namespace aderite

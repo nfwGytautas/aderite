@@ -5,16 +5,16 @@ namespace compiler {
 
 /**
  * @brief Utility class for compiling C# mono scripts
-*/
+ */
 class ScriptCompiler final {
 public:
-	/**
-	 * @brief Compiles the scripts
-	*/
-	void compile();
-private:
+    /**
+     * @brief Compiles the scripts
+     */
+    void compile();
 
+private:
 };
 
-}
-}
+} // namespace compiler
+} // namespace aderite

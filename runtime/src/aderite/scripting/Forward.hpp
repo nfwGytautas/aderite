@@ -3,7 +3,7 @@
 /**
  * @brief This file is used to define forward declarations for all
  * scripting related objects
-*/
+ */
 
 namespace aderite {
 namespace scripting {
@@ -14,5 +14,5 @@ class ScriptList;
 class Script;
 class FieldWrapper;
 
-}
-}
+} // namespace scripting
+} // namespace aderite

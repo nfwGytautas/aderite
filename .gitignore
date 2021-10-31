@@ -6,9 +6,11 @@ build/
 *.vcxproj
 *.vcxproj.filters
 *.sln
+*.csproj
 
 *.hint
 
+aderite_scriptlib.dir
 
 # CMake ignore
 

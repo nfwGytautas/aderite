@@ -2,7 +2,7 @@
 
 /**
  * @brief This file is used to define forward declarations for all collider types
-*/
+ */
 
 #include "aderite/utility/Macros.hpp"
 
@@ -12,4 +12,4 @@ namespace physics {
 class BoxCollider;
 
 }
-}
+} // namespace aderite

@@ -8,21 +8,12 @@ file(GLOB_RECURSE CPP_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE
 add_executable(aderite_editor ${CPP_SOURCE_FILES})
 
 # Lib folders
-if(BUILD_RELEASE)
-    target_link_directories(aderite_editor PUBLIC ${PROJECT_SOURCE_DIR}/dependencies/lib/release/)
-else()
-	message(STATUS "Linking debug libraries for editor")
-	target_link_directories(aderite_editor PUBLIC ${PROJECT_SOURCE_DIR}/dependencies/lib/debug/)
-endif()
+target_link_directories(aderite_editor PUBLIC ${DEPENDENCY_LIB_PATH})
 
 # Includes
 target_include_directories(aderite_editor PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-target_include_directories(aderite_editor PUBLIC ${PROJECT_SOURCE_DIR}/dependencies/include/)
+target_include_directories(aderite_editor PUBLIC ${INCLUDE_DIRS})
 target_include_directories(aderite_editor PUBLIC ${PROJECT_SOURCE_DIR}/runtime/src/)
-
-# BGFX compat include
-# TODO: Add check for compiler and platform
-target_include_directories(aderite_editor PUBLIC ${PROJECT_SOURCE_DIR}/dependencies/include/compat/msvc/)
 
 set_property(TARGET aderite_editor PROPERTY CXX_STANDARD 17)
 set_property(TARGET aderite_editor PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

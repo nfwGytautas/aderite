@@ -5,8 +5,8 @@ namespace scripting {
 
 /**
  * @brief Function links all engine internal systems with mono and makes them visible to scripts
-*/
+ */
 void linkInternals();
 
-}
-}
+} // namespace scripting
+} // namespace aderite

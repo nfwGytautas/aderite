@@ -125,6 +125,7 @@ Rename dynamic text API
 Tooltips?
 
 Code:
+DLLs instead of static libs
 this for self invokes
 Middleware sections
 Remove virtual from places that don't need it
@@ -140,3 +141,4 @@ Move enums to files
 Move logger to engine system
 More verbose logging
 Remove pointers where not needed
+Some files start with lowercase

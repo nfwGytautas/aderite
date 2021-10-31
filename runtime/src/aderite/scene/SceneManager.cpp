@@ -1,29 +1,29 @@
 #include "SceneManager.hpp"
-
 #include <thread>
+
 #include "aderite/Aderite.hpp"
-#include "aderite/utility/Random.hpp"
-#include "aderite/utility/Macros.hpp"
 #include "aderite/scene/Scene.hpp"
+#include "aderite/utility/Macros.hpp"
+#include "aderite/utility/Random.hpp"
 
-ADERITE_SCENE_NAMESPACE_BEGIN
-		
+namespace aderite {
+namespace scene {
+
 bool SceneManager::init() {
-	return true;
+    return true;
 }
 
-void SceneManager::shutdown() {
-
-}
+void SceneManager::shutdown() {}
 
 void SceneManager::setActive(Scene* scene) {
-	// Notify engine
-	::aderite::Engine::get()->onSceneChanged(scene);
-	m_activeScene = scene;
+    // Notify engine
+    ::aderite::Engine::get()->onSceneChanged(scene);
+    m_activeScene = scene;
 }
 
 Scene* SceneManager::getCurrentScene() const {
-	return m_activeScene;
+    return m_activeScene;
 }
 
-ADERITE_SCENE_NAMESPACE_END
+} // namespace scene
+} // namespace aderite

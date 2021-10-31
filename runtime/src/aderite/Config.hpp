@@ -2,8 +2,8 @@
 
 // Version of the engine
 // History:
-//		0.0.0 - Initial release
-constexpr char* EngineVersion = "0.0.0";
+//		0.0 - Initial release
+constexpr const char* EngineVersion = "0.0";
 
 // ---------------------------------
 // WINDOWING BACKENDS
@@ -14,7 +14,6 @@ constexpr char* EngineVersion = "0.0.0";
 
 // Is aderite using GLFW backend, for Windows/Linux/MacOS platforms
 #define GLFW_BACKEND 1
-
 
 // ---------------------------------
 // RESOURCE SAVE TYPE
@@ -29,7 +28,6 @@ constexpr char* EngineVersion = "0.0.0";
 // Is aderite using some human readable type (Editors and debug builds)
 #define HUMAN_READABLE_SAVE_TYPE 1
 
-
 // ---------------------------------
 // Other settings
 // 0 - Disabled
@@ -41,7 +39,6 @@ constexpr char* EngineVersion = "0.0.0";
 
 // Will the renderer support debug rendering
 #define DEBUG_RENDER 1
-
 
 // ---------------------------------
 // Error checks

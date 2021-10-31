@@ -3,15 +3,15 @@
 // TODO: Macro switch
 #include "aderiteeditor/windows/WindowsEditor.hpp"
 
-ADERITE_EDITOR_ROOT_NAMESPACE_BEGIN
+namespace aderite {
 
 interfaces::IEngineMiddleware* createEditor(int argc, char** argv) {
-	// TODO: Macro switch
+    // TODO: Macro switch
 #if defined(WIN32) || defined(_WIN32)
-	return new WindowsEditor(argc, argv);
+    return new WindowsEditor(argc, argv);
 #endif
 
-	return nullptr;
+    return nullptr;
 }
 
-ADERITE_EDITOR_ROOT_NAMESPACE_END
+} // namespace aderite

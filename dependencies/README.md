@@ -5,7 +5,7 @@ In order for aderite to find these libraries all includes must be in directory i
 
 All compiled binaries must be in directory lib/{debug/release}/.
 
-The provided dependencies.7z contains all the libraries needed for aderite to compile
+The provided dependencies.7z (Currently only provided for windows) contains all the libraries needed for aderite to compile
 
 ## List of dependencies:
 ### Runtime:

@@ -2,7 +2,7 @@
 
 /**
  * @brief This file is used to define forward declarations for all virtual file system objects
-*/
+ */
 
 #include "aderiteeditor/utility/Macros.hpp"
 
@@ -13,5 +13,5 @@ class VFS;
 class Directory;
 class File;
 
-}
-}
+} // namespace vfs
+} // namespace aderite

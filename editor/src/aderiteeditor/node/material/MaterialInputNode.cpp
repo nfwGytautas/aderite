@@ -2,29 +2,30 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/io/Serializer.hpp"
-#include "aderiteeditor/shared/State.hpp"
-#include "aderiteeditor/shared/Project.hpp"
-#include "aderiteeditor/node/Graph.hpp"
-#include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
-#include "aderiteeditor/compiler/ShaderEvaluator.hpp"
-#include "aderiteeditor/runtime/EditorTypes.hpp"
+
 #include "aderiteeditor/asset/EditorMaterialType.hpp"
 #include "aderiteeditor/asset/property/Property.hpp"
-#include "aderiteeditor/vfs/VFS.hpp"
+#include "aderiteeditor/compiler/ShaderEvaluator.hpp"
+#include "aderiteeditor/node/Graph.hpp"
+#include "aderiteeditor/node/OutputPin.hpp"
+#include "aderiteeditor/runtime/EditorTypes.hpp"
+#include "aderiteeditor/shared/Project.hpp"
+#include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/vfs/File.hpp"
+#include "aderiteeditor/vfs/VFS.hpp"
+#include "aderiteeditor/windows/backend/node/imnodes.h"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
-MaterialInputNode::MaterialInputNode()
-{}
+MaterialInputNode::MaterialInputNode() {}
 
 void MaterialInputNode::setType(asset::EditorMaterialType* type) {
     for (OutputPin* opin : p_outputs) {
         opin->disconnect();
         delete opin;
     }
-    
+
     m_material = type;
     generatePins();
 }
@@ -38,10 +39,9 @@ void MaterialInputNode::renderBody() {
 
     auto props = m_material->getProperties();
     auto samplers = m_material->getSamplers();
-    if (props.size() + samplers.size() != p_outputs.size() ) {
+    if (props.size() + samplers.size() != p_outputs.size()) {
         generatePins();
-    }
-    else {
+    } else {
         for (size_t i = 0; i < props.size(); i++) {
             p_outputs[i]->setName(props[i]->getName());
         }
@@ -99,19 +99,16 @@ void MaterialInputNode::generatePins() {
     for (int i = 0; i < props.size(); i++) {
         asset::Property* prop = props[i];
         node::OutputPin* opin = new OutputPin(this, asset::getNameForType(prop->getType()), prop->getName());
-        p_outputs.push_back(
-            opin
-        );
+        p_outputs.push_back(opin);
     }
 
     auto samplers = m_material->getSamplers();
     for (int i = 0; i < samplers.size(); i++) {
         asset::Sampler* samp = samplers[i];
         node::OutputPin* opin = new OutputPin(this, asset::getNameForType(samp->getType()), samp->getName());
-        p_outputs.push_back(
-            opin
-        );
+        p_outputs.push_back(opin);
     }
 }
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
+} // namespace node
+} // namespace aderite

@@ -1,32 +1,25 @@
 #include "SelectObjectNode.hpp"
 
 #include <imgui/imgui.h>
-#include "EntitiesNode.hpp"
 
 #include "aderite/rendering/operation/EntityProvideOperation.hpp"
+
+#include "EntitiesNode.hpp"
+#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/node/shared/Properties.hpp"
-#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
-SelectObjectNode::SelectObjectNode()
-{
+SelectObjectNode::SelectObjectNode() {
     // Inputs
-    p_inputs.push_back(new InputPin(
-        this,
-        "None[]",
-        "Objects"
-    ));
+    p_inputs.push_back(new InputPin(this, "None[]", "Objects"));
 
     // Output
-    p_outputs.push_back(new OutputPin(
-        this,
-        "None",
-        "Item"
-    ));
+    p_outputs.push_back(new OutputPin(this, "None", "Item"));
 }
 
 void SelectObjectNode::setType(const std::string& newType) {
@@ -42,8 +35,8 @@ const char* SelectObjectNode::getNodeName() const {
 void SelectObjectNode::evaluate(compiler::GraphEvaluator* evaluator) {
     evaluateDependencies(evaluator);
     compiler::PipelineEvaluator* pe = static_cast<compiler::PipelineEvaluator*>(evaluator);
-    //rendering::EntityProvideOperation* op = new rendering::EntityProvideOperation();
-    //p_outputs[0]->setValue(pe->addOperation(op));
+    // rendering::EntityProvideOperation* op = new rendering::EntityProvideOperation();
+    // p_outputs[0]->setValue(pe->addOperation(op));
     m_evaluated = true;
 }
 
@@ -79,4 +72,5 @@ bool SelectObjectNode::deserialize(io::Serializer* serializer, const YAML::Node&
     return true;
 }
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
+} // namespace node
+} // namespace aderite

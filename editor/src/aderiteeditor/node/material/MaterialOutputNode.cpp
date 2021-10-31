@@ -1,19 +1,15 @@
 #include "MaterialOutputNode.hpp"
 
+#include "aderiteeditor/asset/property/Property.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
-#include "aderiteeditor/asset/property/Property.hpp"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
-MaterialOutputNode::MaterialOutputNode() 
-{
-    p_inputs.push_back(new InputPin(
-		this,
-        asset::getNameForType(asset::PropertyType::VEC4),
-        "Color"
-    ));
+MaterialOutputNode::MaterialOutputNode() {
+    p_inputs.push_back(new InputPin(this, asset::getNameForType(asset::PropertyType::VEC4), "Color"));
 }
 
 const char* MaterialOutputNode::getNodeName() const {
@@ -41,5 +37,5 @@ bool MaterialOutputNode::deserialize(io::Serializer* serializer, const YAML::Nod
     return true;
 }
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
-
+} // namespace node
+} // namespace aderite

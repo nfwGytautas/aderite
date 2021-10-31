@@ -2,11 +2,12 @@
 
 /**
  * @brief This file is used to define forward declarations for all component types
-*/
+ */
 
 #include "aderite/utility/Macros.hpp"
 
-ADERITE_COMPONENTS_NAMESPACE_BEGIN
+namespace aderite {
+namespace scene {
 
 struct MetaComponent;
 struct TransformComponent;
@@ -15,4 +16,5 @@ struct CameraComponent;
 struct RigidbodyComponent;
 struct CollidersComponent;
 
-ADERITE_COMPONENTS_NAMESPACE_END
+} // namespace scene
+} // namespace aderite

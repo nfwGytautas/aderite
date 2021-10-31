@@ -1,15 +1,17 @@
 #include "FileHandler.hpp"
-
 #include <fstream>
+
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace io {
 
-DataChunk::DataChunk(size_t offset, size_t size, std::string name, std::vector<unsigned char> data)
-    : Offset(offset), OriginalSize(size), Name(name), Data(std::move(data))
-{}
+DataChunk::DataChunk(size_t offset, size_t size, std::string name, std::vector<unsigned char> data) :
+    Offset(offset),
+    OriginalSize(size),
+    Name(name),
+    Data(std::move(data)) {}
 
 DataChunk FileHandler::openSerializable(SerializableHandle handle) const {
     const std::filesystem::path path = m_rootDir / "Asset" / (std::to_string(handle) + ".asset");
@@ -98,5 +100,5 @@ void FileHandler::writePhysicalFile(LoadableHandle handle, const std::filesystem
     this->commit(chunk);
 }
 
-}
-}
+} // namespace io
+} // namespace aderite

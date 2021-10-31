@@ -2,11 +2,12 @@
 
 /**
  * @brief This file is used to define forward declarations for all node functionality
-*/
+ */
 
 #include "aderiteeditor/utility/Macros.hpp"
 
-ADERITE_EDITOR_NODE_NAMESPACE_BEGIN
+namespace aderite {
+namespace node {
 
 class Graph;
 class Node;
@@ -35,4 +36,5 @@ class RequireLockNode;
 class ConcatObjectsNode;
 class SelectObjectNode;
 
-ADERITE_EDITOR_NODE_NAMESPACE_END
+} // namespace node
+} // namespace aderite

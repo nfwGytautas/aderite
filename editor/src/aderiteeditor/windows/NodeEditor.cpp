@@ -1,11 +1,12 @@
 #include "NodeEditor.hpp"
 
 #include "aderite/Aderite.hpp"
-#include "aderite/utility/Log.hpp"
 #include "aderite/input/InputManager.hpp"
 #include "aderite/io/Serializer.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
+#include "aderite/utility/Log.hpp"
+
 #include "aderiteeditor/shared/State.hpp"
+#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 // Nodes
 // Material
@@ -28,10 +29,11 @@
 #include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
 
 // Shared
-#include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/node/shared/ConvertNode.hpp"
+#include "aderiteeditor/node/shared/Properties.hpp"
 
-ADERITE_EDITOR_COMPONENT_NAMESPACE_BEGIN
+namespace aderite {
+namespace editor_ui {
 
 constexpr int c_RootMaterialNodeId = 0;
 
@@ -50,18 +52,15 @@ void NodeEditor::render() {
             ImNodes::BeginNodeEditor();
 
             {
-                const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
-                    ImNodes::IsEditorHovered() &&
-                    ImGui::IsMouseDown(ImGuiMouseButton_Right);
+                const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && ImNodes::IsEditorHovered() &&
+                                        ImGui::IsMouseDown(ImGuiMouseButton_Right);
 
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.f, 8.f));
-                if (!ImGui::IsAnyItemHovered() && open_popup)
-                {
+                if (!ImGui::IsAnyItemHovered() && open_popup) {
                     ImGui::OpenPopup("add node");
                 }
 
-                if (ImGui::BeginPopup("add node"))
-                {
+                if (ImGui::BeginPopup("add node")) {
                     switch (m_type) {
                     case NodeEditorType::MATERIAL: {
                         renderMaterialEditorContextMenu();
@@ -140,14 +139,12 @@ void NodeEditor::setGraph(node::Graph* graph, NodeEditorType type) {
 void NodeEditor::renderMaterialEditorContextMenu() {
     const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
 
-    if (ImGui::MenuItem("Add"))
-    {
+    if (ImGui::MenuItem("Add")) {
         node::Node* n = m_graph->addNode<node::AddNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
-    if (ImGui::MenuItem("Sampler 2D"))
-    {
+    if (ImGui::MenuItem("Sampler 2D")) {
         node::Node* n = m_graph->addNode<node::Sampler2DNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
@@ -156,34 +153,28 @@ void NodeEditor::renderMaterialEditorContextMenu() {
 void NodeEditor::renderRenderPipelineEditorContextMenu() {
     const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
 
-    if (ImGui::MenuItem("Entities"))
-    {
+    if (ImGui::MenuItem("Entities")) {
         node::Node* n = m_graph->addNode<node::EntitiesNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
-    if (ImGui::MenuItem("Camera provider"))
-    {
+    if (ImGui::MenuItem("Camera provider")) {
         node::Node* n = m_graph->addNode<node::CameraProviderNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
-    if (ImGui::MenuItem("Target provider"))
-    {
+    if (ImGui::MenuItem("Target provider")) {
         node::Node* n = m_graph->addNode<node::TargetProviderNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
-    if (ImGui::BeginMenu("Array"))
-    {
-        if (ImGui::MenuItem("Concat"))
-        {
+    if (ImGui::BeginMenu("Array")) {
+        if (ImGui::MenuItem("Concat")) {
             node::Node* n = m_graph->addNode<node::ConcatObjectsNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
-        if (ImGui::MenuItem("Select"))
-        {
+        if (ImGui::MenuItem("Select")) {
             node::Node* n = m_graph->addNode<node::SelectObjectNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
@@ -191,10 +182,8 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
         ImGui::EndMenu();
     }
 
-    if (ImGui::BeginMenu("Flow control"))
-    {
-        if (ImGui::MenuItem("Require lock"))
-        {
+    if (ImGui::BeginMenu("Flow control")) {
+        if (ImGui::MenuItem("Require lock")) {
             node::Node* n = m_graph->addNode<node::RequireLockNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
@@ -207,10 +196,8 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
 
-    if (ImGui::BeginMenu("Rendering"))
-    {
-        if (ImGui::MenuItem("Depth & Color"))
-        {
+    if (ImGui::BeginMenu("Rendering")) {
+        if (ImGui::MenuItem("Depth & Color")) {
             node::Node* n = m_graph->addNode<node::RenderNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
@@ -220,29 +207,25 @@ void NodeEditor::renderRenderPipelineEditorContextMenu() {
 
     ImGui::Separator();
 
-    if (ImGui::BeginMenu("Editor"))
-    {
-        if (ImGui::MenuItem("Render"))
-        {
+    if (ImGui::BeginMenu("Editor")) {
+        if (ImGui::MenuItem("Render")) {
             node::Node* n = m_graph->addNode<node::EditorRenderNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
-        if (ImGui::MenuItem("Camera"))
-        {
+        if (ImGui::MenuItem("Camera")) {
             node::Node* n = m_graph->addNode<node::EditorCameraNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
 
-        if (ImGui::MenuItem("Target"))
-        {
+        if (ImGui::MenuItem("Target")) {
             node::Node* n = m_graph->addNode<node::EditorTargetNode>();
             ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
         }
-
 
         ImGui::EndMenu();
     }
 }
 
-ADERITE_EDITOR_COMPONENT_NAMESPACE_END
+} // namespace editor_ui
+} // namespace aderite

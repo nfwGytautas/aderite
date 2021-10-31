@@ -2,7 +2,7 @@
 
 /**
  * @brief This file is used to define forward declarations for all asset types
-*/
+ */
 
 #include "aderite/utility/Macros.hpp"
 
@@ -12,5 +12,5 @@ namespace asset {
 class Property;
 class Sampler;
 
-}
-}
+} // namespace asset
+} // namespace aderite
