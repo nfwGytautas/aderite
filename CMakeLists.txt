@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16.2 FATAL_ERROR)
 
-project(aderite LANGUAGES CXX CSharp)
+project(aderite LANGUAGES CXX)
 
 # Init
 set(ADERITE_OUTPUT_DIR ${CMAKE_BINARY_DIR}/bin)
@@ -22,7 +22,6 @@ set(PHYSX_LIBS LowLevel_static_64 LowLevelAABB_static_64 LowLevelDynamics_static
 message(STATUS "PhysX libs ${PHYSX_LIBS}")
 
 add_subdirectory(runtime)
-add_subdirectory(scriptlib)
 add_subdirectory(editor)
 
 # Copy dlls to output

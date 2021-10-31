@@ -1,7 +1,7 @@
 # Dependencies
 dependencies/include/
-dependencies/glad/build/
-dependencies/imgui/build/
+dependencies/windows/
+build/
 
 *.vcxproj
 *.vcxproj.filters
