@@ -39,15 +39,9 @@ public:
     void setScale(const glm::vec3& scale);
 
     /**
-     * @brief Applies colliders in the list to the actor
-     * @param actor Actor to apply to
+     * @brief Detaches all colliders from their previous actor
      */
-    void setActor(physx::PxRigidActor* actor);
-
-    /**
-     * @brief Returns the actor of colliders
-     */
-    physx::PxRigidActor* getActor() const;
+    void detach();
 
     Collider* get(size_t idx) const {
         return m_colliders[idx];
@@ -76,9 +70,6 @@ public:
 
 private:
     std::vector<Collider*> m_colliders;
-
-    // Runtime variable set by physics controller
-    physx::PxRigidActor* m_actor = nullptr;
 };
 
 } // namespace physics

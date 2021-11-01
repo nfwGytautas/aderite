@@ -22,4 +22,8 @@ namespace audio {
 using AudioInstanceId = size_t;
 }
 
+namespace physics {
+using ActorHandle = size_t;
+}
+
 } // namespace aderite

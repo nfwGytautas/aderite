@@ -17,21 +17,18 @@ Collider::Collider(physx::PxGeometry* geometry) {
                                     physx::PxShapeFlag::eSIMULATION_SHAPE;
 
     p_shape = physics->createShape(*geometry, *defaultMaterial, true, baseFlags);
-
     if (p_shape == nullptr) {
         LOG_ERROR("Failed to create collider shape");
     }
+
+    p_shape->acquireReference();
 
     delete geometry;
 }
 
 Collider::~Collider() {
     if (p_shape != nullptr) {
-        physx::PxRigidActor* prevActor = p_shape->getActor();
-        if (prevActor != nullptr) {
-            prevActor->detachShape(*p_shape);
-        }
-
+        this->detach();
         p_shape->release();
     }
 }
@@ -50,13 +47,11 @@ void Collider::setTrigger(bool value) {
     p_shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, value);
 }
 
-void Collider::setActor(physx::PxRigidActor* actor) {
+void Collider::detach() {
     physx::PxRigidActor* prevActor = p_shape->getActor();
     if (prevActor != nullptr) {
-        p_shape->acquireReference();
         prevActor->detachShape(*p_shape);
     }
-    actor->attachShape(*p_shape);
 }
 
 bool Collider::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {

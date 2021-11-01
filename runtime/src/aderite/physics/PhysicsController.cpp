@@ -22,8 +22,14 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/ColliderList.hpp"
+#include "aderite/physics/DynamicActor.hpp"
+#include "aderite/physics/PhysicsScene.hpp"
+#include "aderite/physics/StaticActor.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/components/Actors.hpp"
+#include "aderite/scene/components/Meta.hpp"
+#include "aderite/scene/components/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -136,10 +142,35 @@ void PhysicsController::update(float delta) {
     auto currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 
     // Simulate a step
-    if (currentScene != nullptr) {
-        // TODO: Substep
-        currentScene->fixedUpdate(delta);
+    if (currentScene == nullptr) {
+        return;
     }
+
+    physics::PhysicsScene* physicsScene = currentScene->getPhysicsScene();
+    if (physicsScene == nullptr) {
+        return;
+    }
+
+    // Initialize if not already initialized
+    if (!physicsScene->initialized()) {
+        physicsScene->initialize(this);
+    }
+
+    // Properties
+    this->syncProperties();
+
+    // Remove detached
+    this->removeDetached();
+
+    // Simulate
+    uint8_t substeps = delta / c_SubStepLength;
+    for (uint8_t i = 0; i < substeps; i++) {
+        physicsScene->simulate(c_SubStepLength);
+        this->syncChanges();
+    }
+    float remainder = delta - (substeps * c_SubStepLength);
+    physicsScene->simulate(remainder);
+    this->syncChanges();
 }
 
 physx::PxRigidStatic* PhysicsController::createStaticBody() {
@@ -148,7 +179,6 @@ physx::PxRigidStatic* PhysicsController::createStaticBody() {
 
 physx::PxRigidDynamic* PhysicsController::createDynamicBody() {
     return m_physics->createRigidDynamic(physx::PxTransform(physx::PxVec3(0)));
-    ;
 }
 
 physx::PxPhysics* PhysicsController::getPhysics() {
@@ -178,6 +208,69 @@ physx::PxFilterFlags PhysicsController::filterShader(physx::PxFilterObjectAttrib
     pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND | physx::PxPairFlag::eNOTIFY_TOUCH_LOST;
 
     return physx::PxFilterFlag::eDEFAULT;
+}
+
+void PhysicsController::syncChanges() {
+    auto currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+
+    // Sync changes with ECS
+    auto dynamicGroup = currentScene->getEntityRegistry().group<scene::DynamicActor>(entt::get<scene::TransformComponent>);
+    for (auto entity : dynamicGroup) {
+        auto [actor, transform] = dynamicGroup.get(entity);
+
+        // Sync transform
+        actor.Actor->sync(transform);
+    }
+}
+
+void PhysicsController::syncProperties() {
+    auto currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+    auto physicsScene = currentScene->getPhysicsScene();
+
+    // Sync changes with ECS
+    auto dynamicView = currentScene->getEntityRegistry().group<scene::DynamicActor>(entt::get<scene::CollidersComponent>);
+    for (auto entity : dynamicView) {
+        auto [actor, colliders] = dynamicView.get(entity);
+
+        if (actor.Actor == nullptr) {
+            // Create actor
+            actor.Actor = new physics::DynamicActor();
+            actor.Actor->init(this);
+
+            // Set actor for colliders
+            actor.Actor->setColliders(colliders.Colliders);
+
+            // Add to the physics scene
+            physicsScene->addActor(actor.Actor);
+
+            // Track
+            m_actors.add(actor.Actor);
+        }
+    }
+
+    auto staticView = currentScene->getEntityRegistry().group<scene::StaticActor>(entt::get<scene::CollidersComponent>);
+    for (auto entity : staticView) {
+        auto [actor, colliders] = staticView.get(entity);
+
+        if (actor.Actor == nullptr) {
+            // Create actor
+            actor.Actor = new physics::StaticActor();
+            actor.Actor->init(this);
+
+            // Set actor for colliders
+            actor.Actor->setColliders(colliders.Colliders);
+
+            // Add to the physics scene
+            physicsScene->addActor(actor.Actor);
+
+            // Track
+            m_actors.add(actor.Actor);
+        }
+    }
+}
+
+void PhysicsController::removeDetached() {
+    // TODO: Iterate and remove actors
 }
 
 } // namespace physics

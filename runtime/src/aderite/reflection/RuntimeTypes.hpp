@@ -22,22 +22,27 @@ enum class RuntimeTypes : Type {
     PIPELINE = 5,
 
     // Colliders
-    CLDR_LIST = 10,
-    BOX_CLDR = 11,
+    CLDR_LIST = 50,
+    BOX_CLDR,
+
+    // Physics actors
+    PHYSICS_ACTOR = 90,
+    DYNAMIC_ACTOR,
+    STATIC_ACTOR,
 
     // Operations
-    OP_CAMERA = 20,
-    OP_ENTITY = 21,
-    OP_SCREEN = 22,
-    OP_RENDER = 23,
-    OP_TARGET = 24,
+    OP_CAMERA = 100,
+    OP_ENTITY,
+    OP_SCREEN,
+    OP_RENDER,
+    OP_TARGET,
 
     // Scripting
-    SCRIPT_LIST = 40,
-    SCRIPT = 41,
+    SCRIPT_LIST = 200,
+    SCRIPT,
 
     // Last element of runtime types, used to specify the end runtime serializables
-    RESERVED = 50,
+    RESERVED,
     // END used to extend runtime types
     END
 };

@@ -6,6 +6,7 @@
 #include <cooking/PxCooking.h>
 #include <extensions/PxExtensionsAPI.h>
 
+#include "aderite/lib/ObjectPool.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/utility/Macros.hpp"
@@ -18,6 +19,8 @@ namespace physics {
  * @brief Class used to handle all physics related functionality for aderite
  */
 class PhysicsController {
+    static constexpr float c_SubStepLength = 0.016667f;
+
 public:
     /**
      * @brief Initializes the physics controller
@@ -76,6 +79,22 @@ public:
                                              physx::PxPairFlags& pairFlags, const void* constantBlock, physx::PxU32 constantBlockSize);
 
 private:
+    /**
+     * @brief Synchronize changes between physics world and ECS
+     */
+    void syncChanges();
+
+    /**
+     * @brief Synchronize actor and collider properties with ECS
+     */
+    void syncProperties();
+
+    /**
+     * @brief Removes detached actors from pool
+     */
+    void removeDetached();
+
+private:
     PhysicsController() {}
     friend Engine;
 
@@ -95,6 +114,8 @@ private:
     float m_defaultRestitution = 0.6f;
     float m_defaultDensity = 10.0f;
     float m_defaultAngularDamping = 0.5f;
+
+    ObjectPool<PhysicsActor> m_actors;
 };
 
 } // namespace physics

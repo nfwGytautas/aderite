@@ -52,6 +52,7 @@ Rendering:
 BGFX multithread encoder
 
 Audio:
+Rework API to not be so cumbersome
 Fix inspector selection
 Rethink serialization
 3D audio
@@ -61,6 +62,7 @@ Meta enabled field
 Handle to ColliderList, audio list etc., managers take care of these lists
 
 Physics:
+Rework API to not be so cumbersome
 Static/Dynamic PhysicsActor component
 Multithreading
 Substeps
@@ -76,6 +78,7 @@ Refactor to be more intuitive
 Remove files that don't physically exist anymore
 
 Scripting:
+Rework API to not be so cumbersome
 Set fields after initializing object
 Generate .csproj file for easier coding
 Dont kill entire editor on script run error

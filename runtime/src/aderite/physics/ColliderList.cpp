@@ -18,20 +18,11 @@ ColliderList::~ColliderList() {
     for (Collider* c : m_colliders) {
         delete c;
     }
-
-    if (m_actor) {
-        m_actor->release();
-        m_actor = nullptr;
-    }
 }
 
 ColliderList::ColliderList() {}
 
 void ColliderList::addCollider(Collider* collider) {
-    if (m_actor != nullptr) {
-        collider->setActor(m_actor);
-    }
-
     m_colliders.push_back(collider);
 }
 
@@ -50,21 +41,10 @@ void ColliderList::setScale(const glm::vec3& scale) {
     }
 }
 
-void ColliderList::setActor(physx::PxRigidActor* actor) {
+void ColliderList::detach() {
     for (Collider* c : m_colliders) {
-        c->setActor(actor);
-    }
-
-    // Release old actor
-    if (m_actor != nullptr) {
-        m_actor->release();
-    }
-
-    m_actor = actor;
-}
-
-physx::PxRigidActor* ColliderList::getActor() const {
-    return m_actor;
+        c->detach();
+    }   
 }
 
 reflection::Type aderite::physics::ColliderList::getType() const {

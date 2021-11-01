@@ -4,6 +4,7 @@
 
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/components/Components.hpp"
+#include "aderite/scene/components/Transform.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
 #include "aderite/utility/Log.hpp"
 

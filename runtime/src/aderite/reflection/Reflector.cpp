@@ -11,6 +11,8 @@
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/ColliderList.hpp"
+#include "aderite/physics/DynamicActor.hpp"
+#include "aderite/physics/StaticActor.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
@@ -40,6 +42,10 @@ bool Reflector::init() {
     // Colliders
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::ColliderList, RuntimeTypes::CLDR_LIST);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::BoxCollider, RuntimeTypes::BOX_CLDR);
+
+    // Physics actor
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::DynamicActor, RuntimeTypes::DYNAMIC_ACTOR);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::StaticActor, RuntimeTypes::STATIC_ACTOR);
 
     // Operations
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::CameraProvideOperation, RuntimeTypes::OP_CAMERA);

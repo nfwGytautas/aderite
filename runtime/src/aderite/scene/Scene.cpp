@@ -16,11 +16,17 @@
 #include "aderite/io/Loader.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/physics/ColliderList.hpp"
+#include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/PhysicsController.hpp"
+#include "aderite/physics/PhysicsScene.hpp"
+#include "aderite/physics/StaticActor.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderite/scene/Entity.hpp"
+#include "aderite/scene/components/Actors.hpp"
 #include "aderite/scene/components/Components.hpp"
+#include "aderite/scene/components/Meta.hpp"
+#include "aderite/scene/components/Transform.hpp"
 #include "aderite/scripting/ScriptList.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/YAML.hpp"
@@ -92,18 +98,28 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
         out << YAML::EndMap; // Camera
     }
 
-    // Rigid body
-    if (e.hasComponent<RigidbodyComponent>()) {
-        out << YAML::Key << "Rigidbody";
-        out << YAML::BeginMap; // Rigidbody
+    // Dynamic actor
+    if (e.hasComponent<DynamicActor>()) {
+        out << YAML::Key << "DynamicActor";
+        out << YAML::BeginMap; // DynamicActor
 
-        RigidbodyComponent& rbc = e.getComponent<RigidbodyComponent>();
+        DynamicActor& dac = e.getComponent<DynamicActor>();
 
-        out << YAML::Key << "IsKinematic" << rbc.IsKinematic;
-        out << YAML::Key << "HasGravity" << rbc.HasGravity;
-        out << YAML::Key << "Mass" << rbc.Mass;
+        ::aderite::Engine::getSerializer()->writeUntrackedType(out, dac.Actor);
 
-        out << YAML::EndMap; // Rigidbody
+        out << YAML::EndMap; // DynamicActor
+    }
+
+    // Static actor
+    if (e.hasComponent<StaticActor>()) {
+        out << YAML::Key << "StaticActor";
+        out << YAML::BeginMap; // StaticActor
+
+        StaticActor& dac = e.getComponent<StaticActor>();
+
+        ::aderite::Engine::getSerializer()->writeUntrackedType(out, dac.Actor);
+
+        out << YAML::EndMap; // StaticActor
     }
 
     // Colliders
@@ -202,15 +218,22 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
         // TODO: Deserialize camera
     }
 
-    // Rigid body
-    auto rb_node = e_node["Rigidbody"];
-    if (rb_node) {
-        auto& rbc = e.addComponent<RigidbodyComponent>();
+    // Dynamic actor
+    auto da_node = e_node["DynamicActor"];
+    if (da_node) {
+        auto& dac = e.addComponent<DynamicActor>();
 
         // TODO: Error check
-        rbc.IsKinematic = rb_node["IsKinematic"].as<bool>();
-        rbc.HasGravity = rb_node["HasGravity"].as<bool>();
-        rbc.Mass = rb_node["Mass"].as<float>();
+        dac.Actor = static_cast<physics::DynamicActor*>(::aderite::Engine::getSerializer()->parseUntrackedType(da_node));
+    }
+
+    // Static actor
+    auto sa_node = e_node["StaticActor"];
+    if (sa_node) {
+        auto& sac = e.addComponent<StaticActor>();
+
+        // TODO: Error check
+        sac.Actor = static_cast<physics::StaticActor*>(::aderite::Engine::getSerializer()->parseUntrackedType(sa_node));
     }
 
     // Colliders
@@ -267,8 +290,6 @@ Scene::~Scene() {
         auto [colliders] = entities.get(entity);
         delete colliders.Colliders;
     }
-
-    m_physicsScene->release();
 }
 
 void Scene::update(float delta) {
@@ -278,14 +299,6 @@ void Scene::update(float delta) {
 
         // TODO: Update entity cameras
     }
-}
-
-void Scene::fixedUpdate(float step) {
-    // Sync ECS to physics
-    syncEcsToPhysics();
-    m_physicsScene->simulate(step);
-    m_physicsScene->fetchResults(true);
-    syncPhysicsToEcs();
 }
 
 Entity Scene::createEntity(const MetaComponent& meta) {
@@ -307,12 +320,12 @@ void Scene::destroyEntity(Entity entity) {
     m_registry.destroy(entity);
 }
 
-physx::PxScene* Scene::getPhysicsScene() const {
-    return m_physicsScene;
-}
-
 rendering::Pipeline* Scene::getPipeline() const {
     return m_pipeline;
+}
+
+physics::PhysicsScene* Scene::getPhysicsScene() const {
+    return m_physics;
 }
 
 void Scene::setPipeline(rendering::Pipeline* pipeline) {
@@ -369,49 +382,15 @@ bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 }
 
 Scene::Scene() {
-    auto physics = ::aderite::Engine::getPhysicsController()->getPhysics();
-
-    // TODO: Configure physics properties
-    physx::PxSceneDesc sceneDesc(physics->getTolerancesScale());
-    sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
-    sceneDesc.cpuDispatcher = ::aderite::Engine::getPhysicsController()->getDispatcher();
-    sceneDesc.filterShader = physics::PhysicsController::filterShader;
-    sceneDesc.simulationEventCallback = this;
-    // sceneDesc.flags = physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
-    m_physicsScene = physics->createScene(sceneDesc);
-    ADERITE_DYNAMIC_ASSERT(m_physicsScene != nullptr, "Failed to create a PhysX scene");
+    m_physics = new physics::PhysicsScene();
 }
 
 template<typename T>
 void Scene::onComponentAdded(Entity entity, T& component) {}
 
 template<>
-void Scene::onComponentAdded<RigidbodyComponent>(Entity entity, RigidbodyComponent& component) {
-    // Can't have rigidbody without colliders
-    if (!entity.hasComponent<CollidersComponent>()) {
-        entity.addComponent<CollidersComponent>();
-    }
-
-    // Convert to static
-    auto& colliders = entity.getComponent<CollidersComponent>();
-
-    // Convert to dynamic
-    physx::PxRigidDynamic* actor = ::aderite::Engine::getPhysicsController()->createDynamicBody();
-
-    // Switch
-    actor->userData = &entity.getComponent<MetaComponent>();
-    m_physicsScene->removeActor(*colliders.Colliders->getActor());
-    colliders.Colliders->setActor(actor);
-    m_physicsScene->addActor(*actor);
-}
-
-template<>
 void Scene::onComponentAdded<CollidersComponent>(Entity entity, CollidersComponent& component) {
     component.Colliders = new physics::ColliderList();
-    physx::PxRigidStatic* actor = ::aderite::Engine::getPhysicsController()->createStaticBody();
-    actor->userData = &entity.getComponent<MetaComponent>();
-    component.Colliders->setActor(actor);
-    m_physicsScene->addActor(*actor);
 }
 
 template<>
@@ -459,159 +438,23 @@ template<>
 void Scene::onComponentRemoved(Entity entity, AudioListenerComponent& component) {}
 
 template<>
-void Scene::onComponentRemoved<RigidbodyComponent>(Entity entity, RigidbodyComponent& component) {
-    // Convert to static
-    auto& colliders = entity.getComponent<CollidersComponent>();
+void Scene::onComponentRemoved<DynamicActor>(Entity entity, DynamicActor& component) {
+    component.Actor->detach();
+}
 
-    // Make static
-    physx::PxRigidStatic* actor = ::aderite::Engine::getPhysicsController()->createStaticBody();
-
-    // Switch
-    m_physicsScene->removeActor(*colliders.Colliders->getActor());
-    colliders.Colliders->setActor(actor);
-    m_physicsScene->addActor(*actor);
+template<>
+void Scene::onComponentRemoved<StaticActor>(Entity entity, StaticActor& component) {
+    component.Actor->detach();
 }
 
 template<>
 void Scene::onComponentRemoved<CollidersComponent>(Entity entity, CollidersComponent& component) {
-    if (entity.hasComponent<RigidbodyComponent>()) {
-        entity.removeComponent<RigidbodyComponent>();
-    }
-    m_physicsScene->removeActor(*component.Colliders->getActor());
     delete component.Colliders;
 }
 
 template<>
 void Scene::onComponentRemoved<ScriptsComponent>(Entity entity, ScriptsComponent& component) {
     delete component.Scripts;
-}
-
-void Scene::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) {
-    for (physx::PxU32 i = 0; i < nbPairs; i++) {
-        const physx::PxContactPair& cp = pairs[i];
-
-        physx::PxRigidActor* actor1 = pairHeader.actors[0];
-        physx::PxRigidActor* actor2 = pairHeader.actors[1];
-
-        MetaComponent* e1 = static_cast<MetaComponent*>(actor1->userData);
-        MetaComponent* e2 = static_cast<MetaComponent*>(actor2->userData);
-
-        Entity a1Entity = Entity(e1->This, this);
-        Entity a2Entity = Entity(e2->This, this);
-        if (a1Entity.hasComponent<ScriptsComponent>()) {
-            ScriptsComponent& scriptsActor = a1Entity.getComponent<ScriptsComponent>();
-
-            if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-                scriptsActor.Scripts->onCollisionEnter(a2Entity);
-            } else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-                scriptsActor.Scripts->onCollisionLeave(a2Entity);
-            }
-        }
-
-        if (a2Entity.hasComponent<ScriptsComponent>()) {
-            ScriptsComponent& scriptsActor = a2Entity.getComponent<ScriptsComponent>();
-
-            if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-                scriptsActor.Scripts->onCollisionEnter(a1Entity);
-            } else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-                scriptsActor.Scripts->onCollisionLeave(a1Entity);
-            }
-        }
-    }
-}
-
-void Scene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) {
-    for (physx::PxU32 i = 0; i < nbPairs; i++) {
-        const physx::PxTriggerPair& cp = pairs[i];
-
-        physx::PxRigidActor* actor = cp.otherActor;
-        physx::PxRigidActor* trigger = cp.triggerActor;
-
-        MetaComponent* metaActor = static_cast<MetaComponent*>(actor->userData);
-        MetaComponent* metaTrigger = static_cast<MetaComponent*>(trigger->userData);
-
-        Entity actorEntity = Entity(metaActor->This, this);
-        Entity triggerEntity = Entity(metaTrigger->This, this);
-        if (actorEntity.hasComponent<ScriptsComponent>()) {
-            ScriptsComponent& scriptsActor = actorEntity.getComponent<ScriptsComponent>();
-
-            if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-                scriptsActor.Scripts->onTriggerEnter(triggerEntity);
-            } else if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-                scriptsActor.Scripts->onTriggerLeave(triggerEntity);
-            }
-        }
-    }
-}
-
-void Scene::syncActorToEcs(physx::PxRigidActor* actor, const scene::CollidersComponent& colliders,
-                           const scene::TransformComponent& transform) {
-    // Transform
-    actor->setGlobalPose(
-        physx::PxTransform(physx::PxVec3 {transform.Position.x, transform.Position.y, transform.Position.z},
-                           physx::PxQuat {transform.Rotation.x, transform.Rotation.y, transform.Rotation.z, transform.Rotation.w}));
-
-    // Scale
-    colliders.Colliders->setScale(transform.Scale);
-
-    // Collision group
-    physx::PxSetGroup(*actor, 0);
-}
-
-void Scene::syncEcsToPhysics() {
-    // Sync changes with ECS
-    auto dynamicGroup = m_registry.group<scene::RigidbodyComponent>(entt::get<scene::CollidersComponent, scene::TransformComponent>);
-    for (auto entity : dynamicGroup) {
-        auto [rigidbody, colliders, transform] =
-            dynamicGroup.get<scene::RigidbodyComponent, scene::CollidersComponent, scene::TransformComponent>(entity);
-
-        physx::PxRigidDynamic* actor = static_cast<physx::PxRigidDynamic*>(colliders.Colliders->getActor());
-        if (actor != nullptr && (transform.WasAltered || rigidbody.WasAltered)) {
-            // Sync ECS -> PhysX
-            syncActorToEcs(actor, colliders, transform);
-
-            // Settings
-            actor->setMass(rigidbody.Mass);
-            actor->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, !rigidbody.HasGravity);
-            actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, rigidbody.IsKinematic);
-
-            // Reset flags
-            transform.WasAltered = false;
-            rigidbody.WasAltered = false;
-        }
-    }
-
-    auto staticGroup =
-        m_registry.group<scene::CollidersComponent>(entt::get<scene::TransformComponent>, entt::exclude<scene::RigidbodyComponent>);
-    for (auto entity : staticGroup) {
-        auto [colliders, transform] = staticGroup.get<scene::CollidersComponent, scene::TransformComponent>(entity);
-
-        physx::PxRigidStatic* actor = static_cast<physx::PxRigidStatic*>(colliders.Colliders->getActor());
-        if (actor != nullptr && transform.WasAltered) {
-            LOG_WARN("Altered position of static physics entity");
-
-            // Sync ECS -> PhysX
-            syncActorToEcs(actor, colliders, transform);
-
-            // Reset flags
-            transform.WasAltered = false;
-        }
-    }
-}
-
-void Scene::syncPhysicsToEcs() {
-    // Sync changes with physics
-    auto physicsGroup = m_registry.group<scene::CollidersComponent>(entt::get<scene::TransformComponent>);
-    for (auto entity : physicsGroup) {
-        auto [colliders, transform] = physicsGroup.get<scene::CollidersComponent, scene::TransformComponent>(entity);
-
-        physx::PxRigidActor* actor = static_cast<physx::PxRigidActor*>(colliders.Colliders->getActor());
-
-        // Transform
-        physx::PxTransform pxt = actor->getGlobalPose();
-        transform.Position = {pxt.p.x, pxt.p.y, pxt.p.z};
-        transform.Rotation = {pxt.q.w, pxt.q.x, pxt.q.y, pxt.q.z};
-    }
 }
 
 } // namespace scene

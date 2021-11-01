@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include <PxSimulationEventCallback.h>
 #include <entt/entity/registry.hpp>
 
 #include "aderite/Config.hpp"
@@ -13,6 +12,7 @@
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/scene/components/Components.hpp"
+#include "aderite/scene/components/Meta.hpp"
 #include "aderite/utility/Macros.hpp"
 
 namespace aderite {
@@ -24,7 +24,7 @@ namespace scene {
  * be it meshes, materials, etc. However these resources are loaded as trunks into the asset manager
  * the actual data is not loaded until needed.
  */
-class Scene : public io::SerializableObject, public physx::PxSimulationEventCallback {
+class Scene : public io::SerializableObject {
 public:
     Scene();
     virtual ~Scene();
@@ -43,12 +43,6 @@ public:
     void update(float delta);
 
     /**
-     * @brief Physics update
-     * @param step Fixed step size
-     */
-    void fixedUpdate(float step);
-
-    /**
      * @brief Create Entity with a MetaComponent component
      * @param meta MetaComponent of the entity
      * @return Entity instance
@@ -61,14 +55,14 @@ public:
     void destroyEntity(Entity entity);
 
     /**
-     * @brief Returns the physics scene
-     */
-    physx::PxScene* getPhysicsScene() const;
-
-    /**
      * @brief Returns the pipeline of this scene
      */
     rendering::Pipeline* getPipeline() const;
+
+    /**
+     * @brief Returns the physics scene attached to this one
+     */
+    physics::PhysicsScene* getPhysicsScene() const;
 
     /**
      * @brief Sets the pipeline of the scene
@@ -94,38 +88,12 @@ private:
     template<typename T>
     void onComponentRemoved(Entity entity, T& component);
 
-    // Inherited via PxSimulationEventCallback
-    virtual void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override;
-    virtual void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) override;
-    virtual void onConstraintBreak(physx::PxConstraintInfo*, physx::PxU32) {}
-    virtual void onWake(physx::PxActor**, physx::PxU32) {}
-    virtual void onSleep(physx::PxActor**, physx::PxU32) {}
-    virtual void onAdvance(const physx::PxRigidBody* const*, const physx::PxTransform*, const physx::PxU32) {}
-
-    /**
-     * @brief Syncs physics actor to ECS entity state
-     * @param actor Actor to sync
-     * @param colliders Colliders component of the entity
-     * @param transform Entity transform to sync with
-     */
-    void syncActorToEcs(physx::PxRigidActor* actor, const scene::CollidersComponent& colliders, const scene::TransformComponent& transform);
-
-    /**
-     * @brief Syncs ECS state to physics
-     */
-    void syncEcsToPhysics();
-
-    /**
-     * @brief Syncs physics state to ECS
-     */
-    void syncPhysicsToEcs();
-
     friend class Entity;
     friend class SceneManager;
 
 private:
     entt::registry m_registry;
-    physx::PxScene* m_physicsScene = nullptr;
+    physics::PhysicsScene* m_physics = nullptr;
     rendering::Pipeline* m_pipeline = nullptr;
 };
 

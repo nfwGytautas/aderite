@@ -37,10 +37,9 @@ public:
     void setTrigger(bool value);
 
     /**
-     * @brief Sets the actor of the collider, this will remove the collider from previous actor
-     * @param actor New actor of the collider
+     * @brief Detach collider from its actor
      */
-    void setActor(physx::PxRigidActor* actor);
+    void detach();
 
     /**
      * @brief Sets the scale of the collider
@@ -51,6 +50,9 @@ public:
     // Inherited via ISerializable
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+
+private:
+    friend class PhysicsActor;
 
 protected:
     // Not serialized
