@@ -11,7 +11,9 @@ bgfx::ShaderHandle load_shader(const std::vector<unsigned char>& source, const s
     return vsh;
 }
 
-MaterialTypeAsset::~MaterialTypeAsset() {}
+MaterialTypeAsset::~MaterialTypeAsset() {
+    this->unload();
+}
 
 bool MaterialTypeAsset::isValid() const {
     for (bgfx::UniformHandle uh : m_samplers) {

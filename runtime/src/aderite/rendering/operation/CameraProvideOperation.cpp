@@ -4,6 +4,7 @@
 #include "aderite/rendering/PipelineState.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/components/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -19,8 +20,7 @@ void CameraProvideOperation::execute(PipelineState* state) {
     }
 
     // Entity group
-    auto cameras =
-        currentScene->getEntityRegistry().group<scene::CameraComponent>(entt::get<scene::TransformComponent>);
+    auto cameras = currentScene->getEntityRegistry().group<scene::CameraComponent>(entt::get<scene::TransformComponent>);
 
     for (auto entity : cameras) {
         auto [camera, transform] = cameras.get(entity);

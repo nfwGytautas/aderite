@@ -9,14 +9,15 @@
 #include <yaml-cpp/yaml.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/io/Loader.hpp"
 #include "aderite/io/Serializer.hpp"
-#include "aderite/physics/ColliderList.hpp"
 #include "aderite/physics/DynamicActor.hpp"
+#include "aderite/physics/PhysicsActor.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
 #include "aderite/physics/StaticActor.hpp"
@@ -34,7 +35,96 @@
 namespace aderite {
 namespace scene {
 
-void serialize_entity(YAML::Emitter& out, Entity e) {
+Scene::~Scene() {
+    delete m_physics;
+}
+
+void Scene::update(float delta) {
+    auto cameraGroup = m_registry.group<scene::CameraComponent>(entt::get<scene::TransformComponent>);
+    for (auto entity : cameraGroup) {
+        auto [camera, transform] = cameraGroup.get(entity);
+
+        // TODO: Update entity cameras
+    }
+}
+
+Entity Scene::createEntity(const MetaComponent& meta) {
+    // TODO: Check for name conflicts
+    Entity e = Entity(m_registry.create(), this);
+    e.addComponent<MetaComponent>(meta).This = e.getHandle();
+    return e;
+}
+
+void Scene::destroyEntity(Entity entity) {
+    if (entity.hasComponent<ScriptsComponent>()) {
+        delete entity.getComponent<ScriptsComponent>().Scripts;
+    }
+
+    m_registry.destroy(entity);
+}
+
+rendering::Pipeline* Scene::getPipeline() const {
+    return m_pipeline;
+}
+
+physics::PhysicsScene* Scene::getPhysicsScene() const {
+    return m_physics;
+}
+
+void Scene::setPipeline(rendering::Pipeline* pipeline) {
+    m_pipeline = pipeline;
+}
+
+reflection::Type Scene::getType() const {
+    return static_cast<reflection::Type>(reflection::RuntimeTypes::SCENE);
+}
+
+bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    // Entities
+    emitter << YAML::Key << "Entities" << YAML::BeginSeq;
+
+    m_registry.each([&](auto entity_id) {
+        Entity e = Entity(entity_id, this);
+
+        if (!e) {
+            return;
+        }
+
+        // TODO: Error check
+        this->serializeEntity(emitter, e);
+    });
+
+    emitter << YAML::EndSeq; // Entities
+
+    emitter << YAML::Key << "Pipeline" << YAML::Value;
+    if (m_pipeline != nullptr) {
+        emitter << m_pipeline->getHandle();
+    } else {
+        emitter << YAML::Null;
+    }
+
+    return true;
+}
+
+bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+    // Entities
+    auto entities = data["Entities"];
+    if (entities) {
+        for (auto Entity : entities) {
+            // Error check
+            this->deserializeEntity(Entity);
+        }
+    }
+
+    if (!data["Pipeline"].IsNull()) {
+        setPipeline(static_cast<rendering::Pipeline*>(
+            ::aderite::Engine::getSerializer()->getOrRead(data["Pipeline"].as<io::SerializableHandle>())));
+    }
+
+    return true;
+}
+
+void Scene::serializeEntity(YAML::Emitter& out, Entity e) {
     out << YAML::BeginMap; // Entity
 
     out << YAML::Key << "Entity" << YAML::Value << (entt::id_type)e;
@@ -76,11 +166,11 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
         MeshRendererComponent& mrc = e.getComponent<MeshRendererComponent>();
 
         if (mrc.MeshHandle) {
-            out << YAML::Key << "Mesh" << mrc.MeshHandle->getHandle();
+            out << YAML::Key << "Mesh" << YAML::Value << mrc.MeshHandle->getHandle();
         }
 
         if (mrc.MaterialHandle) {
-            out << YAML::Key << "Material" << mrc.MaterialHandle->getHandle();
+            out << YAML::Key << "Material" << YAML::Value << mrc.MaterialHandle->getHandle();
         }
 
         out << YAML::EndMap; // MeshRenderer
@@ -101,34 +191,29 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
     // Dynamic actor
     if (e.hasComponent<DynamicActor>()) {
         out << YAML::Key << "DynamicActor";
-        out << YAML::BeginMap; // DynamicActor
 
         DynamicActor& dac = e.getComponent<DynamicActor>();
-
         ::aderite::Engine::getSerializer()->writeUntrackedType(out, dac.Actor);
-
-        out << YAML::EndMap; // DynamicActor
     }
 
     // Static actor
     if (e.hasComponent<StaticActor>()) {
         out << YAML::Key << "StaticActor";
-        out << YAML::BeginMap; // StaticActor
 
         StaticActor& dac = e.getComponent<StaticActor>();
-
         ::aderite::Engine::getSerializer()->writeUntrackedType(out, dac.Actor);
-
-        out << YAML::EndMap; // StaticActor
     }
 
     // Colliders
     if (e.hasComponent<CollidersComponent>()) {
         out << YAML::Key << "Colliders";
+        out << YAML::BeginMap; // Colliders
         CollidersComponent& cc = e.getComponent<CollidersComponent>();
 
-        // TODO: Error check
-        ::aderite::Engine::getSerializer()->writeUntrackedType(out, cc.Colliders);
+        if (cc.Colliders) {
+            out << YAML::Key << "ID" << YAML::Value << cc.Colliders->getHandle();
+        }
+        out << YAML::EndMap;
     }
 
     // Audio sources
@@ -167,9 +252,9 @@ void serialize_entity(YAML::Emitter& out, Entity e) {
     out << YAML::EndMap; // Entity
 }
 
-Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
+Entity Scene::deserializeEntity(YAML::Node& eNode) {
     // Read MetaComponent info
-    YAML::Node meta_node = e_node["Meta"];
+    YAML::Node meta_node = eNode["Meta"];
     if (!meta_node) {
         LOG_ERROR("Tried to deserialize Entity without MetaComponent component, this should never happen");
         return Entity(entt::null, nullptr);
@@ -179,12 +264,12 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
     MetaComponent.Name = meta_node["Name"].as<std::string>();
 
     // Create Entity
-    Entity e = scene->createEntity(MetaComponent);
+    Entity e = this->createEntity(MetaComponent);
 
     // Deserialize rest of components
 
     // Transform
-    auto transform_node = e_node["Transform"];
+    auto transform_node = eNode["Transform"];
     if (transform_node) {
         auto& tc = e.addComponent<TransformComponent>();
         tc.Position = transform_node["Position"].as<glm::vec3>();
@@ -193,7 +278,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
     }
 
     // Mesh Renderer
-    auto mr_node = e_node["MeshRenderer"];
+    auto mr_node = eNode["MeshRenderer"];
     if (mr_node) {
         auto& mrc = e.addComponent<MeshRendererComponent>();
 
@@ -211,7 +296,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
     }
 
     // Camera
-    auto cam_node = e_node["Camera"];
+    auto cam_node = eNode["Camera"];
     if (cam_node) {
         auto& cc = e.addComponent<CameraComponent>();
 
@@ -219,38 +304,38 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
     }
 
     // Dynamic actor
-    auto da_node = e_node["DynamicActor"];
+    auto da_node = eNode["DynamicActor"];
     if (da_node) {
         auto& dac = e.addComponent<DynamicActor>();
 
         // TODO: Error check
-        dac.Actor = static_cast<physics::DynamicActor*>(::aderite::Engine::getSerializer()->parseUntrackedType(da_node));
+        ::aderite::Engine::getSerializer()->fillData(dac.Actor, da_node);
     }
 
     // Static actor
-    auto sa_node = e_node["StaticActor"];
+    auto sa_node = eNode["StaticActor"];
     if (sa_node) {
         auto& sac = e.addComponent<StaticActor>();
 
         // TODO: Error check
-        sac.Actor = static_cast<physics::StaticActor*>(::aderite::Engine::getSerializer()->parseUntrackedType(sa_node));
+        ::aderite::Engine::getSerializer()->fillData(sac.Actor, sa_node);
     }
 
     // Colliders
-    auto colliders = e_node["Colliders"];
+    auto colliders = eNode["Colliders"];
     if (colliders) {
-        if (!e.hasComponent<CollidersComponent>()) {
-            e.addComponent<CollidersComponent>();
-        }
-
-        auto& cc = e.getComponent<CollidersComponent>();
+        auto& cc = e.addComponent<CollidersComponent>();
 
         // TODO: Error check
-        cc.Colliders->deserialize(::aderite::Engine::getSerializer(), colliders["Data"]);
+        if (colliders["ID"]) {
+            const io::SerializableHandle handle = colliders["ID"].as<io::SerializableHandle>();
+            cc.Colliders = static_cast<asset::ColliderListAsset*>(::aderite::Engine::getSerializer()->getOrRead(handle));
+            ADERITE_DYNAMIC_ASSERT(cc.Colliders != nullptr, "Tried to use a deleted asset");
+        }
     }
 
     // Audio sources
-    auto audioSources = e_node["AudioSource"];
+    auto audioSources = eNode["AudioSource"];
     if (audioSources) {
         auto& asc = e.addComponent<AudioSourceComponent>();
 
@@ -259,7 +344,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
     }
 
     // Audio listener
-    auto al_node = e_node["AudioListener"];
+    auto al_node = eNode["AudioListener"];
     if (al_node) {
         auto& alc = e.addComponent<AudioListenerComponent>();
 
@@ -268,7 +353,7 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
     }
 
     // Scripts
-    auto scripts = e_node["Scripts"];
+    auto scripts = eNode["Scripts"];
     if (scripts) {
         if (!e.hasComponent<ScriptsComponent>()) {
             e.addComponent<ScriptsComponent>();
@@ -284,103 +369,6 @@ Entity deserialize_entity(YAML::Node& e_node, Scene* scene) {
     return e;
 }
 
-Scene::~Scene() {
-    auto entities = m_registry.view<scene::CollidersComponent>();
-    for (auto entity : entities) {
-        auto [colliders] = entities.get(entity);
-        delete colliders.Colliders;
-    }
-}
-
-void Scene::update(float delta) {
-    auto cameraGroup = m_registry.group<scene::CameraComponent>(entt::get<scene::TransformComponent>);
-    for (auto entity : cameraGroup) {
-        auto [camera, transform] = cameraGroup.get(entity);
-
-        // TODO: Update entity cameras
-    }
-}
-
-Entity Scene::createEntity(const MetaComponent& meta) {
-    // TODO: Check for name conflicts
-    Entity e = Entity(m_registry.create(), this);
-    e.addComponent<MetaComponent>(meta).This = e.getHandle();
-    return e;
-}
-
-void Scene::destroyEntity(Entity entity) {
-    if (entity.hasComponent<CollidersComponent>()) {
-        delete entity.getComponent<CollidersComponent>().Colliders;
-    }
-
-    if (entity.hasComponent<ScriptsComponent>()) {
-        delete entity.getComponent<ScriptsComponent>().Scripts;
-    }
-
-    m_registry.destroy(entity);
-}
-
-rendering::Pipeline* Scene::getPipeline() const {
-    return m_pipeline;
-}
-
-physics::PhysicsScene* Scene::getPhysicsScene() const {
-    return m_physics;
-}
-
-void Scene::setPipeline(rendering::Pipeline* pipeline) {
-    m_pipeline = pipeline;
-}
-
-reflection::Type Scene::getType() const {
-    return static_cast<reflection::Type>(reflection::RuntimeTypes::SCENE);
-}
-
-bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
-    // Entities
-    emitter << YAML::Key << "Entities" << YAML::BeginSeq;
-
-    m_registry.each([&](auto entity_id) {
-        Entity e = Entity(entity_id, this);
-
-        if (!e) {
-            return;
-        }
-
-        // TODO: Error check
-        serialize_entity(emitter, e);
-    });
-
-    emitter << YAML::EndSeq; // Entities
-
-    emitter << YAML::Key << "Pipeline" << YAML::Value;
-    if (m_pipeline != nullptr) {
-        emitter << m_pipeline->getHandle();
-    } else {
-        emitter << YAML::Null;
-    }
-
-    return true;
-}
-
-bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    // Entities
-    auto entities = data["Entities"];
-    if (entities) {
-        for (auto Entity : entities) {
-            // Error check
-            deserialize_entity(Entity, this);
-        }
-    }
-
-    if (!data["Pipeline"].IsNull()) {
-        setPipeline(static_cast<rendering::Pipeline*>(
-            ::aderite::Engine::getSerializer()->getOrRead(data["Pipeline"].as<io::SerializableHandle>())));
-    }
-
-    return true;
-}
-
 Scene::Scene() {
     m_physics = new physics::PhysicsScene();
 }
@@ -389,9 +377,7 @@ template<typename T>
 void Scene::onComponentAdded(Entity entity, T& component) {}
 
 template<>
-void Scene::onComponentAdded<CollidersComponent>(Entity entity, CollidersComponent& component) {
-    component.Colliders = new physics::ColliderList();
-}
+void Scene::onComponentAdded<CollidersComponent>(Entity entity, CollidersComponent& component) {}
 
 template<>
 void Scene::onComponentAdded<ScriptsComponent>(Entity entity, ScriptsComponent& component) {
@@ -415,12 +401,37 @@ void Scene::onComponentAdded<AudioListenerComponent>(Entity entity, AudioListene
 }
 
 template<>
+void Scene::onComponentAdded<DynamicActor>(Entity entity, DynamicActor& component) {
+    // Add transform if don't have already
+    if (!entity.hasComponent<TransformComponent>()) {
+        entity.addComponent<TransformComponent>();
+    }
+
+    component.Actor =
+        static_cast<physics::DynamicActor*>(this->m_physics->createDynamicBody(entity, entity.getComponent<TransformComponent>()));
+}
+
+template<>
+void Scene::onComponentAdded<StaticActor>(Entity entity, StaticActor& component) {
+    // Add transform if don't have already
+    if (!entity.hasComponent<TransformComponent>()) {
+        entity.addComponent<TransformComponent>();
+    }
+
+    component.Actor =
+        static_cast<physics::StaticActor*>(this->m_physics->createStaticBody(entity, entity.getComponent<TransformComponent>()));
+}
+
+template<>
 void Scene::onComponentAdded<CameraComponent>(Entity entity, CameraComponent& component) {
     // Add transform if don't have already
     if (!entity.hasComponent<TransformComponent>()) {
         entity.addComponent<TransformComponent>();
     }
 }
+
+template<>
+void Scene::onComponentAdded<PhysicsCallbackComponent>(Entity entity, PhysicsCallbackComponent& component) {}
 
 template<typename T>
 void Scene::onComponentRemoved(Entity entity, T& component) {}
@@ -439,18 +450,16 @@ void Scene::onComponentRemoved(Entity entity, AudioListenerComponent& component)
 
 template<>
 void Scene::onComponentRemoved<DynamicActor>(Entity entity, DynamicActor& component) {
-    component.Actor->detach();
+    this->m_physics->detachActor(component.Actor);
 }
 
 template<>
 void Scene::onComponentRemoved<StaticActor>(Entity entity, StaticActor& component) {
-    component.Actor->detach();
+    this->m_physics->detachActor(component.Actor);
 }
 
 template<>
-void Scene::onComponentRemoved<CollidersComponent>(Entity entity, CollidersComponent& component) {
-    delete component.Colliders;
-}
+void Scene::onComponentRemoved<CollidersComponent>(Entity entity, CollidersComponent& component) {}
 
 template<>
 void Scene::onComponentRemoved<ScriptsComponent>(Entity entity, ScriptsComponent& component) {

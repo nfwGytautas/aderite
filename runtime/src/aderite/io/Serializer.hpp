@@ -96,6 +96,14 @@ public:
     ISerializable* parseUntrackedType(const YAML::Node& data);
 
     /**
+     * @brief Fills the specified object with data from the node. This method is similar to parseUntrackedType, but is used when an instance
+     * already exists and should just be filled with data form disk
+     * @param object Object to fill
+     * @param data Data to fill with
+     */
+    void fillData(ISerializable* object, const YAML::Node& data);
+
+    /**
      * @brief Write an untracked object to the specified emitter
      * @param emitter Emitter to write to
      * @param object Object to write

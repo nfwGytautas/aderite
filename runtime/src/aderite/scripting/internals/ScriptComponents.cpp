@@ -5,6 +5,7 @@
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/scene/components/Transform.hpp"
+#include "aderite/scene/components/Actors.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -24,21 +25,36 @@ glm::vec3 GetScale(scene::Scene* scene, entt::entity entity) {
 }
 
 void SetPosition(scene::Scene* scene, entt::entity entity, glm::vec3 position) {
-    auto& transform = scene::Entity(entity, scene).getComponent<scene::TransformComponent>();
+    scene::Entity e = scene::Entity(entity, scene);
+    if (e.hasComponent<scene::DynamicActor>() || e.hasComponent<scene::StaticActor>()) {
+        LOG_ERROR("Don't directly set transform when a physics actor is attached, use PhysicsActor methods");
+        return;
+    }
+
+    auto& transform = e.getComponent<scene::TransformComponent>();
     transform.Position = position;
-    transform.WasAltered = true;
 }
 
 void SetRotation(scene::Scene* scene, entt::entity entity, glm::quat rotation) {
-    auto& transform = scene::Entity(entity, scene).getComponent<scene::TransformComponent>();
+    scene::Entity e = scene::Entity(entity, scene);
+    if (e.hasComponent<scene::DynamicActor>() || e.hasComponent<scene::StaticActor>()) {
+        LOG_ERROR("Don't directly set transform when a physics actor is attached, use PhysicsActor.Rotate");
+        return;
+    }
+
+    auto& transform = e.getComponent<scene::TransformComponent>();
     transform.Rotation = rotation;
-    transform.WasAltered = true;
 }
 
 void SetScale(scene::Scene* scene, entt::entity entity, glm::vec3 scale) {
-    auto& transform = scene::Entity(entity, scene).getComponent<scene::TransformComponent>();
+    scene::Entity e = scene::Entity(entity, scene);
+    if (e.hasComponent<scene::DynamicActor>() || e.hasComponent<scene::StaticActor>()) {
+        LOG_ERROR("Don't directly set transform when a physics actor is attached, use PhysicsActor.Scale");
+        return;
+    }
+
+    auto& transform = e.getComponent<scene::TransformComponent>();
     transform.Scale = scale;
-    transform.WasAltered = true;
 }
 
 asset::MeshAsset* GetMesh(scene::Scene* scene, entt::entity entity) {

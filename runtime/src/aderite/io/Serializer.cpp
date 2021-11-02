@@ -82,6 +82,21 @@ ISerializable* Serializer::parseUntrackedType(const YAML::Node& data) {
     return instance;
 }
 
+void Serializer::fillData(ISerializable* object, const YAML::Node& data) {
+    ADERITE_DYNAMIC_ASSERT(object != nullptr, "Trying to fill nullptr object");
+
+    ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
+    ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
+
+    reflection::Type type = data["Type"].as<reflection::Type>();
+
+    // Check if types match
+    ADERITE_DYNAMIC_ASSERT(type == object->getType(), "Type mismatch");
+
+    // Deserialize
+    object->deserialize(this, data["Data"]);
+}
+
 void Serializer::writeUntrackedType(YAML::Emitter& emitter, ISerializable* object) const {
     emitter << YAML::BeginMap;
     emitter << YAML::Key << "Type" << YAML::Value << object->getType();

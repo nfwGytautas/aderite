@@ -20,8 +20,8 @@
 #include <pvd/PxPvdTransport.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/physics/Collider.hpp"
-#include "aderite/physics/ColliderList.hpp"
 #include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
 #include "aderite/physics/StaticActor.hpp"
@@ -30,6 +30,7 @@
 #include "aderite/scene/components/Actors.hpp"
 #include "aderite/scene/components/Meta.hpp"
 #include "aderite/scene/components/Transform.hpp"
+#include "aderite/scripting/ScriptList.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -151,11 +152,6 @@ void PhysicsController::update(float delta) {
         return;
     }
 
-    // Initialize if not already initialized
-    if (!physicsScene->initialized()) {
-        physicsScene->initialize(this);
-    }
-
     // Properties
     this->syncProperties();
 
@@ -169,16 +165,10 @@ void PhysicsController::update(float delta) {
         this->syncChanges();
     }
     float remainder = delta - (substeps * c_SubStepLength);
-    physicsScene->simulate(remainder);
+    if (remainder > 0.0f) {
+        physicsScene->simulate(remainder);
+    }
     this->syncChanges();
-}
-
-physx::PxRigidStatic* PhysicsController::createStaticBody() {
-    return m_physics->createRigidStatic(physx::PxTransform(physx::PxVec3(0)));
-}
-
-physx::PxRigidDynamic* PhysicsController::createDynamicBody() {
-    return m_physics->createRigidDynamic(physx::PxTransform(physx::PxVec3(0)));
 }
 
 physx::PxPhysics* PhysicsController::getPhysics() {
@@ -219,8 +209,34 @@ void PhysicsController::syncChanges() {
         auto [actor, transform] = dynamicGroup.get(entity);
 
         // Sync transform
-        actor.Actor->sync(transform);
+        actor.Actor->sync();
     }
+
+    auto physicsEventGroup = currentScene->getEntityRegistry().group<scene::PhysicsCallbackComponent>(entt::get<scene::ScriptsComponent>);
+    for (auto entity : physicsEventGroup) {
+        auto [events, scripts] = physicsEventGroup.get(entity);
+
+        // Trigger callbacks
+        if (scripts.Scripts != nullptr) {
+            for (scene::Entity& entity : events.TriggerEnter) {
+                scripts.Scripts->onTriggerEnter(entity);
+            }
+
+            for (scene::Entity& entity : events.TriggerLeave) {
+                scripts.Scripts->onTriggerLeave(entity);
+            }
+
+            for (scene::Entity& entity : events.CollisionEnter) {
+                scripts.Scripts->onCollisionEnter(entity);
+            }
+
+            for (scene::Entity& entity : events.CollisionLeave) {
+                scripts.Scripts->onCollisionLeave(entity);
+            }
+        }
+    }
+
+    currentScene->getEntityRegistry().clear<scene::PhysicsCallbackComponent>();
 }
 
 void PhysicsController::syncProperties() {
@@ -228,49 +244,54 @@ void PhysicsController::syncProperties() {
     auto physicsScene = currentScene->getPhysicsScene();
 
     // Sync changes with ECS
-    auto dynamicView = currentScene->getEntityRegistry().group<scene::DynamicActor>(entt::get<scene::CollidersComponent>);
+    auto dynamicView =
+        currentScene->getEntityRegistry().group<scene::DynamicActor>(entt::get<scene::CollidersComponent, scene::TransformComponent>);
     for (auto entity : dynamicView) {
-        auto [actor, colliders] = dynamicView.get(entity);
+        auto [actor, colliders, transform] = dynamicView.get(entity);
 
-        if (actor.Actor == nullptr) {
-            // Create actor
-            actor.Actor = new physics::DynamicActor();
-            actor.Actor->init(this);
+        if (colliders.Colliders == nullptr) {
+            // If there are no colliders the body is useless
+            continue;
+        }
 
-            // Set actor for colliders
-            actor.Actor->setColliders(colliders.Colliders);
+        if (colliders.Iteration != colliders.Colliders->getIteration() || colliders.GlobalScale != transform.Scale) {
+            // Detach previous shapes
+            actor.Actor->detachShapes();
 
-            // Add to the physics scene
-            physicsScene->addActor(actor.Actor);
+            // Attach new ones
+            colliders.Colliders->attachTo(actor.Actor, transform.Scale);
 
-            // Track
-            m_actors.add(actor.Actor);
+            colliders.GlobalScale = transform.Scale;
+            colliders.Iteration = colliders.Colliders->getIteration();
         }
     }
 
-    auto staticView = currentScene->getEntityRegistry().group<scene::StaticActor>(entt::get<scene::CollidersComponent>);
+    auto staticView =
+        currentScene->getEntityRegistry().group<scene::StaticActor>(entt::get<scene::CollidersComponent, scene::TransformComponent>);
     for (auto entity : staticView) {
-        auto [actor, colliders] = staticView.get(entity);
+        auto [actor, colliders, transform] = staticView.get(entity);
 
-        if (actor.Actor == nullptr) {
-            // Create actor
-            actor.Actor = new physics::StaticActor();
-            actor.Actor->init(this);
+        if (colliders.Colliders == nullptr) {
+            // If there are no colliders the body is useless
+            continue;
+        }
 
-            // Set actor for colliders
-            actor.Actor->setColliders(colliders.Colliders);
+        if (colliders.Iteration != colliders.Colliders->getIteration() || colliders.GlobalScale != transform.Scale) {
+            // Detach previous shapes
+            actor.Actor->detachShapes();
 
-            // Add to the physics scene
-            physicsScene->addActor(actor.Actor);
+            // Attach new ones
+            colliders.Colliders->attachTo(actor.Actor, transform.Scale);
 
-            // Track
-            m_actors.add(actor.Actor);
+            colliders.GlobalScale = transform.Scale;
+            colliders.Iteration = colliders.Colliders->getIteration();
         }
     }
 }
 
 void PhysicsController::removeDetached() {
     // TODO: Iterate and remove actors
+    // TODO: Also detach shapes from the actor
 }
 
 } // namespace physics

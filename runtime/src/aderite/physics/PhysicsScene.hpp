@@ -3,6 +3,9 @@
 #include <PxSimulationEventCallback.h>
 
 #include "aderite/io/SerializableObject.hpp"
+#include "aderite/physics/Forward.hpp"
+#include "aderite/scene/Entity.hpp"
+#include "aderite/scene/components/Transform.hpp"
 
 namespace aderite {
 namespace physics {
@@ -22,21 +25,24 @@ public:
     void simulate(float step);
 
     /**
-     * @brief Initialize the physics scene
-     * @param controller Physics controller
+     * @brief Creates a static rigidbody and returns it
+     * @param e Entity to create for
+     * @param transform Initial transform of the actor
      */
-    void initialize(physics::PhysicsController* controller);
+    physics::PhysicsActor* createStaticBody(scene::Entity e, const scene::TransformComponent& transform);
 
     /**
-     * @brief Adds a physics actor to the scene
-     * @param actor Actor to add
+     * @brief Creates a dynamic rigidbody and returns it
+     * @param e Entity to create for
+     * @param transform Initial transform of the actor
      */
-    void addActor(PhysicsActor* actor);
+    physics::PhysicsActor* createDynamicBody(scene::Entity e, const scene::TransformComponent& transform);
 
     /**
-     * @brief Returns true if the physics scene was initialized, false otherwise
+     * @brief Detach the specified actor from physics scene
+     * @param actor Actor to detach
      */
-    bool initialized() const;
+    void detachActor(physics::PhysicsActor* actor);
 
 private:
     // Inherited via PxSimulationEventCallback

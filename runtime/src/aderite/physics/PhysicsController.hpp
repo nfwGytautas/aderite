@@ -6,7 +6,6 @@
 #include <cooking/PxCooking.h>
 #include <extensions/PxExtensionsAPI.h>
 
-#include "aderite/lib/ObjectPool.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/utility/Macros.hpp"
@@ -37,16 +36,6 @@ public:
      * @param delta Delta between two frames
      */
     void update(float delta);
-
-    /**
-     * @brief Creates a static rigidbody and returns it
-     */
-    physx::PxRigidStatic* createStaticBody();
-
-    /**
-     * @brief Creates a dynamic rigidbody and returns it
-     */
-    physx::PxRigidDynamic* createDynamicBody();
 
     /**
      * @brief Returns the PhysX physics object instance
@@ -114,8 +103,6 @@ private:
     float m_defaultRestitution = 0.6f;
     float m_defaultDensity = 10.0f;
     float m_defaultAngularDamping = 0.5f;
-
-    ObjectPool<PhysicsActor> m_actors;
 };
 
 } // namespace physics

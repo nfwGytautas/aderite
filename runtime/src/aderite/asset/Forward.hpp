@@ -13,6 +13,7 @@ class MaterialAsset;
 class MaterialTypeAsset;
 class MeshAsset;
 class TextureAsset;
+class ColliderListAsset;
 
 } // namespace asset
 } // namespace aderite

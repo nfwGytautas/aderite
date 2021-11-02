@@ -11,7 +11,7 @@ namespace asset {
 
 TextureAsset::~TextureAsset() {
     if (bgfx::isValid(m_handle)) {
-        LOG_WARN("Deleting a loaded texture asset {0}", getHandle());
+        this->unload();
     }
 }
 

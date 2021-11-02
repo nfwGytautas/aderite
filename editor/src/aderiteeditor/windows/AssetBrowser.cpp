@@ -4,6 +4,7 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
@@ -179,6 +180,10 @@ void AssetBrowser::renderItems() {
                     target = editor::DDPayloadID__PipelineAsset;
                     break;
                 }
+                case reflection::RuntimeTypes::CLDR_LIST: {
+                    target = editor::DDPayloadID__ColliderListAsset;
+                    break;
+                }
                 default: {
                     target = editor::DDPayloadID__GenericAsset;
                 }
@@ -248,6 +253,11 @@ void AssetBrowser::renderAddItemPopup() {
         if (ImGui::MenuItem("Material type")) {
             object = new asset::EditorMaterialType();
             newName = "New material type";
+        }
+
+        if (ImGui::MenuItem("Collider list")) {
+            object = new asset::ColliderListAsset();
+            newName = "New collider list";
         }
 
         ImGui::EndMenu();

@@ -1,0 +1,9 @@
+Version: 2021_10_15r1
+Type: 50
+Handle: 7
+Data:
+  Colliders:
+    - Type: 51
+      Data:
+        IsTrigger: true
+        Size: [1, 1, 1]

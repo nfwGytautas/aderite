@@ -55,6 +55,11 @@ constexpr char* DDPayloadID__MaterialType = "DDPayloadID__MaterialType";
 constexpr char* DDPayloadID__PipelineAsset = "DDPayloadID__PipelineAsset";
 
 /**
+ * @brief Drag and drop ip passed when the object that is being dragged is a collider list object
+*/
+constexpr char* DDPayloadID__ColliderListAsset = "DDPayloadID__ColliderListAsset";
+
+/**
  * @brief Drag and drop id passed when the object that is being dragged is a raw file
  */
 constexpr char* DDPayloadID__RawData = "DDPayloadID__RawData";

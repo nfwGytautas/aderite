@@ -11,6 +11,7 @@
 #include "aderite/io/LoaderPool.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/components/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Utility.hpp"
 
@@ -31,8 +32,7 @@ void EntityProvideOperation::execute(PipelineState* state) {
 
     // Entity group
     auto renderables =
-        currentScene->getEntityRegistry().group<scene::MeshRendererComponent, scene::TransformComponent>(
-            entt::get<scene::MetaComponent>);
+        currentScene->getEntityRegistry().group<scene::MeshRendererComponent, scene::TransformComponent>(entt::get<scene::MetaComponent>);
 
     for (auto e : renderables) {
         auto [meshRenderer, transform, meta] = renderables.get(e);

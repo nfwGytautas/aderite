@@ -9,7 +9,7 @@ namespace aderite {
 namespace physics {
 
 StaticActor::StaticActor() {
-    p_actor = ::aderite::Engine::getPhysicsController()->createStaticBody();
+    p_actor = ::aderite::Engine::getPhysicsController()->getPhysics()->createRigidStatic(physx::PxTransform(physx::PxVec3(0)));
     p_actor->userData = this;
 }
 

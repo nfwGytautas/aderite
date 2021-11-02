@@ -16,7 +16,7 @@ namespace asset {
 MeshAsset::~MeshAsset() {
     // TODO: Check for either handle to be valid
     if (bgfx::isValid(m_vbh)) {
-        LOG_WARN("Deleting a loaded mesh asset {0}", getHandle());
+        this->unload();
     }
 }
 
@@ -39,6 +39,7 @@ void MeshAsset::load(const io::Loader* loader) {
     if (m_info.IsStatic) {
         io::Loader::MeshLoadResult result = loader->loadMesh(this->getHandle());
         if (!result.Error.empty()) {
+            LOG_WARN("Mesh load error: {0}", result.Error);
             return;
         }
 

@@ -1,53 +1,54 @@
 #pragma once
 
-#include <vector>
-
-#include <PxShape.h>
 #include <glm/glm.hpp>
 
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
-namespace physics {
+namespace asset {
 
 /**
- * @brief A list of colliders used for an entity
+ * @brief An asset class used to represent a list of colliders and triggers that can be assigned to entities
  */
-class ColliderList : public io::ISerializable {
+class ColliderListAsset final : public io::SerializableObject {
 public:
-    ColliderList();
-    ~ColliderList();
+    ~ColliderListAsset();
+
+    /**
+     * @brief Attach colliders in the list to the specified actor
+     * @param actor Actor to attach to
+     * @param globalScale Scale vector to be applied
+     */
+    void attachTo(physics::PhysicsActor* actor, const glm::vec3& globalScale);
 
     /**
      * @brief Add an already created collider, this collider is managed by the collider list
      * @param collider Collider to add
      */
-    void addCollider(Collider* collider);
+    void add(physics::Collider* collider);
 
     /**
      * @brief Removes collider from list
      * @param collider Collider to remove
      */
-    void removeCollider(Collider* collider);
+    void remove(physics::Collider* collider);
 
     /**
-     * @brief Sets the scale of all colliders in the list
-     * @param scale New scale of the colliders
+     * @brief Gets the collider iteration used only when changing state
      */
-    void setScale(const glm::vec3& scale);
+    size_t getIteration() const;
 
     /**
-     * @brief Detaches all colliders from their previous actor
+     * @brief Increments the iteration of the list
      */
-    void detach();
+    void incrementIteration();
 
-    Collider* get(size_t idx) const {
+    physics::Collider* get(size_t idx) const {
         return m_colliders[idx];
     }
 
-    Collider* operator[](size_t idx) const {
+    physics::Collider* operator[](size_t idx) const {
         return m_colliders[idx];
     }
 
@@ -63,14 +64,15 @@ public:
         return m_colliders.end();
     }
 
-    // Inherited via ISerializable
+    // Inherited via SerializableObject
     virtual reflection::Type getType() const override;
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
-    std::vector<Collider*> m_colliders;
+    size_t m_iteration = 1;
+    std::vector<physics::Collider*> m_colliders;
 };
 
-} // namespace physics
+} // namespace asset
 } // namespace aderite

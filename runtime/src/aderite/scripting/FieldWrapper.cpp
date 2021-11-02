@@ -26,6 +26,10 @@ FieldWrapper::FieldWrapper(MonoClassField* field) : m_field(field) {
         m_type = FieldType::Float;
         break;
     }
+    case MONO_TYPE_BOOLEAN: {
+        m_type = FieldType::Boolean;
+        break;
+    }
     default: {
         // Check for engine classes
         MonoClass* klass = mono_type_get_class(type);

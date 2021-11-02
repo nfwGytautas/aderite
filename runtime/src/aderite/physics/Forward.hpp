@@ -17,10 +17,6 @@ class PhysicsActor;
 class DynamicActor;
 class StaticActor;
 
-class EventNotifier;
-
-struct PhysicsEntity;
-class ColliderList;
 class Collider;
 
 } // namespace physics

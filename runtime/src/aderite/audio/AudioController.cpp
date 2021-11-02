@@ -10,6 +10,7 @@
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/components/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -89,9 +90,8 @@ void AudioController::update() {
     // Configure listener
     bool thisFrameMute = false;
     int enabledListenerCount = 0;
-    auto listenerGroup =
-        ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::AudioListenerComponent>(
-            entt::get<scene::TransformComponent>);
+    auto listenerGroup = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::AudioListenerComponent>(
+        entt::get<scene::TransformComponent>);
 
     // If no listeners no need to update anything
     if (listenerGroup.size() != 0) {
@@ -105,8 +105,7 @@ void AudioController::update() {
         }
 
         for (auto entity : listenerGroup) {
-            auto [listener, transform] =
-                listenerGroup.get<scene::AudioListenerComponent, scene::TransformComponent>(entity);
+            auto [listener, transform] = listenerGroup.get<scene::AudioListenerComponent, scene::TransformComponent>(entity);
 
             if (listener.IsEnabled) {
                 FMOD_3D_ATTRIBUTES listener3dAttributes = {};
@@ -134,12 +133,10 @@ void AudioController::update() {
     }
 
     // Configure sources
-    auto audioGroup =
-        ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::AudioSourceComponent>(
-            entt::get<scene::TransformComponent>);
+    auto audioGroup = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::AudioSourceComponent>(
+        entt::get<scene::TransformComponent>);
     for (auto entity : audioGroup) {
-        auto [audioSource, transform] =
-            audioGroup.get<scene::AudioSourceComponent, scene::TransformComponent>(entity);
+        auto [audioSource, transform] = audioGroup.get<scene::AudioSourceComponent, scene::TransformComponent>(entity);
 
         if (audioSource.Instance == c_InvalidHandle) {
             continue;

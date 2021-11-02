@@ -88,6 +88,20 @@ private:
     template<typename T>
     void onComponentRemoved(Entity entity, T& component);
 
+    /**
+     * @brief Serialize entity to the specified emitter
+     * @param out Emitter to serialize into
+     * @param e Entity to serialize
+    */
+    void serializeEntity(YAML::Emitter& out, Entity e);
+
+    /**
+     * @brief Deserialize entity and return it
+     * @param eNode Entity data node
+     * @return Entity instance
+    */
+    Entity deserializeEntity(YAML::Node& eNode);
+
     friend class Entity;
     friend class SceneManager;
 

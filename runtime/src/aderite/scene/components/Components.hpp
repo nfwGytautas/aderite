@@ -43,7 +43,9 @@ struct CameraComponent {
  * @brief Component containing all colliders attached to this object
  */
 struct CollidersComponent {
-    physics::ColliderList* Colliders = nullptr;
+    asset::ColliderListAsset* Colliders = nullptr;
+    size_t Iteration = 0;
+    glm::vec3 GlobalScale = glm::vec3(1.0f);
 
     CollidersComponent() = default;
     CollidersComponent(const CollidersComponent&) = default;

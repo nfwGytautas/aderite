@@ -20,7 +20,8 @@ private:
     void renderEntity();
     void renderTransform(scene::Entity entity);
     void renderMeshrenderer(scene::Entity entity);
-    void renderRigidbody(scene::Entity entity);
+    void renderDynamicBody(scene::Entity entity);
+    void renderStaticBody(scene::Entity entity);
     void renderAudioListener(scene::Entity entity);
     void renderAudioSource(scene::Entity entity);
     void renderColliders(scene::Entity entity);
@@ -33,6 +34,7 @@ private:
     void renderMaterialType(io::SerializableObject* asset);
     void renderScene(io::SerializableObject* asset);
     void renderPipeline(io::SerializableObject* asset);
+    void renderColliderList(io::SerializableObject* asset);
 };
 
 } // namespace editor_ui

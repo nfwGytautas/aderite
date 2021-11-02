@@ -1,18 +1,42 @@
 #include "PhysicsScene.hpp"
 
+#include "aderite/Aderite.hpp"
+#include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/PhysicsActor.hpp"
 #include "aderite/physics/PhysicsController.hpp"
-#include "aderite/physics/EventNotifier.hpp"
+#include "aderite/physics/StaticActor.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace physics {
 
-PhysicsScene::PhysicsScene() {}
+PhysicsScene::PhysicsScene() {
+    auto physics = ::aderite::Engine::getPhysicsController()->getPhysics();
+
+    // TODO: Configure physics properties
+    physx::PxSceneDesc sceneDesc(physics->getTolerancesScale());
+    sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
+    sceneDesc.cpuDispatcher = ::aderite::Engine::getPhysicsController()->getDispatcher();
+    sceneDesc.filterShader = physics::PhysicsController::filterShader;
+    sceneDesc.simulationEventCallback = this;
+    // sceneDesc.flags = physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
+    m_scene = physics->createScene(sceneDesc);
+    ADERITE_DYNAMIC_ASSERT(m_scene != nullptr, "Failed to create a PhysX scene");
+}
 
 PhysicsScene::~PhysicsScene() {
     if (m_scene != nullptr) {
+        size_t count = m_scene->getNbActors(physx::PxActorTypeFlag::eRIGID_STATIC | physx::PxActorTypeFlag::eRIGID_DYNAMIC);
+        std::vector<physx::PxActor*> actors;
+        actors.resize(count);
+
+        m_scene->getActors(physx::PxActorTypeFlag::eRIGID_STATIC | physx::PxActorTypeFlag::eRIGID_DYNAMIC, actors.data(), count);
+
+        for (physx::PxActor* actor : actors) {
+            delete static_cast<physics::PhysicsActor*>(actor->userData);
+        }
+
         m_scene->release();
     }
 }
@@ -22,26 +46,34 @@ void PhysicsScene::simulate(float step) {
     m_scene->fetchResults(true);
 }
 
-void PhysicsScene::initialize(physics::PhysicsController* controller) {
-    auto physics = controller->getPhysics();
+physics::PhysicsActor* PhysicsScene::createStaticBody(scene::Entity e, const scene::TransformComponent& transform) {
+    physics::PhysicsActor* actor = new physics::StaticActor();
 
-    // TODO: Configure physics properties
-    physx::PxSceneDesc sceneDesc(physics->getTolerancesScale());
-    sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
-    sceneDesc.cpuDispatcher = controller->getDispatcher();
-    sceneDesc.filterShader = physics::PhysicsController::filterShader;
-    sceneDesc.simulationEventCallback = this;
-    // sceneDesc.flags = physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
-    m_scene = physics->createScene(sceneDesc);
-    ADERITE_DYNAMIC_ASSERT(m_scene != nullptr, "Failed to create a PhysX scene");
+    // Initial position
+    actor->moveActor(transform.Position);
+    actor->rotateActor(transform.Rotation);
+
+    actor->m_entity = e;
+    this->m_scene->addActor(*actor->p_actor);
+
+    return actor;
 }
 
-void PhysicsScene::addActor(PhysicsActor* actor) {
-    m_scene->addActor(*actor->p_actor);
+physics::PhysicsActor* PhysicsScene::createDynamicBody(scene::Entity e, const scene::TransformComponent& transform) {
+    physics::PhysicsActor* actor = new physics::DynamicActor();
+
+    // Initial position
+    actor->moveActor(transform.Position);
+    actor->rotateActor(transform.Rotation);
+
+    actor->m_entity = e;
+    this->m_scene->addActor(*actor->p_actor);
+
+    return actor;
 }
 
-bool PhysicsScene::initialized() const {
-    return m_scene != nullptr;
+void PhysicsScene::detachActor(physics::PhysicsActor* actor) {
+    delete actor;
 }
 
 void PhysicsScene::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) {
@@ -54,27 +86,13 @@ void PhysicsScene::onContact(const physx::PxContactPairHeader& pairHeader, const
         PhysicsActor* e1 = static_cast<PhysicsActor*>(actor1->userData);
         PhysicsActor* e2 = static_cast<PhysicsActor*>(actor2->userData);
 
-        // Get notifiers
-        EventNotifier* e1Notifier = e1->getNotifier();
-        EventNotifier* e2Notifier = e2->getNotifier();
-
         // Send notifications
         if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-            if (e1Notifier != nullptr) {
-                e1Notifier->onCollisionEnter(e2);
-            }
-
-            if (e2Notifier != nullptr) {
-                e2Notifier->onCollisionEnter(e1);
-            }
+            e1->onCollisionEnter(e2);
+            e2->onCollisionEnter(e1);
         } else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-            if (e1Notifier != nullptr) {
-                e1Notifier->onCollisionLeave(e2);
-            }
-
-            if (e2Notifier != nullptr) {
-                e2Notifier->onCollisionLeave(e1);
-            }
+            e1->onCollisionLeave(e2);
+            e2->onCollisionLeave(e1);
         }
     }
 }
@@ -89,27 +107,13 @@ void PhysicsScene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) 
         PhysicsActor* paA = static_cast<PhysicsActor*>(actor->userData);
         PhysicsActor* paT = static_cast<PhysicsActor*>(trigger->userData);
 
-        // Get notifiers
-        EventNotifier* aNotifier = paA->getNotifier();
-        EventNotifier* tNotifier = paT->getNotifier();
-
         // Send notifications
         if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-            if (aNotifier != nullptr) {
-                aNotifier->onTriggerEnter(paT);
-            }
-
-            if (tNotifier != nullptr) {
-                tNotifier->onTriggerEnter(paA);
-            }
+            paA->onTriggerEnter(paT);
+            paT->onTriggerEnter(paA);
         } else if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-            if (aNotifier != nullptr) {
-                aNotifier->onTriggerLeave(paT);
-            }
-
-            if (tNotifier != nullptr) {
-                tNotifier->onTriggerLeave(paA);
-            }
+            paA->onTriggerLeave(paT);
+            paT->onTriggerLeave(paA);
         }
     }
 }

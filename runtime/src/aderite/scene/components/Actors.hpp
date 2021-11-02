@@ -25,5 +25,19 @@ struct DynamicActor {
     DynamicActor(const DynamicActor&) = default;
 };
 
+/**
+ * @brief Helper component to transfer physics callback
+ */
+struct PhysicsCallbackComponent {
+    std::vector<Entity> TriggerEnter;
+    std::vector<Entity> TriggerLeave;
+
+    std::vector<Entity> CollisionEnter;
+    std::vector<Entity> CollisionLeave;
+
+    PhysicsCallbackComponent() = default;
+    PhysicsCallbackComponent(const PhysicsCallbackComponent&) = default;
+};
+
 } // namespace scene
 } // namespace aderite

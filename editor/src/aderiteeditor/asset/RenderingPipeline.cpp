@@ -16,7 +16,7 @@ namespace asset {
 RenderingPipeline::RenderingPipeline() : m_graph(new node::Graph()) {
     node::ScreenNode* sn = m_graph->addNode<node::ScreenNode>();
     m_graph->setLastNode(sn);
-    ImNodes::SetNodeGridSpacePos(sn->getId(), ImVec2(200, 200));
+    sn->setPosition({400, 200});
 }
 
 RenderingPipeline::~RenderingPipeline() {

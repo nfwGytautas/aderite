@@ -29,6 +29,14 @@ namespace Aderite
             {
                 return new MeshRenderer(scene, entity) as T;
             }
+            else if (type.Equals(typeof(DynamicActor)))
+            {
+                return new DynamicActor(scene, entity) as T;
+            }
+            else if (type.Equals(typeof(StaticActor)))
+            {
+                return new StaticActor(scene, entity) as T;
+            }
             else
             {
                 // Try to resolve as a behavior

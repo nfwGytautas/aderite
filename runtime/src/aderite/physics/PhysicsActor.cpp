@@ -4,24 +4,21 @@
 #include <PxScene.h>
 
 #include "aderite/physics/Collider.hpp"
-#include "aderite/physics/ColliderList.hpp"
-#include "aderite/scripting/ScriptList.hpp"
 
 namespace aderite {
 namespace physics {
 
 PhysicsActor::~PhysicsActor() {
-    if (m_colliders != nullptr) {
-        m_colliders->detach();
-    }
+    this->detachShapes();
 
     if (p_actor != nullptr) {
+        physx::PxScene* scene = p_actor->getScene();
+        if (scene != nullptr) {
+            scene->removeActor(*p_actor);
+        }
+
         p_actor->release();
         p_actor = nullptr;
-    }
-
-    if (m_notifier != nullptr) {
-        delete m_notifier;
     }
 }
 
@@ -47,54 +44,46 @@ void PhysicsActor::rotateActor(const glm::quat& rotation) {
     p_actor->setGlobalPose(pxt);
 }
 
-void PhysicsActor::sync(scene::TransformComponent& transform) const {
+void PhysicsActor::sync() {
     physx::PxTransform pxt = p_actor->getGlobalPose();
+
+    scene::TransformComponent& transform = m_entity.getComponent<scene::TransformComponent>();
     transform.Position = {pxt.p.x, pxt.p.y, pxt.p.z};
     transform.Rotation = {pxt.q.w, pxt.q.x, pxt.q.y, pxt.q.z};
 }
 
-void PhysicsActor::markForRemove() {
-    m_marked = true;
-}
-
-bool PhysicsActor::isMarkedForRemoval() const {
-    return m_marked;
-}
-
-void PhysicsActor::detach() {
-    physx::PxScene* scene = p_actor->getScene();
-    scene->removeActor(*p_actor);
-}
-
-void PhysicsActor::setNotifier(EventNotifier* notifier) {
-    if (m_notifier != nullptr) {
-        delete m_notifier;
-    }
-
-    m_notifier = notifier;
-}
-
-EventNotifier* PhysicsActor::getNotifier() const {
-    return m_notifier;
-}
-
-void PhysicsActor::setColliders(ColliderList* colliders) {
-    if (m_colliders != nullptr) {
-        m_colliders->detach();
-    }
-
-    m_colliders = colliders;
-
-    for (Collider* collider : *m_colliders) {
-        if (collider->p_shape != nullptr) {
-            // TODO: Handle error?
-            p_actor->attachShape(*collider->p_shape);
-        }
+void PhysicsActor::detachShapes() {
+    size_t shapeCount = p_actor->getNbShapes();
+    std::vector<physx::PxShape*> shapes;
+    shapes.resize(shapeCount);
+    p_actor->getShapes(shapes.data(), shapeCount);
+    for (physx::PxShape* shape : shapes) {
+        p_actor->detachShape(*shape);
     }
 }
 
-void PhysicsActor::updateColliders() {
-    this->setColliders(m_colliders);
+void PhysicsActor::onTriggerEnter(PhysicsActor* trigger) {
+    this->ensureEventComponent().TriggerEnter.push_back(trigger->m_entity);
+}
+
+void PhysicsActor::onTriggerLeave(PhysicsActor* trigger) {
+    this->ensureEventComponent().TriggerLeave.push_back(trigger->m_entity);
+}
+
+void PhysicsActor::onCollisionEnter(PhysicsActor* collision) {
+    this->ensureEventComponent().CollisionEnter.push_back(collision->m_entity);
+}
+
+void PhysicsActor::onCollisionLeave(PhysicsActor* collision) {
+    this->ensureEventComponent().CollisionLeave.push_back(collision->m_entity);
+}
+
+scene::PhysicsCallbackComponent& PhysicsActor::ensureEventComponent() {
+    if (!m_entity.hasComponent<scene::PhysicsCallbackComponent>()) {
+        return m_entity.addComponent<scene::PhysicsCallbackComponent>();
+    }
+
+    return m_entity.getComponent<scene::PhysicsCallbackComponent>();
 }
 
 } // namespace physics

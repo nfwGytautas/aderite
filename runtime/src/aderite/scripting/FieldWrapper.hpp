@@ -13,6 +13,7 @@ namespace scripting {
 enum class FieldType {
     Null,
     Float,
+    Boolean,
     Object,
     Mesh,
     Material,

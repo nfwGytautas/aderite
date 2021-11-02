@@ -4,6 +4,7 @@
 #include <imgui/imgui_internal.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
@@ -14,13 +15,17 @@
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/physics/Collider.hpp"
-#include "aderite/physics/ColliderList.hpp"
+#include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/PhysicsController.hpp"
+#include "aderite/physics/StaticActor.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderite/scene/Scene.hpp"
+#include "aderite/scene/components/Actors.hpp"
 #include "aderite/scene/components/Components.hpp"
+#include "aderite/scene/components/Meta.hpp"
+#include "aderite/scene/components/Transform.hpp"
 #include "aderite/scripting/BehaviorWrapper.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
@@ -47,10 +52,10 @@
 #include "aderiteeditor/utility/Utility.hpp"
 #include "aderiteeditor/vfs/File.hpp"
 #include "aderiteeditor/vfs/VFS.hpp"
-#include "aderiteeditor/windows/SelectScriptModal.hpp"
-#include "aderiteeditor/windows/WindowsEditor.hpp"
 #include "aderiteeditor/windows/FileDialog.hpp"
 #include "aderiteeditor/windows/NodeEditor.hpp"
+#include "aderiteeditor/windows/SelectScriptModal.hpp"
+#include "aderiteeditor/windows/WindowsEditor.hpp"
 
 namespace aderite {
 namespace editor_ui {
@@ -142,9 +147,14 @@ void Inspector::renderEntity() {
         this->renderMeshrenderer(entity);
     }
 
-    bool hasRigidbody = entity.hasComponent<scene::RigidbodyComponent>();
-    if (hasRigidbody) {
-        this->renderRigidbody(entity);
+    bool hasDynamicBody = entity.hasComponent<scene::DynamicActor>();
+    if (hasDynamicBody) {
+        this->renderDynamicBody(entity);
+    }
+
+    bool hasStaticBody = entity.hasComponent<scene::StaticActor>();
+    if (hasStaticBody) {
+        this->renderStaticBody(entity);
     }
 
     bool hasAudioListener = entity.hasComponent<scene::AudioListenerComponent>();
@@ -187,8 +197,13 @@ void Inspector::renderEntity() {
             ImGui::CloseCurrentPopup();
         }
 
-        if (!hasRigidbody && ImGui::MenuItem("Rigidbody")) {
-            entity.addComponent<::aderite::scene::RigidbodyComponent>();
+        if (!hasDynamicBody && !hasStaticBody && ImGui::MenuItem("Dynamic body")) {
+            entity.addComponent<::aderite::scene::DynamicActor>();
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (!hasDynamicBody && !hasStaticBody && ImGui::MenuItem("Static body")) {
+            entity.addComponent<::aderite::scene::StaticActor>();
             ImGui::CloseCurrentPopup();
         }
 
@@ -197,13 +212,8 @@ void Inspector::renderEntity() {
             ImGui::CloseCurrentPopup();
         }
 
-        if (ImGui::MenuItem("Box collider")) {
-            if (!entity.hasComponent<::aderite::scene::CollidersComponent>()) {
-                auto& collidersComponent = entity.addComponent<::aderite::scene::CollidersComponent>();
-            }
-
-            auto& collidersComponent = entity.getComponent<::aderite::scene::CollidersComponent>();
-            collidersComponent.Colliders->addCollider(new physics::BoxCollider());
+        if (!hasColliders && ImGui::MenuItem("Collider list")) {
+            entity.addComponent<::aderite::scene::CollidersComponent>();
             ImGui::CloseCurrentPopup();
         }
 
@@ -248,19 +258,46 @@ void Inspector::renderTransform(scene::Entity entity) {
         auto& c = entity.getComponent<scene::TransformComponent>();
 
         if (utility::DrawVec3Control("Position", c.Position)) {
-            c.WasAltered = true;
+            if (entity.hasComponent<scene::DynamicActor>()) {
+                auto& da = entity.getComponent<scene::DynamicActor>();
+                if (da.Actor != nullptr) {
+                    da.Actor->moveActor(c.Position);
+                }
+            } else if (entity.hasComponent<scene::StaticActor>()) {
+                auto& sa = entity.getComponent<scene::StaticActor>();
+                if (sa.Actor != nullptr) {
+                    sa.Actor->moveActor(c.Position);
+                }
+            }
         }
 
         glm::vec3 euler = glm::eulerAngles(c.Rotation);
         glm::vec3 rotation = glm::degrees(euler);
         if (utility::DrawVec3Control("Rotation", rotation)) {
             c.Rotation = glm::quat(rotation);
-            c.WasAltered = true;
+            
+            if (entity.hasComponent<scene::DynamicActor>()) {
+                auto& da = entity.getComponent<scene::DynamicActor>();
+                if (da.Actor != nullptr) {
+                    da.Actor->rotateActor(c.Rotation);
+                }
+            } else if (entity.hasComponent<scene::StaticActor>()) {
+                auto& sa = entity.getComponent<scene::StaticActor>();
+                if (sa.Actor != nullptr) {
+                    sa.Actor->rotateActor(c.Rotation);
+                }
+            }
         }
 
         c.Rotation = glm::radians(rotation);
         if (utility::DrawVec3Control("Scale", c.Scale, 1.0f)) {
-            c.WasAltered = true;
+            if (entity.hasComponent<scene::CollidersComponent>()) {
+                auto& c = entity.getComponent<scene::CollidersComponent>();
+                if (c.Colliders != nullptr) {
+                    // Force a reattach
+                    c.Iteration = c.Iteration--;
+                }
+            }
         }
 
         ImGui::TreePop();
@@ -342,31 +379,50 @@ void Inspector::renderMeshrenderer(scene::Entity entity) {
     }
 }
 
-void Inspector::renderRigidbody(scene::Entity entity) {
+void Inspector::renderDynamicBody(scene::Entity entity) {
     bool open, remove = false;
-    render_component_shared("Rigidbody", "Rigidbody", open, remove);
+    render_component_shared("Dynamic body", "Dynamic body", open, remove);
 
     if (open) {
-        auto& c = entity.getComponent<scene::RigidbodyComponent>();
+        auto& c = entity.getComponent<scene::DynamicActor>();
 
-        if (ImGui::Checkbox("Has gravity", &c.HasGravity)) {
-            c.WasAltered = true;
+        bool hasGravity = c.Actor->getGravity();
+        if (ImGui::Checkbox("Has gravity", &hasGravity)) {
+            c.Actor->setGravity(hasGravity);
         }
-        if (ImGui::Checkbox("Is kinematic", &c.IsKinematic)) {
-            c.WasAltered = true;
+
+        bool isKinematic = c.Actor->getKinematic();
+        if (ImGui::Checkbox("Is kinematic", &isKinematic)) {
+            c.Actor->setKinematic(isKinematic);
         }
 
         ImGui::Text("Mass");
         ImGui::SameLine();
-        if (ImGui::DragFloat("##X", &c.Mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
-            c.WasAltered = true;
+        float mass = c.Actor->getMass();
+        if (ImGui::DragFloat("##X", &mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+            c.Actor->setMass(mass);
         }
 
         ImGui::TreePop();
     }
 
     if (remove) {
-        entity.removeComponent<scene::RigidbodyComponent>();
+        entity.removeComponent<scene::DynamicActor>();
+    }
+}
+
+void Inspector::renderStaticBody(scene::Entity entity) {
+    bool open, remove = false;
+    render_component_shared("Static body", "Static body", open, remove);
+
+    if (open) {
+        auto& c = entity.getComponent<scene::StaticActor>();
+
+        ImGui::TreePop();
+    }
+
+    if (remove) {
+        entity.removeComponent<scene::StaticActor>();
     }
 }
 
@@ -405,47 +461,49 @@ void Inspector::renderAudioSource(scene::Entity entity) {
 }
 
 void Inspector::renderColliders(scene::Entity entity) {
-    auto& colliders = entity.getComponent<scene::CollidersComponent>();
-    std::vector<physics::Collider*> toRemove;
+    bool open, remove = false;
+    render_component_shared("Collider list", "Collider list", open, remove);
 
-    // Colliders
-    for (size_t i = 0; i < colliders.Colliders->size(); i++) {
-        bool remove = false;
+    if (open) {
+        auto& c = entity.getComponent<scene::CollidersComponent>();
 
-        switch (static_cast<reflection::RuntimeTypes>(colliders.Colliders->get(i)->getType())) {
-        case reflection::RuntimeTypes::BOX_CLDR: {
-            bool open = false;
-            render_component_shared("Box collider " + std::to_string(i), "Box Collider", open, remove);
+        if (ImGui::BeginTable("ColliderListComponentTable", 2)) {
+            ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 70.0f);
+            ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
 
-            if (open) {
-                auto typeCollider = static_cast<physics::BoxCollider*>(colliders.Colliders->get(i));
-                bool isTrigger = typeCollider->isTrigger();
-                glm::vec3 size = typeCollider->getSize();
+            ImGui::TableNextRow();
 
-                if (ImGui::Checkbox("Is trigger", &isTrigger)) {
-                    typeCollider->setTrigger(isTrigger);
-                }
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("List");
 
-                if (utility::DrawVec3Control("Size", size, 1.0f)) {
-                    typeCollider->setSize(size);
-                }
+            ImGui::TableSetColumnIndex(1);
+            ImGui::PushItemWidth(-FLT_MIN);
 
-                ImGui::TreePop();
+            if (c.Colliders) {
+                vfs::File* colliderFile = editor::State::Project->getVfs()->getFile(c.Colliders->getHandle());
+                ImGui::Button(colliderFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+            } else {
+                ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
             }
-            break;
-        }
-        default: {
-            continue;
-        }
+
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__ColliderListAsset)) {
+                    editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+                    vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+                    c.Colliders = static_cast<asset::ColliderListAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
+                }
+
+                ImGui::EndDragDropTarget();
+            }
+
+            ImGui::EndTable();
         }
 
-        if (remove) {
-            toRemove.push_back(colliders.Colliders->get(i));
-        }
+        ImGui::TreePop();
     }
 
-    for (physics::Collider* c : toRemove) {
-        colliders.Colliders->removeCollider(c);
+    if (remove) {
+        entity.removeComponent<scene::CollidersComponent>();
     }
 }
 
@@ -482,6 +540,14 @@ void Inspector::renderScripts(scene::Entity entity) {
                         float val = 0.0f;
                         fw->getValue(script->getInstance(), &val);
                         if (ImGui::InputFloat(std::string("#" + fw->getName()).c_str(), &val, NULL)) {
+                            fw->setValue(script->getInstance(), &val);
+                        }
+                        break;
+                    }
+                    case scripting::FieldType::Boolean: {
+                        bool val = false;
+                        fw->getValue(script->getInstance(), &val);
+                        if (ImGui::Checkbox(std::string("##" + fw->getName()).c_str(), &val)) {
                             fw->setValue(script->getInstance(), &val);
                         }
                         break;
@@ -606,6 +672,10 @@ void Inspector::renderAsset() {
     }
     case reflection::RuntimeTypes::PIPELINE: {
         this->renderPipeline(object);
+        break;
+    }
+    case reflection::RuntimeTypes::CLDR_LIST: {
+        this->renderColliderList(object);
         break;
     }
     default: {
@@ -965,6 +1035,68 @@ void Inspector::renderPipeline(io::SerializableObject* asset) {
         type->compile();
     }
     ImGui::PopItemWidth();
+}
+
+void Inspector::renderColliderList(io::SerializableObject* asset) {
+    asset::ColliderListAsset* type = static_cast<asset::ColliderListAsset*>(asset);
+
+    // Colliders
+    int i = 0;
+    for (physics::Collider* collider : *type) {
+        bool remove = false;
+
+        switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {
+        case reflection::RuntimeTypes::BOX_CLDR: {
+            bool open = false;
+            render_component_shared("Box collider " + std::to_string(i++), "Box Collider", open, remove);
+
+            if (open) {
+                auto typeCollider = static_cast<physics::BoxCollider*>(collider);
+                bool isTrigger = typeCollider->isTrigger();
+                glm::vec3 size = typeCollider->getSize();
+
+                if (ImGui::Checkbox("Is trigger", &isTrigger)) {
+                    typeCollider->setTrigger(isTrigger);
+                    type->incrementIteration();
+                }
+
+                if (utility::DrawVec3Control("Size", size, 1.0f)) {
+                    typeCollider->setSize(size);
+                    type->incrementIteration();
+                }
+
+                ImGui::TreePop();
+            }
+            break;
+        }
+        default: {
+            continue;
+        }
+        }
+
+        if (remove) {
+            type->remove(collider);
+            break;
+        }
+    }
+
+    // Add collider
+    ImGui::Separator();
+
+    float width = ImGui::GetContentRegionAvail().x * 0.4855f;
+    ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
+    if (ImGui::Button("Add collider", ImVec2(width, 0.0f))) {
+        ImGui::OpenPopup("AddCollider");
+    }
+
+    if (ImGui::BeginPopup("AddCollider")) {
+        if (ImGui::MenuItem("Box")) {
+            type->add(new physics::BoxCollider());
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
 }
 
 } // namespace editor_ui

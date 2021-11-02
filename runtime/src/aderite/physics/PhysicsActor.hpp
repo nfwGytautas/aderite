@@ -6,8 +6,9 @@
 #include <glm/glm.hpp>
 
 #include "aderite/io/SerializableObject.hpp"
-#include "aderite/physics/Collision.hpp"
 #include "aderite/physics/Forward.hpp"
+#include "aderite/scene/Entity.hpp"
+#include "aderite/scene/components/Actors.hpp"
 #include "aderite/scene/components/Transform.hpp"
 #include "aderite/scripting/Forward.hpp"
 
@@ -35,55 +36,48 @@ public:
 
     /**
      * @brief Synchronizes the physics actor with the ECS transform
-     * @param transform Transform component where to store result
      */
-    void sync(scene::TransformComponent& transform) const;
+    void sync();
 
     /**
-     * @brief Marks the actor to be removed on the next physics update
+     * @brief Detaches all shapes attached to actor
      */
-    void markForRemove();
+    void detachShapes();
 
     /**
-     * @brief Returns true if the actor has been marked for removal
+     * @brief Function called when the actor enters a trigger zone
+     * @param trigger Trigger zone
      */
-    bool isMarkedForRemoval() const;
+    void onTriggerEnter(PhysicsActor* trigger);
 
     /**
-     * @brief Detaches the actor from it's scene
+     * @brief Function called when the actor leaves a trigger zone
+     * @param trigger Trigger zone
      */
-    void detach();
+    void onTriggerLeave(PhysicsActor* trigger);
 
     /**
-     * @brief Sets the notifier for the actor, the notifier will be deleted together with the actor
-     * @param notifier New notifier for the actor
+     * @brief Function called when the actor starts colliding with another actor
+     * @param collision Actor that is being collided with
      */
-    void setNotifier(EventNotifier* notifier);
+    void onCollisionEnter(PhysicsActor* collision);
 
     /**
-     * @brief Returns the event notifier for this actor
+     * @brief Function called when the actor stops colliding with another actor
+     * @param collision Actor that has stopped colliding with
      */
-    EventNotifier* getNotifier() const;
+    void onCollisionLeave(PhysicsActor* collision);
 
-    /**
-     * @brief Sets the collider list of the actor, any previous colliders are detached
-     * @param colliders Collider list
-     */
-    void setColliders(ColliderList* colliders);
-
-    /**
-     * @brief Updates the collider list of the actor
-     */
-    void updateColliders();
+private:
+    scene::PhysicsCallbackComponent& ensureEventComponent();
 
 private:
     friend class PhysicsScene;
+    friend class Collider;
 
 protected:
+    scene::Entity m_entity = scene::Entity::null();
     physx::PxRigidActor* p_actor = nullptr;
-    EventNotifier* m_notifier = nullptr;
-    ColliderList* m_colliders = nullptr;
-    bool m_marked = false;
 };
 
 } // namespace physics

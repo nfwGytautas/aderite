@@ -9,8 +9,8 @@
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
+#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/physics/Collider.hpp"
-#include "aderite/physics/ColliderList.hpp"
 #include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/StaticActor.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
@@ -40,7 +40,7 @@ bool Reflector::init() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::Pipeline, RuntimeTypes::PIPELINE);
 
     // Colliders
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::ColliderList, RuntimeTypes::CLDR_LIST);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::ColliderListAsset, RuntimeTypes::CLDR_LIST);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::BoxCollider, RuntimeTypes::BOX_CLDR);
 
     // Physics actor

@@ -6,13 +6,14 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/physics/Collider.hpp"
-#include "aderite/physics/ColliderList.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/components/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
 #include "aderiteeditor/compiler/ShaderCompiler.hpp"
@@ -93,12 +94,14 @@ void EditorRenderOperation::renderPhysicsObjects() {
     }
 
     // Colliders and triggers
-    auto colliderGroup =
-        ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::CollidersComponent>(
-            entt::get<scene::TransformComponent>);
+    auto colliderGroup = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::CollidersComponent>(
+        entt::get<scene::TransformComponent>);
     for (auto entity : colliderGroup) {
-        auto [colliders, transform] =
-            colliderGroup.get<scene::CollidersComponent, scene::TransformComponent>(entity);
+        auto [colliders, transform] = colliderGroup.get<scene::CollidersComponent, scene::TransformComponent>(entity);
+
+        if (colliders.Colliders == nullptr) {
+            continue;
+        }
 
         for (physics::Collider* collider : *colliders.Colliders) {
             switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {

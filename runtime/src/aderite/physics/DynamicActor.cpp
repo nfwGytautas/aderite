@@ -9,20 +9,32 @@ namespace aderite {
 namespace physics {
 
 DynamicActor::DynamicActor() {
-    p_actor = ::aderite::Engine::getPhysicsController()->createDynamicBody();
+    p_actor = ::aderite::Engine::getPhysicsController()->getPhysics()->createRigidDynamic(physx::PxTransform(physx::PxVec3(0)));
     p_actor->userData = this;
 }
 
-void DynamicActor::isKinematic(bool value) {
+bool DynamicActor::getKinematic() const {
+    return (static_cast<physx::PxRigidDynamic*>(p_actor)->getRigidBodyFlags() & physx::PxRigidBodyFlag::eKINEMATIC);
+}
+
+void DynamicActor::setKinematic(bool value) {
     static_cast<physx::PxRigidDynamic*>(p_actor)->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, value);
 }
 
-void DynamicActor::hasGravity(bool value) {
-    p_actor->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, value);
+void DynamicActor::setGravity(bool value) {
+    p_actor->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, !value);
+}
+
+bool DynamicActor::getGravity() const {
+    return !(static_cast<physx::PxRigidDynamic*>(p_actor)->getActorFlags() & physx::PxActorFlag::eDISABLE_GRAVITY);
 }
 
 void DynamicActor::setMass(float mass) {
     static_cast<physx::PxRigidDynamic*>(p_actor)->setMass(mass);
+}
+
+float DynamicActor::getMass() const {
+    return static_cast<float>(static_cast<physx::PxRigidDynamic*>(p_actor)->getMass());
 }
 
 reflection::Type DynamicActor::getType() const {
@@ -30,12 +42,17 @@ reflection::Type DynamicActor::getType() const {
 }
 
 bool DynamicActor::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+    emitter << YAML::Key << "IsKinematic" << YAML::Value
+            << this->getKinematic();
+    emitter << YAML::Key << "HasGravity" << YAML::Value
+            << this->getGravity();
+    emitter << YAML::Key << "Mass" << YAML::Value << this->getMass();
     return true;
 }
 
 bool DynamicActor::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    this->isKinematic(data["IsKinematic"].as<bool>());
-    this->hasGravity(data["HasGravity"].as<bool>());
+    this->setKinematic(data["IsKinematic"].as<bool>());
+    this->setGravity(data["HasGravity"].as<bool>());
     this->setMass(data["Mass"].as<float>());
     return true;
 }

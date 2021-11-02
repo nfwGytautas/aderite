@@ -62,16 +62,12 @@ Meta enabled field
 Handle to ColliderList, audio list etc., managers take care of these lists
 
 Physics:
-Rework API to not be so cumbersome
-Static/Dynamic PhysicsActor component
 Multithreading
-Substeps
 Physics material asset
 Disable/enable actors at runtime
 Disable/enable colliders at runtime
 Broad-Phase callbacks
 Collision layers
-Rethink the collision callback architecture
 
 VFS:
 Refactor to be more intuitive
@@ -86,6 +82,11 @@ Load on project open
 Improve engine class finding
 
 Editor:
+Enable depth for wireframe
+On material type property delete link gets disconnected
+Mass on dynamic body not alligned
+Delete renaming content asset browser
+Collider list preview window
 Don't compile when loading project
 Loading bar
 Dont load scripts if they are out of date

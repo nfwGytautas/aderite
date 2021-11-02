@@ -19,14 +19,6 @@ namespace physics {
 class Collider : public io::ISerializable {
 public:
     /**
-     * @brief Creates a collider from geometry
-     * @param geometry Geometry of the collider (will be deleted)
-     */
-    Collider(physx::PxGeometry* geometry);
-
-    virtual ~Collider();
-
-    /**
      * @brief Returns true if the collider acts as a trigger or not
      */
     bool isTrigger() const;
@@ -37,26 +29,34 @@ public:
     void setTrigger(bool value);
 
     /**
-     * @brief Detach collider from its actor
+     * @brief Attach collider to actor
+     * @param actor Actor to attach to
+     * @param globalScale Scale to be applied
      */
-    void detach();
-
-    /**
-     * @brief Sets the scale of the collider
-     * @param scale New scale of the collider
-     */
-    virtual void setScale(const glm::vec3& scale) = 0;
+    void attach(PhysicsActor* actor, const glm::vec3& globalScale);
 
     // Inherited via ISerializable
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
-private:
-    friend class PhysicsActor;
-
 protected:
-    // Not serialized
-    physx::PxShape* p_shape = nullptr;
+    /**
+     * @brief Generate a geometry with specified globalScale
+     * @param globalScale Global scale of the geometry
+     * @return physx::PxGeometry instance
+     */
+    virtual physx::PxGeometry* genGeometry(const glm::vec3& globalScale) = 0;
+
+private:
+    /**
+     * @brief Creates physx shape from collider geometry
+     * @param globalScale Scale to be applied
+     * @return PxShape instance
+     */
+    physx::PxShape* createShape(const glm::vec3& globalScale);
+
+private:
+    bool m_isTrigger = false;
 };
 
 } // namespace physics
