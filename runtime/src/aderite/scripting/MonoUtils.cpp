@@ -88,5 +88,10 @@ void extractMaterial(MonoObject* object, asset::MaterialAsset*& material) {
     return fw.getValue(object, &material);
 }
 
+void extractAudio(MonoObject* object, asset::AudioAsset*& audio) {
+    static FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"));
+    return fw.getValue(object, &audio);
+}
+
 } // namespace scripting
 } // namespace aderite

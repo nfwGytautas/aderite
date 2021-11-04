@@ -2,10 +2,14 @@
 
 #include <mono/jit/jit.h>
 
+#include "aderite/Aderite.hpp"
+#include "aderite/audio/AudioController.hpp"
+#include "aderite/audio/AudioInstance.hpp"
 #include "aderite/scene/Entity.hpp"
+#include "aderite/scene/components/Actors.hpp"
+#include "aderite/scene/components/Audio.hpp"
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/scene/components/Transform.hpp"
-#include "aderite/scene/components/Actors.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -73,6 +77,26 @@ void SetMaterial(scene::Scene* scene, entt::entity entity, asset::MaterialAsset*
     scene::Entity(entity, scene).getComponent<scene::MeshRendererComponent>().MaterialHandle = material;
 }
 
+audio::AudioInstance* CreateInstance(scene::Scene* scene, entt::entity entity, asset::AudioAsset* audio) {
+    scene::Entity e(entity, scene);
+    if (!e.hasComponent<scene::AudioSourceComponent>()) {
+        LOG_WARN("Tried to create audio instance on an entity that doesn't have a valid audio source");
+    }
+
+    audio::AudioInstance* instance = ::aderite::Engine::getAudioController()->createInstance(audio);
+    e.getComponent<scene::AudioSourceComponent>().Request.Instances.push_back(instance);
+    return instance;
+}
+
+void OneShot(scene::Scene* scene, entt::entity entity, asset::AudioAsset* audio) {
+    scene::Entity e(entity, scene);
+    if (!e.hasComponent<scene::AudioSourceComponent>()) {
+        LOG_WARN("Tried to play one shot on an entity that doesn't have a valid audio source");
+    }
+
+    e.getComponent<scene::AudioSourceComponent>().Request.Oneshot.push_back(::aderite::Engine::getAudioController()->createOneshot(audio));
+}
+
 void componentInternals() {
     // Transform
     mono_add_internal_call("Aderite.Transform::__GetPosition(intptr,uintptr)", reinterpret_cast<void*>(GetPosition));
@@ -89,6 +113,10 @@ void componentInternals() {
 
     mono_add_internal_call("Aderite.MeshRenderer::__SetMesh(intptr,uintptr,intptr)", reinterpret_cast<void*>(SetMesh));
     mono_add_internal_call("Aderite.MeshRenderer::__SetMaterial(intptr,uintptr,intptr)", reinterpret_cast<void*>(SetMaterial));
+
+    // Audio
+    mono_add_internal_call("Aderite.AudioSource::__CreateInstance(intptr,uintptr,intptr)", reinterpret_cast<void*>(CreateInstance));
+    mono_add_internal_call("Aderite.AudioSource::__OneShot(intptr,uintptr,intptr)", reinterpret_cast<void*>(OneShot));
 }
 
 } // namespace scripting

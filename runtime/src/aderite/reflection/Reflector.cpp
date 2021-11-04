@@ -10,6 +10,7 @@
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/asset/ColliderListAsset.hpp"
+#include "aderite/asset/AudioAsset.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/StaticActor.hpp"
@@ -38,6 +39,7 @@ bool Reflector::init() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Scene, RuntimeTypes::SCENE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::MaterialTypeAsset, RuntimeTypes::MAT_TYPE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::Pipeline, RuntimeTypes::PIPELINE);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::AudioAsset, RuntimeTypes::AUDIO);
 
     // Colliders
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::ColliderListAsset, RuntimeTypes::CLDR_LIST);

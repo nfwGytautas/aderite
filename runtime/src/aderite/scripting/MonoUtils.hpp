@@ -75,5 +75,12 @@ void extractMesh(MonoObject* object, asset::MeshAsset*& mesh);
  */
 void extractMaterial(MonoObject* object, asset::MaterialAsset*& material);
 
+/**
+ * @brief Extract audio field from mono object
+ * @param object Object to extract from
+ * @param audio Pointer where to store value
+ */
+void extractAudio(MonoObject* object, asset::AudioAsset*& audio);
+
 } // namespace scripting
 } // namespace aderite

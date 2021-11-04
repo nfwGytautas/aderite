@@ -4,6 +4,7 @@
 #include <imgui/imgui_internal.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
@@ -23,6 +24,7 @@
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/components/Actors.hpp"
+#include "aderite/scene/components/Audio.hpp"
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/scene/components/Meta.hpp"
 #include "aderite/scene/components/Transform.hpp"
@@ -54,6 +56,7 @@
 #include "aderiteeditor/vfs/VFS.hpp"
 #include "aderiteeditor/windows/FileDialog.hpp"
 #include "aderiteeditor/windows/NodeEditor.hpp"
+#include "aderiteeditor/windows/SelectAudioModal.hpp"
 #include "aderiteeditor/windows/SelectScriptModal.hpp"
 #include "aderiteeditor/windows/WindowsEditor.hpp"
 
@@ -218,7 +221,7 @@ void Inspector::renderEntity() {
         }
 
         if (ImGui::MenuItem("Audio source")) {
-            auto& audioSourcesComponent = entity.addComponent<::aderite::scene::AudioSourceComponent>();
+            entity.addComponent<::aderite::scene::AudioSourceComponent>();
             ImGui::CloseCurrentPopup();
         }
 
@@ -275,7 +278,7 @@ void Inspector::renderTransform(scene::Entity entity) {
         glm::vec3 rotation = glm::degrees(euler);
         if (utility::DrawVec3Control("Rotation", rotation)) {
             c.Rotation = glm::quat(rotation);
-            
+
             if (entity.hasComponent<scene::DynamicActor>()) {
                 auto& da = entity.getComponent<scene::DynamicActor>();
                 if (da.Actor != nullptr) {
@@ -450,7 +453,7 @@ void Inspector::renderAudioSource(scene::Entity entity) {
     if (open) {
         auto& c = entity.getComponent<scene::AudioSourceComponent>();
 
-        // ImGui::Checkbox("Enabled", &c.IsEnabled);
+        
 
         ImGui::TreePop();
     }
@@ -606,6 +609,34 @@ void Inspector::renderScripts(scene::Entity entity) {
                         }
                         break;
                     }
+                    case scripting::FieldType::Audio: {
+                        MonoObject* audio = nullptr;
+                        fw->getValue(script->getInstance(), &audio);
+
+                        if (audio) {
+                            asset::AudioAsset* audioHandle = nullptr;
+                            scripting::extractAudio(audio, audioHandle);
+
+                            vfs::File* materialFile = editor::State::Project->getVfs()->getFile(audioHandle->getHandle());
+                            ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                        } else {
+                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                        }
+
+                        if (ImGui::BeginDragDropTarget()) {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioAsset)) {
+                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+                                vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+                                asset::AudioAsset* newAudioHandle =
+                                    static_cast<asset::AudioAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
+                                fw->setValue(script->getInstance(),
+                                             ::aderite::Engine::getScriptManager()->createAudioObject(newAudioHandle));
+                            }
+
+                            ImGui::EndDragDropTarget();
+                        }
+                        break;
+                    }
                     default: {
                         ImGui::Text("Unknown field type");
                     }
@@ -676,6 +707,10 @@ void Inspector::renderAsset() {
     }
     case reflection::RuntimeTypes::CLDR_LIST: {
         this->renderColliderList(object);
+        break;
+    }
+    case reflection::RuntimeTypes::AUDIO: {
+        this->renderAudio(object);
         break;
     }
     default: {
@@ -1096,6 +1131,44 @@ void Inspector::renderColliderList(io::SerializableObject* asset) {
         }
 
         ImGui::EndPopup();
+    }
+}
+
+void Inspector::renderAudio(io::SerializableObject* asset) {
+    static editor_ui::SelectAudioModal sam;
+
+    asset::AudioAsset* audio = static_cast<asset::AudioAsset*>(asset);
+
+    static vfs::File* audioFile = editor::State::Project->getVfs()->getFile(audio->getHandle());
+
+    if (ImGui::BeginTable("AudioClipEditTable", 2)) {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+        ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+        ImGui::TableNextRow();
+
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Event");
+
+        ImGui::TableSetColumnIndex(1);
+        ImGui::PushItemWidth(-FLT_MIN);
+
+        if (ImGui::Button(audio->getEventName().empty() ? "None" : audio->getEventName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
+            // Open audio select
+            sam.show();
+        }
+
+        ImGui::PopItemWidth();
+        ImGui::EndTable();
+    }
+
+    sam.render();
+
+    if (!sam.getSelectedEvent().empty()) {
+        audio->setEventName(sam.getSelectedEvent());
+
+        // Reset the selector
+        sam.reset();
     }
 }
 

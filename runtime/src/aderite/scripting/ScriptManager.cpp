@@ -144,6 +144,16 @@ MonoObject* ScriptManager::createMaterialObject(asset::MaterialAsset* material) 
     return object;
 }
 
+MonoObject* ScriptManager::createAudioObject(asset::AudioAsset* audio) {
+    // TODO: Handle exception
+    void* args[1];
+    args[0] = &audio;
+    MonoObject* object = mono_object_new(m_currentDomain, m_audioClass);
+    MonoObject* ex = nullptr;
+    mono_runtime_invoke(m_audioCtor, object, args, &ex);
+    return object;
+}
+
 MonoClassField* ScriptManager::getBehaviorEntityField() const {
     return m_sbEntityField;
 }
@@ -253,6 +263,18 @@ bool ScriptManager::setupEngineAssemblies() {
     m_materialCtor = mono_class_get_method_from_name(m_materialClass, ".ctor", 1);
     if (m_materialCtor == nullptr) {
         LOG_ERROR("Failed to find Material constructor method");
+        return false;
+    }
+
+    m_audioClass = mono_class_from_name(m_scriptlibImage, "Aderite", "Audio");
+    if (m_audioClass == nullptr) {
+        LOG_ERROR("Failed to find Audio class");
+        return false;
+    }
+
+    m_audioCtor = mono_class_get_method_from_name(m_audioClass, ".ctor", 1);
+    if (m_audioCtor == nullptr) {
+        LOG_ERROR("Failed to find Audio constructor method");
         return false;
     }
 

@@ -3,9 +3,11 @@
 #include <filesystem>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include <fmod_studio.hpp>
 
+#include "aderite/asset/Forward.hpp"
 #include "aderite/audio/Forward.hpp"
 #include "aderite/utility/Macros.hpp"
 
@@ -35,8 +37,7 @@ public:
     void update();
 
     /**
-     * @brief Loads the master bank (invoked automatically by AssetManager)
-     * @param dir Path to directory where master bank (strings.bank should be in the same directory) is located in
+     * @brief Loads the master bank (invoked automatically or by hand through the editor)
      */
     void loadMasterBank();
 
@@ -44,13 +45,6 @@ public:
      * @brief Returns true if master banks loaded, false otherwise
      */
     bool masterBanksLoaded() const;
-
-    /**
-     * @brief Creates and returns an audio instance list
-     * @param name Name of the audio
-     * @return AudioIntance object
-     */
-    AudioInstanceId createAudioInstance(const std::string name);
 
     /**
      * @brief If true all sounds will be muted (not stopped)
@@ -68,6 +62,20 @@ public:
      */
     const std::vector<std::string>& getKnownEvents() const;
 
+    /**
+     * @brief Creates an audio instance for the specified clip
+     * @param clip Clip to create instance for
+     * @return AudioInstance object
+     */
+    AudioInstance* createInstance(const asset::AudioAsset* clip);
+
+    /**
+     * @brief Creats a one shot audio instance for the specified clip
+     * @param clip Clip to create instance for
+     * @return AudioInstance object
+     */
+    AudioInstance* createOneshot(const asset::AudioAsset* clip);
+
 private:
     AudioController() {}
     friend Engine;
@@ -77,6 +85,19 @@ private:
      */
     void unloadAll();
 
+    /**
+     * @brief Creates and returns an audio instance list
+     * @param name Name of the audio
+     * @return AudioIntance object
+     */
+    AudioInstance* createAudioInstance(const std::string name);
+
+    /**
+     * @brief Removes an audio instance from the controller list
+     * @param instance Instance to remove
+     */
+    void removeInstance(AudioInstance* instance);
+
 private:
     FMOD::Studio::System* m_fmodSystem = nullptr;
     FMOD::Studio::Bank* m_masterBank = nullptr;
@@ -85,7 +106,8 @@ private:
     // Loaded banks
     std::vector<std::string> m_knownEvents;
 
-    std::vector<FMOD::Studio::EventInstance*> m_instances;
+    std::vector<AudioInstance*> m_instances;
+    std::vector<AudioInstance*> m_oneshots;
 
     bool m_mute = false;
     bool m_disabled = false;

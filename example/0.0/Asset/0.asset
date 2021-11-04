@@ -5,20 +5,17 @@ Data:
   Entities:
     - Entity: 2
       Meta:
-        Name: Plane
+        Name: TriggerZone
       Transform:
-        Position: [0, 0, 0]
+        Position: [-4, 2.5999999, 0]
         Rotation: [1, 0, 0, 0]
-        Scale: [10, 0.200000003, 10]
-      MeshRenderer:
-        Mesh: 2
-        Material: 4
+        Scale: [5, 0.200000003, 5]
       StaticActor:
         Type: 92
         Data:
           {}
       Colliders:
-        ID: 6
+        ID: 7
     - Entity: 1
       Meta:
         Name: Object1
@@ -37,6 +34,8 @@ Data:
           Mass: 1
       Colliders:
         ID: 6
+      AudioSource:
+        Volume: 1
       Scripts:
         Type: 200
         Data:
@@ -45,18 +44,28 @@ Data:
               Data:
                 Name: Scripts.TestBehavior
                 Fields:
-                  {}
+                  EnableGravity: true
+            - Type: 201
+              Data:
+                Name: Scripts.BoingBehavior
+                Fields:
+                  Clip: 8
     - Entity: 0
       Meta:
-        Name: TriggerZone
+        Name: Plane
       Transform:
-        Position: [-4, 2.5999999, 0]
+        Position: [0, 0, 0]
         Rotation: [1, 0, 0, 0]
-        Scale: [5, 0.200000003, 5]
+        Scale: [10, 0.200000003, 10]
+      MeshRenderer:
+        Mesh: 2
+        Material: 4
       StaticActor:
         Type: 92
         Data:
           {}
       Colliders:
-        ID: 7
+        ID: 6
+      AudioListener:
+        IsEnabled: true
   Pipeline: 1

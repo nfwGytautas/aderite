@@ -1,5 +1,6 @@
 #include "InternalCalls.hpp"
 
+#include "aderite/scripting/internals/ScriptAudio.hpp"
 #include "aderite/scripting/internals/ScriptComponents.hpp"
 #include "aderite/scripting/internals/ScriptDebug.hpp"
 #include "aderite/scripting/internals/ScriptEntity.hpp"
@@ -18,6 +19,7 @@ void linkInternals() {
     entityInternals();
     inputInternals();
     physicsInternals();
+    audioInternals();
 
     LOG_TRACE("Internals linked");
 }

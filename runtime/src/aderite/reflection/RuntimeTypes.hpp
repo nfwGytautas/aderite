@@ -20,6 +20,7 @@ enum class RuntimeTypes : Type {
     SCENE = 3,
     MAT_TYPE = 4,
     PIPELINE = 5,
+    AUDIO = 6,
 
     // Colliders
     CLDR_LIST = 50,

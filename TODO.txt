@@ -18,6 +18,7 @@ Namespace refactoring
 Move objects for editor so that they don't get destroyed on pipeline change
 
 ECS:
+Remove in 0.2 with a less half/half current solution
 Parent
 
 Licensing:
@@ -82,6 +83,7 @@ Load on project open
 Improve engine class finding
 
 Editor:
+List item select (merge SelectScriptModal, SelectClipModal)
 Enable depth for wireframe
 On material type property delete link gets disconnected
 Mass on dynamic body not alligned

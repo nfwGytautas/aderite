@@ -81,6 +81,13 @@ public:
     MonoObject* createMaterialObject(asset::MaterialAsset* material);
 
     /**
+     * @brief Creates a C# audio object from C++ asset
+     * @param audio Audio from which to create
+     * @return MonoObject instance
+    */
+    MonoObject* createAudioObject(asset::AudioAsset* audio);
+
+    /**
      * @brief Returns the ScriptedBehavior.Entity field
      */
     MonoClassField* getBehaviorEntityField() const;
@@ -97,6 +104,13 @@ public:
      */
     MonoClass* getMaterialClass() const {
         return m_materialClass;
+    }
+
+    /**
+     * @brief Returns the Audio class
+     */
+    MonoClass* getAudioClass() const {
+        return m_audioClass;
     }
 
 private:
@@ -149,6 +163,8 @@ private:
     MonoMethod* m_meshCtor = nullptr;
     MonoClass* m_materialClass = nullptr;
     MonoMethod* m_materialCtor = nullptr;
+    MonoClass* m_audioClass = nullptr;
+    MonoMethod* m_audioCtor = nullptr;
 
     // Code assemblies
     MonoAssembly* m_codeAssembly = nullptr;

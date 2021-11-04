@@ -47,6 +47,17 @@ public:
     std::filesystem::path getRootDir() const;
 
     /**
+     * @brief Returns the linked FMOD project directory
+     */
+    std::filesystem::path getFmodProjectDir() const;
+
+    /**
+     * @brief Link FMOD project to aderite project
+     * @param project Path to project Build path
+     */
+    void linkFmodProject(std::filesystem::path project);
+
+    /**
      * @brief Returns the active scene of the project
      */
     io::SerializableHandle getActiveScene() const;
@@ -64,6 +75,7 @@ public:
 
 private:
     std::filesystem::path m_directory;
+    std::filesystem::path m_fmodProjectDirectory;
     std::string m_name;
     io::SerializableHandle m_activeScene;
 

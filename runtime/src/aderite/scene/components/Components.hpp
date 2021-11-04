@@ -52,27 +52,6 @@ struct CollidersComponent {
 };
 
 /**
- * @brief Component containing information about audio source on an entity (1 per entity)
- */
-struct AudioSourceComponent {
-    audio::AudioInstanceId Instance = c_InvalidHandle;
-    bool PlayOnStart = false;
-
-    AudioSourceComponent() = default;
-    AudioSourceComponent(const AudioSourceComponent&) = default;
-};
-
-/**
- * @brief Component used to specify that this entity is listening to audio inputs
- */
-struct AudioListenerComponent {
-    bool IsEnabled = false;
-
-    AudioListenerComponent() = default;
-    AudioListenerComponent(const AudioListenerComponent&) = default;
-};
-
-/**
  * @brief Component used to specify that this entity has ScriptableBehaviors applied to it
  */
 struct ScriptsComponent {

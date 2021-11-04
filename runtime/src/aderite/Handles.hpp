@@ -18,12 +18,4 @@ using SerializableHandle = size_t;
 using LoadableHandle = size_t;
 } // namespace io
 
-namespace audio {
-using AudioInstanceId = size_t;
-}
-
-namespace physics {
-using ActorHandle = size_t;
-}
-
 } // namespace aderite

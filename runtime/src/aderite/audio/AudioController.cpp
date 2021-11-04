@@ -7,9 +7,13 @@
 #include <fmod_studio_common.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AudioAsset.hpp"
+#include "aderite/audio/AudioInstance.hpp"
+#include "aderite/audio/AudioRequest.hpp"
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/components/Audio.hpp"
 #include "aderite/scene/components/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -138,41 +142,43 @@ void AudioController::update() {
     for (auto entity : audioGroup) {
         auto [audioSource, transform] = audioGroup.get<scene::AudioSourceComponent, scene::TransformComponent>(entity);
 
-        if (audioSource.Instance == c_InvalidHandle) {
-            continue;
+        // Handle and update request
+        for (audio::AudioInstance* instance : audioSource.Request.Instances) {
+            if (m_disabled) {
+                instance->stop();
+                continue;
+            }
+
+            // Update instances
+            if (m_mute || thisFrameMute) {
+                instance->setVolume(0.0f);
+            } else {
+                instance->setVolume(audioSource.Volume);
+            }
+
+            // TODO: Velocity
+            instance->setAttributes(transform.Position, transform.Rotation, glm::vec3(0.0f));
         }
 
-        // Update instances
-        // TODO: Error checking and handling
-        FMOD::Studio::EventInstance* instance = m_instances[audioSource.Instance];
-        if (m_disabled) {
-            instance->stop(FMOD_STUDIO_STOP_IMMEDIATE);
+        for (audio::AudioInstance* instance : audioSource.Request.Oneshot) {
+            if (m_disabled) {
+                instance->stop();
+                continue;
+            }
+
+            // Update instances
+            if (m_mute || thisFrameMute) {
+                instance->setVolume(0.0f);
+            } else {
+                instance->setVolume(audioSource.Volume);
+            }
+
+            // TODO: Velocity
+            instance->setAttributes(transform.Position, transform.Rotation, glm::vec3(0.0f));
         }
-
-        if (m_wasDisabled && audioSource.PlayOnStart) {
-            instance->start();
-        }
-
-        FMOD_3D_ATTRIBUTES source3dAttributes = {};
-
-        // TODO: Volume
-        if (m_mute || thisFrameMute) {
-            instance->setVolume(0.0f);
-        } else {
-            instance->setVolume(1.0f);
-        }
-
-        source3dAttributes.position = {transform.Position.x, transform.Position.y, transform.Position.z};
-
-        // TODO: Rotation
-        source3dAttributes.up = {0.0f, 1.0f, 0.0f};
-        source3dAttributes.forward = {0.0f, 0.0f, 1.0f};
-
-        // TODO: Velocity
-        source3dAttributes.velocity = {0.0f, 0.0f, 0.0f};
-
-        instance->set3DAttributes(&source3dAttributes);
     }
+
+    // TODO: Clean one shots
 
     if (!m_disabled) {
         m_wasDisabled = false;
@@ -204,6 +210,9 @@ void AudioController::loadMasterBank() {
     m_stringBank = nullptr;
     m_masterBank = nullptr;
 
+    // Get all events
+    this->unloadAll();
+
     // Load
     FMOD_RESULT result = m_fmodSystem->loadBankMemory(reinterpret_cast<const char*>(stringsChunk.Data.data()), stringsChunk.Data.size(),
                                                       FMOD_STUDIO_LOAD_MEMORY, FMOD_STUDIO_LOAD_BANK_NORMAL, &m_stringBank);
@@ -216,24 +225,23 @@ void AudioController::loadMasterBank() {
 
     ADERITE_DYNAMIC_ASSERT(result == FMOD_OK, "Failed to load master bank");
 
-    // Get all events
-    this->unloadAll();
-
     LOG_TRACE("Querying strings");
     int strings = 0;
     ADERITE_DYNAMIC_ASSERT(m_stringBank->getStringCount(&strings) == FMOD_OK, "Failed to query string count");
 
-    LOG_TRACE("Querying events and banks");
+    LOG_TRACE("Querying events");
     constexpr size_t c_pathSize = 100;
     std::string pathHolder;
-    pathHolder.reserve(c_pathSize);
+    pathHolder.resize(c_pathSize);
     for (int i = 0; i < strings; i++) {
-        ADERITE_DYNAMIC_ASSERT(m_stringBank->getStringInfo(1, nullptr, pathHolder.data(), c_pathSize, nullptr) == FMOD_OK, "Failed to "
+        // TODO: Length overflow check
+        int length = 0;
+        ADERITE_DYNAMIC_ASSERT(m_stringBank->getStringInfo(i, nullptr, pathHolder.data(), c_pathSize, &length) == FMOD_OK, "Failed to "
                                                                                                                            "query string "
                                                                                                                            "count");
 
         LOG_TRACE("Found {0}", pathHolder);
-        if (pathHolder.rfind("event:/", 0) == 0) {
+        if (pathHolder.find("event:/") != std::string::npos) {
             m_knownEvents.push_back(pathHolder);
         }
     }
@@ -243,13 +251,32 @@ bool AudioController::masterBanksLoaded() const {
     return m_masterBank != nullptr && m_stringBank != nullptr;
 }
 
-AudioInstanceId aderite::audio::AudioController::createAudioInstance(const std::string name) {
-    FMOD::Studio::EventDescription* desc;
-    ADERITE_DYNAMIC_ASSERT(m_fmodSystem->getEvent(name.c_str(), &desc) == FMOD_OK, "Failed to get event");
+AudioInstance* aderite::audio::AudioController::createAudioInstance(const std::string name) {
+    FMOD::Studio::EventDescription* desc = nullptr;
     FMOD::Studio::EventInstance* instance;
+    FMOD_STUDIO_LOADING_STATE loadState;
+
+    ADERITE_DYNAMIC_ASSERT(m_fmodSystem->getEvent(name.c_str(), &desc) == FMOD_OK, "Failed to get event");
     ADERITE_DYNAMIC_ASSERT(desc->createInstance(&instance) == FMOD_OK, "Failed to create event instance");
-    m_instances.push_back(instance);
-    return m_instances.size() - 1;
+
+    desc->getSampleLoadingState(&loadState);
+    if (loadState == FMOD_STUDIO_LOADING_STATE_UNLOADED) {
+        ADERITE_DYNAMIC_ASSERT(desc->loadSampleData() == FMOD_OK, "Failed to load event sample data");
+    }
+
+    AudioInstance* aderiteInstance = new AudioInstance(instance);
+    return aderiteInstance;
+}
+
+void AudioController::removeInstance(AudioInstance* instance) {
+    auto it = std::find(m_instances.begin(), m_instances.end(), instance);
+
+    ADERITE_DYNAMIC_ASSERT(it != m_instances.end(), "Tried to remove a non existing or untracked audio instance");
+
+    // TODO: Unload bank if no longer needed
+
+    delete *it;
+    m_instances.erase(it);
 }
 
 void AudioController::setMute(bool value) {
@@ -265,10 +292,23 @@ const std::vector<std::string>& aderite::audio::AudioController::getKnownEvents(
     return m_knownEvents;
 }
 
+AudioInstance* AudioController::createInstance(const asset::AudioAsset* clip) {
+    AudioInstance* instance = this->createAudioInstance(clip->getEventName());
+    m_instances.push_back(instance);
+    return instance;
+}
+
+AudioInstance* AudioController::createOneshot(const asset::AudioAsset* clip) {
+    AudioInstance* instance = this->createAudioInstance(clip->getEventName());
+    instance->start();
+    m_oneshots.push_back(instance);
+    return instance;
+}
+
 void AudioController::unloadAll() {
     // Unload all then delete
     for (auto& instance : m_instances) {
-        instance->stop(FMOD_STUDIO_STOP_IMMEDIATE);
+        delete instance;
     }
 
     m_instances.clear();

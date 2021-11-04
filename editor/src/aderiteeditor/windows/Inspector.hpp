@@ -35,6 +35,7 @@ private:
     void renderScene(io::SerializableObject* asset);
     void renderPipeline(io::SerializableObject* asset);
     void renderColliderList(io::SerializableObject* asset);
+    void renderAudio(io::SerializableObject* asset);
 };
 
 } // namespace editor_ui

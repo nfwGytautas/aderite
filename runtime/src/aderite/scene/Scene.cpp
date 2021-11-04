@@ -9,6 +9,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
@@ -25,6 +26,7 @@
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/components/Actors.hpp"
+#include "aderite/scene/components/Audio.hpp"
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/scene/components/Meta.hpp"
 #include "aderite/scene/components/Transform.hpp"
@@ -219,13 +221,13 @@ void Scene::serializeEntity(YAML::Emitter& out, Entity e) {
     // Audio sources
     if (e.hasComponent<AudioSourceComponent>()) {
         out << YAML::Key << "AudioSource";
-        out << YAML::BeginSeq; // AudioSource
+        out << YAML::BeginMap; // AudioSource
 
         AudioSourceComponent& asc = e.getComponent<AudioSourceComponent>();
 
-        // TODO: Serialize
+        out << YAML::Key << "Volume" << YAML::Value << asc.Volume;
 
-        out << YAML::EndSeq; // AudioSource
+        out << YAML::EndMap; // AudioSource
     }
 
     // Audio listener
@@ -338,9 +340,7 @@ Entity Scene::deserializeEntity(YAML::Node& eNode) {
     auto audioSources = eNode["AudioSource"];
     if (audioSources) {
         auto& asc = e.addComponent<AudioSourceComponent>();
-
-        // TODO: Deserialize
-        asc.Instance = ::aderite::Engine::getAudioController()->createAudioInstance("TODO");
+        asc.Volume = audioSources["Volume"].as<float>();
     }
 
     // Audio listener

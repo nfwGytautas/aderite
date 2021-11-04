@@ -39,6 +39,8 @@ FieldWrapper::FieldWrapper(MonoClassField* field) : m_field(field) {
             m_type = FieldType::Mesh;
         } else if (klass == ::aderite::Engine::getScriptManager()->getMaterialClass()) {
             m_type = FieldType::Material;
+        } else if (klass == ::aderite::Engine::getScriptManager()->getAudioClass()) {
+            m_type = FieldType::Audio;
         }
     }
     }

@@ -4,6 +4,7 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
@@ -184,6 +185,10 @@ void AssetBrowser::renderItems() {
                     target = editor::DDPayloadID__ColliderListAsset;
                     break;
                 }
+                case reflection::RuntimeTypes::AUDIO: {
+                    target = editor::DDPayloadID__AudioAsset;
+                    break;
+                }
                 default: {
                     target = editor::DDPayloadID__GenericAsset;
                 }
@@ -258,6 +263,11 @@ void AssetBrowser::renderAddItemPopup() {
         if (ImGui::MenuItem("Collider list")) {
             object = new asset::ColliderListAsset();
             newName = "New collider list";
+        }
+
+        if (ImGui::MenuItem("Audio clip")) {
+            object = new asset::AudioAsset();
+            newName = "New audio clip";
         }
 
         ImGui::EndMenu();

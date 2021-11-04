@@ -1,6 +1,7 @@
 #include "Script.hpp"
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/io/Serializer.hpp"
@@ -99,6 +100,10 @@ bool Script::serialize(const io::Serializer* serializer, YAML::Emitter& emitter)
             emitter << (*(float*)unbox(fw->getValueObject(m_instance)));
             break;
         }
+        case FieldType::Boolean: {
+            emitter << (*(bool*)unbox(fw->getValueObject(m_instance)));
+            break;
+        }
         case FieldType::Mesh: {
             MonoObject* mesh = nullptr;
             fw->getValue(m_instance, &mesh);
@@ -120,6 +125,18 @@ bool Script::serialize(const io::Serializer* serializer, YAML::Emitter& emitter)
                 asset::MaterialAsset* materialAsset = nullptr;
                 extractMaterial(material, materialAsset);
                 emitter << materialAsset->getHandle();
+            }
+            break;
+        }
+        case FieldType::Audio: {
+            MonoObject* audio = nullptr;
+            fw->getValue(m_instance, &audio);
+            if (audio == nullptr) {
+                emitter << YAML::Null;
+            } else {
+                asset::AudioAsset* audioAsset = nullptr;
+                extractAudio(audio, audioAsset);
+                emitter << audioAsset->getHandle();
             }
             break;
         }
@@ -156,6 +173,11 @@ bool Script::deserialize(io::Serializer* serializer, const YAML::Node& data) {
                 fw->setValue(m_instance, &val);
                 break;
             }
+            case FieldType::Boolean: {
+                bool val = fieldData.second.as<bool>();
+                fw->setValue(m_instance, &val);
+                break;
+            }
             case FieldType::Mesh: {
                 asset::MeshAsset* mesh = static_cast<asset::MeshAsset*>(
                     ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>()));
@@ -167,6 +189,13 @@ bool Script::deserialize(io::Serializer* serializer, const YAML::Node& data) {
                 asset::MaterialAsset* material = static_cast<asset::MaterialAsset*>(
                     ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>()));
                 MonoObject* obj = ::aderite::Engine::getScriptManager()->createMaterialObject(material);
+                fw->setValue(m_instance, obj);
+                break;
+            }
+            case FieldType::Audio: {
+                asset::AudioAsset* audio = static_cast<asset::AudioAsset*>(
+                    ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>()));
+                MonoObject* obj = ::aderite::Engine::getScriptManager()->createAudioObject(audio);
                 fw->setValue(m_instance, obj);
                 break;
             }
