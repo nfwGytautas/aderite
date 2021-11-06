@@ -53,9 +53,6 @@ Rendering:
 BGFX multithread encoder
 
 Audio:
-Rework API to not be so cumbersome
-Fix inspector selection
-Rethink serialization
 3D audio
 
 Components:
@@ -75,12 +72,10 @@ Refactor to be more intuitive
 Remove files that don't physically exist anymore
 
 Scripting:
-Rework API to not be so cumbersome
 Set fields after initializing object
 Generate .csproj file for easier coding
 Dont kill entire editor on script run error
 Load on project open
-Improve engine class finding
 
 Editor:
 List item select (merge SelectScriptModal, SelectClipModal)

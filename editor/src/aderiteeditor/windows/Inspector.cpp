@@ -574,7 +574,7 @@ void Inspector::renderScripts(scene::Entity entity) {
                                 vfs::File* file = static_cast<vfs::File*>(ddo->Data);
                                 asset::MeshAsset* newMeshHandle =
                                     static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                                fw->setValue(script->getInstance(), ::aderite::Engine::getScriptManager()->createMeshObject(newMeshHandle));
+                                fw->setValue(script->getInstance(), ::aderite::Engine::getScriptManager()->getLocator().create(newMeshHandle));
                             }
 
                             ImGui::EndDragDropTarget();
@@ -602,7 +602,7 @@ void Inspector::renderScripts(scene::Entity entity) {
                                 asset::MaterialAsset* newMaterialHandle =
                                     static_cast<asset::MaterialAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
                                 fw->setValue(script->getInstance(),
-                                             ::aderite::Engine::getScriptManager()->createMaterialObject(newMaterialHandle));
+                                             ::aderite::Engine::getScriptManager()->getLocator().create(newMaterialHandle));
                             }
 
                             ImGui::EndDragDropTarget();
@@ -630,7 +630,7 @@ void Inspector::renderScripts(scene::Entity entity) {
                                 asset::AudioAsset* newAudioHandle =
                                     static_cast<asset::AudioAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
                                 fw->setValue(script->getInstance(),
-                                             ::aderite::Engine::getScriptManager()->createAudioObject(newAudioHandle));
+                                             ::aderite::Engine::getScriptManager()->getLocator().create(newAudioHandle));
                             }
 
                             ImGui::EndDragDropTarget();

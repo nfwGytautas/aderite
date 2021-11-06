@@ -47,7 +47,7 @@ void Script::pair(scene::Entity entity) {
 void Script::onTriggerEnter(scene::Entity trigger) {
     if (m_behavior != nullptr && m_behavior->hasTriggerEnterFunction()) {
         // TODO: Optimize by creating once
-        MonoObject* entity = ::aderite::Engine::getScriptManager()->createEntityObject(trigger);
+        MonoObject* entity = ::aderite::Engine::getScriptManager()->getLocator().create(trigger);
         m_behavior->onTriggerEnter(m_instance, entity);
     }
 }
@@ -55,7 +55,7 @@ void Script::onTriggerEnter(scene::Entity trigger) {
 void Script::onTriggerLeave(scene::Entity trigger) {
     if (m_behavior != nullptr && m_behavior->hasTriggerLeaveFunction()) {
         // TODO: Optimize by creating once
-        MonoObject* entity = ::aderite::Engine::getScriptManager()->createEntityObject(trigger);
+        MonoObject* entity = ::aderite::Engine::getScriptManager()->getLocator().create(trigger);
         m_behavior->onTriggerLeave(m_instance, entity);
     }
 }
@@ -63,7 +63,7 @@ void Script::onTriggerLeave(scene::Entity trigger) {
 void Script::onCollisionEnter(scene::Entity collision) {
     if (m_behavior != nullptr && m_behavior->hasCollisionEnterFunction()) {
         // TODO: Optimize by creating once
-        MonoObject* entity = ::aderite::Engine::getScriptManager()->createEntityObject(collision);
+        MonoObject* entity = ::aderite::Engine::getScriptManager()->getLocator().create(collision);
         m_behavior->onCollisionEnter(m_instance, entity);
     }
 }
@@ -71,7 +71,7 @@ void Script::onCollisionEnter(scene::Entity collision) {
 void Script::onCollisionLeave(scene::Entity collision) {
     if (m_behavior != nullptr && m_behavior->hasCollisionLeaveFunction()) {
         // TODO: Optimize by creating once
-        MonoObject* entity = ::aderite::Engine::getScriptManager()->createEntityObject(collision);
+        MonoObject* entity = ::aderite::Engine::getScriptManager()->getLocator().create(collision);
         m_behavior->onCollisionLeave(m_instance, entity);
     }
 }
@@ -181,21 +181,21 @@ bool Script::deserialize(io::Serializer* serializer, const YAML::Node& data) {
             case FieldType::Mesh: {
                 asset::MeshAsset* mesh = static_cast<asset::MeshAsset*>(
                     ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>()));
-                MonoObject* obj = ::aderite::Engine::getScriptManager()->createMeshObject(mesh);
+                MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(mesh);
                 fw->setValue(m_instance, obj);
                 break;
             }
             case FieldType::Material: {
                 asset::MaterialAsset* material = static_cast<asset::MaterialAsset*>(
                     ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>()));
-                MonoObject* obj = ::aderite::Engine::getScriptManager()->createMaterialObject(material);
+                MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(material);
                 fw->setValue(m_instance, obj);
                 break;
             }
             case FieldType::Audio: {
                 asset::AudioAsset* audio = static_cast<asset::AudioAsset*>(
                     ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>()));
-                MonoObject* obj = ::aderite::Engine::getScriptManager()->createAudioObject(audio);
+                MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(audio);
                 fw->setValue(m_instance, obj);
                 break;
             }

@@ -111,51 +111,23 @@ BehaviorWrapper* ScriptManager::getBehavior(const std::string& name) {
     return *it;
 }
 
-MonoObject* ScriptManager::createEntityObject(scene::Entity entity) {
-    MonoObject* object = mono_object_new(m_currentDomain, m_entityClass);
-    entt::entity e = entity.getHandle();
-    scene::Scene* scene = entity.getScene();
-
-    mono_runtime_object_init(object);
-
-    mono_field_set_value(object, m_entitySceneField, &scene);
-    mono_field_set_value(object, m_entityEntityField, &e);
-
-    return object;
+FieldType ScriptManager::getType(MonoType* type) const {
+    // Check for value types
+    switch (mono_type_get_type(type)) {
+    case MONO_TYPE_R4: {
+        return FieldType::Float;
+    }
+    case MONO_TYPE_BOOLEAN: {
+        return FieldType::Boolean;
+    }
+    default: {
+        return m_locator.getType(type);
+    }
+    }
 }
 
-MonoObject* ScriptManager::createMeshObject(asset::MeshAsset* mesh) {
-    // TODO: Handle exception
-    void* args[1];
-    args[0] = &mesh;
-    MonoObject* object = mono_object_new(m_currentDomain, m_meshClass);
-    MonoObject* ex = nullptr;
-    mono_runtime_invoke(m_meshCtor, object, args, &ex);
-    return object;
-}
-
-MonoObject* ScriptManager::createMaterialObject(asset::MaterialAsset* material) {
-    // TODO: Handle exception
-    void* args[1];
-    args[0] = &material;
-    MonoObject* object = mono_object_new(m_currentDomain, m_materialClass);
-    MonoObject* ex = nullptr;
-    mono_runtime_invoke(m_materialCtor, object, args, &ex);
-    return object;
-}
-
-MonoObject* ScriptManager::createAudioObject(asset::AudioAsset* audio) {
-    // TODO: Handle exception
-    void* args[1];
-    args[0] = &audio;
-    MonoObject* object = mono_object_new(m_currentDomain, m_audioClass);
-    MonoObject* ex = nullptr;
-    mono_runtime_invoke(m_audioCtor, object, args, &ex);
-    return object;
-}
-
-MonoClassField* ScriptManager::getBehaviorEntityField() const {
-    return m_sbEntityField;
+LibClassLocator& ScriptManager::getLocator() {
+    return m_locator;
 }
 
 void ScriptManager::resolveBehaviors() {
@@ -180,7 +152,7 @@ void ScriptManager::resolveBehaviors() {
                 continue;
             }
 
-            if (this->classMarkedAsBehavior(monoClass)) {
+            if (m_locator.isBehavior(monoClass)) {
                 LOG_TRACE("Found behavior. Namespace: {1}, name: {0}", name, nSpace);
                 m_behaviors.push_back(new BehaviorWrapper(m_codeImage, monoClass));
             }
@@ -212,69 +184,8 @@ bool ScriptManager::setupEngineAssemblies() {
     }
 
     // Find meta classes
-    m_sbClass = mono_class_from_name(m_scriptlibImage, "Aderite", "ScriptedBehavior");
-    if (m_sbClass == nullptr) {
-        LOG_ERROR("Failed to find ScriptedBehavior class");
-        return false;
-    }
-
-    m_sbEntityField = mono_class_get_field_from_name(m_sbClass, "Entity");
-    if (m_sbEntityField == nullptr) {
-        LOG_ERROR("Failed to find ScriptedBehavior.Entity field");
-        return false;
-    }
-
-    m_entityClass = mono_class_from_name(m_scriptlibImage, "Aderite", "Entity");
-    if (m_entityClass == nullptr) {
-        LOG_ERROR("Failed to find Entity class");
-        return false;
-    }
-
-    m_entitySceneField = mono_class_get_field_from_name(m_entityClass, "scene");
-    if (m_entitySceneField == nullptr) {
-        LOG_ERROR("Failed to find Entity.scene field");
-        return false;
-    }
-
-    m_entityEntityField = mono_class_get_field_from_name(m_entityClass, "entity");
-    if (m_entityEntityField == nullptr) {
-        LOG_ERROR("Failed to find Entity.entity field");
-        return false;
-    }
-
-    m_meshClass = mono_class_from_name(m_scriptlibImage, "Aderite", "Mesh");
-    if (m_meshClass == nullptr) {
-        LOG_ERROR("Failed to find Mesh class");
-        return false;
-    }
-
-    m_meshCtor = mono_class_get_method_from_name(m_meshClass, ".ctor", 1);
-    if (m_meshCtor == nullptr) {
-        LOG_ERROR("Failed to find Mesh constructor method");
-        return false;
-    }
-
-    m_materialClass = mono_class_from_name(m_scriptlibImage, "Aderite", "Material");
-    if (m_materialClass == nullptr) {
-        LOG_ERROR("Failed to find Material class");
-        return false;
-    }
-
-    m_materialCtor = mono_class_get_method_from_name(m_materialClass, ".ctor", 1);
-    if (m_materialCtor == nullptr) {
-        LOG_ERROR("Failed to find Material constructor method");
-        return false;
-    }
-
-    m_audioClass = mono_class_from_name(m_scriptlibImage, "Aderite", "Audio");
-    if (m_audioClass == nullptr) {
-        LOG_ERROR("Failed to find Audio class");
-        return false;
-    }
-
-    m_audioCtor = mono_class_get_method_from_name(m_audioClass, ".ctor", 1);
-    if (m_audioCtor == nullptr) {
-        LOG_ERROR("Failed to find Audio constructor method");
+    if (!m_locator.locate(m_scriptlibImage)) {
+        LOG_ERROR("Failed to locate engine classes");
         return false;
     }
 
@@ -305,39 +216,6 @@ bool ScriptManager::setupCodeAssemblies() {
     }
 
     return true;
-}
-
-bool ScriptManager::classMarkedAsBehavior(MonoClass* klass) {
-    //// Get attributes
-    // MonoCustomAttrInfo* attrInfo = mono_custom_attrs_from_class(klass);
-
-    //// Check if there are any attributes
-    // if (attrInfo == nullptr) {
-    //	return false;
-    //}
-
-    //// Iterate over attributes
-    // for (int i = 0; i < attrInfo->num_attrs; i++) 	{
-    //	// Get attribute class
-    //	MonoClass* attrClass = mono_method_get_class(attrInfo->attrs[i].ctor);
-
-    //	if (attrClass == m_sbAttributeClass) {
-    //		mono_custom_attrs_free(attrInfo);
-    //		return true;
-    //	}
-    //}
-
-    //// Free memory
-    // mono_custom_attrs_free(attrInfo);
-
-    //// Return the attributes
-    // return false;
-
-    if (mono_class_get_parent(klass) == m_sbClass) {
-        return true;
-    }
-
-    return false;
 }
 
 void ScriptManager::clean() {

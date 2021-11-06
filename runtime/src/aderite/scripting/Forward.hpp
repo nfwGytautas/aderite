@@ -13,6 +13,7 @@ class BehaviorWrapper;
 class ScriptList;
 class Script;
 class FieldWrapper;
+class LibClassLocator;
 
 } // namespace scripting
 } // namespace aderite

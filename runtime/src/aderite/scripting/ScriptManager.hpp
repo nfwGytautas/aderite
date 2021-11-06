@@ -7,8 +7,8 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 
-#include "aderite/scene/Entity.hpp"
 #include "aderite/scripting/Forward.hpp"
+#include "aderite/scripting/LibClassLocator.hpp"
 
 namespace aderite {
 class Engine;
@@ -60,58 +60,17 @@ public:
     BehaviorWrapper* getBehavior(const std::string& name);
 
     /**
-     * @brief Creates a C# script Entity object from C++ entity
-     * @param entity Entity from which to create
-     * @return MonoObject instance
+     * @brief Returns FieldType from the MonoType
+     * @param type MonoType instance
+     * @return Corresponding FieldType enum value
      */
-    MonoObject* createEntityObject(scene::Entity entity);
+    FieldType getType(MonoType* type) const;
 
     /**
-     * @brief Creates a C# mesh object from C++ asset
-     * @param mesh Mesh from which to create
-     * @return MonoObject instance
-     */
-    MonoObject* createMeshObject(asset::MeshAsset* mesh);
-
-    /**
-     * @brief Creates a C# material object from C++ asset
-     * @param material Material from which to create
-     * @return MonoObject instance
-     */
-    MonoObject* createMaterialObject(asset::MaterialAsset* material);
-
-    /**
-     * @brief Creates a C# audio object from C++ asset
-     * @param audio Audio from which to create
-     * @return MonoObject instance
+     * @brief Returns the script lib locator
+     * @return Locator reference
     */
-    MonoObject* createAudioObject(asset::AudioAsset* audio);
-
-    /**
-     * @brief Returns the ScriptedBehavior.Entity field
-     */
-    MonoClassField* getBehaviorEntityField() const;
-
-    /**
-     * @brief Returns the Mesh class
-     */
-    MonoClass* getMeshClass() const {
-        return m_meshClass;
-    }
-
-    /**
-     * @brief Returns the Material class
-     */
-    MonoClass* getMaterialClass() const {
-        return m_materialClass;
-    }
-
-    /**
-     * @brief Returns the Audio class
-     */
-    MonoClass* getAudioClass() const {
-        return m_audioClass;
-    }
+    LibClassLocator& getLocator();
 
 private:
     /**
@@ -130,11 +89,6 @@ private:
     bool setupCodeAssemblies();
 
     /**
-     * @brief Returns true if the specified class has ScriptedBehavior attribute
-     */
-    bool classMarkedAsBehavior(MonoClass* klass);
-
-    /**
      * @brief Cleans up all data
      */
     void clean();
@@ -144,6 +98,8 @@ private:
     friend Engine;
 
 private:
+    LibClassLocator m_locator;
+
     MonoDomain* m_jitDomain = nullptr;
 
     MonoDomain* m_currentDomain = nullptr;
@@ -151,20 +107,6 @@ private:
     // Engine assemblies
     MonoAssembly* m_scriptlibAssembly = nullptr;
     MonoImage* m_scriptlibImage = nullptr;
-
-    MonoClass* m_sbClass = nullptr; // ScriptedBehavior
-    MonoClassField* m_sbEntityField = nullptr;
-
-    MonoClass* m_entityClass = nullptr; // Entity
-    MonoClassField* m_entitySceneField = nullptr;
-    MonoClassField* m_entityEntityField = nullptr;
-
-    MonoClass* m_meshClass = nullptr;
-    MonoMethod* m_meshCtor = nullptr;
-    MonoClass* m_materialClass = nullptr;
-    MonoMethod* m_materialCtor = nullptr;
-    MonoClass* m_audioClass = nullptr;
-    MonoMethod* m_audioCtor = nullptr;
 
     // Code assemblies
     MonoAssembly* m_codeAssembly = nullptr;

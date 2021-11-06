@@ -8,8 +8,8 @@ namespace Aderite
     /// </summary>
     public class Entity
     {
-        private IntPtr scene = IntPtr.Zero;
-        private UIntPtr entity = UIntPtr.Zero;
+        private IntPtr Scene = IntPtr.Zero;
+        private UIntPtr EntityHandle = UIntPtr.Zero;
 
         /// <summary>
         /// Returns a component of T
@@ -23,23 +23,23 @@ namespace Aderite
             // Locate
             if (type.Equals(typeof(Transform)))
             {
-                return new Transform(scene, entity) as T;
+                return new Transform(Scene, EntityHandle) as T;
             }
             else if (type.Equals(typeof(MeshRenderer)))
             {
-                return new MeshRenderer(scene, entity) as T;
+                return new MeshRenderer(Scene, EntityHandle) as T;
             }
             else if (type.Equals(typeof(DynamicActor)))
             {
-                return new DynamicActor(scene, entity) as T;
+                return new DynamicActor(Scene, EntityHandle) as T;
             }
             else if (type.Equals(typeof(StaticActor)))
             {
-                return new StaticActor(scene, entity) as T;
+                return new StaticActor(Scene, EntityHandle) as T;
             }
             else if (type.Equals(typeof(AudioSource)))
             {
-                return new AudioSource(scene, entity) as T;
+                return new AudioSource(Scene, EntityHandle) as T;
             }
             else
             {
@@ -50,7 +50,7 @@ namespace Aderite
                 }
                 else
                 {
-                    return __ResolveBehavior(scene, entity, type) as T;
+                    return __ResolveBehavior(Scene, EntityHandle, type) as T;
                 }
             }
         }

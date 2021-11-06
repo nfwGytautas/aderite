@@ -149,8 +149,8 @@ FieldWrapper* BehaviorWrapper::getField(const std::string& fieldName) const {
 }
 
 void BehaviorWrapper::pair(scene::Entity entity, MonoObject* instance) {
-    MonoObject* obj = ::aderite::Engine::getScriptManager()->createEntityObject(entity);
-    MonoClassField* entityField = ::aderite::Engine::getScriptManager()->getBehaviorEntityField();
+    MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(entity);
+    MonoClassField* entityField = ::aderite::Engine::getScriptManager()->getLocator().getBehavior().Entity;
 
     mono_field_set_value(instance, entityField, obj);
 

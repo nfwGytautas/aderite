@@ -17,6 +17,7 @@ enum class FieldType {
     Object,
     Mesh,
     Material,
+    Behavior,
     Audio,
 };
 
