@@ -41,7 +41,7 @@ reflection::Type DynamicActor::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::DYNAMIC_ACTOR);
 }
 
-bool DynamicActor::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool DynamicActor::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "IsKinematic" << YAML::Value
             << this->getKinematic();
     emitter << YAML::Key << "HasGravity" << YAML::Value

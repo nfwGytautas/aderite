@@ -21,6 +21,22 @@ public:
     virtual void render() override;
 
 private:
+    /**
+     * @brief Render context menu
+     */
+    void renderContextMenu();
+
+    /**
+     * @brief Renders entity tree node of the scene
+     */
+    void renderEntities();
+
+    /**
+     * @brief Renders audio tree node of the scene
+     */
+    void renderAudio();
+
+private:
     TextInputModal* m_textModal = nullptr;
 };
 

@@ -34,8 +34,6 @@ Data:
           Mass: 1
       Colliders:
         ID: 6
-      AudioSource:
-        Volume: 1
       Scripts:
         Type: 200
         Data:
@@ -50,6 +48,7 @@ Data:
                 Name: Scripts.BoingBehavior
                 Fields:
                   Clip: 8
+                  Source: 1
     - Entity: 0
       Meta:
         Name: Plane
@@ -68,4 +67,13 @@ Data:
         ID: 6
       AudioListener:
         IsEnabled: true
+  AudioSources:
+    - Type: 20
+      Data:
+        Handle: 1
+        Volume: 1
+        Position: [0, 0, 0]
+        Rotation: [1, 0, 0, 0]
+        Velocity: [0, 0, 0]
+        Name: Origin
   Pipeline: 1

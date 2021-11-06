@@ -53,7 +53,7 @@ reflection::Type TextureAsset::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::TEXTURE);
 }
 
-bool TextureAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool TextureAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "IsHDR" << YAML::Value << m_info.IsHDR;
     emitter << YAML::Key << "IsCubemap" << YAML::Value << m_info.IsCubemap;
     return true;

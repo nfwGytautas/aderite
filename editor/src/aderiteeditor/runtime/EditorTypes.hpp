@@ -40,6 +40,9 @@ enum class EditorTypes : Type {
     EditorRenderOp,
     EditorTargetOp,
     ArrayOp,
+
+    // Extensions
+    AudioSource = 3000,
 };
 
 } // namespace reflection

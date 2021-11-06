@@ -52,7 +52,7 @@ reflection::Type Pipeline::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::PIPELINE);
 }
 
-bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Operations" << YAML::BeginSeq;
     for (size_t i = 0; i < m_operations.size(); i++) {
         serializer->writeUntrackedType(emitter, m_operations[i]);

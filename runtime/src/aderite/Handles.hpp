@@ -18,4 +18,8 @@ using SerializableHandle = size_t;
 using LoadableHandle = size_t;
 } // namespace io
 
+namespace audio {
+using SourceHandle = size_t;
+}
+
 } // namespace aderite

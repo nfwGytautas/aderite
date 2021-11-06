@@ -39,7 +39,7 @@ EditorMaterialType::~EditorMaterialType() {
     }
 }
 
-bool EditorMaterialType::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool EditorMaterialType::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     MaterialTypeAsset::serialize(serializer, emitter);
 
     emitter << YAML::Key << "Properties" << YAML::BeginSeq;

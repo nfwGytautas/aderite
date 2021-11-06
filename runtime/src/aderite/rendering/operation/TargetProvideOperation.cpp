@@ -50,7 +50,7 @@ reflection::Type TargetProvideOperation::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_TARGET);
 }
 
-bool TargetProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool TargetProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Blittable" << YAML::Value << m_params.Blittable;
     emitter << YAML::Key << "DepthAttachment" << YAML::Value << m_params.DepthAttachment;
     emitter << YAML::Key << "StencilAttachment" << YAML::Value << m_params.StencilAttachment;

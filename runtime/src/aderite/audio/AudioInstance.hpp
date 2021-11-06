@@ -41,7 +41,7 @@ public:
      * @param rotation Rotation of the audio source
      * @param velocity Velocity at which the audio is moving
      */
-    void setAttributes(const glm::vec3& position, const glm::quat& rotation, glm::vec3& velocity);
+    void setAttributes(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& velocity);
 
 private:
     AudioInstance(FMOD::Studio::EventInstance* instance);

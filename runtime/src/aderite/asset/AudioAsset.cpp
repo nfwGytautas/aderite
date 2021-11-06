@@ -25,7 +25,7 @@ reflection::Type AudioAsset::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::AUDIO);
 }
 
-bool AudioAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool AudioAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Event" << YAML::Value << m_name;
     return true;
 }

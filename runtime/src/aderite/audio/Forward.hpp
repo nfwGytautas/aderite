@@ -8,7 +8,7 @@ namespace audio {
 
 class AudioController;
 class AudioInstance;
-struct AudioRequest;
+class AudioSource;
 
 } // namespace audio
 } // namespace aderite

@@ -21,7 +21,7 @@ void AudioInstance::setVolume(float volume) {
     m_instance->setVolume(volume);
 }
 
-void AudioInstance::setAttributes(const glm::vec3& position, const glm::quat& rotation, glm::vec3& velocity) {
+void AudioInstance::setAttributes(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& velocity) {
     FMOD_3D_ATTRIBUTES source3dAttributes = {};
     source3dAttributes.position = {position.x, position.y, position.z};
     source3dAttributes.velocity = {velocity.x, velocity.y, velocity.z};

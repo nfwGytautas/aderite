@@ -40,8 +40,9 @@ bool LibClassLocator::locate(MonoImage* image) {
     findClass(image, "Aderite", "Mesh", m_mesh.Klass, result);
     findClass(image, "Aderite", "Material", m_material.Klass, result);
     findClass(image, "Aderite", "Audio", m_audio.Klass, result);
+    findClass(image, "Aderite", "AudioSource", m_audioSource.Klass, result);
 
-    // Can't procede if classes are not found
+    // Can't proceed if classes are not found
     if (result == false) {
         LOG_ERROR("Failed to find one of engine classes aborting");
         return false;
@@ -56,6 +57,7 @@ bool LibClassLocator::locate(MonoImage* image) {
     findMethod(m_mesh.Klass, ".ctor", 1, m_mesh.Ctor, result);
     findMethod(m_material.Klass, ".ctor", 1, m_material.Ctor, result);
     findMethod(m_audio.Klass, ".ctor", 1, m_audio.Ctor, result);
+    findMethod(m_audioSource.Klass, ".ctor", 1, m_audioSource.Ctor, result);
 
     return result;
 }
@@ -72,6 +74,8 @@ FieldType LibClassLocator::getType(MonoType* type) const {
         return FieldType::Audio;
     } else if (klass == m_behavior.Klass) {
         return FieldType::Behavior;
+    } else if (klass == m_audioSource.Klass) {
+        return FieldType::AudioSource;
     }
 
     return FieldType::Null;
@@ -117,6 +121,11 @@ MonoObject* LibClassLocator::create(asset::MaterialAsset* material) {
 MonoObject* LibClassLocator::create(asset::AudioAsset* audio) {
     void* args[1] = {&audio};
     return this->genericAssetCreate(m_audio.Klass, m_audio.Ctor, args);
+}
+
+MonoObject* LibClassLocator::create(audio::AudioSource* source) {
+    void* args[1] = {&source};
+    return this->genericAssetCreate(m_audioSource.Klass, m_audioSource.Ctor, args);
 }
 
 void LibClassLocator::handleException(MonoObject* exception) {

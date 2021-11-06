@@ -4,7 +4,6 @@
 
 #include "aderite/scene/Forward.hpp"
 #include "aderite/scene/Scene.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace scene {
@@ -95,6 +94,73 @@ public:
 private:
     entt::entity m_handle {entt::null};
     Scene* m_scene = nullptr;
+};
+
+/**
+ * @brief Wrapper for entt Entity
+ */
+class ConstEntity {
+public:
+    ConstEntity(entt::entity handle, const Scene* scene);
+
+    /**
+     * @brief Get component
+     */
+    template<typename T>
+    const T& getComponent() const {
+        return m_scene->getEntityRegistry().get<T>(m_handle);
+    }
+
+    /**
+     * @brief Check if Entity has component
+     */
+    template<typename T>
+    bool hasComponent() const {
+        return m_scene->getEntityRegistry().try_get<T>(m_handle) != nullptr;
+    }
+
+    operator bool() const {
+        return m_handle != entt::null;
+    }
+    operator entt::entity() const {
+        return m_handle;
+    }
+    operator uint32_t() const {
+        return (uint32_t)m_handle;
+    }
+
+    bool operator==(const ConstEntity& other) const {
+        return m_handle == other.m_handle && m_scene == other.m_scene;
+    }
+
+    bool operator!=(const ConstEntity& other) const {
+        return !(*this == other);
+    }
+
+    /**
+     * @brief Returns the Scene that the Entity belongs to
+     */
+    const Scene* getScene() const {
+        return m_scene;
+    }
+
+    /**
+     * @brief Returns the handle of this entity
+     */
+    entt::entity getHandle() const {
+        return m_handle;
+    }
+
+    /**
+     * @brief Returns empty Entity
+     */
+    static Entity null() {
+        return Entity(entt::null, nullptr);
+    }
+
+private:
+    entt::entity m_handle {entt::null};
+    const Scene* m_scene = nullptr;
 };
 
 } // namespace scene

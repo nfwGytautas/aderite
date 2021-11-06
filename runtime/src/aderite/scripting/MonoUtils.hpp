@@ -12,6 +12,7 @@
 #include <mono/metadata/tokentype.h>
 
 #include "aderite/asset/Forward.hpp"
+#include "aderite/audio/Forward.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -66,21 +67,28 @@ std::string toString(MonoObject* object);
  * @param object Object to extract from
  * @param mesh Pointer where to store value
  */
-void extractMesh(MonoObject* object, asset::MeshAsset*& mesh);
+void extract(MonoObject* object, asset::MeshAsset*& mesh);
 
 /**
  * @brief Extract material field from mono object
  * @param object Object to extract from
  * @param material Pointer where to store value
  */
-void extractMaterial(MonoObject* object, asset::MaterialAsset*& material);
+void extract(MonoObject* object, asset::MaterialAsset*& material);
 
 /**
  * @brief Extract audio field from mono object
  * @param object Object to extract from
  * @param audio Pointer where to store value
  */
-void extractAudio(MonoObject* object, asset::AudioAsset*& audio);
+void extract(MonoObject* object, asset::AudioAsset*& audio);
+
+/**
+ * @brief Extract source field from mono object
+ * @param object Object to extract from
+ * @param source Pointer where to store value
+ */
+void extract(MonoObject* object, audio::AudioSource*& source);
 
 } // namespace scripting
 } // namespace aderite

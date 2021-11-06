@@ -40,6 +40,11 @@ public:
         MonoMethod* Ctor = nullptr;
     };
 
+    struct AudioSource {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    };
+
 public:
     /**
      * @brief Locates engine classes from the specified image
@@ -90,6 +95,13 @@ public:
      */
     MonoObject* create(asset::AudioAsset* audio);
 
+    /**
+     * @brief Creates a C# audio source object from C++
+     * @param source Source from which to create
+     * @return MonoObject instance
+     */
+    MonoObject* create(audio::AudioSource* source);
+
     // Class getters
     const Behavior& getBehavior() const {
         return m_behavior;
@@ -109,6 +121,10 @@ public:
 
     const Audio& getAudio() const {
         return m_audio;
+    }
+
+    const AudioSource& getAudioSource() const {
+        return m_audioSource;
     }
 
 private:
@@ -133,6 +149,7 @@ private:
     Mesh m_mesh;
     Material m_material;
     Audio m_audio;
+    AudioSource m_audioSource;
 };
 
 } // namespace scripting

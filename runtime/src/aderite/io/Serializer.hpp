@@ -108,7 +108,7 @@ public:
      * @param emitter Emitter to write to
      * @param object Object to write
      */
-    void writeUntrackedType(YAML::Emitter& emitter, ISerializable* object) const;
+    void writeUntrackedType(YAML::Emitter& emitter, const ISerializable* object) const;
 
     /**
      * @brief Returns object associated with the serializable handle

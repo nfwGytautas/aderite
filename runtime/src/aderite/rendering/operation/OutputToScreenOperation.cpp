@@ -15,7 +15,7 @@ reflection::Type OutputToScreenOperation::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_SCREEN);
 }
 
-bool OutputToScreenOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool OutputToScreenOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     return true;
 }
 

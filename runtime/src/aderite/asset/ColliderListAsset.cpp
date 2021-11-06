@@ -46,7 +46,7 @@ reflection::Type ColliderListAsset::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::CLDR_LIST);
 }
 
-bool ColliderListAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool ColliderListAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     // Output to file
     emitter << YAML::Key << "Colliders";
     emitter << YAML::BeginSeq;

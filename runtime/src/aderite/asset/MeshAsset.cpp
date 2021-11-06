@@ -73,7 +73,7 @@ reflection::Type MeshAsset::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::MESH);
 }
 
-bool MeshAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool MeshAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     // Layout
     emitter << YAML::Key << "IsStatic" << YAML::Value << m_info.IsStatic;
     return true;

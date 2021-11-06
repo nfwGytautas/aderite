@@ -5,12 +5,24 @@ namespace Scripts
     class BoingBehavior : ScriptedBehavior
     {
         public Audio Clip;
+        public AudioSource Source;
 
-        private AudioSource Source;
+        private Transform Transform;
 
         void Init()
         {
-            Source = this.Entity.GetComponent<AudioSource>();
+            Transform = Entity.GetComponent<Transform>();
+        }
+
+        void Update(float delta)
+        {
+            if (Source == null)
+            {
+                return;
+            }
+
+            Source.Position = Transform.Position;
+            Source.Rotation = Transform.Rotation;
         }
 
         void OnCollisionEnter(Entity collision)

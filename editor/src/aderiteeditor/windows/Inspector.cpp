@@ -11,6 +11,7 @@
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
+#include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/io/LoaderPool.hpp"
 #include "aderite/io/SerializableObject.hpp"
@@ -22,6 +23,7 @@
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/rendering/Pipeline.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/components/Actors.hpp"
 #include "aderite/scene/components/Audio.hpp"
@@ -42,6 +44,7 @@
 #include "aderiteeditor/asset/property/Property.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
+#include "aderiteeditor/extensions/EditorAudioSource.hpp"
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/shared/Config.hpp"
@@ -108,8 +111,12 @@ void Inspector::render() {
         this->renderEntity();
         break;
     }
+    case editor::SelectableObjectType::Serializable: {
+        this->renderSerializable();
+        break;
+    }
     default: {
-        ImGui::Text("Select asset or entity");
+        ImGui::Text("Select an object");
     }
     }
 
@@ -165,11 +172,6 @@ void Inspector::renderEntity() {
         this->renderAudioListener(entity);
     }
 
-    bool hasAudioSource = entity.hasComponent<scene::AudioSourceComponent>();
-    if (hasAudioSource) {
-        this->renderAudioSource(entity);
-    }
-
     bool hasColliders = entity.hasComponent<scene::CollidersComponent>();
     if (hasColliders) {
         this->renderColliders(entity);
@@ -217,11 +219,6 @@ void Inspector::renderEntity() {
 
         if (!hasColliders && ImGui::MenuItem("Collider list")) {
             entity.addComponent<::aderite::scene::CollidersComponent>();
-            ImGui::CloseCurrentPopup();
-        }
-
-        if (ImGui::MenuItem("Audio source")) {
-            entity.addComponent<::aderite::scene::AudioSourceComponent>();
             ImGui::CloseCurrentPopup();
         }
 
@@ -446,23 +443,6 @@ void Inspector::renderAudioListener(scene::Entity entity) {
     }
 }
 
-void Inspector::renderAudioSource(scene::Entity entity) {
-    bool open, remove = false;
-    render_component_shared("Audio source", "Audio Source", open, remove);
-
-    if (open) {
-        auto& c = entity.getComponent<scene::AudioSourceComponent>();
-
-        
-
-        ImGui::TreePop();
-    }
-
-    if (remove) {
-        entity.removeComponent<scene::AudioSourceComponent>();
-    }
-}
-
 void Inspector::renderColliders(scene::Entity entity) {
     bool open, remove = false;
     render_component_shared("Collider list", "Collider list", open, remove);
@@ -560,7 +540,7 @@ void Inspector::renderScripts(scene::Entity entity) {
 
                         if (mesh) {
                             asset::MeshAsset* meshHandle = nullptr;
-                            scripting::extractMesh(mesh, meshHandle);
+                            scripting::extract(mesh, meshHandle);
 
                             vfs::File* materialFile = editor::State::Project->getVfs()->getFile(meshHandle->getHandle());
                             ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
@@ -574,7 +554,8 @@ void Inspector::renderScripts(scene::Entity entity) {
                                 vfs::File* file = static_cast<vfs::File*>(ddo->Data);
                                 asset::MeshAsset* newMeshHandle =
                                     static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                                fw->setValue(script->getInstance(), ::aderite::Engine::getScriptManager()->getLocator().create(newMeshHandle));
+                                fw->setValue(script->getInstance(),
+                                             ::aderite::Engine::getScriptManager()->getLocator().create(newMeshHandle));
                             }
 
                             ImGui::EndDragDropTarget();
@@ -587,7 +568,7 @@ void Inspector::renderScripts(scene::Entity entity) {
 
                         if (material) {
                             asset::MaterialAsset* materialHandle = nullptr;
-                            scripting::extractMaterial(material, materialHandle);
+                            scripting::extract(material, materialHandle);
 
                             vfs::File* materialFile = editor::State::Project->getVfs()->getFile(materialHandle->getHandle());
                             ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
@@ -615,7 +596,7 @@ void Inspector::renderScripts(scene::Entity entity) {
 
                         if (audio) {
                             asset::AudioAsset* audioHandle = nullptr;
-                            scripting::extractAudio(audio, audioHandle);
+                            scripting::extract(audio, audioHandle);
 
                             vfs::File* materialFile = editor::State::Project->getVfs()->getFile(audioHandle->getHandle());
                             ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
@@ -631,6 +612,32 @@ void Inspector::renderScripts(scene::Entity entity) {
                                     static_cast<asset::AudioAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
                                 fw->setValue(script->getInstance(),
                                              ::aderite::Engine::getScriptManager()->getLocator().create(newAudioHandle));
+                            }
+
+                            ImGui::EndDragDropTarget();
+                        }
+                        break;
+                    }
+                    case scripting::FieldType::AudioSource: {
+                        MonoObject* source = nullptr;
+                        fw->getValue(script->getInstance(), &source);
+
+                        if (source) {
+                            audio::AudioSource* audioHandle = nullptr;
+                            scripting::extract(source, audioHandle);
+
+                            audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(audioHandle);
+                            ImGui::Button(editorSource->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                        } else {
+                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                        }
+
+                        if (ImGui::BeginDragDropTarget()) {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioSource)) {
+                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+                                audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(ddo->Data);
+                                fw->setValue(script->getInstance(),
+                                             ::aderite::Engine::getScriptManager()->getLocator().create(editorSource));
                             }
 
                             ImGui::EndDragDropTarget();
@@ -1170,6 +1177,33 @@ void Inspector::renderAudio(io::SerializableObject* asset) {
         // Reset the selector
         sam.reset();
     }
+}
+
+void Inspector::renderSerializable() {
+    io::ISerializable* object = editor::State::LastSelectedObject.getSerializable();
+
+    switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
+    case reflection::RuntimeTypes::AUDIO_SOURCE: {
+        this->renderAudioSource(object);
+        break;
+    }
+    default: {
+    }
+    }
+}
+
+void Inspector::renderAudioSource(io::ISerializable* serializable) {
+    static utility::InlineRename renamer;
+    audio::EditorAudioSource* source = static_cast<audio::EditorAudioSource*>(serializable);
+
+    renamer.setValue(source->getName());
+
+    if (renamer.renderUI()) {
+        source->setName(renamer.getValue());
+        renamer.setValue(renamer.getValue());
+    }
+
+    ImGui::Separator();
 }
 
 } // namespace editor_ui

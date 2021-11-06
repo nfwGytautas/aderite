@@ -5,12 +5,13 @@
 #include "aderite/utility/Log.hpp"
 
 // Assets, needed for linking instancers
+#include "aderite/asset/AudioAsset.hpp"
+#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
-#include "aderite/asset/ColliderListAsset.hpp"
-#include "aderite/asset/AudioAsset.hpp"
+#include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/StaticActor.hpp"
@@ -40,6 +41,9 @@ bool Reflector::init() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::MaterialTypeAsset, RuntimeTypes::MAT_TYPE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::Pipeline, RuntimeTypes::PIPELINE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::AudioAsset, RuntimeTypes::AUDIO);
+
+    // Audio
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, audio::AudioSource, RuntimeTypes::AUDIO_SOURCE);
 
     // Colliders
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::ColliderListAsset, RuntimeTypes::CLDR_LIST);

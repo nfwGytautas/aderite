@@ -36,7 +36,7 @@ void RenderingPipeline::compile() {
     evaluator.transferToPipeline(this);
 }
 
-bool RenderingPipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool RenderingPipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     Pipeline::serialize(serializer, emitter);
 
     emitter << YAML::Key << "Graph";

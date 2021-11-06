@@ -39,14 +39,10 @@ Property for ALL items
 
 FPRP:
 Array operation
-Change pipeline when scene changes
 Operation resize events
 Base vertex shader compiling
 Varying generation
 Compiling shaders from C++ code
-Move MaterialTypeAsset::recalculate to editor
-Move MaterialAsset::setType to editor
-Move MaterialTypeAsset to editor
 Pipeline verification
 
 Rendering:
@@ -72,14 +68,18 @@ Refactor to be more intuitive
 Remove files that don't physically exist anymore
 
 Scripting:
+Serialization api
 Set fields after initializing object
 Generate .csproj file for easier coding
 Dont kill entire editor on script run error
 Load on project open
 
 Editor:
+Icons
+Provide default utility scripts
 List item select (merge SelectScriptModal, SelectClipModal)
 Enable depth for wireframe
+Split inspector to not be so monolithic
 On material type property delete link gets disconnected
 Mass on dynamic body not alligned
 Delete renaming content asset browser
@@ -126,6 +126,9 @@ Rename dynamic text API
 Tooltips?
 
 Code:
+Macro to mark final unless in editor mode
+Remove uneccessary includes
+Get/Set checks
 DLLs instead of static libs
 this for self invokes
 Middleware sections

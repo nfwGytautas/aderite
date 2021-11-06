@@ -83,7 +83,7 @@ glm::vec2 Node::getPosition() const {
     return m_position;
 }
 
-void Node::serializeData(YAML::Emitter& out) {
+void Node::serializeData(YAML::Emitter& out) const {
     out << YAML::Key << "InputPins" << YAML::Flow << YAML::BeginSeq;
     for (InputPin* pin : getInputPins()) {
         out << pin->getId();

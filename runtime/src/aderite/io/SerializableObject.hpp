@@ -24,7 +24,7 @@ public:
      * @param emitter Emmitter to serialize to
      * @return True if serialized without errors, false otherwise
      */
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) = 0;
+    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const = 0;
 
     /**
      * @brief Deserialize object from data node

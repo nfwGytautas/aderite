@@ -9,7 +9,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/audio/AudioInstance.hpp"
-#include "aderite/audio/AudioRequest.hpp"
+#include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
@@ -132,56 +132,11 @@ void AudioController::update() {
     }
 
     // If no active listeners, mute
-    if (enabledListenerCount == 0) {
-        thisFrameMute = true;
-    }
-
-    // Configure sources
-    auto audioGroup = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::AudioSourceComponent>(
-        entt::get<scene::TransformComponent>);
-    for (auto entity : audioGroup) {
-        auto [audioSource, transform] = audioGroup.get<scene::AudioSourceComponent, scene::TransformComponent>(entity);
-
-        // Handle and update request
-        for (audio::AudioInstance* instance : audioSource.Request.Instances) {
-            if (m_disabled) {
-                instance->stop();
-                continue;
-            }
-
-            // Update instances
-            if (m_mute || thisFrameMute) {
-                instance->setVolume(0.0f);
-            } else {
-                instance->setVolume(audioSource.Volume);
-            }
-
-            // TODO: Velocity
-            instance->setAttributes(transform.Position, transform.Rotation, glm::vec3(0.0f));
+    if (enabledListenerCount > 0) {
+        // Configure sources
+        for (AudioSource* source : m_sources) {
+            source->update();
         }
-
-        for (audio::AudioInstance* instance : audioSource.Request.Oneshot) {
-            if (m_disabled) {
-                instance->stop();
-                continue;
-            }
-
-            // Update instances
-            if (m_mute || thisFrameMute) {
-                instance->setVolume(0.0f);
-            } else {
-                instance->setVolume(audioSource.Volume);
-            }
-
-            // TODO: Velocity
-            instance->setAttributes(transform.Position, transform.Rotation, glm::vec3(0.0f));
-        }
-    }
-
-    // TODO: Clean one shots
-
-    if (!m_disabled) {
-        m_wasDisabled = false;
     }
 
     if (m_fmodSystem->update() != FMOD_OK) {
@@ -268,50 +223,57 @@ AudioInstance* aderite::audio::AudioController::createAudioInstance(const std::s
     return aderiteInstance;
 }
 
-void AudioController::removeInstance(AudioInstance* instance) {
-    auto it = std::find(m_instances.begin(), m_instances.end(), instance);
-
-    ADERITE_DYNAMIC_ASSERT(it != m_instances.end(), "Tried to remove a non existing or untracked audio instance");
-
-    // TODO: Unload bank if no longer needed
-
-    delete *it;
-    m_instances.erase(it);
-}
-
 void AudioController::setMute(bool value) {
-    m_mute = value;
+    for (AudioSource* source : m_sources) {
+        if (value) {
+            source->mute();
+        } else {
+            source->unmute();
+        }
+    }
 }
 
 void AudioController::disable(bool value) {
-    m_wasDisabled = m_disabled;
-    m_disabled = value;
+    for (AudioSource* source : m_sources) {
+        if (value) {
+            source->stop();
+        } else {
+            // TODO: Play?
+        }
+    }
 }
 
 const std::vector<std::string>& aderite::audio::AudioController::getKnownEvents() const {
     return m_knownEvents;
 }
 
-AudioInstance* AudioController::createInstance(const asset::AudioAsset* clip) {
-    AudioInstance* instance = this->createAudioInstance(clip->getEventName());
-    m_instances.push_back(instance);
-    return instance;
+AudioSource* AudioController::createSource() {
+    AudioSource* source = new AudioSource();
+    m_sources.push_back(source);
+    return source;
 }
 
-AudioInstance* AudioController::createOneshot(const asset::AudioAsset* clip) {
-    AudioInstance* instance = this->createAudioInstance(clip->getEventName());
-    instance->start();
-    m_oneshots.push_back(instance);
-    return instance;
+void AudioController::addSource(AudioSource* source) {
+    m_sources.push_back(source);
+}
+
+AudioSource* AudioController::getSource(SourceHandle handle) {
+    for (AudioSource* source : m_sources) {
+        if (source->getHandle() == handle) {
+            return source;
+        }
+    }
+
+    return nullptr;
 }
 
 void AudioController::unloadAll() {
     // Unload all then delete
-    for (auto& instance : m_instances) {
-        delete instance;
+    for (auto& source : m_sources) {
+        delete source;
     }
 
-    m_instances.clear();
+    m_sources.clear();
 }
 
 } // namespace audio

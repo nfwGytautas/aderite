@@ -22,6 +22,9 @@ enum class RuntimeTypes : Type {
     PIPELINE = 5,
     AUDIO = 6,
 
+    // Audio
+    AUDIO_SOURCE = 20,
+
     // Colliders
     CLDR_LIST = 50,
     BOX_CLDR,
@@ -43,7 +46,7 @@ enum class RuntimeTypes : Type {
     SCRIPT,
 
     // Last element of runtime types, used to specify the end runtime serializables
-    RESERVED,
+    RESERVED = 250,
     // END used to extend runtime types
     END
 };

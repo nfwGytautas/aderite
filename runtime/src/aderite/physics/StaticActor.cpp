@@ -17,7 +17,7 @@ reflection::Type StaticActor::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::STATIC_ACTOR);
 }
 
-bool StaticActor::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool StaticActor::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     return true;
 }
 

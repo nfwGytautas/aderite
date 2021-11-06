@@ -23,7 +23,6 @@ private:
     void renderDynamicBody(scene::Entity entity);
     void renderStaticBody(scene::Entity entity);
     void renderAudioListener(scene::Entity entity);
-    void renderAudioSource(scene::Entity entity);
     void renderColliders(scene::Entity entity);
     void renderScripts(scene::Entity entity);
 
@@ -36,6 +35,9 @@ private:
     void renderPipeline(io::SerializableObject* asset);
     void renderColliderList(io::SerializableObject* asset);
     void renderAudio(io::SerializableObject* asset);
+
+    void renderSerializable();
+    void renderAudioSource(io::ISerializable* serializable);
 };
 
 } // namespace editor_ui

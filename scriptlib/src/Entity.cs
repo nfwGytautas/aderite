@@ -37,10 +37,6 @@ namespace Aderite
             {
                 return new StaticActor(Scene, EntityHandle) as T;
             }
-            else if (type.Equals(typeof(AudioSource)))
-            {
-                return new AudioSource(Scene, EntityHandle) as T;
-            }
             else
             {
                 // Try to resolve as a behavior

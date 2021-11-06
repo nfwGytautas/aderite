@@ -13,6 +13,10 @@ aderite::editor::SelectableObject::SelectableObject(scene::Entity entity) : m_ty
     m_data.Entity = entity;
 }
 
+SelectableObject::SelectableObject(io::ISerializable* serializable) : m_type(SelectableObjectType::Serializable), m_data {} {
+    m_data.Serializable = serializable;
+}
+
 SelectableObjectType aderite::editor::SelectableObject::getType() const {
     return m_type;
 }
@@ -23,6 +27,10 @@ io::SerializableObject* aderite::editor::SelectableObject::getAsset() const {
 
 scene::Entity aderite::editor::SelectableObject::getEntity() const {
     return m_data.Entity;
+}
+
+io::ISerializable* SelectableObject::getSerializable() const {
+    return m_data.Serializable;
 }
 
 } // namespace editor

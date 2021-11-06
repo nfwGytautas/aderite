@@ -43,7 +43,7 @@ reflection::Type CameraProvideOperation::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_CAMERA);
 }
 
-bool CameraProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool CameraProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     return true;
 }
 

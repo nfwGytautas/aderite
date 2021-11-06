@@ -23,7 +23,7 @@ reflection::Type BoxCollider::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::BOX_CLDR);
 }
 
-bool BoxCollider::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool BoxCollider::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     Collider::serialize(serializer, emitter);
     emitter << YAML::Key << "Size" << YAML::Value << m_size;
     return true;

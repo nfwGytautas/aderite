@@ -19,6 +19,7 @@ enum class FieldType {
     Material,
     Behavior,
     Audio,
+    AudioSource,
 };
 
 /**

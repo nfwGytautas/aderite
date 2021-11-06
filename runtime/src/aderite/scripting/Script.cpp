@@ -4,6 +4,8 @@
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
+#include "aderite/audio/AudioController.hpp"
+#include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/scripting/BehaviorWrapper.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
@@ -88,7 +90,7 @@ reflection::Type Script::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::SCRIPT);
 }
 
-bool Script::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool Script::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Name" << YAML::Value << m_name;
 
     emitter << YAML::Key << "Fields" << YAML::BeginMap;
@@ -111,7 +113,7 @@ bool Script::serialize(const io::Serializer* serializer, YAML::Emitter& emitter)
                 emitter << YAML::Null;
             } else {
                 asset::MeshAsset* meshAsset = nullptr;
-                extractMesh(mesh, meshAsset);
+                extract(mesh, meshAsset);
                 emitter << meshAsset->getHandle();
             }
             break;
@@ -123,7 +125,7 @@ bool Script::serialize(const io::Serializer* serializer, YAML::Emitter& emitter)
                 emitter << YAML::Null;
             } else {
                 asset::MaterialAsset* materialAsset = nullptr;
-                extractMaterial(material, materialAsset);
+                extract(material, materialAsset);
                 emitter << materialAsset->getHandle();
             }
             break;
@@ -135,8 +137,20 @@ bool Script::serialize(const io::Serializer* serializer, YAML::Emitter& emitter)
                 emitter << YAML::Null;
             } else {
                 asset::AudioAsset* audioAsset = nullptr;
-                extractAudio(audio, audioAsset);
+                extract(audio, audioAsset);
                 emitter << audioAsset->getHandle();
+            }
+            break;
+        }
+        case FieldType::AudioSource: {
+            MonoObject* audioSource = nullptr;
+            fw->getValue(m_instance, &audioSource);
+            if (audioSource == nullptr) {
+                emitter << YAML::Null;
+            } else {
+                audio::AudioSource* source = nullptr;
+                extract(audioSource, source);
+                emitter << source->getHandle();
             }
             break;
         }
@@ -196,6 +210,12 @@ bool Script::deserialize(io::Serializer* serializer, const YAML::Node& data) {
                 asset::AudioAsset* audio = static_cast<asset::AudioAsset*>(
                     ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>()));
                 MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(audio);
+                fw->setValue(m_instance, obj);
+                break;
+            }
+            case FieldType::AudioSource: {
+                audio::AudioSource* source = ::aderite::Engine::getAudioController()->getSource(fieldData.second.as<audio::SourceHandle>());
+                MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(source);
                 fw->setValue(m_instance, obj);
                 break;
             }

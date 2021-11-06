@@ -37,7 +37,7 @@ reflection::Type MaterialAsset::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::MATERIAL);
 }
 
-bool MaterialAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool MaterialAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     // Material
     if (m_info.Type == nullptr) {
         // Can't serialize anything

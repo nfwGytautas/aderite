@@ -79,7 +79,7 @@ reflection::Type MaterialTypeAsset::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::MAT_TYPE);
 }
 
-bool MaterialTypeAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool MaterialTypeAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "DataSize" << YAML::Value << m_info.Size;
     emitter << YAML::Key << "SamplerCount" << YAML::Value << m_info.NumSamplers;
     return true;

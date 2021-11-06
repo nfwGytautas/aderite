@@ -23,7 +23,7 @@ void Collider::attach(PhysicsActor* actor, const glm::vec3& globalScale) {
     actor->p_actor->attachShape(*this->createShape(globalScale));
 }
 
-bool Collider::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool Collider::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "IsTrigger" << YAML::Value << isTrigger();
     return true;
 }

@@ -12,6 +12,7 @@ namespace editor {
 enum class SelectableObjectType {
     None,
     Asset,
+    Serializable,
     Entity,
 };
 
@@ -23,6 +24,7 @@ public:
     SelectableObject();
     SelectableObject(io::SerializableObject* asset);
     SelectableObject(scene::Entity entity);
+    SelectableObject(io::ISerializable* serializable);
 
     /**
      * @brief Returns the type of the object
@@ -39,11 +41,17 @@ public:
      */
     scene::Entity getEntity() const;
 
+    /**
+     * @brief Returns the object part of the selectable
+    */
+    io::ISerializable* getSerializable() const;
+
 private:
     SelectableObjectType m_type = SelectableObjectType::None;
 
     union {
         io::SerializableObject* Object;
+        io::ISerializable* Serializable;
         scene::Entity Entity;
     } m_data;
 };

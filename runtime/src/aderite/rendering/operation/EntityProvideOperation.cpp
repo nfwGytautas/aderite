@@ -11,6 +11,7 @@
 #include "aderite/io/LoaderPool.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/components/Components.hpp"
 #include "aderite/scene/components/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Utility.hpp"
@@ -119,7 +120,7 @@ reflection::Type EntityProvideOperation::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_ENTITY);
 }
 
-bool EntityProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool EntityProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     return true;
 }
 

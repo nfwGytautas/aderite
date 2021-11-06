@@ -43,7 +43,7 @@ reflection::Type AddNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::AddNode);
 }
 
-bool AddNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool AddNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "ElementType" << YAML::Value << m_type;
     serializeData(emitter);
     return true;

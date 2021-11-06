@@ -56,7 +56,7 @@ reflection::Type RenderOperation::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_RENDER);
 }
 
-bool RenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool RenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "ViewId" << YAML::Value << (int)m_viewId;
     return true;
 }

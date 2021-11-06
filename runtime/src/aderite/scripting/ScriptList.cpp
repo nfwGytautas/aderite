@@ -67,7 +67,7 @@ reflection::Type ScriptList::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::SCRIPT_LIST);
 }
 
-bool ScriptList::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool ScriptList::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Scripts";
     emitter << YAML::BeginSeq;
     for (Script* s : m_scripts) {

@@ -5,15 +5,12 @@
 #include <entt/entity/registry.hpp>
 
 #include "aderite/Config.hpp"
-#include "aderite/asset/Forward.hpp"
-#include "aderite/io/Loader.hpp"
+#include "aderite/audio/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
-#include "aderite/scene/Forward.hpp"
-#include "aderite/scene/components/Components.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/components/Meta.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace scene {
@@ -36,6 +33,10 @@ public:
         return m_registry;
     }
 
+    const entt::registry& getEntityRegistry() const {
+        return m_registry;
+    }
+
     /**
      * @brief Update scene
      * @param delta Delta time between frames
@@ -55,6 +56,12 @@ public:
     void destroyEntity(Entity entity);
 
     /**
+     * @brief Adds an AudioSource to the scene
+     * @param source Source to add
+    */
+    void addSource(audio::AudioSource* source);
+
+    /**
      * @brief Returns the pipeline of this scene
      */
     rendering::Pipeline* getPipeline() const;
@@ -65,6 +72,13 @@ public:
     physics::PhysicsScene* getPhysicsScene() const;
 
     /**
+     * @brief Returns audio sources of this scene
+    */
+    const std::vector<audio::AudioSource*>& getAudioSources() const {
+        return m_audioSources;
+    }
+
+    /**
      * @brief Sets the pipeline of the scene
      * @param pipeline New pipeline
      */
@@ -72,7 +86,7 @@ public:
 
     // Inherited via SerializableObject
     virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
@@ -88,27 +102,16 @@ private:
     template<typename T>
     void onComponentRemoved(Entity entity, T& component);
 
-    /**
-     * @brief Serialize entity to the specified emitter
-     * @param out Emitter to serialize into
-     * @param e Entity to serialize
-    */
-    void serializeEntity(YAML::Emitter& out, Entity e);
-
-    /**
-     * @brief Deserialize entity and return it
-     * @param eNode Entity data node
-     * @return Entity instance
-    */
-    Entity deserializeEntity(YAML::Node& eNode);
-
     friend class Entity;
     friend class SceneManager;
+    friend class SceneSerializer;
 
 private:
     entt::registry m_registry;
     physics::PhysicsScene* m_physics = nullptr;
+
     rendering::Pipeline* m_pipeline = nullptr;
+    std::vector<audio::AudioSource*> m_audioSources;
 };
 
 } // namespace scene

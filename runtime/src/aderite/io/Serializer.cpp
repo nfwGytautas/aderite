@@ -97,7 +97,7 @@ void Serializer::fillData(ISerializable* object, const YAML::Node& data) {
     object->deserialize(this, data["Data"]);
 }
 
-void Serializer::writeUntrackedType(YAML::Emitter& emitter, ISerializable* object) const {
+void Serializer::writeUntrackedType(YAML::Emitter& emitter, const ISerializable* object) const {
     emitter << YAML::BeginMap;
     emitter << YAML::Key << "Type" << YAML::Value << object->getType();
     emitter << YAML::Key << "Data" << YAML::BeginMap;

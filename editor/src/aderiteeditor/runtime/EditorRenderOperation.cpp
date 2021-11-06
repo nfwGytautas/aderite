@@ -66,7 +66,7 @@ reflection::Type EditorRenderOperation::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::EditorRenderOp);
 }
 
-bool EditorRenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool EditorRenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     return true;
 }
 

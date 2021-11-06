@@ -2,12 +2,11 @@
 
 #include <filesystem>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include <fmod_studio.hpp>
 
-#include "aderite/asset/Forward.hpp"
 #include "aderite/audio/Forward.hpp"
 #include "aderite/utility/Macros.hpp"
 
@@ -63,18 +62,36 @@ public:
     const std::vector<std::string>& getKnownEvents() const;
 
     /**
-     * @brief Creates an audio instance for the specified clip
-     * @param clip Clip to create instance for
-     * @return AudioInstance object
+     * @brief Creates an audio source object and returns it
      */
-    AudioInstance* createInstance(const asset::AudioAsset* clip);
+    AudioSource* createSource();
 
     /**
-     * @brief Creats a one shot audio instance for the specified clip
-     * @param clip Clip to create instance for
-     * @return AudioInstance object
+     * @brief Adds a source to controller
+     * @param source Source to add
      */
-    AudioInstance* createOneshot(const asset::AudioAsset* clip);
+    void addSource(AudioSource* source);
+
+    /**
+     * @brief Returns audio source associated with the specified handle
+     * @param handle Handle of the source
+     * @return AudioSource instance or nullptr if audio controller doesn't have the source
+    */
+    AudioSource* getSource(SourceHandle handle);
+
+    /**
+     * @brief Creates and returns an audio instance
+     * @param name Name of the audio
+     * @return AudioIntance object
+     */
+    AudioInstance* createAudioInstance(const std::string name);
+
+    /**
+     * @brief Returns audio sources currently registered in the audio controller
+     */
+    const std::vector<AudioSource*>& getAudioSources() const {
+        return m_sources;
+    }
 
 private:
     AudioController() {}
@@ -85,19 +102,6 @@ private:
      */
     void unloadAll();
 
-    /**
-     * @brief Creates and returns an audio instance list
-     * @param name Name of the audio
-     * @return AudioIntance object
-     */
-    AudioInstance* createAudioInstance(const std::string name);
-
-    /**
-     * @brief Removes an audio instance from the controller list
-     * @param instance Instance to remove
-     */
-    void removeInstance(AudioInstance* instance);
-
 private:
     FMOD::Studio::System* m_fmodSystem = nullptr;
     FMOD::Studio::Bank* m_masterBank = nullptr;
@@ -106,12 +110,7 @@ private:
     // Loaded banks
     std::vector<std::string> m_knownEvents;
 
-    std::vector<AudioInstance*> m_instances;
-    std::vector<AudioInstance*> m_oneshots;
-
-    bool m_mute = false;
-    bool m_disabled = false;
-    bool m_wasDisabled = true;
+    std::vector<AudioSource*> m_sources;
 };
 
 } // namespace audio
