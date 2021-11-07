@@ -7,9 +7,7 @@
 
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
-#include "aderite/scene/Entity.hpp"
-#include "aderite/scene/components/Actors.hpp"
-#include "aderite/scene/components/Transform.hpp"
+#include "aderite/scene/Forward.hpp"
 #include "aderite/scripting/Forward.hpp"
 
 namespace aderite {
@@ -21,6 +19,31 @@ namespace physics {
 class PhysicsActor : public io::ISerializable {
 public:
     virtual ~PhysicsActor();
+
+    /**
+     * @brief Add collider to the physics actor
+     * @param collider Collider to add
+     */
+    void addCollider(physics::Collider* collider);
+
+    /**
+     * @brief Remove collider from the actor
+     * @param collider Collider to remove
+     */
+    void removeCollider(physics::Collider* collider);
+
+    /**
+     * @brief Transfers colliders from this actor to the specified actor
+     * @param actor Actor to transfer to
+    */
+    void transferColliders(PhysicsActor* actor);
+
+    /**
+     * @brief Returns the list of colliders for this actor
+     */
+    const std::vector<physics::Collider*>& getColliders() const {
+        return m_colliders;
+    }
 
     /**
      * @brief Instantly moves the actor to the specified position
@@ -35,14 +58,10 @@ public:
     void rotateActor(const glm::quat& rotation);
 
     /**
-     * @brief Synchronizes the physics actor with the ECS transform
+     * @brief Synchronizes the physics actor with the transform
+     * @param transform Transform where to store result
      */
-    void sync();
-
-    /**
-     * @brief Detaches all shapes attached to actor
-     */
-    void detachShapes();
+    void sync(scene::Transform* transform) const;
 
     /**
      * @brief Function called when the actor enters a trigger zone
@@ -68,16 +87,19 @@ public:
      */
     void onCollisionLeave(PhysicsActor* collision);
 
-private:
-    scene::PhysicsCallbackComponent& ensureEventComponent();
+    // Inherited via ISerializable
+    virtual reflection::Type getType() const override;
+    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     friend class PhysicsScene;
-    friend class Collider;
 
 protected:
-    scene::Entity m_entity = scene::Entity::null();
     physx::PxRigidActor* p_actor = nullptr;
+
+private:
+    std::vector<physics::Collider*> m_colliders;
 };
 
 } // namespace physics

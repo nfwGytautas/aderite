@@ -5,8 +5,7 @@
 
 #include "aderite/rendering/DrawCall.hpp"
 #include "aderite/rendering/PipelineState.hpp"
-#include "aderite/scene/components/Components.hpp"
-#include "aderite/scene/components/Transform.hpp"
+#include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -26,6 +25,10 @@ void RenderOperation::initialize() {
 }
 
 void RenderOperation::execute(PipelineState* state) {
+    if (!state->canExecuteRender()) {
+        return;
+    }
+
     bgfx::FrameBufferHandle target = state->popTarget();
     EyeInformation eye = state->popEye();
 
@@ -100,7 +103,7 @@ void RenderOperation::executeDrawCall(const DrawCall& dc) {
     bgfx::setState(state);
 
     for (auto& transform : dc.Transformations) {
-        bgfx::setTransform(glm::value_ptr(scene::TransformComponent::computeTransform(*transform)));
+        bgfx::setTransform(glm::value_ptr(transform));
 
         // Submit draw call
         uint8_t flags = BGFX_DISCARD_ALL &

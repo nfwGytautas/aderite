@@ -1,21 +1,18 @@
 General:
 Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
 Animations
-Scripting
 Include BGFX stats to ImGui
 Fix dependencies folder and CMake
-Optimize component include
 Memory manager
-Propogate physics events
 BGFX leaks
 Event system?
 Recovery from failure
-Move Property and MaterialType to editor, cause they are not mutable during runtime
 Rework pin type to be enum
 Profiling
 Compiler switch to disable some setters in runtime
-Namespace refactoring
 Move objects for editor so that they don't get destroyed on pipeline change
+Handle storage?
+Prefabs
 
 ECS:
 Remove in 0.2 with a less half/half current solution
@@ -28,6 +25,8 @@ bgfx splash screen
 
 Serialization:
 Name resolve
+Remove get/set Data methods
+Return true/false on writeUntrackedType, fillData
 
 Asset manager:
 Asset ref counting
@@ -56,11 +55,13 @@ Meta enabled field
 Handle to ColliderList, audio list etc., managers take care of these lists
 
 Physics:
+Move kinematic to base actor
 Multithreading
 Physics material asset
 Disable/enable actors at runtime
 Disable/enable colliders at runtime
 Broad-Phase callbacks
+Scene queries
 Collision layers
 
 VFS:
@@ -75,6 +76,7 @@ Dont kill entire editor on script run error
 Load on project open
 
 Editor:
+Move radio buttons for entities to Base tab
 Icons
 Provide default utility scripts
 List item select (merge SelectScriptModal, SelectClipModal)
@@ -126,6 +128,7 @@ Rename dynamic text API
 Tooltips?
 
 Code:
+Force PhysicsActor abstract
 Macro to mark final unless in editor mode
 Remove uneccessary includes
 Get/Set checks

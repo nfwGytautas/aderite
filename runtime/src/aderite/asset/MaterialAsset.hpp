@@ -29,6 +29,11 @@ public:
 public:
     ~MaterialAsset();
 
+    /**
+     * @brief Returns true if the material is valid and can be used for rendering
+     */
+    bool isValid() const;
+
     // Inherited via ILoadable
     virtual void load(const io::Loader* loader) override;
     virtual void unload() override;

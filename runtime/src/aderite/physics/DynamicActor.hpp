@@ -8,9 +8,10 @@ namespace physics {
 /**
  * @brief Dynamic physics actor, that is affected by gravity, can be applied with a force, etc.
  */
-class DynamicActor final : public PhysicsActor {
+class DynamicActor : public PhysicsActor {
 public:
     DynamicActor();
+    virtual ~DynamicActor() {}
 
     /**
      * @brief If value is true, then the actor will be made into a kinematic actor

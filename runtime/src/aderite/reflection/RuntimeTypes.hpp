@@ -25,14 +25,20 @@ enum class RuntimeTypes : Type {
     // Audio
     AUDIO_SOURCE = 20,
 
+    // Entity
+    TRANSFORM = 40,
+    ENTITY = 41,
+    RENDERABLE = 42,
+
     // Colliders
     CLDR_LIST = 50,
     BOX_CLDR,
 
-    // Physics actors
+    // Physics
     PHYSICS_ACTOR = 90,
     DYNAMIC_ACTOR,
     STATIC_ACTOR,
+    PHYSICS_SCENE,
 
     // Operations
     OP_CAMERA = 100,

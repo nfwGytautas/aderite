@@ -3,6 +3,7 @@
 #include <mono/jit/jit.h>
 
 #include "aderite/asset/Forward.hpp"
+#include "aderite/audio/Forward.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
 

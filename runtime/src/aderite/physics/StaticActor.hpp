@@ -8,9 +8,10 @@ namespace physics {
 /**
  * @brief Static physics actor, which ideally should never move
  */
-class StaticActor final : public PhysicsActor {
+class StaticActor : public PhysicsActor {
 public:
     StaticActor();
+    virtual ~StaticActor() {}
 
     // Inherited via PhysicsActor
     virtual reflection::Type getType() const override;

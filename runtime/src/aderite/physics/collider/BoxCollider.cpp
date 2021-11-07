@@ -17,6 +17,7 @@ glm::vec3 BoxCollider::getSize() const {
 
 void BoxCollider::setSize(const glm::vec3 size) {
     m_size = size;
+    this->updateGeometry();
 }
 
 reflection::Type BoxCollider::getType() const {
@@ -24,20 +25,23 @@ reflection::Type BoxCollider::getType() const {
 }
 
 bool BoxCollider::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    Collider::serialize(serializer, emitter);
+    if (!Collider::serialize(serializer, emitter)) {
+        return false;
+    }
     emitter << YAML::Key << "Size" << YAML::Value << m_size;
     return true;
 }
 
 bool BoxCollider::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    Collider::deserialize(serializer, data);
-    glm::vec3 size = data["Size"].as<glm::vec3>();
-    setSize(size);
+    if (!Collider::deserialize(serializer, data)) {
+        return false;
+    }
+    setSize(data["Size"].as<glm::vec3>());
     return true;
 }
 
-physx::PxGeometry* BoxCollider::genGeometry(const glm::vec3& globalScale) {
-    return new physx::PxBoxGeometry(m_size.x * globalScale.x, m_size.y * globalScale.y, m_size.z * globalScale.z);
+physx::PxGeometry* BoxCollider::genGeometry() {
+    return new physx::PxBoxGeometry((m_size.x / 2) * p_scale.x, (m_size.y / 2) * p_scale.y, (m_size.z / 2) * p_scale.z);
 }
 
 } // namespace physics

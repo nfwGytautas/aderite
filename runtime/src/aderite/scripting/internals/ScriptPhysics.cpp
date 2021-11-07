@@ -2,62 +2,68 @@
 
 #include <mono/jit/jit.h>
 
+// TEMP
+#include <entt/entt.hpp>
+
 #include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/PhysicsActor.hpp"
 #include "aderite/physics/StaticActor.hpp"
 #include "aderite/scene/Entity.hpp"
-#include "aderite/scene/components/Actors.hpp"
+#include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
 namespace scripting {
 
 void MoveActor(scene::Scene* scene, entt::entity entity, glm::vec3 position) {
-    // Can be either static or dynamic actor
-    scene::Entity e = scene::Entity(entity, scene);
-
-    if (e.hasComponent<scene::DynamicActor>()) {
-        e.getComponent<scene::DynamicActor>().Actor->moveActor(position);
-    } else {
-        // Should be static actor
-        e.getComponent<scene::StaticActor>().Actor->moveActor(position);
-    }
+    //// Can be either static or dynamic actor
+    // scene::Entity e = scene::Entity(entity, scene);
+    //
+    // if (e.hasComponent<scene::DynamicActor>()) {
+    //    e.getComponent<scene::DynamicActor>().Actor->moveActor(position);
+    //} else {
+    //    // Should be static actor
+    //    e.getComponent<scene::StaticActor>().Actor->moveActor(position);
+    //}
 }
 
 void RotateActor(scene::Scene* scene, entt::entity entity, glm::quat rotation) {
-    // Can be either static or dynamic actor
-    scene::Entity e = scene::Entity(entity, scene);
+    //// Can be either static or dynamic actor
+    // scene::Entity e = scene::Entity(entity, scene);
 
-    if (e.hasComponent<scene::DynamicActor>()) {
-        e.getComponent<scene::DynamicActor>().Actor->rotateActor(rotation);
-    } else {
-        // Should be static actor
-        e.getComponent<scene::StaticActor>().Actor->rotateActor(rotation);
-    }
+    // if (e.hasComponent<scene::DynamicActor>()) {
+    //    e.getComponent<scene::DynamicActor>().Actor->rotateActor(rotation);
+    //} else {
+    //    // Should be static actor
+    //    e.getComponent<scene::StaticActor>().Actor->rotateActor(rotation);
+    //}
 }
 
 bool GetActorKinematic(scene::Scene* scene, entt::entity entity) {
-    return scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->getKinematic();
+    // return scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->getKinematic();
+    return true;
 }
 
 bool GetActorGravity(scene::Scene* scene, entt::entity entity) {
-    return scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->getGravity();
+    // return scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->getGravity();
+    return true;
 }
 
 float GetActorMass(scene::Scene* scene, entt::entity entity) {
-    return scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->getMass();
+    // return scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->getMass();
+    return 0.0f;
 }
 
 void SetActorKinematic(scene::Scene* scene, entt::entity entity, bool value) {
-    scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->setKinematic(value);
+    // scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->setKinematic(value);
 }
 
 void SetActorGravity(scene::Scene* scene, entt::entity entity, bool value) {
-    scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->setGravity(value);
+    // scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->setGravity(value);
 }
 
 void SetActorMass(scene::Scene* scene, entt::entity entity, float value) {
-    scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->setMass(value);
+    // scene::Entity(entity, scene).getComponent<scene::DynamicActor>().Actor->setMass(value);
 }
 
 void physicsInternals() {

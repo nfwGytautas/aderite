@@ -97,13 +97,16 @@ bool LibClassLocator::isBehavior(MonoClass* klass) const {
 
 MonoObject* LibClassLocator::create(scene::Entity entity) {
     MonoObject* object = mono_object_new(::aderite::Engine::getScriptManager()->getDomain(), m_entity.Klass);
-    entt::entity e = entity.getHandle();
-    scene::Scene* scene = entity.getScene();
+    /*entt::entity e = entity.getHandle();
+    scene::Scene* scene = entity.getScene();*/
 
     mono_runtime_object_init(object);
 
-    mono_field_set_value(object, m_entity.Scene, &scene);
-    mono_field_set_value(object, m_entity.EntityHandle, &e);
+    /*mono_field_set_value(object, m_entity.Scene, &scene);
+    mono_field_set_value(object, m_entity.EntityHandle, &e);*/
+
+    mono_field_set_value(object, m_entity.Scene, nullptr);
+    mono_field_set_value(object, m_entity.EntityHandle, nullptr);
 
     return object;
 }

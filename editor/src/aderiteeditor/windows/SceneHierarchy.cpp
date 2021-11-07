@@ -5,12 +5,16 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/audio/AudioSource.hpp"
+#include "aderite/physics/DynamicActor.hpp"
+#include "aderite/physics/PhysicsScene.hpp"
+#include "aderite/physics/StaticActor.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 
 #include "aderiteeditor/extensions/EditorAudioSource.hpp"
+#include "aderiteeditor/extensions/EditorEntity.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/shared/DragDropObject.hpp"
 #include "aderiteeditor/shared/Project.hpp"
@@ -74,29 +78,45 @@ void SceneHierarchy::render() {
         ImGui::TreePop();
     }
 
+    ImGui::Dummy(ImVec2(0.0f, 10.0f));
+    ImGui::Separator();
+
+    ImGui::SetNextItemOpen(false, ImGuiCond_Once);
+    if (ImGui::TreeNode("Physics")) {
+        this->renderPhysics();
+        ImGui::TreePop();
+    }
+
     ImGui::End();
 }
 
 void SceneHierarchy::renderContextMenu() {
     scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 
+    // TODO: Move to their own tree contexts?
+
     if (ImGui::BeginPopupContextWindow()) {
+        ImGui::MenuItem("(Entity)", NULL, false, false);
+
         if (ImGui::Selectable("Create Entity")) {
             // TODO: Make sure that this is actually unique
-            currentScene->createEntity(::aderite::scene::MetaComponent(utility::generateString(16)));
+            scene::EditorEntity* entity = new scene::EditorEntity();
+            currentScene->addEntity(entity);
         }
 
         ImGui::Separator();
 
-        if (ImGui::BeginMenu("Audio")) {
-            if (ImGui::MenuItem("Create source")) {
-                audio::EditorAudioSource* source = new audio::EditorAudioSource();
-                currentScene->addSource(source);
-                ::aderite::Engine::getAudioController()->addSource(source);
-            }
+        ImGui::MenuItem("(Audio)", NULL, false, false);
 
-            ImGui::EndMenu();
+        if (ImGui::MenuItem("Create source")) {
+            audio::EditorAudioSource* source = new audio::EditorAudioSource();
+            currentScene->addSource(source);
+            ::aderite::Engine::getAudioController()->addSource(source);
         }
+
+        ImGui::Separator();
+
+        ImGui::MenuItem("(Scene)", NULL, false, false);
 
         if (ImGui::Selectable("Edit")) {
             editor::State::LastSelectedObject = editor::SelectableObject(currentScene);
@@ -109,42 +129,40 @@ void SceneHierarchy::renderContextMenu() {
 void SceneHierarchy::renderEntities() {
     scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 2));
-    for (auto [Entity, MetaComponent] : currentScene->getEntityRegistry().view<::aderite::scene::MetaComponent>().each()) {
-        scene::Entity e = scene::Entity(Entity, currentScene);
+    size_t idx = 0;
+    for (scene::Entity* entity : currentScene->getEntities()) {
+        scene::EditorEntity* editorEntity = static_cast<scene::EditorEntity*>(entity);
 
-        // Tree node
-        bool has_children = false;
+        ImGuiTreeNodeFlags leafFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
-        if (has_children) {
-            // If this is a Entity with children
-            // TODO: TreeNodeEx (ImGui Selectable Node example)
-        } else {
-            // If this is a single Entity
-            ImGuiTreeNodeFlags node_flags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-
-            if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Entity &&
-                editor::State::LastSelectedObject.getEntity() == Entity) {
-                node_flags |= ImGuiTreeNodeFlags_Selected;
-            }
-
-            ImGui::TreeNodeEx((void*)(intptr_t)(uint32_t)Entity, node_flags, "%s", MetaComponent.Name.c_str());
-
-            if (ImGui::IsItemClicked()) {
-                editor::State::LastSelectedObject = editor::SelectableObject(e);
-            }
+        if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Entity &&
+            editor::State::LastSelectedObject.getSerializable() == entity) {
+            leafFlags |= ImGuiTreeNodeFlags_Selected;
         }
+
+        ImGui::TreeNodeEx(editorEntity->getName().c_str(), leafFlags);
 
         // Context menu
         if (ImGui::BeginPopupContextItem()) {
-            if (ImGui::Selectable("Delete")) {
-                currentScene->destroyEntity(e);
+            if (ImGui::MenuItem("Delete")) {
+                // TODO: Delete entity   
             }
 
             ImGui::EndPopup();
         }
+
+        // Drag drop
+        if (ImGui::BeginDragDropSource()) {
+            editor::DragDropObject obj {editorEntity};
+            ImGui::SetDragDropPayload(editor::DDPayloadID__Entity, &obj, sizeof(editor::DragDropObject));
+            ImGui::EndDragDropSource();
+        }
+
+        // Selection
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+            editor::State::LastSelectedObject = editor::SelectableObject(editorEntity);
+        }
     }
-    ImGui::PopStyleVar();
 }
 
 void SceneHierarchy::renderAudio() {
@@ -158,7 +176,40 @@ void SceneHierarchy::renderAudio() {
 
             ImGuiTreeNodeFlags nodeFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
-            if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Entity &&
+            if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Serializable &&
+                editor::State::LastSelectedObject.getSerializable() == editorSource) {
+                nodeFlags |= ImGuiTreeNodeFlags_Selected;
+            }
+
+            ImGui::TreeNodeEx(editorSource->getName().c_str(), nodeFlags, "%s", editorSource->getName().c_str());
+
+            if (ImGui::BeginDragDropSource()) {
+                editor::DragDropObject obj {editorSource};
+                ImGui::SetDragDropPayload(editor::DDPayloadID__AudioSource, &obj, sizeof(editor::DragDropObject));
+                ImGui::EndDragDropSource();
+            }
+
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                editor::State::LastSelectedObject = editor::SelectableObject(editorSource);
+            }
+        }
+
+        ImGui::TreePop();
+    }
+}
+
+void SceneHierarchy::renderPhysics() {
+    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+
+    ImGui::SetNextItemOpen(false, ImGuiCond_Once);
+    if (ImGui::TreeNode("Dynamic actors")) {
+        /*size_t idx = 0;
+        for (audio::AudioSource* source : currentScene->getAudioSources()) {
+            audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(source);
+
+            ImGuiTreeNodeFlags nodeFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+            if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Serializable &&
                 editor::State::LastSelectedObject.getSerializable() == editorSource) {
                 nodeFlags |= ImGuiTreeNodeFlags_Selected;
             }
@@ -171,10 +222,39 @@ void SceneHierarchy::renderAudio() {
                 ImGui::EndDragDropSource();
             }
 
-            if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 editor::State::LastSelectedObject = editor::SelectableObject(editorSource);
             }
-        }
+        }*/
+
+        ImGui::TreePop();
+    }
+
+    ImGui::SetNextItemOpen(false, ImGuiCond_Once);
+    if (ImGui::TreeNode("Static actors")) {
+        /*size_t idx = 0;
+        for (audio::AudioSource* source : currentScene->getAudioSources()) {
+            audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(source);
+
+            ImGuiTreeNodeFlags nodeFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+            if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Serializable &&
+                editor::State::LastSelectedObject.getSerializable() == editorSource) {
+                nodeFlags |= ImGuiTreeNodeFlags_Selected;
+            }
+
+            ImGui::TreeNodeEx((void*)&idx, nodeFlags, "%s", editorSource->getName().c_str());
+
+            if (ImGui::BeginDragDropSource()) {
+                editor::DragDropObject obj {editorSource};
+                ImGui::SetDragDropPayload(editor::DDPayloadID__AudioSource, &obj, sizeof(editor::DragDropObject));
+                ImGui::EndDragDropSource();
+            }
+
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                editor::State::LastSelectedObject = editor::SelectableObject(editorSource);
+            }
+        }*/
 
         ImGui::TreePop();
     }

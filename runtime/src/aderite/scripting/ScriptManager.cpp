@@ -59,11 +59,11 @@ void ScriptManager::update(float delta) {
         return;
     }
 
-    auto scriptableView = currentScene->getEntityRegistry().view<scene::ScriptsComponent>();
+    /*auto scriptableView = currentScene->getEntityRegistry().view<scene::ScriptsComponent>();
     for (auto entity : scriptableView) {
         auto [script] = scriptableView.get(entity);
         script.Scripts->update(delta);
-    }
+    }*/
 }
 
 void ScriptManager::loadAssemblies() {

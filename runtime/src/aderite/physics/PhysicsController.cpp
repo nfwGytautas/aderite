@@ -20,19 +20,14 @@
 #include <pvd/PxPvdTransport.h>
 
 #include "aderite/Aderite.hpp"
-#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/DynamicActor.hpp"
+#include "aderite/physics/PhysicsEventList.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
 #include "aderite/physics/StaticActor.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
-#include "aderite/scene/components/Actors.hpp"
-#include "aderite/scene/components/Components.hpp"
-#include "aderite/scene/components/Meta.hpp"
-#include "aderite/scene/components/Transform.hpp"
-#include "aderite/scripting/ScriptList.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -129,6 +124,9 @@ bool PhysicsController::init() {
     // Configure collision filter
     physx::PxSetGroupCollisionFlag(0, 0, true);
 
+    // Create event list
+    m_events = new PhysicsEventList();
+
     return true;
 }
 
@@ -139,6 +137,8 @@ void PhysicsController::shutdown() {
     m_pvd->release();
     PxCloseExtensions();
     m_foundation->release();
+
+    delete m_events;
 }
 
 void PhysicsController::update(float delta) {
@@ -154,9 +154,6 @@ void PhysicsController::update(float delta) {
         return;
     }
 
-    // Properties
-    this->syncProperties();
-
     // Remove detached
     this->removeDetached();
 
@@ -171,6 +168,10 @@ void PhysicsController::update(float delta) {
         physicsScene->simulate(remainder);
     }
     this->syncChanges();
+}
+
+PhysicsEventList* PhysicsController::getEventList() const {
+    return m_events;
 }
 
 physx::PxPhysics* PhysicsController::getPhysics() {
@@ -205,90 +206,20 @@ physx::PxFilterFlags PhysicsController::filterShader(physx::PxFilterObjectAttrib
 void PhysicsController::syncChanges() {
     auto currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 
-    // Sync changes with ECS
-    auto dynamicGroup = currentScene->getEntityRegistry().group<scene::DynamicActor>(entt::get<scene::TransformComponent>);
-    for (auto entity : dynamicGroup) {
-        auto [actor, transform] = dynamicGroup.get(entity);
+    PhysicsScene* scene = currentScene->getPhysicsScene();
 
-        // Sync transform
-        actor.Actor->sync();
-    }
+    for (scene::Entity* entity : currentScene->getEntities()) {
+        physics::PhysicsActor* actor = entity->getActor();
 
-    auto physicsEventGroup = currentScene->getEntityRegistry().group<scene::PhysicsCallbackComponent>(entt::get<scene::ScriptsComponent>);
-    for (auto entity : physicsEventGroup) {
-        auto [events, scripts] = physicsEventGroup.get(entity);
-
-        // Trigger callbacks
-        if (scripts.Scripts != nullptr) {
-            for (scene::Entity& entity : events.TriggerEnter) {
-                scripts.Scripts->onTriggerEnter(entity);
-            }
-
-            for (scene::Entity& entity : events.TriggerLeave) {
-                scripts.Scripts->onTriggerLeave(entity);
-            }
-
-            for (scene::Entity& entity : events.CollisionEnter) {
-                scripts.Scripts->onCollisionEnter(entity);
-            }
-
-            for (scene::Entity& entity : events.CollisionLeave) {
-                scripts.Scripts->onCollisionLeave(entity);
-            }
+        if (actor != nullptr) {
+            actor->sync(entity->getTransform());
         }
     }
 
-    currentScene->getEntityRegistry().clear<scene::PhysicsCallbackComponent>();
-}
+    // TODO: Send events to scripts
 
-void PhysicsController::syncProperties() {
-    auto currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-    auto physicsScene = currentScene->getPhysicsScene();
-
-    // Sync changes with ECS
-    auto dynamicView =
-        currentScene->getEntityRegistry().group<scene::DynamicActor>(entt::get<scene::CollidersComponent, scene::TransformComponent>);
-    for (auto entity : dynamicView) {
-        auto [actor, colliders, transform] = dynamicView.get(entity);
-
-        if (colliders.Colliders == nullptr) {
-            // If there are no colliders the body is useless
-            continue;
-        }
-
-        if (colliders.Iteration != colliders.Colliders->getIteration() || colliders.GlobalScale != transform.Scale) {
-            // Detach previous shapes
-            actor.Actor->detachShapes();
-
-            // Attach new ones
-            colliders.Colliders->attachTo(actor.Actor, transform.Scale);
-
-            colliders.GlobalScale = transform.Scale;
-            colliders.Iteration = colliders.Colliders->getIteration();
-        }
-    }
-
-    auto staticView =
-        currentScene->getEntityRegistry().group<scene::StaticActor>(entt::get<scene::CollidersComponent, scene::TransformComponent>);
-    for (auto entity : staticView) {
-        auto [actor, colliders, transform] = staticView.get(entity);
-
-        if (colliders.Colliders == nullptr) {
-            // If there are no colliders the body is useless
-            continue;
-        }
-
-        if (colliders.Iteration != colliders.Colliders->getIteration() || colliders.GlobalScale != transform.Scale) {
-            // Detach previous shapes
-            actor.Actor->detachShapes();
-
-            // Attach new ones
-            colliders.Colliders->attachTo(actor.Actor, transform.Scale);
-
-            colliders.GlobalScale = transform.Scale;
-            colliders.Iteration = colliders.Colliders->getIteration();
-        }
-    }
+    // Clear events
+    m_events->clear();
 }
 
 void PhysicsController::removeDetached() {

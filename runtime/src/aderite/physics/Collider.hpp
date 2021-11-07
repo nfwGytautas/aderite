@@ -18,6 +18,22 @@ namespace physics {
  */
 class Collider : public io::ISerializable {
 public:
+    Collider();
+    virtual ~Collider();
+
+    /**
+     * @brief Set the scale of the collider
+     * @param scale New scale
+    */
+    void setScale(const glm::vec3& scale);
+
+    /**
+     * @brief Returns the scale of the collider
+    */
+    const glm::vec3& getScale() const {
+        return p_scale;
+    }
+
     /**
      * @brief Returns true if the collider acts as a trigger or not
      */
@@ -29,11 +45,14 @@ public:
     void setTrigger(bool value);
 
     /**
-     * @brief Attach collider to actor
-     * @param actor Actor to attach to
-     * @param globalScale Scale to be applied
+     * @brief Sets the actor of the shape
      */
-    void attach(PhysicsActor* actor, const glm::vec3& globalScale);
+    void setActor(physx::PxRigidActor* actor);
+
+    /**
+     * @brief Returns the actor of the collider
+    */
+    physics::PhysicsActor* getActor() const;
 
     // Inherited via ISerializable
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
@@ -42,21 +61,23 @@ public:
 protected:
     /**
      * @brief Generate a geometry with specified globalScale
-     * @param globalScale Global scale of the geometry
      * @return physx::PxGeometry instance
      */
-    virtual physx::PxGeometry* genGeometry(const glm::vec3& globalScale) = 0;
+    virtual physx::PxGeometry* genGeometry() = 0;
 
-private:
     /**
-     * @brief Creates physx shape from collider geometry
-     * @param globalScale Scale to be applied
-     * @return PxShape instance
+     * @brief Updates the geometry of the shape
      */
-    physx::PxShape* createShape(const glm::vec3& globalScale);
+    void updateGeometry();
 
-private:
-    bool m_isTrigger = false;
+    /**
+     * @brief Creates the shape of the collider
+     */
+    void createShape();
+
+protected:
+    physx::PxShape* p_shape = nullptr;
+    glm::vec3 p_scale = {1.0f, 1.0f, 1.0f};
 };
 
 } // namespace physics

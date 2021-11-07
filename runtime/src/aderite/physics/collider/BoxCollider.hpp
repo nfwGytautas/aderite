@@ -11,7 +11,6 @@ namespace physics {
  */
 class BoxCollider : public Collider {
 public:
-    // Inherited via Collider
     /**
      * @brief Returns the size of the box collider
      * @return Box collider size
@@ -31,11 +30,10 @@ public:
 
 protected:
     // Inherited via Collider
-    virtual physx::PxGeometry* genGeometry(const glm::vec3& globalScale) override;
+    virtual physx::PxGeometry* genGeometry() override;
 
 private:
     glm::vec3 m_size = glm::vec3(1.0f);
-    glm::vec3 m_localScale = glm::vec3(1.0f);
 };
 
 } // namespace physics

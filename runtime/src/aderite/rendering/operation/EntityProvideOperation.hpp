@@ -23,14 +23,6 @@ public:
 
 public:
     /**
-     * @brief Validates entity
-     * @param meta Meta component
-     * @param mrenderer Mesh renderer component
-     * @return True if valid and can be rendered, false otherwise
-     */
-    bool validateEntity(scene::MetaComponent& meta, scene::MeshRendererComponent& mrenderer);
-
-    /**
      * @brief Cleans the drawcall list (removes transformations)
      */
     void cleanList();

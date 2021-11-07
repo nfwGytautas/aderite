@@ -17,7 +17,7 @@ MaterialTypeAsset::~MaterialTypeAsset() {
 
 bool MaterialTypeAsset::isValid() const {
     for (bgfx::UniformHandle uh : m_samplers) {
-        if (bgfx::isValid(uh)) {
+        if (!bgfx::isValid(uh)) {
             return false;
         }
     }

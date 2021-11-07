@@ -18,10 +18,16 @@ reflection::Type StaticActor::getType() const {
 }
 
 bool StaticActor::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
+    if (!PhysicsActor::serialize(serializer, emitter)) {
+        return false;
+    }
     return true;
 }
 
 bool StaticActor::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+    if (!PhysicsActor::deserialize(serializer, data)) {
+        return false;
+    }
     return true;
 }
 

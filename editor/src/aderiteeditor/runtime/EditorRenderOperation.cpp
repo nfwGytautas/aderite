@@ -6,14 +6,12 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "aderite/Aderite.hpp"
-#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
-#include "aderite/scene/components/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
 #include "aderiteeditor/compiler/ShaderCompiler.hpp"
@@ -93,29 +91,29 @@ void EditorRenderOperation::renderPhysicsObjects() {
         return;
     }
 
-    // Colliders and triggers
-    auto colliderGroup = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::CollidersComponent>(
-        entt::get<scene::TransformComponent>);
-    for (auto entity : colliderGroup) {
-        auto [colliders, transform] = colliderGroup.get<scene::CollidersComponent, scene::TransformComponent>(entity);
+    //// Colliders and triggers
+    //auto colliderGroup = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::CollidersComponent>(
+    //    entt::get<scene::TransformComponent>);
+    //for (auto entity : colliderGroup) {
+    //    auto [colliders, transform] = colliderGroup.get<scene::CollidersComponent, scene::TransformComponent>(entity);
 
-        if (colliders.Colliders == nullptr) {
-            continue;
-        }
+    //    if (colliders.Colliders == nullptr) {
+    //        continue;
+    //    }
 
-        for (physics::Collider* collider : *colliders.Colliders) {
-            switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {
-            case reflection::RuntimeTypes::BOX_CLDR: {
-                this->renderBoxCollider(static_cast<physics::BoxCollider*>(collider), transform);
-                break;
-            }
-            }
-        }
-    }
+    //    for (physics::Collider* collider : *colliders.Colliders) {
+    //        switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {
+    //        case reflection::RuntimeTypes::BOX_CLDR: {
+    //            this->renderBoxCollider(static_cast<physics::BoxCollider*>(collider), transform);
+    //            break;
+    //        }
+    //        }
+    //    }
+    //}
 }
 
-void EditorRenderOperation::renderBoxCollider(physics::BoxCollider* collider, const scene::TransformComponent& transform) {
-    glm::vec3 extents = collider->getSize();
+//void EditorRenderOperation::renderBoxCollider(physics::BoxCollider* collider, const scene::TransformComponent& transform) {
+    /*glm::vec3 extents = collider->getSize();
 
     scene::TransformComponent tempTransform = transform;
     tempTransform.Scale *= extents;
@@ -141,8 +139,8 @@ void EditorRenderOperation::renderBoxCollider(physics::BoxCollider* collider, co
 
     bgfx::setVertexBuffer(0, m_bcCube);
     bgfx::setIndexBuffer(m_bcCubeIbo);
-    bgfx::submit(c_ViewId, m_wireframeShader, 0);
-}
+    bgfx::submit(c_ViewId, m_wireframeShader, 0);*/
+//}
 
 void EditorRenderOperation::loadMeshes() {
     bgfx::VertexLayout cubeLayout;

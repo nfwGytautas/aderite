@@ -180,7 +180,9 @@ void Serializer::save(SerializableObject* object) {
 
 void Serializer::saveAll() {
     for (SerializableObject* obj : m_objects) {
-        this->save(obj);
+        if (obj != nullptr) {
+            this->save(obj);
+        }
     }
 }
 

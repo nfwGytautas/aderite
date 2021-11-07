@@ -17,15 +17,15 @@ public:
     virtual void render() override;
 
 private:
+    // Entity
     void renderEntity();
-    void renderTransform(scene::Entity entity);
-    void renderMeshrenderer(scene::Entity entity);
-    void renderDynamicBody(scene::Entity entity);
-    void renderStaticBody(scene::Entity entity);
-    void renderAudioListener(scene::Entity entity);
-    void renderColliders(scene::Entity entity);
-    void renderScripts(scene::Entity entity);
 
+    // Physics
+    void renderActor(physics::PhysicsActor* actor);
+    void renderDynamicActor(physics::DynamicActor* actor);
+    void renderStaticActor(physics::StaticActor* actor);
+
+    // Assets
     void renderAsset();
     void renderMesh(io::SerializableObject* asset);
     void renderTexture(io::SerializableObject* asset);
@@ -33,7 +33,6 @@ private:
     void renderMaterialType(io::SerializableObject* asset);
     void renderScene(io::SerializableObject* asset);
     void renderPipeline(io::SerializableObject* asset);
-    void renderColliderList(io::SerializableObject* asset);
     void renderAudio(io::SerializableObject* asset);
 
     void renderSerializable();

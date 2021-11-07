@@ -5,6 +5,7 @@
 #include "aderiteeditor/shared/BaseComponent.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/windows/Forward.hpp"
+#include "aderiteeditor/extensions/Forward.hpp"
 
 namespace aderite {
 namespace editor_ui {
@@ -35,6 +36,11 @@ private:
      * @brief Renders audio tree node of the scene
      */
     void renderAudio();
+
+    /**
+     * @brief Renders physics tree node of the scene
+    */
+    void renderPhysics();
 
 private:
     TextInputModal* m_textModal = nullptr;

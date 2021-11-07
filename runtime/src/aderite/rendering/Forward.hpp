@@ -13,6 +13,7 @@ class Renderer;
 class DrawCall;
 class Pipeline;
 class PipelineState;
+class Renderable;
 
 } // namespace rendering
 } // namespace aderite

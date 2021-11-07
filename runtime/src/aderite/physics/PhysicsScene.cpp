@@ -1,10 +1,12 @@
 #include "PhysicsScene.hpp"
 
 #include "aderite/Aderite.hpp"
+#include "aderite/io/Serializer.hpp"
 #include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/PhysicsActor.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/StaticActor.hpp"
+#include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
 
@@ -22,6 +24,7 @@ PhysicsScene::PhysicsScene() {
     sceneDesc.simulationEventCallback = this;
     // sceneDesc.flags = physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
     m_scene = physics->createScene(sceneDesc);
+    m_scene->userData = this;
     ADERITE_DYNAMIC_ASSERT(m_scene != nullptr, "Failed to create a PhysX scene");
 }
 
@@ -46,34 +49,28 @@ void PhysicsScene::simulate(float step) {
     m_scene->fetchResults(true);
 }
 
-physics::PhysicsActor* PhysicsScene::createStaticBody(scene::Entity e, const scene::TransformComponent& transform) {
-    physics::PhysicsActor* actor = new physics::StaticActor();
+void PhysicsScene::addActor(physics::PhysicsActor* actor, const scene::Transform* initialTransform) {
+    // TODO: Check if not already attached, if attached to another scene move
 
     // Initial position
-    actor->moveActor(transform.Position);
-    actor->rotateActor(transform.Rotation);
+    if (initialTransform != nullptr) {
+        actor->moveActor(initialTransform->position());
+        actor->rotateActor(initialTransform->rotation());
+    }
 
-    actor->m_entity = e;
     this->m_scene->addActor(*actor->p_actor);
-
-    return actor;
-}
-
-physics::PhysicsActor* PhysicsScene::createDynamicBody(scene::Entity e, const scene::TransformComponent& transform) {
-    physics::PhysicsActor* actor = new physics::DynamicActor();
-
-    // Initial position
-    actor->moveActor(transform.Position);
-    actor->rotateActor(transform.Rotation);
-
-    actor->m_entity = e;
-    this->m_scene->addActor(*actor->p_actor);
-
-    return actor;
+    this->m_actors.push_back(actor);
 }
 
 void PhysicsScene::detachActor(physics::PhysicsActor* actor) {
-    delete actor;
+    auto it = std::find(m_actors.begin(), m_actors.end(), actor);
+
+    if (it == m_actors.end()) {
+        return;
+    }
+
+    delete *it;
+    m_actors.erase(it);
 }
 
 void PhysicsScene::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) {
@@ -116,6 +113,22 @@ void PhysicsScene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) 
             paT->onTriggerLeave(paA);
         }
     }
+}
+
+reflection::Type PhysicsScene::getType() const {
+    return static_cast<reflection::Type>(reflection::RuntimeTypes::PHYSICS_SCENE);
+}
+
+bool PhysicsScene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
+    // Actors are filled from entities not from physics scene itself
+
+    return true;
+}
+
+bool PhysicsScene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+    // Actors are filled from entities not from physics scene itself
+
+    return true;
 }
 
 } // namespace physics

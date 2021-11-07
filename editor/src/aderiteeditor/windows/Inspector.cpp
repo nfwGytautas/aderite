@@ -5,7 +5,6 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/asset/AudioAsset.hpp"
-#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
@@ -23,13 +22,9 @@
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/rendering/Pipeline.hpp"
+#include "aderite/rendering/Renderable.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
-#include "aderite/scene/components/Actors.hpp"
-#include "aderite/scene/components/Audio.hpp"
-#include "aderite/scene/components/Components.hpp"
-#include "aderite/scene/components/Meta.hpp"
-#include "aderite/scene/components/Transform.hpp"
 #include "aderite/scripting/BehaviorWrapper.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
@@ -45,6 +40,7 @@
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/extensions/EditorAudioSource.hpp"
+#include "aderiteeditor/extensions/EditorEntity.hpp"
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/shared/Config.hpp"
@@ -125,548 +121,478 @@ void Inspector::render() {
 
 void Inspector::renderEntity() {
     static utility::InlineRename renamer;
-    static editor_ui::SelectScriptModal ssm;
+    scene::EditorEntity* entity = editor::State::LastSelectedObject.getEntity();
 
-    scene::Entity entity = editor::State::LastSelectedObject.getEntity();
-
-    // Component list
-    if (!entity.hasComponent<::aderite::scene::MetaComponent>()) {
-        // This shouldn't happen
-        ImGui::Text("Invalid entity");
-        return;
-    }
-
-    // Meta
-    auto& MetaComponent = entity.getComponent<aderite::scene::MetaComponent>();
-    renamer.setValue(MetaComponent.Name);
+    renamer.setValue(entity->getName());
 
     if (renamer.renderUI()) {
-        MetaComponent.Name = renamer.getValue();
+        entity->setName(renamer.getValue());
     }
 
-    // Other components as tree nodes that can be collapsed
     ImGui::Separator();
 
-    bool hasTransform = entity.hasComponent<scene::TransformComponent>();
-    if (hasTransform) {
-        this->renderTransform(entity);
-    }
+    ImGuiTabBarFlags tabBarFlags = ImGuiTabBarFlags_None;
+    if (ImGui::BeginTabBar("EntityTabBar", ImGuiTabBarFlags_None)) {
+        if (ImGui::BeginTabItem("Base")) {
+            ImGui::Text("Transform");
 
-    bool hasMeshRenderer = entity.hasComponent<scene::MeshRendererComponent>();
-    if (hasMeshRenderer) {
-        this->renderMeshrenderer(entity);
-    }
+            scene::Transform* transform = entity->getTransform();
 
-    bool hasDynamicBody = entity.hasComponent<scene::DynamicActor>();
-    if (hasDynamicBody) {
-        this->renderDynamicBody(entity);
-    }
+            if (utility::DrawVec3Control("Position", transform->position())) {
+                if (entity->getActor() != nullptr) {
+                    entity->getActor()->moveActor(transform->position());
+                }
+            }
 
-    bool hasStaticBody = entity.hasComponent<scene::StaticActor>();
-    if (hasStaticBody) {
-        this->renderStaticBody(entity);
-    }
+            glm::vec3 euler = glm::eulerAngles(transform->rotation());
+            glm::vec3 rotation = glm::degrees(euler);
+            if (utility::DrawVec3Control("Rotation", rotation)) {
+                transform->rotation() = glm::quat(rotation);
 
-    bool hasAudioListener = entity.hasComponent<scene::AudioListenerComponent>();
-    if (hasAudioListener) {
-        this->renderAudioListener(entity);
-    }
+                if (entity->getActor() != nullptr) {
+                    entity->getActor()->rotateActor(transform->rotation());
+                }
+            }
 
-    bool hasColliders = entity.hasComponent<scene::CollidersComponent>();
-    if (hasColliders) {
-        this->renderColliders(entity);
-    }
+            if (utility::DrawVec3Control("Scale", transform->scale(), 1.0f)) {
+                if (entity->getActor() != nullptr) {
+                    for (physics::Collider* collider : entity->getActor()->getColliders()) {
+                        collider->setScale(transform->scale());
+                    }
+                }
+            }
 
-    bool hasScripts = entity.hasComponent<scene::ScriptsComponent>();
-    if (hasScripts) {
-        this->renderScripts(entity);
-    }
+            ImGui::EndTabItem();
+        }
 
-    // Add component
+        if (ImGui::BeginTabItem("Rendering")) {
+            rendering::Renderable* renderable = entity->getRenderable();
+
+            // Type radio button
+            int type = renderable == nullptr ? 0 : static_cast<int>(renderable->getType());
+
+            if (ImGui::RadioButton("No rendering", &type, 0)) {
+                if (renderable != nullptr) {
+                    // TODO: Delete renderable
+                }
+            }
+
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Render", &type, static_cast<int>(reflection::RuntimeTypes::RENDERABLE))) {
+                if (renderable != nullptr) {
+                    // TODO: Delete and create renderable
+                }
+
+                rendering::Renderable* renderable = new rendering::Renderable();
+                entity->setRenderable(renderable);
+            }
+
+            ImGui::Separator();
+
+            // Renderable
+            if (renderable != nullptr) {
+                if (ImGui::BeginTable("RenderableTable", 2)) {
+                    ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 70.0f);
+                    ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+                    ImGui::TableNextRow();
+
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("Mesh");
+
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::PushItemWidth(-FLT_MIN);
+
+                    if (renderable->getMesh()) {
+                        vfs::File* meshFile = editor::State::Project->getVfs()->getFile(renderable->getMesh()->getHandle());
+                        ImGui::Button(meshFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    } else {
+                        ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    }
+
+                    if (ImGui::BeginDragDropTarget()) {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MeshAsset)) {
+                            editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+                            vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+                            renderable->setMesh(
+                                static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle())));
+                        }
+
+                        ImGui::EndDragDropTarget();
+                    }
+
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("Material");
+
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::PushItemWidth(-FLT_MIN);
+
+                    if (renderable->getMaterial()) {
+                        vfs::File* matFile = editor::State::Project->getVfs()->getFile(renderable->getMaterial()->getHandle());
+                        ImGui::Button(matFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    } else {
+                        ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    }
+
+                    if (ImGui::BeginDragDropTarget()) {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MaterialAsset)) {
+                            editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+                            vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+                            renderable->setMaterial(
+                                static_cast<asset::MaterialAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle())));
+                        }
+
+                        ImGui::EndDragDropTarget();
+                    }
+
+                    ImGui::EndTable();
+                }
+            }
+
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Physics")) {
+            physics::PhysicsActor* actor = entity->getActor();
+
+            // Type radio button
+            int type = actor == nullptr ? 0 : static_cast<int>(actor->getType());
+
+            if (ImGui::RadioButton("No actor", &type, 0)) {
+                if (actor != nullptr) {
+                    entity->setActor(nullptr);
+                }
+            }
+
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Static", &type, static_cast<int>(reflection::RuntimeTypes::STATIC_ACTOR))) {
+                if (actor != nullptr) {
+                    // Delete old actor if different type
+                    if (actor->getType() != static_cast<int>(reflection::RuntimeTypes::STATIC_ACTOR)) {
+                        entity->setActor(new physics::StaticActor(), true);
+                    }
+                } else {
+                    entity->setActor(new physics::StaticActor());
+                }
+            }
+
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Dynamic", &type, static_cast<int>(reflection::RuntimeTypes::DYNAMIC_ACTOR))) {
+                if (actor != nullptr) {
+                    // Delete old actor if different type
+                    if (actor->getType() != static_cast<int>(reflection::RuntimeTypes::DYNAMIC_ACTOR)) {
+                        entity->setActor(new physics::DynamicActor(), true);
+                    }
+                } else {
+                    entity->setActor(new physics::DynamicActor());
+                }
+            }
+
+            ImGui::Separator();
+
+            // Refresh actor in case its type was changed
+            actor = entity->getActor();
+
+            // Actor
+            if (actor != nullptr) {
+                // Properties
+                switch (static_cast<reflection::RuntimeTypes>(actor->getType())) {
+                case reflection::RuntimeTypes::DYNAMIC_ACTOR: {
+                    this->renderDynamicActor(static_cast<physics::DynamicActor*>(actor));
+                    break;
+                }
+                case reflection::RuntimeTypes::STATIC_ACTOR: {
+                    this->renderStaticActor(static_cast<physics::StaticActor*>(actor));
+                    break;
+                }
+                }
+            }
+
+            ImGui::EndTabItem();
+        }
+
+        ImGui::EndTabBar();
+    }
+}
+
+// static editor_ui::SelectScriptModal ssm;
+
+// ssm.render();
+
+// if (ssm.getSelectedBehavior() != nullptr) {
+//    if (!entity.hasComponent<::aderite::scene::ScriptsComponent>()) {
+//        entity.addComponent<::aderite::scene::ScriptsComponent>();
+//    }
+
+//    // TODO: Block from adding same script again
+
+//    // Add script
+//    auto& scriptsComponent = entity.getComponent<::aderite::scene::ScriptsComponent>();
+//    scripting::Script* s = new scripting::Script();
+//    s->setName(ssm.getSelectedBehavior()->getName());
+//    scriptsComponent.Scripts->addScript(s);
+
+//    // Reset the selector
+//    ssm.reset();
+//}
+
+void Inspector::renderActor(physics::PhysicsActor* actor) {
+    // Colliders
+    ImGui::Separator();
+    ImGui::Text("Colliders");
+
+    // Add collider
     ImGui::Separator();
 
     float width = ImGui::GetContentRegionAvail().x * 0.4855f;
     ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
-    if (ImGui::Button("Add component", ImVec2(width, 0.0f))) {
-        ImGui::OpenPopup("AddComponent");
+    if (ImGui::Button("Add collider", ImVec2(width, 0.0f))) {
+        ImGui::OpenPopup("AddCollider");
     }
 
-    if (ImGui::BeginPopup("AddComponent")) {
-        if (!hasTransform && ImGui::MenuItem("Transform")) {
-            entity.addComponent<::aderite::scene::TransformComponent>();
-            ImGui::CloseCurrentPopup();
-        }
-
-        if (!hasMeshRenderer && ImGui::MenuItem("Mesh Renderer")) {
-            entity.addComponent<::aderite::scene::MeshRendererComponent>();
-            ImGui::CloseCurrentPopup();
-        }
-
-        if (!hasDynamicBody && !hasStaticBody && ImGui::MenuItem("Dynamic body")) {
-            entity.addComponent<::aderite::scene::DynamicActor>();
-            ImGui::CloseCurrentPopup();
-        }
-
-        if (!hasDynamicBody && !hasStaticBody && ImGui::MenuItem("Static body")) {
-            entity.addComponent<::aderite::scene::StaticActor>();
-            ImGui::CloseCurrentPopup();
-        }
-
-        if (!hasAudioListener && ImGui::MenuItem("Audio Listener")) {
-            entity.addComponent<::aderite::scene::AudioListenerComponent>();
-            ImGui::CloseCurrentPopup();
-        }
-
-        if (!hasColliders && ImGui::MenuItem("Collider list")) {
-            entity.addComponent<::aderite::scene::CollidersComponent>();
-            ImGui::CloseCurrentPopup();
-        }
-
-        if (ImGui::MenuItem("Script")) {
-            ssm.show();
+    if (ImGui::BeginPopup("AddCollider")) {
+        if (ImGui::MenuItem("Box")) {
+            actor->addCollider(new physics::BoxCollider());
             ImGui::CloseCurrentPopup();
         }
 
         ImGui::EndPopup();
     }
 
-    ssm.render();
-
-    if (ssm.getSelectedBehavior() != nullptr) {
-        if (!entity.hasComponent<::aderite::scene::ScriptsComponent>()) {
-            entity.addComponent<::aderite::scene::ScriptsComponent>();
-        }
-
-        // TODO: Block from adding same script again
-
-        // Add script
-        auto& scriptsComponent = entity.getComponent<::aderite::scene::ScriptsComponent>();
-        scripting::Script* s = new scripting::Script();
-        s->setName(ssm.getSelectedBehavior()->getName());
-        scriptsComponent.Scripts->addScript(s);
-
-        // Reset the selector
-        ssm.reset();
+    // Collider list
+    size_t colliderIdx = 0;
+    for (physics::Collider* collider : actor->getColliders()) {
+        ImGui::Text("Collider %ld", colliderIdx);
+        colliderIdx++;
     }
 }
 
-void Inspector::renderTransform(scene::Entity entity) {
-    bool open, remove = false;
-    render_component_shared("Transform", "Transform", open, remove);
-
-    if (open) {
-        auto& c = entity.getComponent<scene::TransformComponent>();
-
-        if (utility::DrawVec3Control("Position", c.Position)) {
-            if (entity.hasComponent<scene::DynamicActor>()) {
-                auto& da = entity.getComponent<scene::DynamicActor>();
-                if (da.Actor != nullptr) {
-                    da.Actor->moveActor(c.Position);
-                }
-            } else if (entity.hasComponent<scene::StaticActor>()) {
-                auto& sa = entity.getComponent<scene::StaticActor>();
-                if (sa.Actor != nullptr) {
-                    sa.Actor->moveActor(c.Position);
-                }
-            }
-        }
-
-        glm::vec3 euler = glm::eulerAngles(c.Rotation);
-        glm::vec3 rotation = glm::degrees(euler);
-        if (utility::DrawVec3Control("Rotation", rotation)) {
-            c.Rotation = glm::quat(rotation);
-
-            if (entity.hasComponent<scene::DynamicActor>()) {
-                auto& da = entity.getComponent<scene::DynamicActor>();
-                if (da.Actor != nullptr) {
-                    da.Actor->rotateActor(c.Rotation);
-                }
-            } else if (entity.hasComponent<scene::StaticActor>()) {
-                auto& sa = entity.getComponent<scene::StaticActor>();
-                if (sa.Actor != nullptr) {
-                    sa.Actor->rotateActor(c.Rotation);
-                }
-            }
-        }
-
-        c.Rotation = glm::radians(rotation);
-        if (utility::DrawVec3Control("Scale", c.Scale, 1.0f)) {
-            if (entity.hasComponent<scene::CollidersComponent>()) {
-                auto& c = entity.getComponent<scene::CollidersComponent>();
-                if (c.Colliders != nullptr) {
-                    // Force a reattach
-                    c.Iteration = c.Iteration--;
-                }
-            }
-        }
-
-        ImGui::TreePop();
+void Inspector::renderDynamicActor(physics::DynamicActor* actor) {
+    // Properties
+    bool hasGravity = actor->getGravity();
+    if (ImGui::Checkbox("Has gravity", &hasGravity)) {
+        actor->setGravity(hasGravity);
     }
 
-    if (remove) {
-        entity.removeComponent<scene::TransformComponent>();
+    bool isKinematic = actor->getKinematic();
+    if (ImGui::Checkbox("Is kinematic", &isKinematic)) {
+        actor->setKinematic(isKinematic);
     }
+
+    ImGui::Text("Mass");
+    ImGui::SameLine();
+    float mass = actor->getMass();
+    if (ImGui::DragFloat("##X", &mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+        actor->setMass(mass);
+    }
+
+    // Shared
+    this->renderActor(actor);
 }
 
-void Inspector::renderMeshrenderer(scene::Entity entity) {
-    bool open, remove = false;
-    render_component_shared("Mesh renderer", "Mesh renderer", open, remove);
+void Inspector::renderStaticActor(physics::StaticActor* actor) {
+    // Properties
+    ImGui::Text("Static actors don't have properties yet");
 
-    if (open) {
-        auto& c = entity.getComponent<scene::MeshRendererComponent>();
-
-        if (ImGui::BeginTable("MeshRendererTable", 2)) {
-            ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 70.0f);
-            ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
-
-            ImGui::TableNextRow();
-
-            ImGui::TableSetColumnIndex(0);
-            ImGui::Text("Mesh");
-
-            ImGui::TableSetColumnIndex(1);
-            ImGui::PushItemWidth(-FLT_MIN);
-
-            if (c.MeshHandle) {
-                vfs::File* meshFile = editor::State::Project->getVfs()->getFile(c.MeshHandle->getHandle());
-                ImGui::Button(meshFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-            } else {
-                ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-            }
-
-            if (ImGui::BeginDragDropTarget()) {
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MeshAsset)) {
-                    editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-                    vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-                    c.MeshHandle = static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                }
-
-                ImGui::EndDragDropTarget();
-            }
-
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::Text("Material");
-
-            ImGui::TableSetColumnIndex(1);
-            ImGui::PushItemWidth(-FLT_MIN);
-
-            if (c.MaterialHandle) {
-                vfs::File* matFile = editor::State::Project->getVfs()->getFile(c.MaterialHandle->getHandle());
-                ImGui::Button(matFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-            } else {
-                ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-            }
-
-            if (ImGui::BeginDragDropTarget()) {
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MaterialAsset)) {
-                    editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-                    vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-                    c.MaterialHandle = static_cast<asset::MaterialAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                }
-
-                ImGui::EndDragDropTarget();
-            }
-
-            ImGui::EndTable();
-        }
-
-        ImGui::TreePop();
-    }
-
-    if (remove) {
-        entity.removeComponent<scene::MeshRendererComponent>();
-    }
+    // Shared
+    this->renderActor(actor);
 }
 
-void Inspector::renderDynamicBody(scene::Entity entity) {
-    bool open, remove = false;
-    render_component_shared("Dynamic body", "Dynamic body", open, remove);
+// void Inspector::renderAudioListener(scene::Entity entity) {
+//    bool open, remove = false;
+//    render_component_shared("Audio Listener", "Audio Listener", open, remove);
+//
+//    if (open) {
+//        auto& c = entity.getComponent<scene::AudioListenerComponent>();
+//
+//        ImGui::Checkbox("Enabled", &c.IsEnabled);
+//
+//        ImGui::TreePop();
+//    }
+//
+//    if (remove) {
+//        entity.removeComponent<scene::AudioListenerComponent>();
+//    }
+//}
 
-    if (open) {
-        auto& c = entity.getComponent<scene::DynamicActor>();
-
-        bool hasGravity = c.Actor->getGravity();
-        if (ImGui::Checkbox("Has gravity", &hasGravity)) {
-            c.Actor->setGravity(hasGravity);
-        }
-
-        bool isKinematic = c.Actor->getKinematic();
-        if (ImGui::Checkbox("Is kinematic", &isKinematic)) {
-            c.Actor->setKinematic(isKinematic);
-        }
-
-        ImGui::Text("Mass");
-        ImGui::SameLine();
-        float mass = c.Actor->getMass();
-        if (ImGui::DragFloat("##X", &mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
-            c.Actor->setMass(mass);
-        }
-
-        ImGui::TreePop();
-    }
-
-    if (remove) {
-        entity.removeComponent<scene::DynamicActor>();
-    }
-}
-
-void Inspector::renderStaticBody(scene::Entity entity) {
-    bool open, remove = false;
-    render_component_shared("Static body", "Static body", open, remove);
-
-    if (open) {
-        auto& c = entity.getComponent<scene::StaticActor>();
-
-        ImGui::TreePop();
-    }
-
-    if (remove) {
-        entity.removeComponent<scene::StaticActor>();
-    }
-}
-
-void Inspector::renderAudioListener(scene::Entity entity) {
-    bool open, remove = false;
-    render_component_shared("Audio Listener", "Audio Listener", open, remove);
-
-    if (open) {
-        auto& c = entity.getComponent<scene::AudioListenerComponent>();
-
-        ImGui::Checkbox("Enabled", &c.IsEnabled);
-
-        ImGui::TreePop();
-    }
-
-    if (remove) {
-        entity.removeComponent<scene::AudioListenerComponent>();
-    }
-}
-
-void Inspector::renderColliders(scene::Entity entity) {
-    bool open, remove = false;
-    render_component_shared("Collider list", "Collider list", open, remove);
-
-    if (open) {
-        auto& c = entity.getComponent<scene::CollidersComponent>();
-
-        if (ImGui::BeginTable("ColliderListComponentTable", 2)) {
-            ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 70.0f);
-            ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
-
-            ImGui::TableNextRow();
-
-            ImGui::TableSetColumnIndex(0);
-            ImGui::Text("List");
-
-            ImGui::TableSetColumnIndex(1);
-            ImGui::PushItemWidth(-FLT_MIN);
-
-            if (c.Colliders) {
-                vfs::File* colliderFile = editor::State::Project->getVfs()->getFile(c.Colliders->getHandle());
-                ImGui::Button(colliderFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-            } else {
-                ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-            }
-
-            if (ImGui::BeginDragDropTarget()) {
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__ColliderListAsset)) {
-                    editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-                    vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-                    c.Colliders = static_cast<asset::ColliderListAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                }
-
-                ImGui::EndDragDropTarget();
-            }
-
-            ImGui::EndTable();
-        }
-
-        ImGui::TreePop();
-    }
-
-    if (remove) {
-        entity.removeComponent<scene::CollidersComponent>();
-    }
-}
-
-void Inspector::renderScripts(scene::Entity entity) {
-    auto& scripts = entity.getComponent<scene::ScriptsComponent>();
-    std::vector<scripting::Script*> toRemove;
-
-    // Colliders
-    for (size_t i = 0; i < scripts.Scripts->size(); i++) {
-        bool remove = false;
-
-        bool open = false;
-        render_component_shared("Script " + std::to_string(i), scripts.Scripts->get(i)->getName(), open, remove);
-
-        if (open) {
-            auto script = static_cast<scripting::Script*>(scripts.Scripts->get(i));
-
-            if (ImGui::BeginTable((scripts.Scripts->get(i)->getName() + "EditTable").c_str(), 2)) {
-                ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
-                ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
-
-                // Render fields
-                for (scripting::FieldWrapper* fw : script->getBehavior()->getFields()) {
-                    ImGui::TableNextRow();
-
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::Text(fw->getName().c_str());
-
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::PushItemWidth(-FLT_MIN);
-
-                    switch (fw->getType()) {
-                    case scripting::FieldType::Float: {
-                        float val = 0.0f;
-                        fw->getValue(script->getInstance(), &val);
-                        if (ImGui::InputFloat(std::string("#" + fw->getName()).c_str(), &val, NULL)) {
-                            fw->setValue(script->getInstance(), &val);
-                        }
-                        break;
-                    }
-                    case scripting::FieldType::Boolean: {
-                        bool val = false;
-                        fw->getValue(script->getInstance(), &val);
-                        if (ImGui::Checkbox(std::string("##" + fw->getName()).c_str(), &val)) {
-                            fw->setValue(script->getInstance(), &val);
-                        }
-                        break;
-                    }
-                    case scripting::FieldType::Mesh: {
-                        MonoObject* mesh = fw->getValueObject(script->getInstance());
-
-                        if (mesh) {
-                            asset::MeshAsset* meshHandle = nullptr;
-                            scripting::extract(mesh, meshHandle);
-
-                            vfs::File* materialFile = editor::State::Project->getVfs()->getFile(meshHandle->getHandle());
-                            ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-                        } else {
-                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-                        }
-
-                        if (ImGui::BeginDragDropTarget()) {
-                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MeshAsset)) {
-                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-                                vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-                                asset::MeshAsset* newMeshHandle =
-                                    static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                                fw->setValue(script->getInstance(),
-                                             ::aderite::Engine::getScriptManager()->getLocator().create(newMeshHandle));
-                            }
-
-                            ImGui::EndDragDropTarget();
-                        }
-                        break;
-                    }
-                    case scripting::FieldType::Material: {
-                        MonoObject* material = nullptr;
-                        fw->getValue(script->getInstance(), &material);
-
-                        if (material) {
-                            asset::MaterialAsset* materialHandle = nullptr;
-                            scripting::extract(material, materialHandle);
-
-                            vfs::File* materialFile = editor::State::Project->getVfs()->getFile(materialHandle->getHandle());
-                            ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-                        } else {
-                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-                        }
-
-                        if (ImGui::BeginDragDropTarget()) {
-                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MaterialAsset)) {
-                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-                                vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-                                asset::MaterialAsset* newMaterialHandle =
-                                    static_cast<asset::MaterialAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                                fw->setValue(script->getInstance(),
-                                             ::aderite::Engine::getScriptManager()->getLocator().create(newMaterialHandle));
-                            }
-
-                            ImGui::EndDragDropTarget();
-                        }
-                        break;
-                    }
-                    case scripting::FieldType::Audio: {
-                        MonoObject* audio = nullptr;
-                        fw->getValue(script->getInstance(), &audio);
-
-                        if (audio) {
-                            asset::AudioAsset* audioHandle = nullptr;
-                            scripting::extract(audio, audioHandle);
-
-                            vfs::File* materialFile = editor::State::Project->getVfs()->getFile(audioHandle->getHandle());
-                            ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-                        } else {
-                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-                        }
-
-                        if (ImGui::BeginDragDropTarget()) {
-                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioAsset)) {
-                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-                                vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-                                asset::AudioAsset* newAudioHandle =
-                                    static_cast<asset::AudioAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                                fw->setValue(script->getInstance(),
-                                             ::aderite::Engine::getScriptManager()->getLocator().create(newAudioHandle));
-                            }
-
-                            ImGui::EndDragDropTarget();
-                        }
-                        break;
-                    }
-                    case scripting::FieldType::AudioSource: {
-                        MonoObject* source = nullptr;
-                        fw->getValue(script->getInstance(), &source);
-
-                        if (source) {
-                            audio::AudioSource* audioHandle = nullptr;
-                            scripting::extract(source, audioHandle);
-
-                            audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(audioHandle);
-                            ImGui::Button(editorSource->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-                        } else {
-                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-                        }
-
-                        if (ImGui::BeginDragDropTarget()) {
-                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioSource)) {
-                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-                                audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(ddo->Data);
-                                fw->setValue(script->getInstance(),
-                                             ::aderite::Engine::getScriptManager()->getLocator().create(editorSource));
-                            }
-
-                            ImGui::EndDragDropTarget();
-                        }
-                        break;
-                    }
-                    default: {
-                        ImGui::Text("Unknown field type");
-                    }
-                    }
-
-                    ImGui::PopItemWidth();
-                }
-
-                ImGui::EndTable();
-            }
-
-            ImGui::TreePop();
-        }
-
-        if (remove) {
-            toRemove.push_back(scripts.Scripts->get(i));
-        }
-    }
-
-    for (scripting::Script* s : toRemove) {
-        scripts.Scripts->removeScript(s);
-    }
-}
+// void Inspector::renderScripts(scene::Entity entity) {
+//    auto& scripts = entity.getComponent<scene::ScriptsComponent>();
+//    std::vector<scripting::Script*> toRemove;
+//
+//    // Colliders
+//    for (size_t i = 0; i < scripts.Scripts->size(); i++) {
+//        bool remove = false;
+//
+//        bool open = false;
+//        render_component_shared("Script " + std::to_string(i), scripts.Scripts->get(i)->getName(), open, remove);
+//
+//        if (open) {
+//            auto script = static_cast<scripting::Script*>(scripts.Scripts->get(i));
+//
+//            if (ImGui::BeginTable((scripts.Scripts->get(i)->getName() + "EditTable").c_str(), 2)) {
+//                ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+//                ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+//
+//                // Render fields
+//                for (scripting::FieldWrapper* fw : script->getBehavior()->getFields()) {
+//                    ImGui::TableNextRow();
+//
+//                    ImGui::TableSetColumnIndex(0);
+//                    ImGui::Text(fw->getName().c_str());
+//
+//                    ImGui::TableSetColumnIndex(1);
+//                    ImGui::PushItemWidth(-FLT_MIN);
+//
+//                    switch (fw->getType()) {
+//                    case scripting::FieldType::Float: {
+//                        float val = 0.0f;
+//                        fw->getValue(script->getInstance(), &val);
+//                        if (ImGui::InputFloat(std::string("#" + fw->getName()).c_str(), &val, NULL)) {
+//                            fw->setValue(script->getInstance(), &val);
+//                        }
+//                        break;
+//                    }
+//                    case scripting::FieldType::Boolean: {
+//                        bool val = false;
+//                        fw->getValue(script->getInstance(), &val);
+//                        if (ImGui::Checkbox(std::string("##" + fw->getName()).c_str(), &val)) {
+//                            fw->setValue(script->getInstance(), &val);
+//                        }
+//                        break;
+//                    }
+//                    case scripting::FieldType::Mesh: {
+//                        MonoObject* mesh = fw->getValueObject(script->getInstance());
+//
+//                        if (mesh) {
+//                            asset::MeshAsset* meshHandle = nullptr;
+//                            scripting::extract(mesh, meshHandle);
+//
+//                            vfs::File* materialFile = editor::State::Project->getVfs()->getFile(meshHandle->getHandle());
+//                            ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+//                        } else {
+//                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+//                        }
+//
+//                        if (ImGui::BeginDragDropTarget()) {
+//                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MeshAsset)) {
+//                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+//                                vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+//                                asset::MeshAsset* newMeshHandle =
+//                                    static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
+//                                fw->setValue(script->getInstance(),
+//                                             ::aderite::Engine::getScriptManager()->getLocator().create(newMeshHandle));
+//                            }
+//
+//                            ImGui::EndDragDropTarget();
+//                        }
+//                        break;
+//                    }
+//                    case scripting::FieldType::Material: {
+//                        MonoObject* material = nullptr;
+//                        fw->getValue(script->getInstance(), &material);
+//
+//                        if (material) {
+//                            asset::MaterialAsset* materialHandle = nullptr;
+//                            scripting::extract(material, materialHandle);
+//
+//                            vfs::File* materialFile = editor::State::Project->getVfs()->getFile(materialHandle->getHandle());
+//                            ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+//                        } else {
+//                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+//                        }
+//
+//                        if (ImGui::BeginDragDropTarget()) {
+//                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MaterialAsset)) {
+//                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+//                                vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+//                                asset::MaterialAsset* newMaterialHandle =
+//                                    static_cast<asset::MaterialAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
+//                                fw->setValue(script->getInstance(),
+//                                             ::aderite::Engine::getScriptManager()->getLocator().create(newMaterialHandle));
+//                            }
+//
+//                            ImGui::EndDragDropTarget();
+//                        }
+//                        break;
+//                    }
+//                    case scripting::FieldType::Audio: {
+//                        MonoObject* audio = nullptr;
+//                        fw->getValue(script->getInstance(), &audio);
+//
+//                        if (audio) {
+//                            asset::AudioAsset* audioHandle = nullptr;
+//                            scripting::extract(audio, audioHandle);
+//
+//                            vfs::File* materialFile = editor::State::Project->getVfs()->getFile(audioHandle->getHandle());
+//                            ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+//                        } else {
+//                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+//                        }
+//
+//                        if (ImGui::BeginDragDropTarget()) {
+//                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioAsset)) {
+//                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+//                                vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+//                                asset::AudioAsset* newAudioHandle =
+//                                    static_cast<asset::AudioAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
+//                                fw->setValue(script->getInstance(),
+//                                             ::aderite::Engine::getScriptManager()->getLocator().create(newAudioHandle));
+//                            }
+//
+//                            ImGui::EndDragDropTarget();
+//                        }
+//                        break;
+//                    }
+//                    case scripting::FieldType::AudioSource: {
+//                        MonoObject* source = nullptr;
+//                        fw->getValue(script->getInstance(), &source);
+//
+//                        if (source) {
+//                            audio::AudioSource* audioHandle = nullptr;
+//                            scripting::extract(source, audioHandle);
+//
+//                            audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(audioHandle);
+//                            ImGui::Button(editorSource->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+//                        } else {
+//                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+//                        }
+//
+//                        if (ImGui::BeginDragDropTarget()) {
+//                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioSource)) {
+//                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+//                                audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(ddo->Data);
+//                                fw->setValue(script->getInstance(),
+//                                             ::aderite::Engine::getScriptManager()->getLocator().create(editorSource));
+//                            }
+//
+//                            ImGui::EndDragDropTarget();
+//                        }
+//                        break;
+//                    }
+//                    default: {
+//                        ImGui::Text("Unknown field type");
+//                    }
+//                    }
+//
+//                    ImGui::PopItemWidth();
+//                }
+//
+//                ImGui::EndTable();
+//            }
+//
+//            ImGui::TreePop();
+//        }
+//
+//        if (remove) {
+//            toRemove.push_back(scripts.Scripts->get(i));
+//        }
+//    }
+//
+//    for (scripting::Script* s : toRemove) {
+//        scripts.Scripts->removeScript(s);
+//    }
+//}
 
 void Inspector::renderAsset() {
     static vfs::File* cacheFile = nullptr;
@@ -710,10 +636,6 @@ void Inspector::renderAsset() {
     }
     case reflection::RuntimeTypes::PIPELINE: {
         this->renderPipeline(object);
-        break;
-    }
-    case reflection::RuntimeTypes::CLDR_LIST: {
-        this->renderColliderList(object);
         break;
     }
     case reflection::RuntimeTypes::AUDIO: {
@@ -1079,67 +1001,67 @@ void Inspector::renderPipeline(io::SerializableObject* asset) {
     ImGui::PopItemWidth();
 }
 
-void Inspector::renderColliderList(io::SerializableObject* asset) {
-    asset::ColliderListAsset* type = static_cast<asset::ColliderListAsset*>(asset);
-
-    // Colliders
-    int i = 0;
-    for (physics::Collider* collider : *type) {
-        bool remove = false;
-
-        switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {
-        case reflection::RuntimeTypes::BOX_CLDR: {
-            bool open = false;
-            render_component_shared("Box collider " + std::to_string(i++), "Box Collider", open, remove);
-
-            if (open) {
-                auto typeCollider = static_cast<physics::BoxCollider*>(collider);
-                bool isTrigger = typeCollider->isTrigger();
-                glm::vec3 size = typeCollider->getSize();
-
-                if (ImGui::Checkbox("Is trigger", &isTrigger)) {
-                    typeCollider->setTrigger(isTrigger);
-                    type->incrementIteration();
-                }
-
-                if (utility::DrawVec3Control("Size", size, 1.0f)) {
-                    typeCollider->setSize(size);
-                    type->incrementIteration();
-                }
-
-                ImGui::TreePop();
-            }
-            break;
-        }
-        default: {
-            continue;
-        }
-        }
-
-        if (remove) {
-            type->remove(collider);
-            break;
-        }
-    }
-
-    // Add collider
-    ImGui::Separator();
-
-    float width = ImGui::GetContentRegionAvail().x * 0.4855f;
-    ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
-    if (ImGui::Button("Add collider", ImVec2(width, 0.0f))) {
-        ImGui::OpenPopup("AddCollider");
-    }
-
-    if (ImGui::BeginPopup("AddCollider")) {
-        if (ImGui::MenuItem("Box")) {
-            type->add(new physics::BoxCollider());
-            ImGui::CloseCurrentPopup();
-        }
-
-        ImGui::EndPopup();
-    }
-}
+// void Inspector::renderColliderList(io::SerializableObject* asset) {
+//    asset::ColliderListAsset* type = static_cast<asset::ColliderListAsset*>(asset);
+//
+//    // Colliders
+//    int i = 0;
+//    for (physics::Collider* collider : *type) {
+//        bool remove = false;
+//
+//        switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {
+//        case reflection::RuntimeTypes::BOX_CLDR: {
+//            bool open = false;
+//            render_component_shared("Box collider " + std::to_string(i++), "Box Collider", open, remove);
+//
+//            if (open) {
+//                auto typeCollider = static_cast<physics::BoxCollider*>(collider);
+//                bool isTrigger = typeCollider->isTrigger();
+//                glm::vec3 size = typeCollider->getSize();
+//
+//                if (ImGui::Checkbox("Is trigger", &isTrigger)) {
+//                    typeCollider->setTrigger(isTrigger);
+//                    type->incrementIteration();
+//                }
+//
+//                if (utility::DrawVec3Control("Size", size, 1.0f)) {
+//                    typeCollider->setSize(size);
+//                    type->incrementIteration();
+//                }
+//
+//                ImGui::TreePop();
+//            }
+//            break;
+//        }
+//        default: {
+//            continue;
+//        }
+//        }
+//
+//        if (remove) {
+//            type->remove(collider);
+//            break;
+//        }
+//    }
+//
+//    // Add collider
+//    ImGui::Separator();
+//
+//    float width = ImGui::GetContentRegionAvail().x * 0.4855f;
+//    ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
+//    if (ImGui::Button("Add collider", ImVec2(width, 0.0f))) {
+//        ImGui::OpenPopup("AddCollider");
+//    }
+//
+//    if (ImGui::BeginPopup("AddCollider")) {
+//        if (ImGui::MenuItem("Box")) {
+//            type->add(new physics::BoxCollider());
+//            ImGui::CloseCurrentPopup();
+//        }
+//
+//        ImGui::EndPopup();
+//    }
+//}
 
 void Inspector::renderAudio(io::SerializableObject* asset) {
     static editor_ui::SelectAudioModal sam;

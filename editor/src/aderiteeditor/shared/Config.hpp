@@ -64,6 +64,8 @@ constexpr char* DDPayloadID__ColliderListAsset = "DDPayloadID__ColliderListAsset
  */
 constexpr char* DDPayloadID__AudioSource = "DDPayloadID__AudioSource";
 
+constexpr char* DDPayloadID__Entity = "DDPayloadID__Entity";
+
 /**
  * @brief Drag and drop id passed when the object that is being dragged is a raw file
  */

@@ -12,6 +12,7 @@ namespace physics {
 class PhysicsController;
 
 class PhysicsScene;
+class PhysicsEventList;
 
 class PhysicsActor;
 class DynamicActor;

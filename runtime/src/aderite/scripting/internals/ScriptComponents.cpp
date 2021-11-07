@@ -1,15 +1,13 @@
 #include "ScriptComponents.hpp"
 
+// TEMP
+#include <entt/entt.hpp>
 #include <mono/jit/jit.h>
 
 #include "aderite/Aderite.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/audio/AudioInstance.hpp"
 #include "aderite/scene/Entity.hpp"
-#include "aderite/scene/components/Actors.hpp"
-#include "aderite/scene/components/Audio.hpp"
-#include "aderite/scene/components/Components.hpp"
-#include "aderite/scene/components/Transform.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -17,64 +15,69 @@ namespace aderite {
 namespace scripting {
 
 glm::vec3 GetPosition(scene::Scene* scene, entt::entity entity) {
-    return scene::Entity(entity, scene).getComponent<scene::TransformComponent>().Position;
+    // return scene::Entity(entity, scene).getComponent<scene::TransformComponent>().Position;
+    return glm::vec3();
 }
 
 glm::quat GetRotation(scene::Scene* scene, entt::entity entity) {
-    return scene::Entity(entity, scene).getComponent<scene::TransformComponent>().Rotation;
+    // return scene::Entity(entity, scene).getComponent<scene::TransformComponent>().Rotation;
+    return glm::quat();
 }
 
 glm::vec3 GetScale(scene::Scene* scene, entt::entity entity) {
-    return scene::Entity(entity, scene).getComponent<scene::TransformComponent>().Scale;
+    // return scene::Entity(entity, scene).getComponent<scene::TransformComponent>().Scale;
+    return glm::vec3();
 }
 
 void SetPosition(scene::Scene* scene, entt::entity entity, glm::vec3 position) {
-    scene::Entity e = scene::Entity(entity, scene);
+    /*scene::Entity e = scene::Entity(entity, scene);
     if (e.hasComponent<scene::DynamicActor>() || e.hasComponent<scene::StaticActor>()) {
         LOG_ERROR("Don't directly set transform when a physics actor is attached, use PhysicsActor methods");
         return;
     }
 
     auto& transform = e.getComponent<scene::TransformComponent>();
-    transform.Position = position;
+    transform.Position = position;*/
 }
 
 void SetRotation(scene::Scene* scene, entt::entity entity, glm::quat rotation) {
-    scene::Entity e = scene::Entity(entity, scene);
+    /*scene::Entity e = scene::Entity(entity, scene);
     if (e.hasComponent<scene::DynamicActor>() || e.hasComponent<scene::StaticActor>()) {
         LOG_ERROR("Don't directly set transform when a physics actor is attached, use PhysicsActor.Rotate");
         return;
     }
 
     auto& transform = e.getComponent<scene::TransformComponent>();
-    transform.Rotation = rotation;
+    transform.Rotation = rotation;*/
 }
 
 void SetScale(scene::Scene* scene, entt::entity entity, glm::vec3 scale) {
-    scene::Entity e = scene::Entity(entity, scene);
+    /*scene::Entity e = scene::Entity(entity, scene);
     if (e.hasComponent<scene::DynamicActor>() || e.hasComponent<scene::StaticActor>()) {
         LOG_ERROR("Don't directly set transform when a physics actor is attached, use PhysicsActor.Scale");
         return;
     }
 
     auto& transform = e.getComponent<scene::TransformComponent>();
-    transform.Scale = scale;
+    transform.Scale = scale;*/
 }
 
 asset::MeshAsset* GetMesh(scene::Scene* scene, entt::entity entity) {
-    return scene::Entity(entity, scene).getComponent<scene::MeshRendererComponent>().MeshHandle;
+    //return scene::Entity(entity, scene).getComponent<scene::MeshRendererComponent>().MeshHandle;
+    return nullptr;
 }
 
 asset::MaterialAsset* GetMaterial(scene::Scene* scene, entt::entity entity) {
-    return scene::Entity(entity, scene).getComponent<scene::MeshRendererComponent>().MaterialHandle;
+    //return scene::Entity(entity, scene).getComponent<scene::MeshRendererComponent>().MaterialHandle;
+    return nullptr;
 }
 
 void SetMesh(scene::Scene* scene, entt::entity entity, asset::MeshAsset* mesh) {
-    scene::Entity(entity, scene).getComponent<scene::MeshRendererComponent>().MeshHandle = mesh;
+    //scene::Entity(entity, scene).getComponent<scene::MeshRendererComponent>().MeshHandle = mesh;
 }
 
 void SetMaterial(scene::Scene* scene, entt::entity entity, asset::MaterialAsset* material) {
-    scene::Entity(entity, scene).getComponent<scene::MeshRendererComponent>().MaterialHandle = material;
+    //scene::Entity(entity, scene).getComponent<scene::MeshRendererComponent>().MaterialHandle = material;
 }
 
 void componentInternals() {

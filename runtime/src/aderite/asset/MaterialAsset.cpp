@@ -8,6 +8,7 @@
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/io/Loader.hpp"
+#include "aderite/io/LoaderPool.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/utility/Log.hpp"
@@ -21,8 +22,30 @@ MaterialAsset::~MaterialAsset() {
     std::free(m_udata);
 }
 
+bool MaterialAsset::isValid() const {
+    if (m_info.Type == nullptr || !m_info.Type->isValid()) {
+        return false;
+    }
+
+    for (asset::TextureAsset* ta : m_info.Samplers) {
+        if (ta == nullptr || !ta->isValid()) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void MaterialAsset::load(const io::Loader* loader) {
     // TODO: Reference
+
+    ::aderite::Engine::getLoaderPool()->enqueue(m_info.Type, io::LoaderPool::Priority::HIGH);
+
+    for (asset::TextureAsset* ta : m_info.Samplers) {
+        if (ta != nullptr && !ta->isValid()) {
+            ::aderite::Engine::getLoaderPool()->enqueue(ta, io::LoaderPool::Priority::HIGH);
+        }
+    }
 }
 
 void MaterialAsset::unload() {
@@ -30,7 +53,7 @@ void MaterialAsset::unload() {
 }
 
 bool MaterialAsset::needsLoading() {
-    return false;
+    return !this->isValid();
 }
 
 reflection::Type MaterialAsset::getType() const {

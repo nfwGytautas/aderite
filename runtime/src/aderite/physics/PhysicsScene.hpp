@@ -5,7 +5,6 @@
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/scene/Entity.hpp"
-#include "aderite/scene/components/Transform.hpp"
 
 namespace aderite {
 namespace physics {
@@ -13,7 +12,7 @@ namespace physics {
 /**
  * @brief Physics scene for aderite
  */
-class PhysicsScene final : public physx::PxSimulationEventCallback {
+class PhysicsScene final : public physx::PxSimulationEventCallback, public io::ISerializable {
 public:
     PhysicsScene();
     ~PhysicsScene();
@@ -25,24 +24,24 @@ public:
     void simulate(float step);
 
     /**
-     * @brief Creates a static rigidbody and returns it
-     * @param e Entity to create for
-     * @param transform Initial transform of the actor
+     * @brief Add a physics actor at the specified transform
+     * @param actor Actor to add
+     * @param initialTransform Optional initial transform
      */
-    physics::PhysicsActor* createStaticBody(scene::Entity e, const scene::TransformComponent& transform);
-
-    /**
-     * @brief Creates a dynamic rigidbody and returns it
-     * @param e Entity to create for
-     * @param transform Initial transform of the actor
-     */
-    physics::PhysicsActor* createDynamicBody(scene::Entity e, const scene::TransformComponent& transform);
+    void addActor(physics::PhysicsActor* actor, const scene::Transform* initialTransform = nullptr);
 
     /**
      * @brief Detach the specified actor from physics scene
      * @param actor Actor to detach
      */
     void detachActor(physics::PhysicsActor* actor);
+
+    /**
+     * @brief Returns a vector of all actors in this scene
+     */
+    const std::vector<PhysicsActor*>& getActors() const {
+        return m_actors;
+    }
 
 private:
     // Inherited via PxSimulationEventCallback
@@ -55,6 +54,13 @@ private:
 
 private:
     physx::PxScene* m_scene = nullptr;
+
+    std::vector<PhysicsActor*> m_actors;
+
+    // Inherited via ISerializable
+    virtual reflection::Type getType() const override;
+    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 };
 
 } // namespace physics

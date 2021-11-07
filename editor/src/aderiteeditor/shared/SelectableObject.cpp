@@ -9,7 +9,7 @@ aderite::editor::SelectableObject::SelectableObject(io::SerializableObject* asse
     m_data.Object = asset;
 }
 
-aderite::editor::SelectableObject::SelectableObject(scene::Entity entity) : m_type(SelectableObjectType::Entity), m_data {} {
+aderite::editor::SelectableObject::SelectableObject(scene::EditorEntity* entity) : m_type(SelectableObjectType::Entity), m_data {} {
     m_data.Entity = entity;
 }
 
@@ -25,7 +25,7 @@ io::SerializableObject* aderite::editor::SelectableObject::getAsset() const {
     return m_data.Object;
 }
 
-scene::Entity aderite::editor::SelectableObject::getEntity() const {
+scene::EditorEntity* aderite::editor::SelectableObject::getEntity() const {
     return m_data.Entity;
 }
 

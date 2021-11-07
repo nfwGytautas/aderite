@@ -3,70 +3,31 @@ Type: 3
 Handle: 0
 Data:
   Entities:
-    - Entity: 2
-      Meta:
-        Name: TriggerZone
-      Transform:
-        Position: [-4, 2.5999999, 0]
-        Rotation: [1, 0, 0, 0]
-        Scale: [5, 0.200000003, 5]
-      StaticActor:
-        Type: 92
-        Data:
-          {}
-      Colliders:
-        ID: 7
-    - Entity: 1
-      Meta:
-        Name: Object1
-      Transform:
-        Position: [-3.5, 5.4000001, 0]
-        Rotation: [1, 0, 0, 0]
-        Scale: [1, 1, 1]
-      MeshRenderer:
-        Mesh: 2
-        Material: 4
-      DynamicActor:
-        Type: 91
-        Data:
-          IsKinematic: false
-          HasGravity: true
-          Mass: 1
-      Colliders:
-        ID: 6
-      Scripts:
-        Type: 200
-        Data:
-          Scripts:
-            - Type: 201
-              Data:
-                Name: Scripts.TestBehavior
-                Fields:
-                  EnableGravity: true
-            - Type: 201
-              Data:
-                Name: Scripts.BoingBehavior
-                Fields:
-                  Clip: 8
-                  Source: 1
-    - Entity: 0
-      Meta:
-        Name: Plane
-      Transform:
-        Position: [0, 0, 0]
-        Rotation: [1, 0, 0, 0]
-        Scale: [10, 0.200000003, 10]
-      MeshRenderer:
-        Mesh: 2
-        Material: 4
-      StaticActor:
-        Type: 92
-        Data:
-          {}
-      Colliders:
-        ID: 6
-      AudioListener:
-        IsEnabled: true
+    - Type: 41
+      Data:
+        Transform:
+          Type: 40
+          Data:
+            Position: [0, 0, 0]
+            Rotation: [1, 0, 0, 0]
+            Scale: [1, 1, 1]
+        Actor:
+          Type: 91
+          Data:
+            Colliders:
+              - Type: 51
+                Data:
+                  IsTrigger: false
+                  Size: [1, 1, 1]
+            IsKinematic: false
+            HasGravity: true
+            Mass: 1
+        Renderable:
+          Type: 42
+          Data:
+            Mesh: 2
+            Material: 4
+        Name: Ground
   AudioSources:
     - Type: 20
       Data:
@@ -76,4 +37,8 @@ Data:
         Rotation: [1, 0, 0, 0]
         Velocity: [0, 0, 0]
         Name: Origin
+  Physics:
+    Type: 93
+    Data:
+      {}
   Pipeline: 1

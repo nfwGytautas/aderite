@@ -1,166 +1,90 @@
 #pragma once
 
-#include <entt/Entity/registry.hpp>
-
+#include "aderite/io/SerializableObject.hpp"
+#include "aderite/physics/Forward.hpp"
+#include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
-#include "aderite/scene/Scene.hpp"
+#include "aderite/scene/Transform.hpp"
 
 namespace aderite {
 namespace scene {
 
 /**
- * @brief Wrapper for entt Entity
+ * @brief Entity class is used to represent an object in the world
  */
-class Entity {
+class Entity : public io::ISerializable {
 public:
-    Entity() = default;
-    Entity(entt::entity handle, Scene* scene);
-    Entity(const Entity& other) = default;
+    Entity();
+    virtual ~Entity();
 
     /**
-     * @brief Add component to Entity
-     */
-    template<typename T, typename... Args>
-    T& addComponent(Args&&... args) {
-        T& component = m_scene->getEntityRegistry().emplace<T>(m_handle, std::forward<Args>(args)...);
-        m_scene->onComponentAdded<T>(*this, component);
-        return component;
-    }
+     * @brief Set the scene of the entity, this will transfer actor to the new scene
+     * @param scene New scene
+    */
+    void setScene(Scene* scene);
 
     /**
-     * @brief Get component
+     * @brief Set the actor for the entity
+     * @param actor Physics actor instance
+     * @param keepColliders If true then colliders will be moved from previous actor to the new one
      */
-    template<typename T>
-    T& getComponent() {
-        return m_scene->getEntityRegistry().get<T>(m_handle);
-    }
+    void setActor(physics::PhysicsActor* actor, bool keepColliders = false);
 
     /**
-     * @brief Check if Entity has component
+     * @brief Set the renderable for the entity
+     * @param renderable Renderable instance
      */
-    template<typename T>
-    bool hasComponent() {
-        return m_scene->getEntityRegistry().try_get<T>(m_handle) != nullptr;
-    }
+    void setRenderable(rendering::Renderable* renderable);
 
     /**
-     * @brief Remove component
+     * @brief Returns the transform of the entity
      */
-    template<typename T>
-    void removeComponent() {
-        m_scene->onComponentRemoved<T>(*this, getComponent<T>());
-        m_scene->getEntityRegistry().remove<T>(m_handle);
-    }
-
-    operator bool() const {
-        return m_handle != entt::null;
-    }
-    operator entt::entity() const {
-        return m_handle;
-    }
-    operator uint32_t() const {
-        return (uint32_t)m_handle;
-    }
-
-    bool operator==(const Entity& other) const {
-        return m_handle == other.m_handle && m_scene == other.m_scene;
-    }
-
-    bool operator!=(const Entity& other) const {
-        return !(*this == other);
+    Transform* getTransform() const {
+        return m_transform;
     }
 
     /**
-     * @brief Returns the Scene that the Entity belongs to
+     * @brief Returns the physics actor of the entity
      */
-    Scene* getScene() const {
-        return m_scene;
+    physics::PhysicsActor* getActor() const {
+        return m_actor;
     }
 
     /**
-     * @brief Returns the handle of this entity
+     * @brief Returns the renderable of this entity
      */
-    entt::entity getHandle() const {
-        return m_handle;
+    rendering::Renderable* getRenderable() const {
+        return m_renderable;
     }
 
-    /**
-     * @brief Returns empty Entity
-     */
-    static Entity null() {
-        return Entity(entt::null, nullptr);
-    }
+    // Inherited via ISerializable
+    virtual reflection::Type getType() const override;
+    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
-    entt::entity m_handle {entt::null};
+    friend class Scene;
+
+private:
+    /**
+     * @brief Scene this entity belongs to
+     */
     Scene* m_scene = nullptr;
-};
-
-/**
- * @brief Wrapper for entt Entity
- */
-class ConstEntity {
-public:
-    ConstEntity(entt::entity handle, const Scene* scene);
 
     /**
-     * @brief Get component
+     * @brief Transform of the entity
      */
-    template<typename T>
-    const T& getComponent() const {
-        return m_scene->getEntityRegistry().get<T>(m_handle);
-    }
+    Transform* m_transform = nullptr;
 
     /**
-     * @brief Check if Entity has component
+     * @brief Physics actor of the entity
      */
-    template<typename T>
-    bool hasComponent() const {
-        return m_scene->getEntityRegistry().try_get<T>(m_handle) != nullptr;
-    }
-
-    operator bool() const {
-        return m_handle != entt::null;
-    }
-    operator entt::entity() const {
-        return m_handle;
-    }
-    operator uint32_t() const {
-        return (uint32_t)m_handle;
-    }
-
-    bool operator==(const ConstEntity& other) const {
-        return m_handle == other.m_handle && m_scene == other.m_scene;
-    }
-
-    bool operator!=(const ConstEntity& other) const {
-        return !(*this == other);
-    }
+    physics::PhysicsActor* m_actor = nullptr;
 
     /**
-     * @brief Returns the Scene that the Entity belongs to
+     * @brief Renderable of the entity
      */
-    const Scene* getScene() const {
-        return m_scene;
-    }
-
-    /**
-     * @brief Returns the handle of this entity
-     */
-    entt::entity getHandle() const {
-        return m_handle;
-    }
-
-    /**
-     * @brief Returns empty Entity
-     */
-    static Entity null() {
-        return Entity(entt::null, nullptr);
-    }
-
-private:
-    entt::entity m_handle {entt::null};
-    const Scene* m_scene = nullptr;
+    rendering::Renderable* m_renderable = nullptr;
 };
 
 } // namespace scene

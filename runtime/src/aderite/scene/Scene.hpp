@@ -2,15 +2,12 @@
 
 #include <vector>
 
-#include <entt/entity/registry.hpp>
-
 #include "aderite/Config.hpp"
 #include "aderite/audio/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Entity.hpp"
-#include "aderite/scene/components/Meta.hpp"
 
 namespace aderite {
 namespace scene {
@@ -27,38 +24,15 @@ public:
     virtual ~Scene();
 
     /**
-     * @brief Returns entt registry
-     */
-    entt::registry& getEntityRegistry() {
-        return m_registry;
-    }
-
-    const entt::registry& getEntityRegistry() const {
-        return m_registry;
-    }
-
-    /**
      * @brief Update scene
      * @param delta Delta time between frames
      */
     void update(float delta);
 
     /**
-     * @brief Create Entity with a MetaComponent component
-     * @param meta MetaComponent of the entity
-     * @return Entity instance
-     */
-    Entity createEntity(const MetaComponent& meta);
-
-    /**
-     * @brief Destroy an Entity
-     */
-    void destroyEntity(Entity entity);
-
-    /**
      * @brief Adds an AudioSource to the scene
      * @param source Source to add
-    */
+     */
     void addSource(audio::AudioSource* source);
 
     /**
@@ -73,7 +47,7 @@ public:
 
     /**
      * @brief Returns audio sources of this scene
-    */
+     */
     const std::vector<audio::AudioSource*>& getAudioSources() const {
         return m_audioSources;
     }
@@ -84,34 +58,33 @@ public:
      */
     void setPipeline(rendering::Pipeline* pipeline);
 
+    /**
+     * @brief Add entity to the scene
+     * @param entity Entity to add
+     */
+    void addEntity(Entity* entity);
+
+    /**
+     * @brief Get entities in this scene
+     */
+    const std::vector<Entity*> getEntities() const {
+        return m_entities;
+    }
+
     // Inherited via SerializableObject
     virtual reflection::Type getType() const override;
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
-    /**
-     * @brief Function invoked right after a component was added to entity
-     */
-    template<typename T>
-    void onComponentAdded(Entity entity, T& component);
-
-    /**
-     * @brief Function invoked right before a component is removed from entity
-     */
-    template<typename T>
-    void onComponentRemoved(Entity entity, T& component);
-
-    friend class Entity;
     friend class SceneManager;
     friend class SceneSerializer;
 
 private:
-    entt::registry m_registry;
     physics::PhysicsScene* m_physics = nullptr;
-
     rendering::Pipeline* m_pipeline = nullptr;
     std::vector<audio::AudioSource*> m_audioSources;
+    std::vector<Entity*> m_entities;
 };
 
 } // namespace scene

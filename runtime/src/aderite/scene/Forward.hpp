@@ -14,7 +14,7 @@ class Scene;
 class SceneSerializer;
 
 class Entity;
-class ConstEntity;
+class Transform;
 
 } // namespace scene
 } // namespace aderite

@@ -5,7 +5,6 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/asset/AudioAsset.hpp"
-#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
@@ -258,11 +257,6 @@ void AssetBrowser::renderAddItemPopup() {
         if (ImGui::MenuItem("Material type")) {
             object = new asset::EditorMaterialType();
             newName = "New material type";
-        }
-
-        if (ImGui::MenuItem("Collider list")) {
-            object = new asset::ColliderListAsset();
-            newName = "New collider list";
         }
 
         if (ImGui::MenuItem("Audio clip")) {

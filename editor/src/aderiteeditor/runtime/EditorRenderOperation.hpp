@@ -10,7 +10,6 @@
 #include "aderite/physics/collider/Forward.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
-#include "aderite/scene/components/Forward.hpp"
 
 #include "aderiteeditor/utility/Macros.hpp"
 
@@ -41,7 +40,7 @@ private:
 
     // Rendering operations
     void renderPhysicsObjects();
-    void renderBoxCollider(physics::BoxCollider* collider, const scene::TransformComponent& transform);
+    //void renderBoxCollider(physics::BoxCollider* collider, const scene::TransformComponent& transform);
 
     // Helpers
     void loadMeshes();

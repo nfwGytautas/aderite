@@ -42,15 +42,21 @@ reflection::Type DynamicActor::getType() const {
 }
 
 bool DynamicActor::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    emitter << YAML::Key << "IsKinematic" << YAML::Value
-            << this->getKinematic();
-    emitter << YAML::Key << "HasGravity" << YAML::Value
-            << this->getGravity();
+    if (!PhysicsActor::serialize(serializer, emitter)) {
+        return false;
+    }
+
+    emitter << YAML::Key << "IsKinematic" << YAML::Value << this->getKinematic();
+    emitter << YAML::Key << "HasGravity" << YAML::Value << this->getGravity();
     emitter << YAML::Key << "Mass" << YAML::Value << this->getMass();
     return true;
 }
 
 bool DynamicActor::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+    if (!PhysicsActor::deserialize(serializer, data)) {
+        return false;
+    }
+
     this->setKinematic(data["IsKinematic"].as<bool>());
     this->setGravity(data["HasGravity"].as<bool>());
     this->setMass(data["Mass"].as<float>());

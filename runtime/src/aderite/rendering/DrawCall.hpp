@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 
 #include "aderite/asset/Forward.hpp"
-#include "aderite/scene/components/Forward.hpp"
 #include "aderite/utility/Macros.hpp"
 
 namespace aderite {
@@ -36,7 +35,7 @@ public:
     float* UniformData = nullptr;
 
     // Vector containing transformations, for instanced rendering
-    std::vector<scene::TransformComponent*> Transformations;
+    std::vector<glm::mat4> Transformations;
 
     // Occlusion culled
     bool FullyCulled = false;

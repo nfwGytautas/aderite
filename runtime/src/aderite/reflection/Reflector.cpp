@@ -6,7 +6,6 @@
 
 // Assets, needed for linking instancers
 #include "aderite/asset/AudioAsset.hpp"
-#include "aderite/asset/ColliderListAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
@@ -17,12 +16,14 @@
 #include "aderite/physics/StaticActor.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/rendering/Pipeline.hpp"
+#include "aderite/rendering/Renderable.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
 #include "aderite/rendering/operation/EntityProvideOperation.hpp"
 #include "aderite/rendering/operation/OutputToScreenOperation.hpp"
 #include "aderite/rendering/operation/RenderOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/scene/Scene.hpp"
+#include "aderite/scene/Transform.hpp"
 #include "aderite/scripting/Script.hpp"
 #include "aderite/scripting/ScriptList.hpp"
 
@@ -45,8 +46,12 @@ bool Reflector::init() {
     // Audio
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, audio::AudioSource, RuntimeTypes::AUDIO_SOURCE);
 
+    // Entity
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Transform, RuntimeTypes::TRANSFORM);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Entity, RuntimeTypes::ENTITY);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::Renderable, RuntimeTypes::RENDERABLE);
+
     // Colliders
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::ColliderListAsset, RuntimeTypes::CLDR_LIST);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::BoxCollider, RuntimeTypes::BOX_CLDR);
 
     // Physics actor

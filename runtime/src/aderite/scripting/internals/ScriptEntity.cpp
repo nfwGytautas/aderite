@@ -1,5 +1,7 @@
 #include "ScriptEntity.hpp"
 
+// TEMP
+#include <entt/entt.hpp>
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/attrdefs.h>
@@ -20,7 +22,7 @@ namespace aderite {
 namespace scripting {
 
 MonoObject* ResolveBehavior(scene::Scene* scene, entt::entity* entityHandle, MonoType* type) {
-    scene::Entity entity(*entityHandle, scene);
+    /*scene::Entity entity(*entityHandle, scene);
 
     if (!entity.hasComponent<scene::ScriptsComponent>()) {
         return nullptr;
@@ -30,7 +32,7 @@ MonoObject* ResolveBehavior(scene::Scene* scene, entt::entity* entityHandle, Mon
 
     scene::ScriptsComponent& scripts = entity.getComponent<scene::ScriptsComponent>();
     for (scripting::Script* script : *scripts.Scripts) {
-    }
+    }*/
 
     return nullptr;
 }

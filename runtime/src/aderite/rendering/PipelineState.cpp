@@ -45,5 +45,9 @@ void PipelineState::reset() {
     }
 }
 
+bool PipelineState::canExecuteRender() const {
+    return m_eyes.size() > 0 && m_targets.size() > 0 && m_drawCalls != nullptr;
+}
+
 } // namespace rendering
 } // namespace aderite

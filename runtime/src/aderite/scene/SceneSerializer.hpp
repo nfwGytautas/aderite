@@ -32,20 +32,22 @@ public:
 
 private:
     /**
-     * @brief Serialize entity to the specified emitter
+     * @brief Serialize entities to the specified emitter
      * @param scene Scene to serialize
+     * @param serializer Serializer instance
      * @param out Emitter to serialize into
-     * @param e Entity to serialize
+     * @return True if serialized, false otherwise
      */
-    void serializeEntity(const Scene* scene, YAML::Emitter& out, ConstEntity e) const;
+    bool serializeEntities(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const;
 
     /**
-     * @brief Deserialize entity and return it
+     * @brief Deserialize entities
      * @param scene Scene to deserialize
-     * @param eNode Entity data node
-     * @return Entity instance
+     * @param serializer Serializer instance
+     * @param asNode Audio source data node
+     * @return True if deserialized, false otherwise
      */
-    Entity deserializeEntity(Scene* scene, const YAML::Node& eNode);
+    bool deserializeEntities(Scene* scene, io::Serializer* serializer, const YAML::Node& asNode);
 
     /**
      * @brief Serialize audio sources to the specified emitter
@@ -64,6 +66,24 @@ private:
      * @return True if deserialized, false otherwise
      */
     bool deserializeAudioSources(Scene* scene, io::Serializer* serializer, const YAML::Node& asNode);
+
+    /**
+     * @brief Serialize physics actor to the specified emitter
+     * @param scene Scene to serialize
+     * @param serializer Serializer instance
+     * @param out Emitter to serialize into
+     * @return True if serialized, false otherwise
+     */
+    bool serializePhysics(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const;
+
+    /**
+     * @brief Deserialize physics actors
+     * @param scene Scene to deserialize
+     * @param serializer Serializer instance
+     * @param asNode Audio source data node
+     * @return True if deserialized, false otherwise
+     */
+    bool deserializePhysics(Scene* scene, io::Serializer* serializer, const YAML::Node& asNode);
 };
 
 } // namespace scene
