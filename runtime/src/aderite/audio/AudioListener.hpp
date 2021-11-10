@@ -14,12 +14,12 @@ namespace aderite {
 namespace audio {
 
 /**
- * @brief Audio source object used to denote a point in the world where audio is emitted from
+ * @brief Audio listener object used to denote a point in the world where audio is heard from
  */
-class AudioSource : public io::ISerializable {
+class AudioListener : public io::ISerializable {
 public:
-    AudioSource();
-    virtual ~AudioSource();
+    AudioListener();
+    virtual ~AudioListener();
 
     /**
      * @brief Update audio source
@@ -27,33 +27,21 @@ public:
     void update();
 
     /**
-     * @brief Creates an audio instance for the specified clip
-     * @param clip Clip to create instance for
-     * @return AudioInstance object
+     * @brief Disables listener
      */
-    AudioInstance* createInstance(const asset::AudioAsset* clip);
+    void disable();
 
     /**
-     * @brief Creats a one shot audio instance for the specified clip
-     * @param clip Clip to create instance for
-     * @return AudioInstance object
+     * @brief Enables listener
      */
-    AudioInstance* createOneshot(const asset::AudioAsset* clip);
+    void enable();
 
     /**
-     * @brief Mutes the source
+     * @brief Returns true if the listener is enabled, false otherwise
      */
-    void mute();
-
-    /**
-     * @brief Unmutes the source
-     */
-    void unmute();
-
-    /**
-     * @brief Stops all instances in the audio, this will clear oneshots if there were any
-     */
-    void stop();
+    bool isEnabled() const {
+        return m_enabled;
+    }
 
     /**
      * @brief Set the name of the source
@@ -66,13 +54,6 @@ public:
      */
     std::string getName() const {
         return m_name;
-    }
-
-    /**
-     * @brief Returns the volume of the source
-     */
-    float getVolume() const {
-        return m_volume;
     }
 
     /**
@@ -95,12 +76,6 @@ public:
     glm::vec3 getVelocity() const {
         return m_velocity;
     }
-
-    /**
-     * @brief Sets the volume of the source
-     * @param volume New volume for this source
-     */
-    void setVolume(const float volume);
 
     /**
      * @brief Sets the position of the source
@@ -126,24 +101,14 @@ public:
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
-    /**
-     * @brief Synchronizes source parameters with the instance
-     * @param instance Instance to sync
-     */
-    void syncInstance(AudioInstance* instance) const;
-
-private:
     std::string m_name = "";
-    std::vector<AudioInstance*> m_instances;
-    std::vector<AudioInstance*> m_oneshots;
 
-    bool m_muted = false;
+    bool m_enabled = false;
 
     // Properties
     glm::vec3 m_position = {0.0f, 0.0f, 0.0f};
     glm::quat m_rotation = glm::quat({1.0f, 0.0f, 0.0f, 0.0f});
     glm::vec3 m_velocity = {0.0f, 0.0f, 0.0f};
-    float m_volume = 1.0f;
 };
 
 } // namespace audio

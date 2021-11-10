@@ -52,15 +52,23 @@ Data:
             Mesh: 2
             Material: 4
         Name: BoingBox1
-  AudioSources:
-    - Type: 20
-      Data:
-        Handle: 1
-        Volume: 1
-        Position: [0, 0, 0]
-        Rotation: [1, 0, 0, 0]
-        Velocity: [0, 0, 0]
-        Name: Origin
+  Audio:
+    Listeners:
+      - Type: 21
+        Data:
+          Name: Origin
+          Enabled: true
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0, 0]
+          Velocity: [0, 0, 0]
+    Sources:
+      - Type: 20
+        Data:
+          Name: Origin
+          Volume: 1
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0, 0]
+          Velocity: [0, 0, 0]
   Physics:
     Type: 93
     Data:
@@ -79,4 +87,5 @@ Data:
           Name: Scripts.BoingSystem
           Selector: BoingCubeSelector
           Fields:
-            {}
+            Source: Origin
+            Boing: 8

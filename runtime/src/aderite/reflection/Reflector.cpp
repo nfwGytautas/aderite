@@ -10,6 +10,7 @@
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
+#include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/DynamicActor.hpp"
@@ -45,6 +46,7 @@ bool Reflector::init() {
 
     // Audio
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, audio::AudioSource, RuntimeTypes::AUDIO_SOURCE);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, audio::AudioListener, RuntimeTypes::AUDIO_LISTENER);
 
     // Entity
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Transform, RuntimeTypes::TRANSFORM);

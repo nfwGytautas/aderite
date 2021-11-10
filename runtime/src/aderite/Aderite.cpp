@@ -188,10 +188,6 @@ void Engine::onPipelineChanged(rendering::Pipeline* pipeline) {
 }
 
 void Engine::onSceneChanged(scene::Scene* scene) {
-    for (audio::AudioSource* source : scene->getAudioSources()) {
-        m_audioController->addSource(source);
-    }
-
     MIDDLEWARE_ACTION(onSceneChanged, scene);
 }
 

@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 
+#include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/EntitySelector.hpp"
@@ -31,10 +32,6 @@ void Scene::update(float delta) {
     //}
 }
 
-void Scene::addSource(audio::AudioSource* source) {
-    m_audioSources.push_back(source);
-}
-
 void Scene::addScriptSystem(scripting::ScriptSystem* system) {
     ADERITE_DYNAMIC_ASSERT(system != nullptr, "Passed nullptr scripting::ScriptSystem to addScriptSystem");
 
@@ -55,6 +52,14 @@ void Scene::addScriptSystem(scripting::ScriptSystem* system) {
 void Scene::addEntitySelector(EntitySelector* selector) {
     m_entitySelectors.push_back(selector);
     selector->setScene(this);
+}
+
+void Scene::addAudioListener(audio::AudioListener* listener) {
+    m_audioListeners.push_back(listener);
+}
+
+void Scene::addAudioSource(audio::AudioSource* source) {
+    m_audioSources.push_back(source);
 }
 
 size_t Scene::getFreeTagSlots() const {
@@ -117,6 +122,18 @@ EntitySelector* Scene::getSelector(const std::string& name) const {
     });
 
     if (it == m_entitySelectors.end()) {
+        return nullptr;
+    }
+
+    return *it;
+}
+
+audio::AudioSource* Scene::getSource(const std::string& name) const {
+    auto it = std::find_if(m_audioSources.begin(), m_audioSources.end(), [name](const audio::AudioSource* source) {
+        return source->getName() == name;
+    });
+
+    if (it == m_audioSources.end()) {
         return nullptr;
     }
 

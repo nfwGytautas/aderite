@@ -56,7 +56,7 @@ private:
      * @param out Emitter to serialize into
      * @return True if serialized, false otherwise
      */
-    bool serializeAudioSources(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const;
+    bool serializeAudio(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const;
 
     /**
      * @brief Deserialize audio sources
@@ -65,7 +65,7 @@ private:
      * @param asNode Audio source data node
      * @return True if deserialized, false otherwise
      */
-    bool deserializeAudioSources(Scene* scene, io::Serializer* serializer, const YAML::Node& asNode);
+    bool deserializeAudio(Scene* scene, io::Serializer* serializer, const YAML::Node& asNode);
 
     /**
      * @brief Serialize physics actor to the specified emitter

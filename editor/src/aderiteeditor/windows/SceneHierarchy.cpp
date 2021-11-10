@@ -4,6 +4,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/audio/AudioController.hpp"
+#include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
@@ -15,7 +16,6 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 
-#include "aderiteeditor/extensions/EditorAudioSource.hpp"
 #include "aderiteeditor/extensions/EditorEntity.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/shared/DragDropObject.hpp"
@@ -122,9 +122,13 @@ void SceneHierarchy::renderContextMenu() {
         ImGui::MenuItem("(Audio)", NULL, false, false);
 
         if (ImGui::MenuItem("Create source")) {
-            audio::EditorAudioSource* source = new audio::EditorAudioSource();
-            currentScene->addSource(source);
-            ::aderite::Engine::getAudioController()->addSource(source);
+            audio::AudioSource* source = new audio::AudioSource();
+            currentScene->addAudioSource(source);
+        }
+
+        if (ImGui::MenuItem("Create listener")) {
+            audio::AudioListener* listener = new audio::AudioListener();
+            currentScene->addAudioListener(listener);
         }
 
         ImGui::Separator();
@@ -213,28 +217,53 @@ void SceneHierarchy::renderAudio() {
     scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 
     ImGui::SetNextItemOpen(false, ImGuiCond_Once);
-    if (ImGui::TreeNode("Sources")) {
+    if (ImGui::TreeNode("Listeners")) {
         size_t idx = 0;
-        for (audio::AudioSource* source : currentScene->getAudioSources()) {
-            audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(source);
-
+        for (audio::AudioListener* listener : currentScene->getAudioListeners()) {
             ImGuiTreeNodeFlags nodeFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
             if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Serializable &&
-                editor::State::LastSelectedObject.getSerializable() == editorSource) {
+                editor::State::LastSelectedObject.getSerializable() == listener) {
                 nodeFlags |= ImGuiTreeNodeFlags_Selected;
             }
 
-            ImGui::TreeNodeEx(editorSource->getName().c_str(), nodeFlags, "%s", editorSource->getName().c_str());
+            ImGui::TreeNodeEx(listener->getName().c_str(), nodeFlags, "%s", listener->getName().c_str());
 
             if (ImGui::BeginDragDropSource()) {
-                editor::DragDropObject obj {editorSource};
+                editor::DragDropObject obj {listener};
+                ImGui::SetDragDropPayload(editor::DDPayloadID__AudioListener, &obj, sizeof(editor::DragDropObject));
+                ImGui::EndDragDropSource();
+            }
+
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                editor::State::LastSelectedObject = editor::SelectableObject(listener);
+            }
+        }
+
+        ImGui::TreePop();
+    }
+
+    ImGui::SetNextItemOpen(false, ImGuiCond_Once);
+    if (ImGui::TreeNode("Sources")) {
+        size_t idx = 0;
+        for (audio::AudioSource* source : currentScene->getAudioSources()) {
+            ImGuiTreeNodeFlags nodeFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+            if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Serializable &&
+                editor::State::LastSelectedObject.getSerializable() == source) {
+                nodeFlags |= ImGuiTreeNodeFlags_Selected;
+            }
+
+            ImGui::TreeNodeEx(source->getName().c_str(), nodeFlags, "%s", source->getName().c_str());
+
+            if (ImGui::BeginDragDropSource()) {
+                editor::DragDropObject obj {source};
                 ImGui::SetDragDropPayload(editor::DDPayloadID__AudioSource, &obj, sizeof(editor::DragDropObject));
                 ImGui::EndDragDropSource();
             }
 
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                editor::State::LastSelectedObject = editor::SelectableObject(editorSource);
+                editor::State::LastSelectedObject = editor::SelectableObject(source);
             }
         }
 

@@ -9,6 +9,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/audio/AudioInstance.hpp"
+#include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/scene/Scene.hpp"
@@ -77,66 +78,48 @@ bool AudioController::init() {
         return false;
     }
 
+    // Aderite only supports single listener
+    if (m_fmodSystem->setNumListeners(1) != FMOD_OK) {
+        LOG_ERROR("Failed to set number of listeners to 1, something is wrong with audio controller, aborting");
+        return false;
+    }
+
     return true;
 }
 
 void AudioController::shutdown() {
-    unloadAll();
     m_fmodSystem->release();
 }
 
 void AudioController::update() {
-    if (::aderite::Engine::getSceneManager()->getCurrentScene() == nullptr) {
-        return;
+    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+    if (currentScene != nullptr) {
+        // Configure listener
+        bool thisFrameMute = false;
+        int enabledListenerCount = 0;
+
+        auto& listeners = currentScene->getAudioListeners();
+
+        // If no listeners no need to update anything
+        for (auto listener : listeners) {
+            if (listener->isEnabled()) {
+                if (enabledListenerCount > 1) {
+                    LOG_WARN("Multiple enabled listeners, the last one will be used as the listener");
+                }
+
+                listener->update();
+                enabledListenerCount++;
+            }
+        }
+
+        // If no active listeners, mute
+        if (enabledListenerCount > 0) {
+            // Configure sources
+            for (AudioSource* source : currentScene->getAudioSources()) {
+                source->update();
+            }
+        }
     }
-
-    //// Configure listener
-    //bool thisFrameMute = false;
-    //int enabledListenerCount = 0;
-    //auto listenerGroup = ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::AudioListenerComponent>(
-    //    entt::get<scene::TransformComponent>);
-
-    //// If no listeners no need to update anything
-    //if (listenerGroup.size() != 0) {
-    //    if (m_fmodSystem->setNumListeners(listenerGroup.size()) != FMOD_OK) {
-    //        LOG_WARN("Failed to set number listeners for FMOD to {0} defaulting to 1", listenerGroup.size());
-
-    //        if (m_fmodSystem->setNumListeners(1) != FMOD_OK) {
-    //            LOG_ERROR("Failed to set number of listeners to 1, something is wrong with audio controller, aborting");
-    //            return;
-    //        }
-    //    }
-
-    //    for (auto entity : listenerGroup) {
-    //        auto [listener, transform] = listenerGroup.get<scene::AudioListenerComponent, scene::TransformComponent>(entity);
-
-    //        if (listener.IsEnabled) {
-    //            FMOD_3D_ATTRIBUTES listener3dAttributes = {};
-
-    //            listener3dAttributes.position = {transform.Position.x, transform.Position.y, transform.Position.z};
-
-    //            // TODO: Rotation
-    //            listener3dAttributes.up = {0.0f, 1.0f, 0.0f};
-    //            listener3dAttributes.forward = {0.0f, 0.0f, 1.0f};
-
-    //            // TODO: Velocity
-    //            listener3dAttributes.velocity = {0.0f, 0.0f, 0.0f};
-
-    //            // TODO: Attenuation
-    //            m_fmodSystem->setListenerAttributes(enabledListenerCount, &listener3dAttributes, nullptr);
-
-    //            enabledListenerCount++;
-    //        }
-    //    }
-    //}
-
-    //// If no active listeners, mute
-    //if (enabledListenerCount > 0) {
-    //    // Configure sources
-    //    for (AudioSource* source : m_sources) {
-    //        source->update();
-    //    }
-    //}
 
     if (m_fmodSystem->update() != FMOD_OK) {
         LOG_WARN("Failed to update audio controller");
@@ -163,9 +146,6 @@ void AudioController::loadMasterBank() {
 
     m_stringBank = nullptr;
     m_masterBank = nullptr;
-
-    // Get all events
-    this->unloadAll();
 
     // Load
     FMOD_RESULT result = m_fmodSystem->loadBankMemory(reinterpret_cast<const char*>(stringsChunk.Data.data()), stringsChunk.Data.size(),
@@ -223,7 +203,12 @@ AudioInstance* aderite::audio::AudioController::createAudioInstance(const std::s
 }
 
 void AudioController::setMute(bool value) {
-    for (AudioSource* source : m_sources) {
+    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+    if (currentScene == nullptr) {
+        return;
+    }
+
+    for (AudioSource* source : currentScene->getAudioSources()) {
         if (value) {
             source->mute();
         } else {
@@ -233,7 +218,12 @@ void AudioController::setMute(bool value) {
 }
 
 void AudioController::disable(bool value) {
-    for (AudioSource* source : m_sources) {
+    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+    if (currentScene == nullptr) {
+        return;
+    }
+
+    for (AudioSource* source : currentScene->getAudioSources()) {
         if (value) {
             source->stop();
         } else {
@@ -244,35 +234,6 @@ void AudioController::disable(bool value) {
 
 const std::vector<std::string>& aderite::audio::AudioController::getKnownEvents() const {
     return m_knownEvents;
-}
-
-AudioSource* AudioController::createSource() {
-    AudioSource* source = new AudioSource();
-    m_sources.push_back(source);
-    return source;
-}
-
-void AudioController::addSource(AudioSource* source) {
-    m_sources.push_back(source);
-}
-
-AudioSource* AudioController::getSource(SourceHandle handle) {
-    for (AudioSource* source : m_sources) {
-        if (source->getHandle() == handle) {
-            return source;
-        }
-    }
-
-    return nullptr;
-}
-
-void AudioController::unloadAll() {
-    // Unload all then delete
-    for (auto& source : m_sources) {
-        delete source;
-    }
-
-    m_sources.clear();
 }
 
 } // namespace audio

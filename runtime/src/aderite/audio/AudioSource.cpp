@@ -4,14 +4,13 @@
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/audio/AudioInstance.hpp"
+#include "aderite/utility/Random.hpp"
 #include "aderite/utility/YAML.hpp"
 
 namespace aderite {
 namespace audio {
 
-static audio::SourceHandle g_NextSourceHandle = 0;
-
-AudioSource::AudioSource() : m_handle(g_NextSourceHandle++) {}
+AudioSource::AudioSource() : m_name(utility::generateString(12)) {}
 
 AudioSource::~AudioSource() {}
 
@@ -58,6 +57,10 @@ void AudioSource::stop() {
     }
 }
 
+void AudioSource::setName(const std::string& name) {
+    m_name = name;
+}
+
 void AudioSource::setVolume(const float volume) {
     m_volume = volume;
 }
@@ -79,7 +82,7 @@ reflection::Type AudioSource::getType() const {
 }
 
 bool AudioSource::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    emitter << YAML::Key << "Handle" << YAML::Value << m_handle;
+    emitter << YAML::Key << "Name" << YAML::Value << m_name;
     emitter << YAML::Key << "Volume" << YAML::Value << m_volume;
     emitter << YAML::Key << "Position" << YAML::Value << m_position;
     emitter << YAML::Key << "Rotation" << YAML::Value << m_rotation;
@@ -88,15 +91,11 @@ bool AudioSource::serialize(const io::Serializer* serializer, YAML::Emitter& emi
 }
 
 bool AudioSource::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    m_handle = data["Handle"].as<audio::SourceHandle>();
+    m_name = data["Name"].as<std::string>();
     m_volume = data["Volume"].as<float>();
     m_position = data["Position"].as<glm::vec3>();
     m_rotation = data["Rotation"].as<glm::quat>();
     m_velocity = data["Velocity"].as<glm::vec3>();
-
-    if (g_NextSourceHandle < m_handle) {
-        g_NextSourceHandle = m_handle + 1;
-    }
 
     return true;
 }

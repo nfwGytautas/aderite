@@ -40,6 +40,7 @@ private:
     void renderAudioSource(io::ISerializable* serializable);
     void renderScriptSystem(io::ISerializable* serializable);
     void renderEntitySelector(io::ISerializable* serializable);
+    void renderAudioListener(io::ISerializable* serializable);
 };
 
 } // namespace editor_ui

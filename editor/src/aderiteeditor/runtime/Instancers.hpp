@@ -40,7 +40,6 @@
 #include "aderiteeditor/runtime/OperationArray.hpp"
 
 // Extensions
-#include "aderiteeditor/extensions/EditorAudioSource.hpp"
 #include "aderiteeditor/extensions/EditorEntity.hpp"
 
 namespace aderite {
@@ -86,7 +85,6 @@ void linkInstancers() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, editor::OperationArray, reflection::EditorTypes::ArrayOp);
 
     // Extensions
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, audio::EditorAudioSource, reflection::RuntimeTypes::AUDIO_SOURCE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, scene::EditorEntity, reflection::RuntimeTypes::ENTITY);
 }
 

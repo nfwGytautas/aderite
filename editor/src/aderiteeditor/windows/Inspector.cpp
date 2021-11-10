@@ -10,6 +10,7 @@
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
+#include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/io/LoaderPool.hpp"
@@ -39,7 +40,6 @@
 #include "aderiteeditor/asset/property/Property.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
-#include "aderiteeditor/extensions/EditorAudioSource.hpp"
 #include "aderiteeditor/extensions/EditorEntity.hpp"
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
@@ -401,23 +401,6 @@ void Inspector::renderStaticActor(physics::StaticActor* actor) {
     // Shared
     this->renderActor(actor);
 }
-
-// void Inspector::renderAudioListener(scene::Entity entity) {
-//    bool open, remove = false;
-//    render_component_shared("Audio Listener", "Audio Listener", open, remove);
-//
-//    if (open) {
-//        auto& c = entity.getComponent<scene::AudioListenerComponent>();
-//
-//        ImGui::Checkbox("Enabled", &c.IsEnabled);
-//
-//        ImGui::TreePop();
-//    }
-//
-//    if (remove) {
-//        entity.removeComponent<scene::AudioListenerComponent>();
-//    }
-//}
 
 void Inspector::renderAsset() {
     static vfs::File* cacheFile = nullptr;
@@ -880,6 +863,10 @@ void Inspector::renderSerializable() {
         this->renderEntitySelector(object);
         break;
     }
+    case reflection::RuntimeTypes::AUDIO_LISTENER: {
+        this->renderAudioListener(object);
+        break;
+    }
     default: {
     }
     }
@@ -887,7 +874,7 @@ void Inspector::renderSerializable() {
 
 void Inspector::renderAudioSource(io::ISerializable* serializable) {
     static utility::InlineRename renamer;
-    audio::EditorAudioSource* source = static_cast<audio::EditorAudioSource*>(serializable);
+    audio::AudioSource* source = static_cast<audio::AudioSource*>(serializable);
 
     renamer.setValue(source->getName());
 
@@ -1054,8 +1041,7 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
                     audio::AudioSource* audioHandle = nullptr;
                     scripting::extract(source, audioHandle);
 
-                    audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(audioHandle);
-                    ImGui::Button(editorSource->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    ImGui::Button(audioHandle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 } else {
                     ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 }
@@ -1063,8 +1049,8 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
                 if (ImGui::BeginDragDropTarget()) {
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioSource)) {
                         editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-                        audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(ddo->Data);
-                        fw.setValue(::aderite::Engine::getScriptManager()->getLocator().create(editorSource));
+                        audio::AudioSource* source = static_cast<audio::AudioSource*>(ddo->Data);
+                        fw.setValue(::aderite::Engine::getScriptManager()->getLocator().create(source));
                     }
 
                     ImGui::EndDragDropTarget();
@@ -1125,6 +1111,29 @@ void Inspector::renderEntitySelector(io::ISerializable* serializable) {
 
         break;
     }
+    }
+}
+
+void Inspector::renderAudioListener(io::ISerializable* serializable) {
+    static utility::InlineRename renamer;
+    audio::AudioListener* listener = static_cast<audio::AudioListener*>(serializable);
+
+    renamer.setValue(listener->getName());
+
+    if (renamer.renderUI()) {
+        listener->setName(renamer.getValue());
+        renamer.setValue(renamer.getValue());
+    }
+
+    ImGui::Separator();
+
+    bool enabled = listener->isEnabled();
+    if (ImGui::Checkbox("Enabled", &enabled)) {
+        if (enabled) {
+            listener->enable();
+        } else {
+            listener->disable();
+        }
     }
 }
 

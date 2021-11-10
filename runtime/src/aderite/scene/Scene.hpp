@@ -33,10 +33,10 @@ public:
     void update(float delta);
 
     /**
-     * @brief Adds an AudioSource to the scene
-     * @param source Source to add
+     * @brief Add entity to the scene
+     * @param entity Entity to add
      */
-    void addSource(audio::AudioSource* source);
+    void addEntity(Entity* entity);
 
     /**
      * @brief Adds a script system to the scene
@@ -51,15 +51,22 @@ public:
     void addEntitySelector(EntitySelector* selector);
 
     /**
-     * @brief Returns the number of empty tag slots
-     */
-    size_t getFreeTagSlots() const;
+     * @brief Adds a audio listener to the scene
+     * @param listener AudioListener instance
+    */
+    void addAudioListener(audio::AudioListener* listener);
 
     /**
-     * @brief Returns the index of the specified tag
-     * @param name Name of the tag
+     * @brief Adds a audio source to the scene
+     * @param source AudioSource instance
+    */
+    void addAudioSource(audio::AudioSource* source);
+
+    /**
+     * @brief Sets the pipeline of the scene
+     * @param pipeline New pipeline
      */
-    size_t getTagIndex(const std::string& name) const;
+    void setPipeline(rendering::Pipeline* pipeline);
 
     /**
      * @brief Add tag to the scene
@@ -72,6 +79,17 @@ public:
      * @param name
      */
     void removeTag(const std::string& name);
+
+    /**
+     * @brief Returns the number of empty tag slots
+     */
+    size_t getFreeTagSlots() const;
+
+    /**
+     * @brief Returns the index of the specified tag
+     * @param name Name of the tag
+     */
+    size_t getTagIndex(const std::string& name) const;
 
     /**
      * @brief Returns the pipeline of this scene
@@ -91,10 +109,24 @@ public:
     EntitySelector* getSelector(const std::string& name) const;
 
     /**
+     * @brief Returns the audio source with the specified name
+     * @param name Name of the source
+     * @return AudioSource instance or nullptr if not found
+     */
+    audio::AudioSource* getSource(const std::string& name) const;
+
+    /**
      * @brief Returns audio sources of this scene
      */
     const std::vector<audio::AudioSource*>& getAudioSources() const {
         return m_audioSources;
+    }
+
+    /**
+     * @brief Returns audio listeners of this scene
+     */
+    const std::vector<audio::AudioListener*>& getAudioListeners() const {
+        return m_audioListeners;
     }
 
     /**
@@ -119,18 +151,6 @@ public:
     }
 
     /**
-     * @brief Sets the pipeline of the scene
-     * @param pipeline New pipeline
-     */
-    void setPipeline(rendering::Pipeline* pipeline);
-
-    /**
-     * @brief Add entity to the scene
-     * @param entity Entity to add
-     */
-    void addEntity(Entity* entity);
-
-    /**
      * @brief Get entities in this scene
      */
     const std::vector<Entity*> getEntities() const {
@@ -151,6 +171,7 @@ private:
     rendering::Pipeline* m_pipeline = nullptr;
 
     std::vector<audio::AudioSource*> m_audioSources;
+    std::vector<audio::AudioListener*> m_audioListeners;
     std::vector<Entity*> m_entities;
     std::vector<scripting::ScriptSystem*> m_systems;
     std::vector<EntitySelector*> m_entitySelectors;

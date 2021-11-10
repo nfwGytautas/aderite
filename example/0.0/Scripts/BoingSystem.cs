@@ -9,22 +9,28 @@ namespace Scripts
 
         void Init()
         {
-            Log.Trace("Initializing BoingSystem");
+
         }
 
         void Shutdown()
         {
-            Log.Trace("Shutting down BoingSystem");
+
         }
 
         void Update(float delta, Entity[] entities)
         {
-            Log.Trace($"BoingSystem updating {entities.Length} entities");
+
         }
 
         void OnCollisionStart(CollisionEvent collision)
         {
-            Log.Trace("Collision start");
+            if (Source == null || Boing == null)
+            {
+                Log.Error("Source or Boing is null");
+                return;
+            }
+
+            Source.OneShot(Boing);
         }
     }
 }

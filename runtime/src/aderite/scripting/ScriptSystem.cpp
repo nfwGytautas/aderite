@@ -190,7 +190,7 @@ bool ScriptSystem::serialize(const io::Serializer* serializer, YAML::Emitter& em
             } else {
                 audio::AudioSource* source = nullptr;
                 scripting::extract(audioSource, source);
-                emitter << source->getHandle();
+                emitter << source->getName();
             }
             break;
         }
@@ -271,7 +271,7 @@ bool ScriptSystem::deserialize(io::Serializer* serializer, const YAML::Node& dat
                 break;
             }
             case scripting::FieldType::AudioSource: {
-                audio::AudioSource* source = ::aderite::Engine::getAudioController()->getSource(fieldData.second.as<audio::SourceHandle>());
+                audio::AudioSource* source = m_scene->getSource(fieldData.second.as<std::string>());
                 MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(source);
                 fw.setValue(obj);
                 break;

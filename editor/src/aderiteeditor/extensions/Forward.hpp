@@ -10,8 +10,4 @@ namespace scene {
 class EditorEntity;
 }
 
-namespace audio {
-class EditorMaterialType;
-}
-
 } // namespace aderite

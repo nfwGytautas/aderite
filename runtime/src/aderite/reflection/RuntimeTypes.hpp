@@ -24,6 +24,7 @@ enum class RuntimeTypes : Type {
 
     // Audio
     AUDIO_SOURCE = 20,
+    AUDIO_LISTENER = 21,
 
     // Entity
     TRANSFORM = 40,

@@ -9,6 +9,7 @@
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
+#include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/Loader.hpp"
 #include "aderite/io/Serializer.hpp"
@@ -42,7 +43,7 @@ bool SceneSerializer::serialize(const Scene* scene, const io::Serializer* serial
     }
 
     // Audio sources
-    if (!this->serializeAudioSources(scene, serializer, emitter)) {
+    if (!this->serializeAudio(scene, serializer, emitter)) {
         return false;
     }
 
@@ -77,7 +78,7 @@ bool SceneSerializer::deserialize(Scene* scene, io::Serializer* serializer, cons
     }
 
     // Audio sources
-    if (!this->deserializeAudioSources(scene, serializer, data)) {
+    if (!this->deserializeAudio(scene, serializer, data)) {
         return false;
     }
 
@@ -128,25 +129,44 @@ bool SceneSerializer::deserializeEntities(Scene* scene, io::Serializer* serializ
     return true;
 }
 
-bool SceneSerializer::serializeAudioSources(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const {
-    out << YAML::Key << "AudioSources" << YAML::BeginSeq;
+bool SceneSerializer::serializeAudio(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const {
+    out << YAML::Key << "Audio" << YAML::BeginMap;
+
+    out << YAML::Key << "Listeners" << YAML::BeginSeq;
+    for (const audio::AudioListener* listener : scene->m_audioListeners) {
+        serializer->writeUntrackedType(out, listener);
+    }
+    out << YAML::EndSeq;
+
+    out << YAML::Key << "Sources" << YAML::BeginSeq;
     for (const audio::AudioSource* source : scene->m_audioSources) {
         serializer->writeUntrackedType(out, source);
     }
     out << YAML::EndSeq;
 
+    out << YAML::EndMap;
+
     return true;
 }
 
-bool SceneSerializer::deserializeAudioSources(Scene* scene, io::Serializer* serializer, const YAML::Node& asNode) {
-    auto sources = asNode["AudioSources"];
-    if (sources) {
-        for (auto sourceNode : sources) {
-            audio::AudioSource* source = static_cast<audio::AudioSource*>(serializer->parseUntrackedType(sourceNode));
-            scene->m_audioSources.push_back(source);
+bool SceneSerializer::deserializeAudio(Scene* scene, io::Serializer* serializer, const YAML::Node& asNode) {
+    auto audio = asNode["Audio"];
+    if (audio) {
+        auto listeners = audio["Listeners"];
+        auto sources = audio["Sources"];
 
-            // TODO: Remove this when standalone scripts are introduced
-            ::aderite::Engine::getAudioController()->addSource(source);
+        if (listeners) {
+            for (auto listenerNode : listeners) {
+                audio::AudioListener* listener = static_cast<audio::AudioListener*>(serializer->parseUntrackedType(listenerNode));
+                scene->addAudioListener(listener);
+            }
+        }
+
+        if (sources) {
+            for (auto sourceNode : sources) {
+                audio::AudioSource* source = static_cast<audio::AudioSource*>(serializer->parseUntrackedType(sourceNode));
+                scene->addAudioSource(source);
+            }
         }
     }
 
