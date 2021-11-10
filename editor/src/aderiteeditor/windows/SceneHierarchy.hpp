@@ -2,10 +2,10 @@
 
 #include "aderite/scene/Entity.hpp"
 
+#include "aderiteeditor/extensions/Forward.hpp"
 #include "aderiteeditor/shared/BaseComponent.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
 #include "aderiteeditor/windows/Forward.hpp"
-#include "aderiteeditor/extensions/Forward.hpp"
 
 namespace aderite {
 namespace editor_ui {
@@ -38,9 +38,14 @@ private:
     void renderAudio();
 
     /**
-     * @brief Renders physics tree node of the scene
-    */
-    void renderPhysics();
+     * @brief Renders scripts tree node of the scene
+     */
+    void renderScripts();
+
+    /**
+     * @brief Renders settings nodes of the scene
+     */
+    void renderSettings();
 
 private:
     TextInputModal* m_textModal = nullptr;

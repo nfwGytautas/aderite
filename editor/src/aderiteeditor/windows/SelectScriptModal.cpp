@@ -3,7 +3,6 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
-#include "aderite/scripting/BehaviorWrapper.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 
 #include "aderiteeditor/shared/IEventSink.hpp"
@@ -45,9 +44,9 @@ void SelectScriptModal::render() {
         // TODO: Filtering
 
         if (ImGui::BeginListBox("##ScriptSelectList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
-            for (scripting::BehaviorWrapper* bw : ::aderite::Engine::getScriptManager()->getAllBehaviors()) {
-                if (ImGui::Selectable(bw->getName().c_str())) {
-                    m_selected = bw;
+            for (auto kvp : ::aderite::Engine::getScriptManager()->getKnownSystems()) {
+                if (ImGui::Selectable(kvp.first.c_str())) {
+                    m_selected = kvp.first;
                     m_visible = false;
                     ImGui::CloseCurrentPopup();
                     break;
@@ -65,12 +64,8 @@ bool SelectScriptModal::isOpen() const {
     return m_visible;
 }
 
-scripting::BehaviorWrapper* SelectScriptModal::getSelectedBehavior() const {
-    return m_selected;
-}
-
 void SelectScriptModal::reset() {
-    m_selected = nullptr;
+    m_selected = "";
 }
 
 } // namespace editor_ui

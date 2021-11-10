@@ -16,6 +16,18 @@ Entity::~Entity() {
     delete m_transform;
 }
 
+void Entity::addTag(size_t tag) {
+    m_tags = m_tags | tag;
+}
+
+void Entity::removeTag(size_t tag) {
+    m_tags = m_tags & ~tag;
+}
+
+bool Entity::hasTag(size_t tag) const {
+    return m_tags & tag;
+}
+
 void Entity::setScene(Scene* scene) {
     m_scene = scene;
 
@@ -26,25 +38,29 @@ void Entity::setScene(Scene* scene) {
 }
 
 void Entity::setActor(physics::PhysicsActor* actor, bool keepColliders) {
-    if (m_scene != nullptr) {
-        if (actor != nullptr) {
-            if (keepColliders && m_actor != nullptr) {
-                m_actor->transferColliders(actor);
-            }
-
-            // Add to scene
-            m_scene->getPhysicsScene()->addActor(actor, m_transform);
-        } else {
-            if (keepColliders) {
-                LOG_WARN("KeepColliders true on a nullptr actor");
-            }
+    if (actor != nullptr) {
+        if (keepColliders && m_actor != nullptr) {
+            m_actor->transferColliders(actor);
         }
 
-        if (m_actor != nullptr) {
-            m_scene->getPhysicsScene()->detachActor(m_actor);
+        // Add to scene
+        if (m_scene != nullptr) {
+            m_scene->getPhysicsScene()->addActor(actor, m_transform);
+        }
+    } else {
+        if (keepColliders) {
+            LOG_WARN("KeepColliders true on a nullptr actor");
         }
     }
 
+    if (m_actor != nullptr) {
+        if (m_scene != nullptr) {
+            m_scene->getPhysicsScene()->detachActor(m_actor);
+        }
+        m_actor->setEntity(nullptr);
+    }
+
+    actor->setEntity(this);
     m_actor = actor;
 }
 
@@ -60,6 +76,9 @@ bool Entity::serialize(const io::Serializer* serializer, YAML::Emitter& emitter)
     // Transform
     emitter << YAML::Key << "Transform";
     serializer->writeUntrackedType(emitter, m_transform);
+
+    // Tag
+    emitter << YAML::Key << "Tags" << YAML::Value << m_tags;
 
     // Actor
     emitter << YAML::Key << "Actor";
@@ -83,6 +102,11 @@ bool Entity::serialize(const io::Serializer* serializer, YAML::Emitter& emitter)
 bool Entity::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     // Transform
     serializer->fillData(m_transform, data["Transform"]);
+
+    // Tags
+    if (data["Tags"]) {
+        m_tags = data["Tags"].as<size_t>();
+    }
 
     // Actor
     if (data["Actor"] && !data["Actor"].IsNull()) {

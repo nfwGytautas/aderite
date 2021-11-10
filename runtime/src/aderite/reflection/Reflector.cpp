@@ -24,8 +24,8 @@
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/Transform.hpp"
-#include "aderite/scripting/Script.hpp"
-#include "aderite/scripting/ScriptList.hpp"
+#include "aderite/scene/selectors/TagSelector.hpp"
+#include "aderite/scripting/ScriptSystem.hpp"
 
 namespace aderite {
 namespace reflection {
@@ -65,9 +65,8 @@ bool Reflector::init() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::RenderOperation, RuntimeTypes::OP_RENDER);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::TargetProvideOperation, RuntimeTypes::OP_TARGET);
 
-    // Scripts
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scripting::ScriptList, RuntimeTypes::SCRIPT_LIST);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scripting::Script, RuntimeTypes::SCRIPT);
+    // Scripting
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::TagSelector, RuntimeTypes::TAG_SELECTOR);
 
     LOG_DEBUG("Registered {0} runtime instancers", m_instancers.size());
     ADERITE_DEBUG_SECTION(this->printInstancers(););

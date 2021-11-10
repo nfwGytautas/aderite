@@ -41,7 +41,7 @@ bool BoxCollider::deserialize(io::Serializer* serializer, const YAML::Node& data
 }
 
 physx::PxGeometry* BoxCollider::genGeometry() {
-    return new physx::PxBoxGeometry((m_size.x / 2) * p_scale.x, (m_size.y / 2) * p_scale.y, (m_size.z / 2) * p_scale.z);
+    return new physx::PxBoxGeometry((m_size.x * p_scale.x), (m_size.y * p_scale.y), (m_size.z * p_scale.z));
 }
 
 } // namespace physics

@@ -14,8 +14,6 @@
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/components/Components.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
-#include "aderite/scripting/Script.hpp"
-#include "aderite/scripting/ScriptList.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {

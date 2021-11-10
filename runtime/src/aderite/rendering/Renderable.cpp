@@ -33,6 +33,10 @@ bool Renderable::isValid() const {
 }
 
 void Renderable::loadIfNeeded() {
+    if (m_meshHandle == nullptr || m_materialHandle == nullptr) {
+        return;
+    }
+
     if (!m_meshHandle->isValid()) {
         ::aderite::Engine::getLoaderPool()->enqueue(m_meshHandle, io::LoaderPool::Priority::HIGH);
     }

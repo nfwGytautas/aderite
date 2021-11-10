@@ -24,13 +24,13 @@
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderite/rendering/Renderable.hpp"
 #include "aderite/scene/Entity.hpp"
+#include "aderite/scene/EntitySelector.hpp"
 #include "aderite/scene/Scene.hpp"
-#include "aderite/scripting/BehaviorWrapper.hpp"
+#include "aderite/scene/selectors/TagSelector.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
-#include "aderite/scripting/Script.hpp"
-#include "aderite/scripting/ScriptList.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 
@@ -160,6 +160,30 @@ void Inspector::renderEntity() {
                         collider->setScale(transform->scale());
                     }
                 }
+            }
+
+            ImGui::Separator();
+            ImGui::Text("Tags");
+            if (ImGui::BeginListBox("##taglist", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
+                auto& tags = entity->getScene()->getTags();
+                for (size_t i = 0; i < tags.size(); i++) {
+                    if (tags[i].empty()) {
+                        continue;
+                    }
+
+                    size_t tag = 1Ui64 << i;
+                    bool has = entity->hasTag(tag);
+
+                    if (ImGui::Checkbox(tags[i].c_str(), &has)) {
+                        if (has) {
+                            entity->addTag(tag);
+                        } else {
+                            entity->removeTag(tag);
+                        }
+                    }
+                }
+
+                ImGui::EndListBox();
             }
 
             ImGui::EndTabItem();
@@ -316,27 +340,6 @@ void Inspector::renderEntity() {
     }
 }
 
-// static editor_ui::SelectScriptModal ssm;
-
-// ssm.render();
-
-// if (ssm.getSelectedBehavior() != nullptr) {
-//    if (!entity.hasComponent<::aderite::scene::ScriptsComponent>()) {
-//        entity.addComponent<::aderite::scene::ScriptsComponent>();
-//    }
-
-//    // TODO: Block from adding same script again
-
-//    // Add script
-//    auto& scriptsComponent = entity.getComponent<::aderite::scene::ScriptsComponent>();
-//    scripting::Script* s = new scripting::Script();
-//    s->setName(ssm.getSelectedBehavior()->getName());
-//    scriptsComponent.Scripts->addScript(s);
-
-//    // Reset the selector
-//    ssm.reset();
-//}
-
 void Inspector::renderActor(physics::PhysicsActor* actor) {
     // Colliders
     ImGui::Separator();
@@ -413,184 +416,6 @@ void Inspector::renderStaticActor(physics::StaticActor* actor) {
 //
 //    if (remove) {
 //        entity.removeComponent<scene::AudioListenerComponent>();
-//    }
-//}
-
-// void Inspector::renderScripts(scene::Entity entity) {
-//    auto& scripts = entity.getComponent<scene::ScriptsComponent>();
-//    std::vector<scripting::Script*> toRemove;
-//
-//    // Colliders
-//    for (size_t i = 0; i < scripts.Scripts->size(); i++) {
-//        bool remove = false;
-//
-//        bool open = false;
-//        render_component_shared("Script " + std::to_string(i), scripts.Scripts->get(i)->getName(), open, remove);
-//
-//        if (open) {
-//            auto script = static_cast<scripting::Script*>(scripts.Scripts->get(i));
-//
-//            if (ImGui::BeginTable((scripts.Scripts->get(i)->getName() + "EditTable").c_str(), 2)) {
-//                ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
-//                ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
-//
-//                // Render fields
-//                for (scripting::FieldWrapper* fw : script->getBehavior()->getFields()) {
-//                    ImGui::TableNextRow();
-//
-//                    ImGui::TableSetColumnIndex(0);
-//                    ImGui::Text(fw->getName().c_str());
-//
-//                    ImGui::TableSetColumnIndex(1);
-//                    ImGui::PushItemWidth(-FLT_MIN);
-//
-//                    switch (fw->getType()) {
-//                    case scripting::FieldType::Float: {
-//                        float val = 0.0f;
-//                        fw->getValue(script->getInstance(), &val);
-//                        if (ImGui::InputFloat(std::string("#" + fw->getName()).c_str(), &val, NULL)) {
-//                            fw->setValue(script->getInstance(), &val);
-//                        }
-//                        break;
-//                    }
-//                    case scripting::FieldType::Boolean: {
-//                        bool val = false;
-//                        fw->getValue(script->getInstance(), &val);
-//                        if (ImGui::Checkbox(std::string("##" + fw->getName()).c_str(), &val)) {
-//                            fw->setValue(script->getInstance(), &val);
-//                        }
-//                        break;
-//                    }
-//                    case scripting::FieldType::Mesh: {
-//                        MonoObject* mesh = fw->getValueObject(script->getInstance());
-//
-//                        if (mesh) {
-//                            asset::MeshAsset* meshHandle = nullptr;
-//                            scripting::extract(mesh, meshHandle);
-//
-//                            vfs::File* materialFile = editor::State::Project->getVfs()->getFile(meshHandle->getHandle());
-//                            ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//                        } else {
-//                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//                        }
-//
-//                        if (ImGui::BeginDragDropTarget()) {
-//                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MeshAsset)) {
-//                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-//                                vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-//                                asset::MeshAsset* newMeshHandle =
-//                                    static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-//                                fw->setValue(script->getInstance(),
-//                                             ::aderite::Engine::getScriptManager()->getLocator().create(newMeshHandle));
-//                            }
-//
-//                            ImGui::EndDragDropTarget();
-//                        }
-//                        break;
-//                    }
-//                    case scripting::FieldType::Material: {
-//                        MonoObject* material = nullptr;
-//                        fw->getValue(script->getInstance(), &material);
-//
-//                        if (material) {
-//                            asset::MaterialAsset* materialHandle = nullptr;
-//                            scripting::extract(material, materialHandle);
-//
-//                            vfs::File* materialFile = editor::State::Project->getVfs()->getFile(materialHandle->getHandle());
-//                            ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//                        } else {
-//                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//                        }
-//
-//                        if (ImGui::BeginDragDropTarget()) {
-//                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MaterialAsset)) {
-//                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-//                                vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-//                                asset::MaterialAsset* newMaterialHandle =
-//                                    static_cast<asset::MaterialAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-//                                fw->setValue(script->getInstance(),
-//                                             ::aderite::Engine::getScriptManager()->getLocator().create(newMaterialHandle));
-//                            }
-//
-//                            ImGui::EndDragDropTarget();
-//                        }
-//                        break;
-//                    }
-//                    case scripting::FieldType::Audio: {
-//                        MonoObject* audio = nullptr;
-//                        fw->getValue(script->getInstance(), &audio);
-//
-//                        if (audio) {
-//                            asset::AudioAsset* audioHandle = nullptr;
-//                            scripting::extract(audio, audioHandle);
-//
-//                            vfs::File* materialFile = editor::State::Project->getVfs()->getFile(audioHandle->getHandle());
-//                            ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//                        } else {
-//                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//                        }
-//
-//                        if (ImGui::BeginDragDropTarget()) {
-//                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioAsset)) {
-//                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-//                                vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-//                                asset::AudioAsset* newAudioHandle =
-//                                    static_cast<asset::AudioAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-//                                fw->setValue(script->getInstance(),
-//                                             ::aderite::Engine::getScriptManager()->getLocator().create(newAudioHandle));
-//                            }
-//
-//                            ImGui::EndDragDropTarget();
-//                        }
-//                        break;
-//                    }
-//                    case scripting::FieldType::AudioSource: {
-//                        MonoObject* source = nullptr;
-//                        fw->getValue(script->getInstance(), &source);
-//
-//                        if (source) {
-//                            audio::AudioSource* audioHandle = nullptr;
-//                            scripting::extract(source, audioHandle);
-//
-//                            audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(audioHandle);
-//                            ImGui::Button(editorSource->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//                        } else {
-//                            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//                        }
-//
-//                        if (ImGui::BeginDragDropTarget()) {
-//                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioSource)) {
-//                                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-//                                audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(ddo->Data);
-//                                fw->setValue(script->getInstance(),
-//                                             ::aderite::Engine::getScriptManager()->getLocator().create(editorSource));
-//                            }
-//
-//                            ImGui::EndDragDropTarget();
-//                        }
-//                        break;
-//                    }
-//                    default: {
-//                        ImGui::Text("Unknown field type");
-//                    }
-//                    }
-//
-//                    ImGui::PopItemWidth();
-//                }
-//
-//                ImGui::EndTable();
-//            }
-//
-//            ImGui::TreePop();
-//        }
-//
-//        if (remove) {
-//            toRemove.push_back(scripts.Scripts->get(i));
-//        }
-//    }
-//
-//    for (scripting::Script* s : toRemove) {
-//        scripts.Scripts->removeScript(s);
 //    }
 //}
 
@@ -1001,68 +826,6 @@ void Inspector::renderPipeline(io::SerializableObject* asset) {
     ImGui::PopItemWidth();
 }
 
-// void Inspector::renderColliderList(io::SerializableObject* asset) {
-//    asset::ColliderListAsset* type = static_cast<asset::ColliderListAsset*>(asset);
-//
-//    // Colliders
-//    int i = 0;
-//    for (physics::Collider* collider : *type) {
-//        bool remove = false;
-//
-//        switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {
-//        case reflection::RuntimeTypes::BOX_CLDR: {
-//            bool open = false;
-//            render_component_shared("Box collider " + std::to_string(i++), "Box Collider", open, remove);
-//
-//            if (open) {
-//                auto typeCollider = static_cast<physics::BoxCollider*>(collider);
-//                bool isTrigger = typeCollider->isTrigger();
-//                glm::vec3 size = typeCollider->getSize();
-//
-//                if (ImGui::Checkbox("Is trigger", &isTrigger)) {
-//                    typeCollider->setTrigger(isTrigger);
-//                    type->incrementIteration();
-//                }
-//
-//                if (utility::DrawVec3Control("Size", size, 1.0f)) {
-//                    typeCollider->setSize(size);
-//                    type->incrementIteration();
-//                }
-//
-//                ImGui::TreePop();
-//            }
-//            break;
-//        }
-//        default: {
-//            continue;
-//        }
-//        }
-//
-//        if (remove) {
-//            type->remove(collider);
-//            break;
-//        }
-//    }
-//
-//    // Add collider
-//    ImGui::Separator();
-//
-//    float width = ImGui::GetContentRegionAvail().x * 0.4855f;
-//    ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
-//    if (ImGui::Button("Add collider", ImVec2(width, 0.0f))) {
-//        ImGui::OpenPopup("AddCollider");
-//    }
-//
-//    if (ImGui::BeginPopup("AddCollider")) {
-//        if (ImGui::MenuItem("Box")) {
-//            type->add(new physics::BoxCollider());
-//            ImGui::CloseCurrentPopup();
-//        }
-//
-//        ImGui::EndPopup();
-//    }
-//}
-
 void Inspector::renderAudio(io::SerializableObject* asset) {
     static editor_ui::SelectAudioModal sam;
 
@@ -1109,6 +872,14 @@ void Inspector::renderSerializable() {
         this->renderAudioSource(object);
         break;
     }
+    case reflection::RuntimeTypes::SCRIPT_SYSTEM: {
+        this->renderScriptSystem(object);
+        break;
+    }
+    case reflection::RuntimeTypes::TAG_SELECTOR: {
+        this->renderEntitySelector(object);
+        break;
+    }
     default: {
     }
     }
@@ -1126,6 +897,235 @@ void Inspector::renderAudioSource(io::ISerializable* serializable) {
     }
 
     ImGui::Separator();
+}
+
+void Inspector::renderScriptSystem(io::ISerializable* serializable) {
+    scripting::ScriptSystem* system = static_cast<scripting::ScriptSystem*>(serializable);
+
+    ImGui::Text(system->getName().c_str());
+
+    if (ImGui::BeginTable("ScriptSystemEditTable", 2)) {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+        ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+        ImGui::TableNextRow();
+
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Selector");
+
+        ImGui::TableSetColumnIndex(1);
+        ImGui::PushItemWidth(-FLT_MIN);
+
+        if (system->getSelector() != nullptr) {
+            ImGui::Button(system->getSelector()->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        } else {
+            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        }
+
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__EntitySelector)) {
+                editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+                system->setSelector(static_cast<scene::EntitySelector*>(ddo->Data));
+            }
+
+            ImGui::EndDragDropTarget();
+        }
+
+        ImGui::EndTable();
+    }
+
+    // Fields
+    if (ImGui::BeginTable((system->getName() + "EditTable").c_str(), 2)) {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+        ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+        // Render fields
+        for (const scripting::FieldWrapper& fw : system->getFields()) {
+            ImGui::TableNextRow();
+
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text(fw.getName().c_str());
+
+            ImGui::TableSetColumnIndex(1);
+            ImGui::PushItemWidth(-FLT_MIN);
+
+            switch (fw.getType()) {
+            case scripting::FieldType::Float: {
+                float val = 0.0f;
+                fw.getValue(&val);
+                if (ImGui::InputFloat(std::string("#" + fw.getName()).c_str(), &val, NULL)) {
+                    fw.setValue(&val);
+                }
+                break;
+            }
+            case scripting::FieldType::Boolean: {
+                bool val = false;
+                fw.getValue(&val);
+                if (ImGui::Checkbox(std::string("##" + fw.getName()).c_str(), &val)) {
+                    fw.setValue(&val);
+                }
+                break;
+            }
+            case scripting::FieldType::Mesh: {
+                MonoObject* mesh = fw.getValueObject();
+
+                if (mesh) {
+                    asset::MeshAsset* meshHandle = nullptr;
+                    scripting::extract(mesh, meshHandle);
+
+                    vfs::File* materialFile = editor::State::Project->getVfs()->getFile(meshHandle->getHandle());
+                    ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                } else {
+                    ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                }
+
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MeshAsset)) {
+                        editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+                        vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+                        asset::MeshAsset* newMeshHandle =
+                            static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
+                        fw.setValue(::aderite::Engine::getScriptManager()->getLocator().create(newMeshHandle));
+                    }
+
+                    ImGui::EndDragDropTarget();
+                }
+                break;
+            }
+            case scripting::FieldType::Material: {
+                MonoObject* material = nullptr;
+                fw.getValue(&material);
+
+                if (material) {
+                    asset::MaterialAsset* materialHandle = nullptr;
+                    scripting::extract(material, materialHandle);
+
+                    vfs::File* materialFile = editor::State::Project->getVfs()->getFile(materialHandle->getHandle());
+                    ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                } else {
+                    ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                }
+
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MaterialAsset)) {
+                        editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+                        vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+                        asset::MaterialAsset* newMaterialHandle =
+                            static_cast<asset::MaterialAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
+                        fw.setValue(::aderite::Engine::getScriptManager()->getLocator().create(newMaterialHandle));
+                    }
+
+                    ImGui::EndDragDropTarget();
+                }
+                break;
+            }
+            case scripting::FieldType::Audio: {
+                MonoObject* audio = nullptr;
+                fw.getValue(&audio);
+
+                if (audio) {
+                    asset::AudioAsset* audioHandle = nullptr;
+                    scripting::extract(audio, audioHandle);
+
+                    vfs::File* materialFile = editor::State::Project->getVfs()->getFile(audioHandle->getHandle());
+                    ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                } else {
+                    ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                }
+
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioAsset)) {
+                        editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+                        vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+                        asset::AudioAsset* newAudioHandle =
+                            static_cast<asset::AudioAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
+                        fw.setValue(::aderite::Engine::getScriptManager()->getLocator().create(newAudioHandle));
+                    }
+
+                    ImGui::EndDragDropTarget();
+                }
+                break;
+            }
+            case scripting::FieldType::AudioSource: {
+                MonoObject* source = nullptr;
+                fw.getValue(&source);
+
+                if (source) {
+                    audio::AudioSource* audioHandle = nullptr;
+                    scripting::extract(source, audioHandle);
+
+                    audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(audioHandle);
+                    ImGui::Button(editorSource->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                } else {
+                    ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                }
+
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioSource)) {
+                        editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
+                        audio::EditorAudioSource* editorSource = static_cast<audio::EditorAudioSource*>(ddo->Data);
+                        fw.setValue(::aderite::Engine::getScriptManager()->getLocator().create(editorSource));
+                    }
+
+                    ImGui::EndDragDropTarget();
+                }
+                break;
+            }
+            default: {
+                ImGui::Text("Unknown field type");
+            }
+            }
+
+            ImGui::PopItemWidth();
+        }
+
+        ImGui::EndTable();
+    }
+}
+
+void Inspector::renderEntitySelector(io::ISerializable* serializable) {
+    static utility::InlineRename renamer;
+    scene::EntitySelector* selector = static_cast<scene::EntitySelector*>(serializable);
+
+    renamer.setValue(selector->getName());
+
+    if (renamer.renderUI()) {
+        selector->setName(renamer.getValue());
+        renamer.setValue(renamer.getValue());
+    }
+
+    ImGui::Separator();
+
+    // Body
+    switch (static_cast<reflection::RuntimeTypes>(selector->getType())) {
+    case reflection::RuntimeTypes::TAG_SELECTOR: {
+        ImGui::Text("Tags");
+        if (ImGui::BeginListBox("##taglist", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
+            scene::TagSelector* typedSelector = static_cast<scene::TagSelector*>(selector);
+            auto& tags = selector->getScene()->getTags();
+            for (size_t i = 0; i < tags.size(); i++) {
+                if (tags[i].empty()) {
+                    continue;
+                }
+
+                size_t tag = 1Ui64 << i;
+                bool has = typedSelector->hasTag(tag);
+
+                if (ImGui::Checkbox(tags[i].c_str(), &has)) {
+                    if (has) {
+                        typedSelector->addTag(tag);
+                    } else {
+                        typedSelector->removeTag(tag);
+                    }
+                }
+            }
+
+            ImGui::EndListBox();
+        }
+
+        break;
+    }
+    }
 }
 
 } // namespace editor_ui

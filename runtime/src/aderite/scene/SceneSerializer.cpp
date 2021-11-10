@@ -20,10 +20,15 @@
 #include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderite/scene/Entity.hpp"
+#include "aderite/scene/EntitySelector.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneSerializer.hpp"
 #include "aderite/scene/Transform.hpp"
-#include "aderite/scripting/ScriptList.hpp"
+#include "aderite/scripting/FieldWrapper.hpp"
+#include "aderite/scripting/LibClassLocator.hpp"
+#include "aderite/scripting/MonoUtils.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/YAML.hpp"
 
@@ -54,6 +59,14 @@ bool SceneSerializer::serialize(const Scene* scene, const io::Serializer* serial
         emitter << YAML::Null;
     }
 
+    // Tags
+    emitter << YAML::Key << "Tags" << YAML::Flow << scene->m_tags;
+
+    // Scripting
+    if (!this->serializeScripts(scene, serializer, emitter)) {
+        return false;
+    }
+
     return true;
 }
 
@@ -77,6 +90,16 @@ bool SceneSerializer::deserialize(Scene* scene, io::Serializer* serializer, cons
     if (!data["Pipeline"].IsNull()) {
         scene->setPipeline(static_cast<rendering::Pipeline*>(
             ::aderite::Engine::getSerializer()->getOrRead(data["Pipeline"].as<io::SerializableHandle>())));
+    }
+
+    // Tags
+    if (data["Tags"]) {
+        scene->m_tags = data["Tags"].as<std::vector<std::string>>();
+    }
+
+    // Scripting
+    if (!this->deserializeScripts(scene, serializer, data)) {
+        return false;
     }
 
     return true;
@@ -104,115 +127,6 @@ bool SceneSerializer::deserializeEntities(Scene* scene, io::Serializer* serializ
 
     return true;
 }
-
-// void SceneSerializer::serializeEntity(const Scene* scene, YAML::Emitter& out, ConstEntity e) const {
-//    out << YAML::BeginMap; // Entity
-//
-//    out << YAML::Key << "Entity" << YAML::Value << (entt::id_type)e;
-//
-//    // Meta component
-//    if (e.hasComponent<MetaComponent>()) {
-//        out << YAML::Key << "Meta";
-//        out << YAML::BeginMap; // Meta
-//
-//        const MetaComponent& mc = e.getComponent<MetaComponent>();
-//        out << YAML::Key << "Name" << YAML::Value << mc.Name;
-//        out << YAML::Key << "Handle" << YAML::Value << mc.Handle;
-//
-//        out << YAML::EndMap; // Meta
-//    } else {
-//        LOG_ERROR("Tried to serialize Entity without MetaComponent component, this should never happen");
-//        return;
-//    }
-//
-//    // Serialize rest of components
-//
-//    // Camera
-//    if (e.hasComponent<CameraComponent>()) {
-//        out << YAML::Key << "Camera";
-//        out << YAML::BeginMap; // Camera
-//
-//        const CameraComponent& cc = e.getComponent<CameraComponent>();
-//
-//        // TODO: Serialize camera
-//
-//        out << YAML::EndMap; // Camera
-//    }
-//
-//    // Audio listener
-//    if (e.hasComponent<AudioListenerComponent>()) {
-//        out << YAML::Key << "AudioListener";
-//        out << YAML::BeginMap; // AudioListener
-//
-//        const AudioListenerComponent& alc = e.getComponent<AudioListenerComponent>();
-//
-//        out << YAML::Key << "IsEnabled" << alc.IsEnabled;
-//
-//        out << YAML::EndMap; // AudioListener
-//    }
-//
-//    // Scripts
-//    if (e.hasComponent<ScriptsComponent>()) {
-//        out << YAML::Key << "Scripts";
-//        const ScriptsComponent& sc = e.getComponent<ScriptsComponent>();
-//
-//        // TODO: Error check
-//        ::aderite::Engine::getSerializer()->writeUntrackedType(out, sc.Scripts);
-//    }
-//
-//    out << YAML::EndMap; // Entity
-//}
-
-// Entity SceneSerializer::deserializeEntity(Scene* scene, const YAML::Node& eNode) {
-//    // Read MetaComponent info
-//    YAML::Node meta_node = eNode["Meta"];
-//    if (!meta_node) {
-//        LOG_ERROR("Tried to deserialize Entity without MetaComponent component, this should never happen");
-//        return Entity(entt::null, nullptr);
-//    }
-//
-//    MetaComponent MetaComponent;
-//    MetaComponent.Name = meta_node["Name"].as<std::string>();
-//    MetaComponent.Handle = meta_node["Handle"].as<size_t>();
-//
-//    // Create Entity
-//    Entity e = scene->createEntity(MetaComponent);
-//
-//    // Deserialize rest of components
-//
-//    // Camera
-//    auto cam_node = eNode["Camera"];
-//    if (cam_node) {
-//        auto& cc = e.addComponent<CameraComponent>();
-//
-//        // TODO: Deserialize camera
-//    }
-//
-//    // Audio listener
-//    auto al_node = eNode["AudioListener"];
-//    if (al_node) {
-//        auto& alc = e.addComponent<AudioListenerComponent>();
-//
-//        // TODO: Error check
-//        alc.IsEnabled = al_node["IsEnabled"].as<bool>();
-//    }
-//
-//    // Scripts
-//    auto scripts = eNode["Scripts"];
-//    if (scripts) {
-//        if (!e.hasComponent<ScriptsComponent>()) {
-//            e.addComponent<ScriptsComponent>();
-//        }
-//
-//        auto& sc = e.getComponent<ScriptsComponent>();
-//
-//        // TODO: Error check
-//        sc.Scripts->deserialize(::aderite::Engine::getSerializer(), scripts["Data"]);
-//        sc.Scripts->pair(e);
-//    }
-//
-//    return e;
-//}
 
 bool SceneSerializer::serializeAudioSources(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const {
     out << YAML::Key << "AudioSources" << YAML::BeginSeq;
@@ -249,6 +163,51 @@ bool SceneSerializer::deserializePhysics(Scene* scene, io::Serializer* serialize
     auto physics = asNode["Physics"];
     if (physics) {
         serializer->fillData(scene->getPhysicsScene(), physics);
+    }
+    return true;
+}
+
+bool SceneSerializer::serializeScripts(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const {
+    out << YAML::Key << "Scripting" << YAML::BeginMap;
+
+    out << YAML::Key << "Selectors" << YAML::BeginSeq;
+    for (const EntitySelector* selector : scene->m_entitySelectors) {
+        // System info
+        serializer->writeUntrackedType(out, selector);
+    }
+    out << YAML::EndSeq;
+
+    out << YAML::Key << "Systems" << YAML::BeginSeq;
+    for (const scripting::ScriptSystem* system : scene->m_systems) {
+        // System info
+        serializer->writeUntrackedType(out, system);
+    }
+    out << YAML::EndSeq;
+
+    out << YAML::EndMap;
+    return true;
+}
+
+bool SceneSerializer::deserializeScripts(Scene* scene, io::Serializer* serializer, const YAML::Node& asNode) {
+    auto scripting = asNode["Scripting"];
+    if (scripting) {
+        auto systems = scripting["Systems"];
+        auto selectors = scripting["Selectors"];
+
+        if (selectors) {
+            for (auto selectorNode : selectors) {
+                EntitySelector* selector = static_cast<EntitySelector*>(serializer->parseUntrackedType(selectorNode));
+                scene->addEntitySelector(selector);
+            }
+        }
+
+        if (systems) {
+            for (auto systemNode : systems) {
+                scripting::ScriptSystem* system = new scripting::ScriptSystem();
+                scene->addScriptSystem(system);
+                serializer->fillData(system, systemNode);
+            }
+        }
     }
     return true;
 }

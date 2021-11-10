@@ -35,8 +35,11 @@ private:
     void renderPipeline(io::SerializableObject* asset);
     void renderAudio(io::SerializableObject* asset);
 
+    // Serializables
     void renderSerializable();
     void renderAudioSource(io::ISerializable* serializable);
+    void renderScriptSystem(io::ISerializable* serializable);
+    void renderEntitySelector(io::ISerializable* serializable);
 };
 
 } // namespace editor_ui

@@ -18,7 +18,7 @@ namespace physics {
  * @brief Class used to handle all physics related functionality for aderite
  */
 class PhysicsController {
-    static constexpr float c_SubStepLength = 0.016667f;
+    static constexpr float c_FixedUpdateWindow = 0.02f;
 
 public:
     /**
@@ -95,6 +95,7 @@ private:
     physx::PxMaterial* m_defaultMaterial = nullptr;
     physx::PxPvd* m_pvd = nullptr;
 
+    float m_accumulator = 0.0f;
     PhysicsEventList* m_events = nullptr;
 
     bool m_recordMemoryAllocations = true;

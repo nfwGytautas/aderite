@@ -17,7 +17,7 @@ enum class FieldType {
     Object,
     Mesh,
     Material,
-    Behavior,
+    System,
     Audio,
     AudioSource,
 };
@@ -27,7 +27,7 @@ enum class FieldType {
  */
 class FieldWrapper final {
 public:
-    FieldWrapper(MonoClassField* field);
+    FieldWrapper(MonoClassField* field, MonoObject* instance);
 
     /**
      * @brief Returns the name of the field
@@ -44,22 +44,23 @@ public:
      * @param instance Instance of the object
      * @param target Pointer where value will be stored, must be correct size
      */
-    void getValue(MonoObject* instance, void* value);
+    void getValue(void* value) const;
 
     /**
      * @brief Returns the value of the field in the specified instance
      */
-    MonoObject* getValueObject(MonoObject* instance);
+    MonoObject* getValueObject() const;
 
     /**
      * @brief Sets the value of the field for the specified instance
      * @param instance Instance to set for
      * @param value New value to set
      */
-    void setValue(MonoObject* instance, void* value);
+    void setValue(void* value) const;
 
 private:
     MonoClassField* m_field = nullptr;
+    MonoObject* m_instance = nullptr;
     std::string m_name;
     FieldType m_type = FieldType::Null;
 };

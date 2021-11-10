@@ -45,6 +45,20 @@ public:
     void registerEvent(const CollisionEvent& ce);
 
     /**
+     * @brief Returns the trigger events
+     */
+    const std::vector<TriggerEvent>& getTriggerEvents() const {
+        return m_triggerEvents;
+    }
+
+    /**
+     * @brief Returns the collision events
+     */
+    const std::vector<CollisionEvent>& getCollisionEvents() const {
+        return m_collisionEvents;
+    }
+
+    /**
      * @brief Clears all events in the list
      */
     void clear();

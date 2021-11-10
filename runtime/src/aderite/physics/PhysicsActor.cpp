@@ -57,6 +57,10 @@ void PhysicsActor::transferColliders(PhysicsActor* actor) {
     m_colliders.clear();
 }
 
+void PhysicsActor::setEntity(scene::Entity* entity) {
+    m_entity = entity;
+}
+
 void PhysicsActor::moveActor(const glm::vec3& position) {
     physx::PxTransform pxt = p_actor->getGlobalPose();
     pxt.p.x = position.x;
@@ -79,11 +83,17 @@ void PhysicsActor::rotateActor(const glm::quat& rotation) {
     p_actor->setGlobalPose(pxt);
 }
 
-void PhysicsActor::sync(scene::Transform* transform) const {
+void PhysicsActor::sync() const {
     physx::PxTransform pxt = p_actor->getGlobalPose();
+    scene::Transform* transform = m_entity->getTransform();
 
     transform->position() = {pxt.p.x, pxt.p.y, pxt.p.z};
     transform->rotation() = {pxt.q.w, pxt.q.x, pxt.q.y, pxt.q.z};
+
+    // Set collider scales
+    for (Collider* collider : m_colliders) {
+        collider->setScale(transform->scale());
+    }
 }
 
 void PhysicsActor::onTriggerEnter(PhysicsActor* trigger) {

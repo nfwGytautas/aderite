@@ -157,6 +157,7 @@ void Engine::loop() {
 
         // Updates
         updateSystem(deltaTimeSec);
+        updateScenes(deltaTimeSec);
         updatePhysics(deltaTimeSec);
         updateScripts(deltaTimeSec);
 

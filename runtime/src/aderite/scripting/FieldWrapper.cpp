@@ -15,7 +15,7 @@
 namespace aderite {
 namespace scripting {
 
-FieldWrapper::FieldWrapper(MonoClassField* field) : m_field(field) {
+FieldWrapper::FieldWrapper(MonoClassField* field, MonoObject* instance) : m_field(field), m_instance(instance) {
     m_name = mono_field_get_name(field);
     m_type = ::aderite::Engine::getScriptManager()->getType(mono_field_get_type(field));
 }
@@ -28,16 +28,16 @@ FieldType FieldWrapper::getType() const {
     return m_type;
 }
 
-void FieldWrapper::getValue(MonoObject* instance, void* value) {
-    mono_field_get_value(instance, m_field, value);
+void FieldWrapper::getValue(void* value) const {
+    mono_field_get_value(m_instance, m_field, value);
 }
 
-MonoObject* FieldWrapper::getValueObject(MonoObject* instance) {
-    return mono_field_get_value_object(::aderite::Engine::getScriptManager()->getDomain(), m_field, instance);
+MonoObject* FieldWrapper::getValueObject() const {
+    return mono_field_get_value_object(::aderite::Engine::getScriptManager()->getDomain(), m_field, m_instance);
 }
 
-void FieldWrapper::setValue(MonoObject* instance, void* value) {
-    mono_field_set_value(instance, m_field, value);
+void FieldWrapper::setValue(void* value) const {
+    mono_field_set_value(m_instance, m_field, value);
 }
 
 } // namespace scripting

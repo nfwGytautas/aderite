@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
@@ -45,19 +45,68 @@ public:
     /**
      * @brief Returns the current domain
      */
-    MonoDomain* getDomain() const;
+    MonoDomain* getDomain() const {
+        return m_currentDomain;
+    }
 
     /**
-     * @brief Returns all behaviors that the script manager knows off
+     * @brief Returns the image of the code assembly
      */
-    std::vector<BehaviorWrapper*> getAllBehaviors() const;
+    MonoImage* getCodeImage() const {
+        return m_codeImage;
+    }
 
     /**
-     * @brief Returns the behavior instance with the specified name
-     * @param name Name of the behavior
-     * @return BehaviorWrapper instance or nullptr if doesn't exist
+     * @brief Returns a system MonoClass instance
+     * @param name Name of the system
+     * @return System MonoClass instance or nullptr if a system with the specified name doesn't exist
      */
-    BehaviorWrapper* getBehavior(const std::string& name);
+    MonoClass* getSystemClass(const std::string& name) const;
+
+    /**
+     * @brief Tries to resolve a class with the specified name
+     * @param nSpace Namespace of the class
+     * @param name Name of the class
+     * @return MonoClass instance or nullptr if failed to resolve
+     */
+    MonoClass* resolveClass(const std::string& nSpace, const std::string& name);
+
+    /**
+     * @brief Instantiate the specified object (0 argument constructor)
+     * @param klass Class to initialize
+     * @return MonoObject instance
+     */
+    MonoObject* instantiate(MonoClass* klass);
+
+    /**
+     * @brief Returns public fields of the specified object
+     * @param object Object instance
+     * @return Vector of FieldWrapper objects
+     */
+    std::vector<FieldWrapper> getPublicFields(MonoObject* object);
+
+    /**
+     * @brief Tries to locate a method in the code assembly and returns it
+     * @param klass Class to search in
+     * @param signature Method signature
+     * @param paramCount Number of arguments in the method
+     * @return MonoMethod instance or nullptr
+     */
+    MonoMethod* getMethod(MonoClass* klass, const std::string& name, size_t paramCount);
+
+    /**
+     * @brief Tries to locate a method in the code assembly and returns it
+     * @param signature Method signature
+     * @return MonoMethod instance or nullptr
+     */
+    MonoMethod* getMethod(const std::string& signature);
+
+    /**
+     * @brief Returns a list of known systems and their names
+     */
+    std::unordered_map<std::string, MonoClass*> getKnownSystems() const {
+        return m_knownSystems;
+    }
 
     /**
      * @brief Returns FieldType from the MonoType
@@ -69,14 +118,14 @@ public:
     /**
      * @brief Returns the script lib locator
      * @return Locator reference
-    */
+     */
     LibClassLocator& getLocator();
 
 private:
     /**
-     * @brief Resolves all Behavior classes in the loaded assembly
+     * @brief Resolves all system classes in the loaded assembly
      */
-    void resolveBehaviors();
+    void resolveSystemNames();
 
     /**
      * @brief Sets up all engine runtime related assemblies and information
@@ -112,7 +161,8 @@ private:
     MonoAssembly* m_codeAssembly = nullptr;
     MonoImage* m_codeImage = nullptr;
 
-    std::vector<BehaviorWrapper*> m_behaviors;
+    // Vector containing the names of systems that exist in the image
+    std::unordered_map<std::string, MonoClass*> m_knownSystems;
 };
 
 } // namespace scripting

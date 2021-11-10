@@ -35,7 +35,7 @@ public:
     /**
      * @brief Transfers colliders from this actor to the specified actor
      * @param actor Actor to transfer to
-    */
+     */
     void transferColliders(PhysicsActor* actor);
 
     /**
@@ -43,6 +43,19 @@ public:
      */
     const std::vector<physics::Collider*>& getColliders() const {
         return m_colliders;
+    }
+
+    /**
+     * @brief Sets the entity of this actor
+     * @param entity Entity instance
+    */
+    void setEntity(scene::Entity* entity);
+
+    /**
+     * @brief Returns the entity of this actor
+     */
+    scene::Entity* getEntity() const {
+        return m_entity;
     }
 
     /**
@@ -58,10 +71,9 @@ public:
     void rotateActor(const glm::quat& rotation);
 
     /**
-     * @brief Synchronizes the physics actor with the transform
-     * @param transform Transform where to store result
+     * @brief Synchronizes the physics actor with it's entity
      */
-    void sync(scene::Transform* transform) const;
+    void sync() const;
 
     /**
      * @brief Function called when the actor enters a trigger zone
@@ -99,6 +111,7 @@ protected:
     physx::PxRigidActor* p_actor = nullptr;
 
 private:
+    scene::Entity* m_entity = nullptr;
     std::vector<physics::Collider*> m_colliders;
 };
 

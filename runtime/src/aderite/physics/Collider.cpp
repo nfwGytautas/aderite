@@ -25,6 +25,11 @@ Collider::~Collider() {
 }
 
 void Collider::setScale(const glm::vec3& scale) {
+    if (p_scale == scale) {
+        // Scale didn't change
+        return;
+    }
+
     p_scale = scale;
     this->updateGeometry();
 }

@@ -1,6 +1,7 @@
 #include "LibClassLocator.hpp"
 
 #include "aderite/Aderite.hpp"
+#include "aderite/physics/PhysicsActor.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -35,12 +36,14 @@ bool LibClassLocator::locate(MonoImage* image) {
     bool result = true;
 
     // Classes
-    findClass(image, "Aderite", "ScriptedBehavior", m_behavior.Klass, result);
+    findClass(image, "Aderite", "ScriptSystem", m_system.Klass, result);
     findClass(image, "Aderite", "Entity", m_entity.Klass, result);
     findClass(image, "Aderite", "Mesh", m_mesh.Klass, result);
     findClass(image, "Aderite", "Material", m_material.Klass, result);
     findClass(image, "Aderite", "Audio", m_audio.Klass, result);
     findClass(image, "Aderite", "AudioSource", m_audioSource.Klass, result);
+    findClass(image, "Aderite", "TriggerEvent", m_triggerEvent.Klass, result);
+    findClass(image, "Aderite", "CollisionEvent", m_collisionEvent.Klass, result);
 
     // Can't proceed if classes are not found
     if (result == false) {
@@ -49,15 +52,15 @@ bool LibClassLocator::locate(MonoImage* image) {
     }
 
     // Fields
-    findField(m_behavior.Klass, "Entity", m_behavior.Entity, result);
-    findField(m_entity.Klass, "Scene", m_entity.Scene, result);
-    findField(m_entity.Klass, "EntityHandle", m_entity.EntityHandle, result);
 
     // Methods
+    findMethod(m_entity.Klass, ".ctor", 1, m_entity.Ctor, result);
     findMethod(m_mesh.Klass, ".ctor", 1, m_mesh.Ctor, result);
     findMethod(m_material.Klass, ".ctor", 1, m_material.Ctor, result);
     findMethod(m_audio.Klass, ".ctor", 1, m_audio.Ctor, result);
     findMethod(m_audioSource.Klass, ".ctor", 1, m_audioSource.Ctor, result);
+    findMethod(m_triggerEvent.Klass, ".ctor", 2, m_triggerEvent.Ctor, result);
+    findMethod(m_collisionEvent.Klass, ".ctor", 2, m_collisionEvent.Ctor, result);
 
     return result;
 }
@@ -72,8 +75,8 @@ FieldType LibClassLocator::getType(MonoType* type) const {
         return FieldType::Material;
     } else if (klass == m_audio.Klass) {
         return FieldType::Audio;
-    } else if (klass == m_behavior.Klass) {
-        return FieldType::Behavior;
+    } else if (klass == m_system.Klass) {
+        return FieldType::System;
     } else if (klass == m_audioSource.Klass) {
         return FieldType::AudioSource;
     }
@@ -81,13 +84,13 @@ FieldType LibClassLocator::getType(MonoType* type) const {
     return FieldType::Null;
 }
 
-bool LibClassLocator::isBehavior(MonoClass* klass) const {
-    if (klass == m_behavior.Klass) {
+bool LibClassLocator::isSystem(MonoClass* klass) const {
+    if (klass == m_system.Klass) {
         // Class is behavior
         return true;
     }
 
-    if (mono_class_get_parent(klass) == m_behavior.Klass) {
+    if (mono_class_get_parent(klass) == m_system.Klass) {
         // Parent is behavior
         return true;
     }
@@ -95,47 +98,47 @@ bool LibClassLocator::isBehavior(MonoClass* klass) const {
     return false;
 }
 
-MonoObject* LibClassLocator::create(scene::Entity entity) {
-    MonoObject* object = mono_object_new(::aderite::Engine::getScriptManager()->getDomain(), m_entity.Klass);
-    /*entt::entity e = entity.getHandle();
-    scene::Scene* scene = entity.getScene();*/
-
-    mono_runtime_object_init(object);
-
-    /*mono_field_set_value(object, m_entity.Scene, &scene);
-    mono_field_set_value(object, m_entity.EntityHandle, &e);*/
-
-    mono_field_set_value(object, m_entity.Scene, nullptr);
-    mono_field_set_value(object, m_entity.EntityHandle, nullptr);
-
-    return object;
+MonoObject* LibClassLocator::create(scene::Entity* entity) {
+    void* args[1] = {&entity};
+    return this->genericInstanceCreate(m_entity.Klass, m_entity.Ctor, args);
 }
 
 MonoObject* LibClassLocator::create(asset::MeshAsset* mesh) {
     void* args[1] = {&mesh};
-    return this->genericAssetCreate(m_mesh.Klass, m_mesh.Ctor, args);
+    return this->genericInstanceCreate(m_mesh.Klass, m_mesh.Ctor, args);
 }
 
 MonoObject* LibClassLocator::create(asset::MaterialAsset* material) {
     void* args[1] = {&material};
-    return this->genericAssetCreate(m_material.Klass, m_material.Ctor, args);
+    return this->genericInstanceCreate(m_material.Klass, m_material.Ctor, args);
 }
 
 MonoObject* LibClassLocator::create(asset::AudioAsset* audio) {
     void* args[1] = {&audio};
-    return this->genericAssetCreate(m_audio.Klass, m_audio.Ctor, args);
+    return this->genericInstanceCreate(m_audio.Klass, m_audio.Ctor, args);
 }
 
 MonoObject* LibClassLocator::create(audio::AudioSource* source) {
     void* args[1] = {&source};
-    return this->genericAssetCreate(m_audioSource.Klass, m_audioSource.Ctor, args);
+    return this->genericInstanceCreate(m_audioSource.Klass, m_audioSource.Ctor, args);
+}
+
+MonoObject* LibClassLocator::create(const physics::TriggerEvent& triggerEvent) {
+    void* args[2] = {create(triggerEvent.Actor->getEntity()), create(triggerEvent.Trigger->getEntity())};
+    return this->genericInstanceCreate(m_triggerEvent.Klass, m_triggerEvent.Ctor, args);
+}
+
+MonoObject* LibClassLocator::create(const physics::CollisionEvent& collisionEvent) {
+    void* args[2] = {create(collisionEvent.Actor1->getEntity()), create(collisionEvent.Actor2->getEntity())};
+    return this->genericInstanceCreate(m_collisionEvent.Klass, m_collisionEvent.Ctor, args);
 }
 
 void LibClassLocator::handleException(MonoObject* exception) {
     // TODO: Implement
+    LOG_ERROR("EXCEPTION THROWN IN C# CODE");
 }
 
-MonoObject* LibClassLocator::genericAssetCreate(MonoClass* klass, MonoMethod* ctor, void** args) {
+MonoObject* LibClassLocator::genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args) {
     // Create object
     MonoObject* object = mono_object_new(::aderite::Engine::getScriptManager()->getDomain(), klass);
     MonoObject* ex = nullptr;

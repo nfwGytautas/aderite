@@ -18,9 +18,26 @@ public:
     virtual ~Entity();
 
     /**
+     * @brief Adds a tag to the entity
+     * @param tag Tag to add
+     */
+    void addTag(size_t tag);
+
+    /**
+     * @brief Remove tag from the entity
+     * @param tag Tag to remove
+     */
+    void removeTag(size_t tag);
+
+    /**
+     * @brief Returns true if the entity has the specified tag, false otherwise
+     */
+    bool hasTag(size_t tag) const;
+
+    /**
      * @brief Set the scene of the entity, this will transfer actor to the new scene
      * @param scene New scene
-    */
+     */
     void setScene(Scene* scene);
 
     /**
@@ -35,6 +52,13 @@ public:
      * @param renderable Renderable instance
      */
     void setRenderable(rendering::Renderable* renderable);
+
+    /**
+     * @brief Returns the scene of the entity
+     */
+    Scene* getScene() const {
+        return m_scene;
+    }
 
     /**
      * @brief Returns the transform of the entity
@@ -57,6 +81,13 @@ public:
         return m_renderable;
     }
 
+    /**
+     * @brief Returns the tagset of this entity
+     */
+    const size_t getTags() const {
+        return m_tags;
+    }
+
     // Inherited via ISerializable
     virtual reflection::Type getType() const override;
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
@@ -75,6 +106,11 @@ private:
      * @brief Transform of the entity
      */
     Transform* m_transform = nullptr;
+
+    /**
+     * @brief Tag bitset
+     */
+    size_t m_tags = 0;
 
     /**
      * @brief Physics actor of the entity

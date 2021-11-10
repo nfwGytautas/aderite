@@ -4,6 +4,7 @@
 
 #include "aderite/asset/Forward.hpp"
 #include "aderite/audio/Forward.hpp"
+#include "aderite/physics/PhysicsEventList.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
 
@@ -15,15 +16,13 @@ namespace scripting {
  */
 class LibClassLocator final {
 public:
-    struct Behavior {
+    struct ScriptSystem {
         MonoClass* Klass = nullptr;
-        MonoClassField* Entity = nullptr;
     };
 
     struct Entity {
         MonoClass* Klass = nullptr;
-        MonoClassField* Scene = nullptr;
-        MonoClassField* EntityHandle = nullptr;
+        MonoMethod* Ctor = nullptr;
     };
 
     struct Mesh {
@@ -46,6 +45,16 @@ public:
         MonoMethod* Ctor = nullptr;
     };
 
+    struct TriggerEvent {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    };
+
+    struct CollisionEvent {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    };
+
 public:
     /**
      * @brief Locates engine classes from the specified image
@@ -62,18 +71,18 @@ public:
     FieldType getType(MonoType* type) const;
 
     /**
-     * @brief Checks if the specified class is a behavior class
+     * @brief Checks if the specified class is a system class
      * @param klass Class to check
-     * @return True if the class is or inherits from behavior class, false otherwise
+     * @return True if the class is or inherits from system class, false otherwise
      */
-    bool isBehavior(MonoClass* klass) const;
+    bool isSystem(MonoClass* klass) const;
 
     /**
      * @brief Creates a C# script Entity object from C++ entity
      * @param entity Entity from which to create
      * @return MonoObject instance
      */
-    MonoObject* create(scene::Entity entity);
+    MonoObject* create(scene::Entity* entity);
 
     /**
      * @brief Creates a C# mesh object from C++ asset
@@ -103,9 +112,23 @@ public:
      */
     MonoObject* create(audio::AudioSource* source);
 
+    /**
+     * @brief Creates a C# trigger event object from C++
+     * @param triggerEvent TriggerEvent object
+     * @return MonoObject instance
+     */
+    MonoObject* create(const physics::TriggerEvent& triggerEvent);
+
+    /**
+     * @brief Creates a C# collision event object from C++
+     * @param collisionEvent CollisionEvent object
+     * @return MonoObject instance
+     */
+    MonoObject* create(const physics::CollisionEvent& collisionEvent);
+
     // Class getters
-    const Behavior& getBehavior() const {
-        return m_behavior;
+    const ScriptSystem& getScriptSystem() const {
+        return m_system;
     }
 
     const Entity& getEntity() const {
@@ -128,6 +151,14 @@ public:
         return m_audioSource;
     }
 
+    const TriggerEvent& getTriggerEvent() const {
+        return m_triggerEvent;
+    }
+
+    const CollisionEvent& getCollisionEvent() const {
+        return m_collisionEvent;
+    }
+
 private:
     /**
      * @brief Handle mono exception object
@@ -136,21 +167,23 @@ private:
     void handleException(MonoObject* exception);
 
     /**
-     * @brief Generic asset creation function
+     * @brief Generic instanced object creation function
      * @param klass Class of the asset
      * @param ctor Constructor method
      * @param args Arguments to pass to constructor
      * @return MonoObject instance
      */
-    MonoObject* genericAssetCreate(MonoClass* klass, MonoMethod* ctor, void** args);
+    MonoObject* genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args);
 
 private:
-    Behavior m_behavior;
+    ScriptSystem m_system;
     Entity m_entity;
     Mesh m_mesh;
     Material m_material;
     Audio m_audio;
     AudioSource m_audioSource;
+    TriggerEvent m_triggerEvent;
+    CollisionEvent m_collisionEvent;
 };
 
 } // namespace scripting

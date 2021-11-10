@@ -10,10 +10,8 @@
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/components/Components.hpp"
-#include "aderite/scripting/BehaviorWrapper.hpp"
-#include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/InternalCalls.hpp"
-#include "aderite/scripting/ScriptList.hpp"
+#include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -59,11 +57,9 @@ void ScriptManager::update(float delta) {
         return;
     }
 
-    /*auto scriptableView = currentScene->getEntityRegistry().view<scene::ScriptsComponent>();
-    for (auto entity : scriptableView) {
-        auto [script] = scriptableView.get(entity);
-        script.Scripts->update(delta);
-    }*/
+    for (scripting::ScriptSystem* system : currentScene->getScriptSystems()) {
+        system->update(delta);
+    }
 }
 
 void ScriptManager::loadAssemblies() {
@@ -95,20 +91,61 @@ void ScriptManager::loadAssemblies() {
     }
 
     // Get behaviors
-    this->resolveBehaviors();
+    this->resolveSystemNames();
 }
 
-BehaviorWrapper* ScriptManager::getBehavior(const std::string& name) {
-    auto it = std::find_if(m_behaviors.begin(), m_behaviors.end(), [name](BehaviorWrapper* bw) {
-        return bw->getName() == name;
-    });
-
-    if (it == m_behaviors.end()) {
-        LOG_WARN("Failed to find behavior with name {0}", name);
+MonoClass* ScriptManager::getSystemClass(const std::string& name) const {
+    auto it = m_knownSystems.find(name);
+    if (it == m_knownSystems.end()) {
         return nullptr;
     }
+    return it->second;
+}
 
-    return *it;
+MonoClass* ScriptManager::resolveClass(const std::string& nSpace, const std::string& name) {
+    MonoClass* klass = mono_class_from_name(m_codeImage, nSpace.c_str(), name.c_str());
+    if (klass == nullptr) {
+        LOG_ERROR("Failed to find class {0} in namespace {1}", name, nSpace);
+        return nullptr;
+    }
+    return klass;
+}
+
+MonoObject* ScriptManager::instantiate(MonoClass* klass) {
+    // Create object
+    MonoObject* object = mono_object_new(m_currentDomain, klass);
+
+    // Invoke constructor
+    mono_runtime_object_init(object);
+
+    // Return instance
+    return object;
+}
+
+std::vector<FieldWrapper> ScriptManager::getPublicFields(MonoObject* object) {
+    std::vector<FieldWrapper> result;
+    void* iter = NULL;
+    MonoClassField* field;
+    while (field = mono_class_get_fields(mono_object_get_class(object), &iter)) {
+        if (mono_field_get_flags(field) & MONO_FIELD_ATTR_PUBLIC) {
+            result.push_back(FieldWrapper(field, object));
+        }
+    }
+    return result;
+}
+
+MonoMethod* ScriptManager::getMethod(MonoClass* klass, const std::string& name, size_t paramCount) {
+    MonoMethod* method = mono_class_get_method_from_name(klass, name.c_str(), paramCount);
+    if (method == nullptr) {
+        LOG_ERROR("Failed to find {0} method in {1}", name, mono_class_get_name(klass));
+        return nullptr;
+    }
+    return method;
+}
+
+MonoMethod* ScriptManager::getMethod(const std::string& signature) {
+    ADERITE_UNIMPLEMENTED;
+    return nullptr;
 }
 
 FieldType ScriptManager::getType(MonoType* type) const {
@@ -130,10 +167,9 @@ LibClassLocator& ScriptManager::getLocator() {
     return m_locator;
 }
 
-void ScriptManager::resolveBehaviors() {
-    LOG_TRACE("Resolving behaviors");
-
-    // Iterate over all classes and check if they have ScriptedBehavior attribute on them
+void ScriptManager::resolveSystemNames() {
+    LOG_TRACE("Resolving systems");
+    m_knownSystems.clear();
 
     // Get the number of rows in the metadata table
     int numRows = mono_image_get_table_rows(m_codeImage, MONO_TABLE_TYPEDEF);
@@ -152,9 +188,9 @@ void ScriptManager::resolveBehaviors() {
                 continue;
             }
 
-            if (m_locator.isBehavior(monoClass)) {
-                LOG_TRACE("Found behavior. Namespace: {1}, name: {0}", name, nSpace);
-                m_behaviors.push_back(new BehaviorWrapper(m_codeImage, monoClass));
+            if (m_locator.isSystem(monoClass)) {
+                LOG_TRACE("Found system. Namespace: {1}, name: {0}", name, nSpace);
+                m_knownSystems[nSpace + "." + name] = monoClass;
             }
         }
     }
@@ -219,25 +255,9 @@ bool ScriptManager::setupCodeAssemblies() {
 }
 
 void ScriptManager::clean() {
-    // TODO: Don't delete just reconfigure its meta data
-    for (BehaviorWrapper* bw : m_behaviors) {
-        delete bw;
-        bw = nullptr;
-    }
-
-    m_behaviors.clear();
-
     // TODO: Invoke GC
 
     // TODO: Unload domain
-}
-
-MonoDomain* ScriptManager::getDomain() const {
-    return m_currentDomain;
-}
-
-std::vector<BehaviorWrapper*> ScriptManager::getAllBehaviors() const {
-    return m_behaviors;
 }
 
 } // namespace scripting

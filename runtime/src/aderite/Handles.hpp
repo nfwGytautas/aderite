@@ -10,6 +10,7 @@ namespace aderite {
 constexpr size_t c_InvalidHandle = 0xffffffffffffffff; // std::numeric_limits<size_t>::max() or ULLONG_MAX
 
 using HandleType = size_t;
+using UniversalHandle = HandleType;
 
 namespace reflection {
 using Type = HandleType;

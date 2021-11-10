@@ -79,23 +79,23 @@ std::string toString(MonoObject* object) {
 }
 
 void extract(MonoObject* object, asset::MeshAsset*& mesh) {
-    static FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"));
-    return fw.getValue(object, &mesh);
+    FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"), object);
+    fw.getValue(&mesh);
 }
 
 void extract(MonoObject* object, asset::MaterialAsset*& material) {
-    static FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"));
-    return fw.getValue(object, &material);
+    FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"), object);
+    fw.getValue(&material);
 }
 
 void extract(MonoObject* object, asset::AudioAsset*& audio) {
-    static FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"));
-    return fw.getValue(object, &audio);
+    FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"), object);
+    fw.getValue(&audio);
 }
 
 void extract(MonoObject* object, audio::AudioSource*& source) {
-    static FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"));
-    return fw.getValue(object, &source);
+    FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"), object);
+    fw.getValue(&source);
 }
 
 } // namespace scripting

@@ -84,6 +84,24 @@ private:
      * @return True if deserialized, false otherwise
      */
     bool deserializePhysics(Scene* scene, io::Serializer* serializer, const YAML::Node& asNode);
+
+    /**
+     * @brief Serialize scripting related information to the specified emitter
+     * @param scene Scene to serialize
+     * @param serializer Serializer instance
+     * @param out Emitter to serialize into
+     * @return True if serialized, false otherwise
+     */
+    bool serializeScripts(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const;
+
+    /**
+     * @brief Deserialize scripting related information
+     * @param scene Scene to deserialize
+     * @param serializer Serializer instance
+     * @param asNode Audio source data node
+     * @return True if deserialized, false otherwise
+     */
+    bool deserializeScripts(Scene* scene, io::Serializer* serializer, const YAML::Node& asNode);
 };
 
 } // namespace scene

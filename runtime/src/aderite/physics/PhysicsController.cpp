@@ -26,8 +26,12 @@
 #include "aderite/physics/PhysicsScene.hpp"
 #include "aderite/physics/StaticActor.hpp"
 #include "aderite/scene/Entity.hpp"
+#include "aderite/scene/EntitySelector.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scripting/LibClassLocator.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -157,16 +161,14 @@ void PhysicsController::update(float delta) {
     // Remove detached
     this->removeDetached();
 
-    // Simulate
-    uint8_t substeps = delta / c_SubStepLength;
-    for (uint8_t i = 0; i < substeps; i++) {
-        physicsScene->simulate(c_SubStepLength);
-        this->syncChanges();
+    m_accumulator += delta;
+
+    if (m_accumulator < c_FixedUpdateWindow) {
+        return;
     }
-    float remainder = delta - (substeps * c_SubStepLength);
-    if (remainder > 0.0f) {
-        physicsScene->simulate(remainder);
-    }
+
+    m_accumulator -= c_FixedUpdateWindow;
+    physicsScene->simulate(c_FixedUpdateWindow);
     this->syncChanges();
 }
 
@@ -208,15 +210,58 @@ void PhysicsController::syncChanges() {
 
     PhysicsScene* scene = currentScene->getPhysicsScene();
 
-    for (scene::Entity* entity : currentScene->getEntities()) {
-        physics::PhysicsActor* actor = entity->getActor();
+    for (physics::PhysicsActor* actor : scene->getActors()) {
+        actor->sync();
+    }
 
-        if (actor != nullptr) {
-            actor->sync(entity->getTransform());
+    // Send physics events to scripts
+    auto& locator = ::aderite::Engine::getScriptManager()->getLocator();
+
+    for (const TriggerEvent& te : m_events->getTriggerEvents()) {
+        MonoObject* triggerObject = locator.create(te);
+        for (scripting::ScriptSystem* system : currentScene->getScriptSystems()) {
+            scene::EntitySelector* selector = system->getSelector();
+
+            if (selector == nullptr) {
+                // No selector so system doesn't receive any entity events
+                continue;
+            }
+
+            if (!selector->isSelected(te.Actor->getEntity()) && !selector->isSelected(te.Trigger->getEntity())) {
+                // System is not interested in either of the entities
+                continue;
+            }
+
+            if (te.Enter) {
+                system->triggerEnter(triggerObject);
+            } else {
+                system->triggerLeave(triggerObject);
+            }
         }
     }
 
-    // TODO: Send events to scripts
+    for (const CollisionEvent& ce : m_events->getCollisionEvents()) {
+        MonoObject* collisionObject = locator.create(ce);
+        for (scripting::ScriptSystem* system : currentScene->getScriptSystems()) {
+            scene::EntitySelector* selector = system->getSelector();
+
+            if (selector == nullptr) {
+                // No selector so system doesn't receive any entity events
+                continue;
+            }
+
+            if (!selector->isSelected(ce.Actor1->getEntity()) && !selector->isSelected(ce.Actor2->getEntity())) {
+                // System is not interested in either of the entities
+                continue;
+            }
+
+            if (ce.Start) {
+                system->collisionStart(collisionObject);
+            } else {
+                system->collisionEnd(collisionObject);
+            }
+        }
+    }
 
     // Clear events
     m_events->clear();

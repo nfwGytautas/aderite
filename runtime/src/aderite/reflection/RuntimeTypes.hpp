@@ -48,8 +48,9 @@ enum class RuntimeTypes : Type {
     OP_TARGET,
 
     // Scripting
-    SCRIPT_LIST = 200,
-    SCRIPT,
+    SCRIPT_SYSTEM = 200,
+
+    TAG_SELECTOR = 210,
 
     // Last element of runtime types, used to specify the end runtime serializables
     RESERVED = 250,
