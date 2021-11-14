@@ -53,13 +53,13 @@ public:
     /**
      * @brief Adds a audio listener to the scene
      * @param listener AudioListener instance
-    */
+     */
     void addAudioListener(audio::AudioListener* listener);
 
     /**
      * @brief Adds a audio source to the scene
      * @param source AudioSource instance
-    */
+     */
     void addAudioSource(audio::AudioSource* source);
 
     /**

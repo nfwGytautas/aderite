@@ -16,7 +16,6 @@
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 
-#include "aderiteeditor/extensions/EditorEntity.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/shared/DragDropObject.hpp"
 #include "aderiteeditor/shared/Project.hpp"
@@ -113,7 +112,7 @@ void SceneHierarchy::renderContextMenu() {
 
         if (ImGui::Selectable("Create Entity")) {
             // TODO: Make sure that this is actually unique
-            scene::EditorEntity* entity = new scene::EditorEntity();
+            scene::Entity* entity = new scene::Entity();
             currentScene->addEntity(entity);
         }
 
@@ -179,8 +178,6 @@ void SceneHierarchy::renderEntities() {
 
     size_t idx = 0;
     for (scene::Entity* entity : currentScene->getEntities()) {
-        scene::EditorEntity* editorEntity = static_cast<scene::EditorEntity*>(entity);
-
         ImGuiTreeNodeFlags leafFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
         if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Entity &&
@@ -188,7 +185,7 @@ void SceneHierarchy::renderEntities() {
             leafFlags |= ImGuiTreeNodeFlags_Selected;
         }
 
-        ImGui::TreeNodeEx(editorEntity->getName().c_str(), leafFlags);
+        ImGui::TreeNodeEx(entity->getName().c_str(), leafFlags);
 
         // Context menu
         if (ImGui::BeginPopupContextItem()) {
@@ -201,14 +198,14 @@ void SceneHierarchy::renderEntities() {
 
         // Drag drop
         if (ImGui::BeginDragDropSource()) {
-            editor::DragDropObject obj {editorEntity};
+            editor::DragDropObject obj {entity};
             ImGui::SetDragDropPayload(editor::DDPayloadID__Entity, &obj, sizeof(editor::DragDropObject));
             ImGui::EndDragDropSource();
         }
 
         // Selection
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            editor::State::LastSelectedObject = editor::SelectableObject(editorEntity);
+            editor::State::LastSelectedObject = editor::SelectableObject(entity);
         }
     }
 }

@@ -1,19 +1,24 @@
 #include "AudioInstance.hpp"
 
+#include "aderite/utility/Log.hpp"
+
 namespace aderite {
 namespace audio {
 
 AudioInstance::AudioInstance(FMOD::Studio::EventInstance* instance) : m_instance(instance) {}
 
 AudioInstance::~AudioInstance() {
+    LOG_TRACE("[Audio] Destroying instance {0}", m_name);
     this->stop();
 }
 
 void AudioInstance::start() {
+    LOG_TRACE("[Audio] Starting {0}", m_name);
     m_instance->start();
 }
 
 void AudioInstance::stop() {
+    LOG_TRACE("[Audio] Stopping {0}", m_name);
     m_instance->stop(FMOD_STUDIO_STOP_IMMEDIATE);
 }
 

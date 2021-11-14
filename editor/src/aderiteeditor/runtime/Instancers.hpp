@@ -39,9 +39,6 @@
 #include "aderiteeditor/runtime/EditorTargetOperation.hpp"
 #include "aderiteeditor/runtime/OperationArray.hpp"
 
-// Extensions
-#include "aderiteeditor/extensions/EditorEntity.hpp"
-
 namespace aderite {
 namespace utility {
 
@@ -85,7 +82,6 @@ void linkInstancers() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, editor::OperationArray, reflection::EditorTypes::ArrayOp);
 
     // Extensions
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, scene::EditorEntity, reflection::RuntimeTypes::ENTITY);
 }
 
 } // namespace utility

@@ -3,6 +3,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/Config.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/LogExtensions.hpp"
 #include "aderite/window/WindowManager.hpp"
 
 #if GLFW_BACKEND
@@ -14,13 +15,19 @@ namespace aderite {
 namespace input {
 
 bool InputManager::init() {
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[IO] Initializing input manager");
+
 #if GLFW_BACKEND == 1
+    LOG_DEBUG("[IO] GLFW backend IO");
+
     GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(::aderite::Engine::getWindowManager()->getImplementationHandle());
     glfwSetWindowUserPointer(glfwWindow, this);
 
     glfwGetCursorPos(glfwWindow, &m_mousePosition.x, &m_mousePosition.y);
 
     // Install event callbacks
+    LOG_TRACE("[IO] Setting input callbacks for GLFW");
 
     // Framebuffer size
     glfwSetFramebufferSizeCallback(glfwWindow, [](GLFWwindow* window, int width, int height) {
@@ -56,14 +63,21 @@ bool InputManager::init() {
         im->onMouseScrolled(ypos);
     });
 
+    LOG_INFO("[IO] Callbacks installed");
+
 #else
 #error "Unsupported backend for input manager"
 #endif
 
+    LOG_INFO("[IO] Input manager initialized");
     return true;
 }
 
-void InputManager::shutdown() {}
+void InputManager::shutdown() {
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[IO] Shutting down input manager");
+    LOG_INFO("[IO] Input manager shutdown");
+}
 
 void InputManager::update() {
     // Reset delta

@@ -41,7 +41,7 @@
 #else
 #define ADERITE_DEBUG_SECTION(code)
 #define ADERITE_STATIC_ASSERT(check, message)
-#define ADERITE_DYNAMIC_ASSERT(check, message)
+#define ADERITE_DYNAMIC_ASSERT(check, message) LOG_ERROR("Failed check {0}, in {1} at line {2}, {3}", #check, __FILE__, __LINE__, message)
 #endif
 
 #if MIDDLEWARE_ENABLED == 1

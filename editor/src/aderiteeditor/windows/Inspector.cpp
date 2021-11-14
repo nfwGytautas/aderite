@@ -40,7 +40,6 @@
 #include "aderiteeditor/asset/property/Property.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
-#include "aderiteeditor/extensions/EditorEntity.hpp"
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/shared/Config.hpp"
@@ -121,7 +120,7 @@ void Inspector::render() {
 
 void Inspector::renderEntity() {
     static utility::InlineRename renamer;
-    scene::EditorEntity* entity = editor::State::LastSelectedObject.getEntity();
+    scene::Entity* entity = editor::State::LastSelectedObject.getEntity();
 
     renamer.setValue(entity->getName());
 

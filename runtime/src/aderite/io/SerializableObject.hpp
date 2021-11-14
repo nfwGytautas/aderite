@@ -40,7 +40,7 @@ public:
  */
 class SerializableObject : public ISerializable {
 public:
-    virtual ~SerializableObject() {}
+    virtual ~SerializableObject();
 
     /**
      * @brief Returns the handle of this serializable object

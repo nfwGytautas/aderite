@@ -37,71 +37,112 @@ namespace aderite {
 namespace scene {
 
 bool SceneSerializer::serialize(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& emitter) const {
+    LOG_TRACE("[Asset] Serializing scene {0}", scene->getHandle());
+
     // Entities
+    LOG_TRACE("[Asset] Serializing entities {0}", scene->getHandle());
     if (!this->serializeEntities(scene, serializer, emitter)) {
+        LOG_ERROR("[Asset] Failed to serialize entities for {0}", scene->getHandle());
         return false;
     }
+    LOG_INFO("[Asset] {0} entities serialized", scene->getHandle());
 
     // Audio sources
+    LOG_TRACE("[Asset] Serializing audio {0}", scene->getHandle());
     if (!this->serializeAudio(scene, serializer, emitter)) {
+        LOG_ERROR("[Asset] Failed to serialize audio for {0}", scene->getHandle());
         return false;
     }
+    LOG_INFO("[Asset] {0} audio serialized", scene->getHandle());
 
     // Physics
+    LOG_TRACE("[Asset] Serializing physics {0}", scene->getHandle());
     if (!this->serializePhysics(scene, serializer, emitter)) {
+        LOG_ERROR("[Asset] Failed to serialize physics for {0}", scene->getHandle());
         return false;
     }
+    LOG_INFO("[Asset] {0} physics serialized", scene->getHandle());
 
     // Pipeline
+    LOG_TRACE("[Asset] Serializing pipeline {0}", scene->getHandle());
     emitter << YAML::Key << "Pipeline" << YAML::Value;
     if (scene->m_pipeline != nullptr) {
         emitter << scene->m_pipeline->getHandle();
     } else {
         emitter << YAML::Null;
     }
+    LOG_INFO("[Asset] {0} pipeline serialized", scene->getHandle());
 
-    // Tags
+    // Metadata
+    LOG_TRACE("[Asset] Serializing metadata {0}", scene->getHandle());
     emitter << YAML::Key << "Tags" << YAML::Flow << scene->m_tags;
+    LOG_INFO("[Asset] {0} metadata serialized", scene->getHandle());
 
     // Scripting
+    LOG_TRACE("[Asset] Serializing scripts {0}", scene->getHandle());
     if (!this->serializeScripts(scene, serializer, emitter)) {
+        LOG_ERROR("[Asset] Failed to serialize scripts for {0}", scene->getHandle());
         return false;
     }
+    LOG_INFO("[Asset] {0} scripts serialized", scene->getHandle());
+
+    LOG_INFO("[Asset] Scene {0} serialized", scene->getHandle());
 
     return true;
 }
 
 bool SceneSerializer::deserialize(Scene* scene, io::Serializer* serializer, const YAML::Node& data) {
-    // Entities
-    if (!this->deserializeEntities(scene, serializer, data)) {
-        return false;
-    }
+    LOG_TRACE("[Asset] Deserializing scene {0:p}", static_cast<void*>(scene));
 
-    // Audio sources
-    if (!this->deserializeAudio(scene, serializer, data)) {
-        return false;
-    }
-
-    // Physics
-    if (!this->deserializePhysics(scene, serializer, data)) {
-        return false;
-    }
-
-    // Pipeline
-    if (!data["Pipeline"].IsNull()) {
-        scene->setPipeline(static_cast<rendering::Pipeline*>(
-            ::aderite::Engine::getSerializer()->getOrRead(data["Pipeline"].as<io::SerializableHandle>())));
-    }
-
-    // Tags
+    // Metadata
+    LOG_TRACE("[Asset] Deserializing {0:p} metadata", static_cast<void*>(scene));
     if (data["Tags"]) {
         scene->m_tags = data["Tags"].as<std::vector<std::string>>();
     }
 
-    // Scripting
-    if (!this->deserializeScripts(scene, serializer, data)) {
+    LOG_INFO("[Asset] {0} metadata deserialized", scene->getHandle());
+
+    // Entities
+    LOG_TRACE("[Asset] Deserializing entities {0}", scene->getHandle());
+    LOG_ERROR("[Asset] Failed to deserialize entities for {0}", scene->getHandle());
+    if (!this->deserializeEntities(scene, serializer, data)) {
         return false;
     }
+    LOG_INFO("[Asset] {0} entities deserialized", scene->getHandle());
+
+    // Audio sources
+    LOG_TRACE("[Asset] Deserializing audio {0}", scene->getHandle());
+    LOG_ERROR("[Asset] Failed to deserialize audio for {0}", scene->getHandle());
+    if (!this->deserializeAudio(scene, serializer, data)) {
+        return false;
+    }
+    LOG_INFO("[Asset] {0} audio deserialized", scene->getHandle());
+
+    // Physics
+    LOG_TRACE("[Asset] Deserializing physics {0}", scene->getHandle());
+    LOG_ERROR("[Asset] Failed to deserialize physics for {0}", scene->getHandle());
+    if (!this->deserializePhysics(scene, serializer, data)) {
+        return false;
+    }
+    LOG_INFO("[Asset] {0} physics deserialized", scene->getHandle());
+
+    // Pipeline
+    LOG_TRACE("[Asset] Deserializing pipeline {0}", scene->getHandle());
+    if (!data["Pipeline"].IsNull()) {
+        scene->setPipeline(static_cast<rendering::Pipeline*>(
+            ::aderite::Engine::getSerializer()->getOrRead(data["Pipeline"].as<io::SerializableHandle>())));
+    }
+    LOG_INFO("[Asset] {0} pipeline deserialized", scene->getHandle());
+
+    // Scripting
+    LOG_TRACE("[Asset] Deserializing scripts {0}", scene->getHandle());
+    if (!this->deserializeScripts(scene, serializer, data)) {
+        LOG_ERROR("[Asset] Failed to deserialize scripts for {0}", scene->getHandle());
+        return false;
+    }
+    LOG_INFO("[Asset] {0} scripts deserialized", scene->getHandle());
+
+    LOG_INFO("[Asset] Scene {0} deserialized", scene->getHandle());
 
     return true;
 }
@@ -132,12 +173,14 @@ bool SceneSerializer::deserializeEntities(Scene* scene, io::Serializer* serializ
 bool SceneSerializer::serializeAudio(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const {
     out << YAML::Key << "Audio" << YAML::BeginMap;
 
+    LOG_TRACE("[Asset] Serializing audio listeners for {0}", scene->getHandle());
     out << YAML::Key << "Listeners" << YAML::BeginSeq;
     for (const audio::AudioListener* listener : scene->m_audioListeners) {
         serializer->writeUntrackedType(out, listener);
     }
     out << YAML::EndSeq;
 
+    LOG_TRACE("[Asset] Serializing audio sources for {0}", scene->getHandle());
     out << YAML::Key << "Sources" << YAML::BeginSeq;
     for (const audio::AudioSource* source : scene->m_audioSources) {
         serializer->writeUntrackedType(out, source);
@@ -156,17 +199,23 @@ bool SceneSerializer::deserializeAudio(Scene* scene, io::Serializer* serializer,
         auto sources = audio["Sources"];
 
         if (listeners) {
+            LOG_TRACE("[Asset] Deserializing audio listeners for {0}", scene->getHandle());
             for (auto listenerNode : listeners) {
                 audio::AudioListener* listener = static_cast<audio::AudioListener*>(serializer->parseUntrackedType(listenerNode));
                 scene->addAudioListener(listener);
             }
+        } else {
+            LOG_TRACE("[Asset] No audio listeners for {0}", scene->getHandle());
         }
 
         if (sources) {
+            LOG_TRACE("[Asset] Deserializing audio sources for {0}", scene->getHandle());
             for (auto sourceNode : sources) {
                 audio::AudioSource* source = static_cast<audio::AudioSource*>(serializer->parseUntrackedType(sourceNode));
                 scene->addAudioSource(source);
             }
+        } else {
+            LOG_TRACE("[Asset] No audio sources for {0}", scene->getHandle());
         }
     }
 
@@ -190,6 +239,7 @@ bool SceneSerializer::deserializePhysics(Scene* scene, io::Serializer* serialize
 bool SceneSerializer::serializeScripts(const Scene* scene, const io::Serializer* serializer, YAML::Emitter& out) const {
     out << YAML::Key << "Scripting" << YAML::BeginMap;
 
+    LOG_TRACE("[Asset] Serializing entity selectors for {0}", scene->getHandle());
     out << YAML::Key << "Selectors" << YAML::BeginSeq;
     for (const EntitySelector* selector : scene->m_entitySelectors) {
         // System info
@@ -197,6 +247,7 @@ bool SceneSerializer::serializeScripts(const Scene* scene, const io::Serializer*
     }
     out << YAML::EndSeq;
 
+    LOG_TRACE("[Asset] Serializing script systems for {0}", scene->getHandle());
     out << YAML::Key << "Systems" << YAML::BeginSeq;
     for (const scripting::ScriptSystem* system : scene->m_systems) {
         // System info
@@ -215,18 +266,24 @@ bool SceneSerializer::deserializeScripts(Scene* scene, io::Serializer* serialize
         auto selectors = scripting["Selectors"];
 
         if (selectors) {
+            LOG_TRACE("[Asset] Deserializing entity selectors for {0}", scene->getHandle());
             for (auto selectorNode : selectors) {
                 EntitySelector* selector = static_cast<EntitySelector*>(serializer->parseUntrackedType(selectorNode));
                 scene->addEntitySelector(selector);
             }
+        } else {
+            LOG_TRACE("[Asset] No entity selectors for {0}", scene->getHandle());
         }
 
         if (systems) {
+            LOG_TRACE("[Asset] Deserializing scripts systems for {0}", scene->getHandle());
             for (auto systemNode : systems) {
                 scripting::ScriptSystem* system = new scripting::ScriptSystem();
                 scene->addScriptSystem(system);
                 serializer->fillData(system, systemNode);
             }
+        } else {
+            LOG_TRACE("[Asset] No script systems for {0}", scene->getHandle());
         }
     }
     return true;

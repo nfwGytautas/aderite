@@ -19,6 +19,7 @@ namespace aderite {
 namespace asset {
 
 MaterialAsset::~MaterialAsset() {
+    LOG_TRACE("[Asset] Destroying {0}", this->getHandle());
     std::free(m_udata);
 }
 
@@ -37,6 +38,8 @@ bool MaterialAsset::isValid() const {
 }
 
 void MaterialAsset::load(const io::Loader* loader) {
+    LOG_TRACE("[Asset] Loading {0}", this->getHandle());
+
     // TODO: Reference
 
     ::aderite::Engine::getLoaderPool()->enqueue(m_info.Type, io::LoaderPool::Priority::HIGH);
@@ -46,10 +49,16 @@ void MaterialAsset::load(const io::Loader* loader) {
             ::aderite::Engine::getLoaderPool()->enqueue(ta, io::LoaderPool::Priority::HIGH);
         }
     }
+
+    LOG_INFO("[Asset] Loaded {0}", this->getHandle());
 }
 
 void MaterialAsset::unload() {
+    LOG_TRACE("[Asset] Unloading {0}", this->getHandle());
+
     // TODO: Rework cause this is reference counted
+
+    LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
 }
 
 bool MaterialAsset::needsLoading() {
@@ -101,7 +110,7 @@ bool MaterialAsset::deserialize(io::Serializer* serializer, const YAML::Node& da
     m_udata = static_cast<float*>(std::malloc(dataSize));
 
     if (m_udata == nullptr) {
-        LOG_ERROR("Failed to allocate space for material property data {0}", getHandle());
+        LOG_ERROR("[Asset] Failed to allocate space for material property data {0}", getHandle());
         return false;
     }
 
@@ -110,7 +119,7 @@ bool MaterialAsset::deserialize(io::Serializer* serializer, const YAML::Node& da
     const YAML::Node& d = data["Properties"]["Data"];
 
     if (d.size() != (m_info.Type->getFields().Size * 4)) {
-        LOG_ERROR("Incorrect size for stored material data and type {0}", getHandle());
+        LOG_ERROR("[Asset] Incorrect size for stored material data and type {0}", getHandle());
         return false;
     }
 

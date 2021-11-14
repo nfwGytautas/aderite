@@ -9,12 +9,16 @@
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/PhysicsEventList.hpp"
 #include "aderite/scene/Transform.hpp"
+#include "aderite/utility/Log.hpp"
+#include "aderite/utility/LogExtensions.hpp"
 #include "aderite/utility/YAML.hpp"
 
 namespace aderite {
 namespace physics {
 
 PhysicsActor::~PhysicsActor() {
+    LOG_TRACE("[Physics] Destroying actor {0:p}", static_cast<void*>(this));
+
     for (Collider* collider : m_colliders) {
         delete collider;
     }
@@ -27,18 +31,25 @@ PhysicsActor::~PhysicsActor() {
 
         p_actor->release();
         p_actor = nullptr;
+    } else {
+        LOG_WARN("[Physics] {0:p} doesn't have an attached PhysX actor", static_cast<void*>(this));
     }
+
+    LOG_INFO("[Physics] Actor destroyed");
 }
 
 void PhysicsActor::addCollider(physics::Collider* collider) {
+    LOG_TRACE("[Physics] Adding collider {1:p} to {0:p}", static_cast<void*>(this), static_cast<void*>(collider));
     collider->setActor(this->p_actor);
     m_colliders.push_back(collider);
 }
 
 void PhysicsActor::removeCollider(physics::Collider* collider) {
+    LOG_TRACE("[Physics] Removing collider {1:p} from {0:p}", static_cast<void*>(this), static_cast<void*>(collider));
     auto it = std::find(m_colliders.begin(), m_colliders.end(), collider);
 
     if (it == m_colliders.end()) {
+        LOG_WARN("[Physics] {0:p} doesn't have collider {1:p}", static_cast<void*>(this), static_cast<void*>(collider));
         return;
     }
 
@@ -47,6 +58,7 @@ void PhysicsActor::removeCollider(physics::Collider* collider) {
 }
 
 void PhysicsActor::transferColliders(PhysicsActor* actor) {
+    LOG_TRACE("[Physics] Transfering colliders from {0:p} to {1:p}", static_cast<void*>(this), static_cast<void*>(actor));
     ADERITE_DYNAMIC_ASSERT(actor != nullptr, "Transfering colliders to nullptr actor");
 
     for (Collider* collider : m_colliders) {
@@ -55,13 +67,18 @@ void PhysicsActor::transferColliders(PhysicsActor* actor) {
 
     // Ownership was transfered
     m_colliders.clear();
+
+    LOG_INFO("[Physics] Colliders transfered from {0:p} to {1:p}", static_cast<void*>(this), static_cast<void*>(actor));
 }
 
 void PhysicsActor::setEntity(scene::Entity* entity) {
+    LOG_TRACE("[Physics] Changing {0:p} entity to {1:p}, was {2:p}", static_cast<void*>(this), static_cast<void*>(entity),
+              static_cast<void*>(m_entity));
     m_entity = entity;
 }
 
 void PhysicsActor::moveActor(const glm::vec3& position) {
+    LOG_TRACE("[Physics] Moving {0:p} to {1}", static_cast<void*>(this), position);
     physx::PxTransform pxt = p_actor->getGlobalPose();
     pxt.p.x = position.x;
     pxt.p.y = position.y;
@@ -74,6 +91,7 @@ void PhysicsActor::moveActor(const glm::vec3& position) {
 }
 
 void PhysicsActor::rotateActor(const glm::quat& rotation) {
+    LOG_TRACE("[Physics] Rotating {0:p} to {1}", static_cast<void*>(this), rotation);
     physx::PxTransform pxt = p_actor->getGlobalPose();
     pxt.q.x = rotation.x;
     pxt.q.y = rotation.y;

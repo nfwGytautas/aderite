@@ -2,6 +2,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/audio/AudioController.hpp"
+#include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 #include "aderite/utility/YAML.hpp"
 
@@ -28,14 +29,17 @@ void AudioListener::update() {
 }
 
 void AudioListener::disable() {
+    LOG_TRACE("[Audio] Disabling listener {0}", m_name);
     m_enabled = false;
 }
 
 void AudioListener::enable() {
+    LOG_TRACE("[Audio] Enabling listener {0}", m_name);
     m_enabled = true;
 }
 
 void AudioListener::setName(const std::string& name) {
+    LOG_TRACE("[Audio] Renaming listener {0} to ", m_name, name);
     m_name = name;
 }
 

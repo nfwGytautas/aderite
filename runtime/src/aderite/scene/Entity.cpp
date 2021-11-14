@@ -17,10 +17,12 @@ Entity::~Entity() {
 }
 
 void Entity::addTag(size_t tag) {
+    LOG_TRACE("[Scene] Added tag {0:b} to entity {1}", tag, this->getName());
     m_tags = m_tags | tag;
 }
 
 void Entity::removeTag(size_t tag) {
+    LOG_TRACE("[Scene] Removed tag {0:b} from entity {1}", tag, this->getName());
     m_tags = m_tags & ~tag;
 }
 
@@ -29,6 +31,7 @@ bool Entity::hasTag(size_t tag) const {
 }
 
 void Entity::setScene(Scene* scene) {
+    LOG_TRACE("[Scene] Setting {0} scene to {1:p}", this->getName(), static_cast<void*>(scene));
     m_scene = scene;
 
     // Add to new scene
@@ -38,6 +41,7 @@ void Entity::setScene(Scene* scene) {
 }
 
 void Entity::setActor(physics::PhysicsActor* actor, bool keepColliders) {
+    LOG_TRACE("[Scene] Setting {0} actor to {1:p}", static_cast<void*>(actor));
     if (actor != nullptr) {
         if (keepColliders && m_actor != nullptr) {
             m_actor->transferColliders(actor);
@@ -49,12 +53,13 @@ void Entity::setActor(physics::PhysicsActor* actor, bool keepColliders) {
         }
     } else {
         if (keepColliders) {
-            LOG_WARN("KeepColliders true on a nullptr actor");
+            LOG_WARN("[Scene] KeepColliders true on a nullptr actor");
         }
     }
 
     if (m_actor != nullptr) {
         if (m_scene != nullptr) {
+            LOG_TRACE("[Scene] Detaching old actor {0:p} from {1}", static_cast<void*>(m_actor), this->getName());
             m_scene->getPhysicsScene()->detachActor(m_actor);
         }
         m_actor->setEntity(nullptr);
@@ -68,6 +73,11 @@ void Entity::setRenderable(rendering::Renderable* renderable) {
     m_renderable = renderable;
 }
 
+void Entity::setName(const std::string& name) {
+    LOG_TRACE("[Scene] Renaming entity {0} to {1}", m_name, name);
+    m_name = name;
+}
+
 reflection::Type Entity::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::ENTITY);
 }
@@ -79,6 +89,7 @@ bool Entity::serialize(const io::Serializer* serializer, YAML::Emitter& emitter)
 
     // Tag
     emitter << YAML::Key << "Tags" << YAML::Value << m_tags;
+    emitter << YAML::Key << "Name" << YAML::Value << m_name;
 
     // Actor
     emitter << YAML::Key << "Actor";
@@ -106,6 +117,10 @@ bool Entity::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     // Tags
     if (data["Tags"]) {
         m_tags = data["Tags"].as<size_t>();
+    }
+
+    if (data["Name"]) {
+        m_name = data["Name"].as<std::string>();
     }
 
     // Actor

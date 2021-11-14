@@ -4,7 +4,6 @@
 
 #include "aderite/rendering/operation/Forward.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
-#include "aderite/scene/components/Components.hpp"
 
 namespace aderite {
 namespace rendering {

@@ -11,7 +11,7 @@ namespace scripting {
 void findClass(MonoImage* image, const char* nspace, const char* name, MonoClass*& klass, bool& result) {
     klass = mono_class_from_name(image, nspace, name);
     if (klass == nullptr) {
-        LOG_ERROR("Failed to find {0} in namespace {1} class", name, nspace);
+        LOG_ERROR("[Scripting] Failed to find {0} in namespace {1} class", name, nspace);
         result = false;
     }
 }
@@ -19,7 +19,7 @@ void findClass(MonoImage* image, const char* nspace, const char* name, MonoClass
 void findField(MonoClass* klass, const char* name, MonoClassField*& field, bool& result) {
     field = mono_class_get_field_from_name(klass, name);
     if (field == nullptr) {
-        LOG_ERROR("Failed to find {0} field in {1}", name, mono_class_get_name(klass));
+        LOG_ERROR("[Scripting] Failed to find {0} field in {1}", name, mono_class_get_name(klass));
         result = false;
     }
 }
@@ -27,12 +27,14 @@ void findField(MonoClass* klass, const char* name, MonoClassField*& field, bool&
 void findMethod(MonoClass* klass, const char* name, int paramCount, MonoMethod*& method, bool& result) {
     method = mono_class_get_method_from_name(klass, name, paramCount);
     if (method == nullptr) {
-        LOG_ERROR("Failed to find {0} method in {1}", name, mono_class_get_name(klass));
+        LOG_ERROR("[Scripting] Failed to find {0} method in {1}", name, mono_class_get_name(klass));
         result = false;
     }
 }
 
 bool LibClassLocator::locate(MonoImage* image) {
+    LOG_TRACE("[Scripting] Locating engine classes in {0:p}", static_cast<void*>(image));
+
     bool result = true;
 
     // Classes
@@ -47,7 +49,7 @@ bool LibClassLocator::locate(MonoImage* image) {
 
     // Can't proceed if classes are not found
     if (result == false) {
-        LOG_ERROR("Failed to find one of engine classes aborting");
+        LOG_ERROR("[Scripting] Failed to find one of engine classes aborting");
         return false;
     }
 
@@ -61,6 +63,12 @@ bool LibClassLocator::locate(MonoImage* image) {
     findMethod(m_audioSource.Klass, ".ctor", 1, m_audioSource.Ctor, result);
     findMethod(m_triggerEvent.Klass, ".ctor", 2, m_triggerEvent.Ctor, result);
     findMethod(m_collisionEvent.Klass, ".ctor", 2, m_collisionEvent.Ctor, result);
+
+    if (result) {
+        LOG_INFO("[Scripting] Engine classed located");
+    } else {
+        LOG_ERROR("[Scripting] Some engine classed couldn't be loaded");
+    }
 
     return result;
 }
@@ -135,7 +143,7 @@ MonoObject* LibClassLocator::create(const physics::CollisionEvent& collisionEven
 
 void LibClassLocator::handleException(MonoObject* exception) {
     // TODO: Implement
-    LOG_ERROR("EXCEPTION THROWN IN C# CODE");
+    LOG_ERROR("[Scripting] EXCEPTION THROWN IN C# CODE");
 }
 
 MonoObject* LibClassLocator::genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args) {

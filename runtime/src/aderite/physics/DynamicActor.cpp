@@ -4,6 +4,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/physics/PhysicsController.hpp"
+#include "aderite/utility/Log.hpp"
 
 namespace aderite {
 namespace physics {
@@ -18,10 +19,12 @@ bool DynamicActor::getKinematic() const {
 }
 
 void DynamicActor::setKinematic(bool value) {
+    LOG_TRACE("[Physics] Setting actor {0:p} kinematic flag to {1}", static_cast<void*>(this), value);
     static_cast<physx::PxRigidDynamic*>(p_actor)->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, value);
 }
 
 void DynamicActor::setGravity(bool value) {
+    LOG_TRACE("[Physics] Setting actor {0:p} gravity flag to {1}", static_cast<void*>(this), value);
     p_actor->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, !value);
 }
 
@@ -30,6 +33,7 @@ bool DynamicActor::getGravity() const {
 }
 
 void DynamicActor::setMass(float mass) {
+    LOG_TRACE("[Physics] Setting actor {0:p} mass to {1}", static_cast<void*>(this), mass);
     static_cast<physx::PxRigidDynamic*>(p_actor)->setMass(mass);
 }
 

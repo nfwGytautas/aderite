@@ -14,6 +14,8 @@ namespace aderite {
 namespace physics {
 
 PhysicsScene::PhysicsScene() {
+    LOG_TRACE("[Physics] Creating physics scene");
+
     auto physics = ::aderite::Engine::getPhysicsController()->getPhysics();
 
     // TODO: Configure physics properties
@@ -26,9 +28,13 @@ PhysicsScene::PhysicsScene() {
     m_scene = physics->createScene(sceneDesc);
     m_scene->userData = this;
     ADERITE_DYNAMIC_ASSERT(m_scene != nullptr, "Failed to create a PhysX scene");
+
+    LOG_INFO("[Physics] Physics scene created");
 }
 
 PhysicsScene::~PhysicsScene() {
+    LOG_TRACE("[Physics] Destroying physics scene");
+
     if (m_scene != nullptr) {
         size_t count = m_scene->getNbActors(physx::PxActorTypeFlag::eRIGID_STATIC | physx::PxActorTypeFlag::eRIGID_DYNAMIC);
         std::vector<physx::PxActor*> actors;
@@ -41,7 +47,11 @@ PhysicsScene::~PhysicsScene() {
         }
 
         m_scene->release();
+    } else {
+        LOG_WARN("[Physics] nullptr PhysX scene");
     }
+
+    LOG_INFO("[Physics] Physics scene destroyed");
 }
 
 void PhysicsScene::simulate(float step) {

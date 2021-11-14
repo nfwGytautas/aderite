@@ -1,11 +1,16 @@
 #include "AudioAsset.hpp"
 
+#include "aderite/utility/Log.hpp"
+
 namespace aderite {
 namespace asset {
 
-AudioAsset::~AudioAsset() {}
+AudioAsset::~AudioAsset() {
+    LOG_TRACE("[Asset] Destroying {0}", this->getHandle());
+}
 
 void AudioAsset::setEventName(const std::string& name) {
+    LOG_TRACE("[Asset] Renaming {0}, event from {1} to {2}", this->getHandle(), m_name, name);
     m_name = name;
 }
 
@@ -13,9 +18,13 @@ std::string AudioAsset::getEventName() const {
     return m_name;
 }
 
-void AudioAsset::load(const io::Loader* loader) {}
+void AudioAsset::load(const io::Loader* loader) {
+    LOG_TRACE("[Asset] Loading {0}", this->getHandle());
+}
 
-void AudioAsset::unload() {}
+void AudioAsset::unload() {
+    LOG_TRACE("[Asset] Unloading {0}", this->getHandle());
+}
 
 bool AudioAsset::needsLoading() {
     return false;

@@ -12,7 +12,7 @@ namespace aderite {
 namespace scripting {
 
 void linkInternals() {
-    LOG_TRACE("Linking internals");
+    LOG_TRACE("[Scripting] Linking internals");
 
     logInternals();
     componentInternals();
@@ -21,7 +21,7 @@ void linkInternals() {
     physicsInternals();
     audioInternals();
 
-    LOG_TRACE("Internals linked");
+    LOG_TRACE("[Scripting] Internals linked");
 }
 
 } // namespace scripting

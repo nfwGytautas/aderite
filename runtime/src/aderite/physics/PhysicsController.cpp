@@ -33,6 +33,7 @@
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/LogExtensions.hpp"
 
 namespace aderite {
 namespace physics {
@@ -46,26 +47,26 @@ public:
         // Error processing implementation
         switch (code) {
         case physx::PxErrorCode::Enum::eDEBUG_INFO: {
-            LOG_INFO("PhysX: {0} in {1}", message, file);
+            LOG_INFO("[Physics] PhysX: {0} in {1}", message, file);
             break;
         }
         case physx::PxErrorCode::Enum::ePERF_WARNING: {
-            LOG_WARN("PhysX: performance warning {0} in {1}", message, file);
+            LOG_WARN("[Physics] PhysX: performance warning {0} in {1}", message, file);
             break;
         }
         case physx::PxErrorCode::Enum::eDEBUG_WARNING: {
-            LOG_WARN("PhysX: {0} in {1}", message, file);
+            LOG_WARN("[Physics] PhysX: {0} in {1}", message, file);
             break;
         }
         case physx::PxErrorCode::Enum::eINVALID_OPERATION:
         case physx::PxErrorCode::Enum::eOUT_OF_MEMORY:
         case physx::PxErrorCode::Enum::eINVALID_PARAMETER: {
-            LOG_ERROR("PhysX: {0} in {1}", message, file);
+            LOG_ERROR("[Physics] PhysX: {0} in {1}", message, file);
             break;
         }
         case physx::PxErrorCode::Enum::eABORT:
         case physx::PxErrorCode::Enum::eINTERNAL_ERROR: {
-            LOG_FATAL("PhysX: Uncoverable error {0} in {1}", message, file);
+            LOG_FATAL("[Physics] PhysX: Uncoverable error {0} in {1}", message, file);
             break;
         }
         }
@@ -76,50 +77,68 @@ static PhysXErrorCallback gErrorCallback;
 static physx::PxDefaultAllocator gDefaultAllocatorCallback;
 
 bool PhysicsController::init() {
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[Physics] Initializing physics controller");
+
     // Foundation
+    LOG_TRACE("[Physics] Creating PhysX foundation");
     m_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback, gErrorCallback);
     if (m_foundation == nullptr) {
-        LOG_ERROR("Failed to create PhysX foundation");
+        LOG_ERROR("[Physics] Failed to create PhysX foundation");
         return false;
     }
+    LOG_INFO("[Physics] PhysX foundation created");
 
     physx::PxTolerancesScale scale = physx::PxTolerancesScale();
 
+#ifdef _DEBUG
     // PVD
+    LOG_TRACE("[Physics] Creating PhysX PVD");
     m_pvd = physx::PxCreatePvd(*m_foundation);
     if (m_pvd == nullptr) {
-        LOG_ERROR("Failed to create PhysX visual debugger");
+        LOG_ERROR("[Physics] Failed to create PhysX visual debugger");
         return false;
     }
+    LOG_INFO("[Physics] PhysX PVD created");
 
+    LOG_TRACE("[Physics] Creating PhysX PVD transport");
     physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate("", 5425, 10);
     if (transport == nullptr) {
-        LOG_ERROR("Failed to create PhysX visual debugger transport");
+        LOG_ERROR("[Physics] Failed to create PhysX visual debugger transport");
         return false;
     }
+    LOG_INFO("[Physics] PhysX PVD transport created");
 
     m_pvd->connect(*transport, physx::PxPvdInstrumentationFlag::eALL);
+#endif
 
     // Physics object
+    LOG_TRACE("[Physics] Creating PhysX physics object");
     m_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *m_foundation, scale, m_recordMemoryAllocations, m_pvd);
     if (m_physics == nullptr) {
-        LOG_ERROR("Failed to create PhysX physics");
+        LOG_ERROR("[Physics] Failed to create PhysX physics");
         return false;
     }
+    LOG_INFO("[Physics] PhysX physics object created");
 
     // Cooking
+    LOG_TRACE("[Physics] Creating PhysX cooking library");
     m_cooking = PxCreateCooking(PX_PHYSICS_VERSION, *m_foundation, physx::PxCookingParams(scale));
     if (m_cooking == nullptr) {
-        LOG_ERROR("Failed to create PhysX cooking");
+        LOG_ERROR("[Physics] Failed to create PhysX cooking");
         return false;
     }
+    LOG_INFO("[Physics] PhysX cooking library created");
 
     // Extensions and dispatcher
+    LOG_TRACE("[Physics] Initializing PhysX extensions");
     if (!PxInitExtensions(*m_physics, m_pvd)) {
-        LOG_ERROR("Failed to init PhysX extensions");
+        LOG_ERROR("[Physics] Failed to init PhysX extensions");
         return false;
     }
+    LOG_INFO("[Physics] PhysX extensions initialized");
 
+    LOG_TRACE("[Physics] Setting up physics defaults and properties");
     m_dispatcher = physx::PxDefaultCpuDispatcherCreate(m_numThreads);
 
     // Create default material
@@ -131,10 +150,15 @@ bool PhysicsController::init() {
     // Create event list
     m_events = new PhysicsEventList();
 
+    LOG_INFO("[Physics] Physics controller initialized");
+
     return true;
 }
 
 void PhysicsController::shutdown() {
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[Physics] Shutting down physics controller");
+
     m_cooking->release();
     m_dispatcher->release();
     m_physics->release();
@@ -143,6 +167,8 @@ void PhysicsController::shutdown() {
     m_foundation->release();
 
     delete m_events;
+
+    LOG_INFO("[Physics] Physics controller shutdown");
 }
 
 void PhysicsController::update(float delta) {

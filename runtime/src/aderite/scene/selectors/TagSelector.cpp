@@ -1,26 +1,19 @@
 #include "TagSelector.hpp"
 
 #include "aderite/scene/Scene.hpp"
+#include "aderite/utility/Log.hpp"
 
 namespace aderite {
 namespace scene {
 
 void TagSelector::addTag(size_t tag) {
+    LOG_TRACE("[Scene] Added tag {0:b} to selector {1}", tag, this->getName());
     m_tags = m_tags | tag;
-
-    //// Check list
-    //m_entities.erase(std::remove_if(m_entities.begin(), m_entities.end(),
-    //                                [&](scene::Entity* e) {
-    //                                    return e->getTags() != m_tags;
-    //                                }),
-    //                 m_entities.end());
 }
 
 void TagSelector::removeTag(size_t tag) {
+    LOG_TRACE("[Scene] Removed tag {0:b} from selector {1}", tag, this->getName());
     m_tags = m_tags & ~tag;
-
-    //// Need to get entire entity list and filter it out again
-    //this->regenerate();
 }
 
 bool TagSelector::hasTag(size_t tag) const {

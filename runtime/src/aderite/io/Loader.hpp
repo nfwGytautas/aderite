@@ -62,6 +62,13 @@ public: // Thread handling
      */
     ILoadable* current() const;
 
+    /**
+     * @brief Returns true if the loader instance is ready to load
+     */
+    bool isReady() const {
+        return m_ready;
+    }
+
 public: // Loading operations
     template<class T>
     struct TextureLoadResult {
@@ -136,6 +143,7 @@ private:
     LoaderPool* m_pool;
     std::thread m_thread;
     bool m_terminated = false;
+    bool m_ready = false;
 
     class LoaderImpl;
     LoaderImpl* m_impl = nullptr;

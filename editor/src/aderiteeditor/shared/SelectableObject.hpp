@@ -3,8 +3,6 @@
 #include "aderite/io/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 
-#include "aderiteeditor/extensions/Forward.hpp"
-
 namespace aderite {
 namespace editor {
 
@@ -25,7 +23,7 @@ class SelectableObject {
 public:
     SelectableObject();
     SelectableObject(io::SerializableObject* asset);
-    SelectableObject(scene::EditorEntity* entity);
+    SelectableObject(scene::Entity* entity);
     SelectableObject(io::ISerializable* serializable);
 
     /**
@@ -41,7 +39,7 @@ public:
     /**
      * @brief Returns the entity of the selectable
      */
-    scene::EditorEntity* getEntity() const;
+    scene::Entity* getEntity() const;
 
     /**
      * @brief Returns the object part of the selectable
@@ -54,7 +52,7 @@ private:
     union {
         io::SerializableObject* Object;
         io::ISerializable* Serializable;
-        scene::EditorEntity* Entity;
+        scene::Entity* Entity;
     } m_data;
 };
 

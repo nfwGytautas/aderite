@@ -7,6 +7,7 @@
 
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/scene/Forward.hpp"
+#include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/Forward.hpp"
 #include "aderite/scripting/ThunkedMethod.hpp"
 

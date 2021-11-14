@@ -3,6 +3,7 @@
 #include "aderite/reflection/Instancer.hpp"
 #include "aderite/reflection/Reflectable.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/LogExtensions.hpp"
 
 // Assets, needed for linking instancers
 #include "aderite/asset/AudioAsset.hpp"
@@ -32,8 +33,9 @@ namespace aderite {
 namespace reflection {
 
 bool Reflector::init() {
+    ADERITE_LOG_BLOCK;
     // Runtime instancers
-    LOG_TRACE("Setting runtime instancers");
+    LOG_TRACE("[Reflection] Setting runtime instancers");
 
     // Assets
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::MeshAsset, RuntimeTypes::MESH);
@@ -70,28 +72,35 @@ bool Reflector::init() {
     // Scripting
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::TagSelector, RuntimeTypes::TAG_SELECTOR);
 
-    LOG_DEBUG("Registered {0} runtime instancers", m_instancers.size());
+    LOG_DEBUG("[Reflection] Registered {0} runtime instancers", m_instancers.size());
     ADERITE_DEBUG_SECTION(this->printInstancers(););
+
+    LOG_INFO("[Reflection] Reflector initialized");
 
     return true;
 }
 
 void Reflector::shutdown() {
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[Reflection] Shutting down reflector");
     for (auto instancer : m_instancers) {
         delete instancer.second;
     }
+    LOG_INFO("[Reflection] Reflector shutdown");
 }
 
 void Reflector::linkInstancer(Type type, InstancerBase* instancer, const std::string& name = "") {
     auto it = m_instancers.find(type);
     if (it != m_instancers.end()) {
         // Already has mapped instancer
-        LOG_DEBUG("Instancer for type {0:03d}({1}) has been overridden to ({2})", type, m_names[type], name);
+        LOG_DEBUG("[Reflection] Instancer for type {0:03d}({1}) has been overridden to ({2})", type, m_names[type], name);
 
         delete it->second;
         it->second = instancer;
 
         return;
+    } else {
+        LOG_TRACE("[Reflection] Registered instancer for type {0:03d}({1})", type, name);
     }
 
     m_instancers.insert_or_assign(type, instancer);

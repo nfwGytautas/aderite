@@ -54,6 +54,12 @@ public:
     void setRenderable(rendering::Renderable* renderable);
 
     /**
+     * @brief Set the name of the entity
+     * @param name New name of the entity
+     */
+    void setName(const std::string& name);
+
+    /**
      * @brief Returns the scene of the entity
      */
     Scene* getScene() const {
@@ -88,6 +94,13 @@ public:
         return m_tags;
     }
 
+    /**
+     * @brief Returns the name of this entity
+     */
+    const std::string& getName() const {
+        return m_name;
+    }
+
     // Inherited via ISerializable
     virtual reflection::Type getType() const override;
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
@@ -111,6 +124,11 @@ private:
      * @brief Tag bitset
      */
     size_t m_tags = 0;
+
+    /**
+     * @brief Name of the entity
+     */
+    std::string m_name = "";
 
     /**
      * @brief Physics actor of the entity

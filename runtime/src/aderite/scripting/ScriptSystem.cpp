@@ -31,12 +31,14 @@ void ScriptSystem::update(float delta) {
 }
 
 void ScriptSystem::init() {
+    LOG_TRACE("[Scripting] Initialzing {0}", m_name);
     if (m_init) {
         m_init();
     }
 }
 
 void ScriptSystem::shutdown() {
+    LOG_TRACE("[Scripting] Shutting down {0}", m_name);
     if (m_shutdown) {
         m_shutdown();
     }
@@ -67,19 +69,22 @@ void ScriptSystem::collisionEnd(MonoObject* collisionEvent) {
 }
 
 void ScriptSystem::load(const std::string& name) {
+    LOG_TRACE("[Scripting] Loading {0} into {1:p}", name, static_cast<void*>(this));
     ScriptManager* sm = ::aderite::Engine::getScriptManager();
 
     // Resolve class
     m_klass = sm->getSystemClass(name);
     if (m_klass == nullptr) {
-        LOG_ERROR("Failed to resolve mono class for {0}", name);
+        LOG_ERROR("[Scripting] Failed to resolve mono class for {0}", name);
         return;
     }
 
     // Create instance
+    LOG_TRACE("[Scripting] Create instance");
     m_instance = sm->instantiate(m_klass);
 
     // Resolve methods and fields
+    LOG_TRACE("[Scripting] Resolving methods");
     m_init = ThunkedMethod<void>(sm->getMethod(m_klass, "Init", 0), m_instance);
     m_shutdown = ThunkedMethod<void>(sm->getMethod(m_klass, "Shutdown", 0), m_instance);
     m_update = ThunkedMethod<void, float, MonoArray*>(sm->getMethod(m_klass, "Update", 2), m_instance);
@@ -88,15 +93,18 @@ void ScriptSystem::load(const std::string& name) {
     m_triggerLeave = ThunkedMethod<void, MonoObject*>(sm->getMethod(m_klass, "OnTriggerLeave", 1), m_instance);
     m_collisionStart = ThunkedMethod<void, MonoObject*>(sm->getMethod(m_klass, "OnCollisionStart", 1), m_instance);
     m_collisionEnd = ThunkedMethod<void, MonoObject*>(sm->getMethod(m_klass, "OnCollisionEnd", 1), m_instance);
-    
 
     // User defined fields
+    LOG_TRACE("[Scripting] Resolving public fields");
     m_fields = sm->getPublicFields(m_instance);
+
+    LOG_INFO("[Scripting] System {0:p} loaded", static_cast<void*>(this));
 
     m_name = name;
 }
 
 void ScriptSystem::attachToScene(scene::Scene* scene) {
+    LOG_TRACE("[Scripting] Attaching {0} to {1}", m_name, scene->getHandle());
     m_scene = scene;
 }
 
@@ -206,7 +214,7 @@ bool ScriptSystem::serialize(const io::Serializer* serializer, YAML::Emitter& em
 
 bool ScriptSystem::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     if (!data["Name"]) {
-        LOG_ERROR("Can't deserialize ScriptSystem without Name node");
+        LOG_ERROR("[Scripting] Can't deserialize ScriptSystem without Name node");
         return false;
     }
 
@@ -231,7 +239,7 @@ bool ScriptSystem::deserialize(io::Serializer* serializer, const YAML::Node& dat
         const std::string fieldName = fieldData.first.as<std::string>();
 
         if (!this->hasField(fieldName)) {
-            LOG_WARN("Unexpected field {0}, skipping", fieldName);
+            LOG_WARN("[Scripting] Unexpected field {0}, skipping", fieldName);
             continue;
         }
 
@@ -294,6 +302,8 @@ void ScriptSystem::updateEntitiesArray() {
     } else {
         // Check if there is a need for realloc
         if (length != mono_array_length(m_entities)) {
+            LOG_TRACE("[Scripting] Reallocating entity array for system {0}, previous length: {1}, new length: {2}", m_name,
+                      mono_array_length(m_entities), length);
             m_entities = mono_array_new(::aderite::Engine::getScriptManager()->getDomain(), locator.getEntity().Klass, length);
         }
     }

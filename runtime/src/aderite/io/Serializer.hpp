@@ -155,17 +155,6 @@ public:
      */
     void saveAll();
 
-    /**
-     * @brief Allows to pass any data to subsequent callers
-     * @param data Data to be passed
-     */
-    void setData(void* data);
-
-    /**
-     * @brief Returns the argument of setData
-     */
-    void* getData() const;
-
     auto begin() {
         return m_objects.begin();
     }
@@ -196,7 +185,6 @@ private:
 private:
     std::vector<SerializableObject*> m_objects;
     bool m_hasNull = false;
-    void* m_data = nullptr;
 };
 
 } // namespace io

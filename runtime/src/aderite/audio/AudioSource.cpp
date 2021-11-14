@@ -4,6 +4,7 @@
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/audio/AudioInstance.hpp"
+#include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 #include "aderite/utility/YAML.hpp"
 
@@ -40,14 +41,18 @@ AudioInstance* AudioSource::createOneshot(const asset::AudioAsset* clip) {
 }
 
 void AudioSource::mute() {
+    LOG_TRACE("[Audio] Muting source {0}", m_name);
     m_muted = true;
 }
 
 void AudioSource::unmute() {
+    LOG_TRACE("[Audio] Unmuting source {0}", m_name);
     m_muted = false;
 }
 
 void AudioSource::stop() {
+    LOG_TRACE("[Audio] Stopping source {0}", m_name);
+
     for (AudioInstance* instance : m_instances) {
         instance->stop();
     }
@@ -58,10 +63,12 @@ void AudioSource::stop() {
 }
 
 void AudioSource::setName(const std::string& name) {
+    LOG_TRACE("[Audio] Renaming source {0} to {1}", m_name, name);
     m_name = name;
 }
 
 void AudioSource::setVolume(const float volume) {
+    LOG_TRACE("[Audio] Changing source {0} volume from {1} to {2}", m_name, m_volume, volume);
     m_volume = volume;
 }
 

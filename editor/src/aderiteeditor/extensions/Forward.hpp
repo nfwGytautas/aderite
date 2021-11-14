@@ -6,8 +6,6 @@
 
 namespace aderite {
 
-namespace scene {
-class EditorEntity;
-}
+namespace scene {}
 
 } // namespace aderite
