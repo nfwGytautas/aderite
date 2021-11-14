@@ -1,6 +1,5 @@
 #include "ScriptManager.hpp"
 
-
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/attrdefs.h>
 #include <mono/metadata/mono-gc.h>
@@ -106,6 +105,22 @@ void ScriptManager::loadAssemblies() {
     this->resolveSystemNames();
 
     LOG_INFO("[Scripting] Assemblies loaded");
+}
+
+MonoObject* ScriptManager::createInstance(io::ISerializable* serializable) {
+    ADERITE_DYNAMIC_ASSERT(serializable != nullptr, "Nullptr serializable passed to createInstance");
+
+    // Check if an object already exists
+    auto it = m_objectCache.find(serializable);
+    if (it != m_objectCache.end()) {
+        // Already have instance
+        return it->second;
+    }
+
+    // Create instance
+    MonoObject* instance = m_locator.create(serializable);
+    m_objectCache[serializable] = instance;
+    return instance;
 }
 
 MonoClass* ScriptManager::getSystemClass(const std::string& name) const {
@@ -281,6 +296,8 @@ bool ScriptManager::setupCodeAssemblies() {
 }
 
 void ScriptManager::clean() {
+    m_objectCache.clear();
+
     // TODO: Invoke GC
 
     // TODO: Unload domain

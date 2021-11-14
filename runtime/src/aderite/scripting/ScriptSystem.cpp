@@ -1,18 +1,13 @@
 #include "ScriptSystem.hpp"
 
 #include "aderite/Aderite.hpp"
-#include "aderite/asset/AudioAsset.hpp"
-#include "aderite/asset/MaterialAsset.hpp"
-#include "aderite/asset/MeshAsset.hpp"
-#include "aderite/audio/AudioController.hpp"
+#include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/scene/EntitySelector.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
-
-#include "aderite/audio/AudioSource.hpp "
 
 namespace aderite {
 namespace scripting {
@@ -147,63 +142,39 @@ bool ScriptSystem::serialize(const io::Serializer* serializer, YAML::Emitter& em
 
         switch (fw.getType()) {
         case scripting::FieldType::Float: {
-            emitter << (*(float*)scripting::unbox(fw.getValueObject()));
+            emitter << fw.getValueType<float>();
             break;
         }
         case scripting::FieldType::Boolean: {
-            emitter << (*(bool*)scripting::unbox(fw.getValueObject()));
-            break;
-        }
-        case scripting::FieldType::Mesh: {
-            MonoObject* mesh = nullptr;
-            fw.getValue(&mesh);
-            if (mesh == nullptr) {
-                emitter << YAML::Null;
-            } else {
-                asset::MeshAsset* meshAsset = nullptr;
-                scripting::extract(mesh, meshAsset);
-                emitter << meshAsset->getHandle();
-            }
-            break;
-        }
-        case scripting::FieldType::Material: {
-            MonoObject* material = nullptr;
-            fw.getValue(&material);
-            if (material == nullptr) {
-                emitter << YAML::Null;
-            } else {
-                asset::MaterialAsset* materialAsset = nullptr;
-                scripting::extract(material, materialAsset);
-                emitter << materialAsset->getHandle();
-            }
-            break;
-        }
-        case scripting::FieldType::Audio: {
-            MonoObject* audio = nullptr;
-            fw.getValue(&audio);
-            if (audio == nullptr) {
-                emitter << YAML::Null;
-            } else {
-                asset::AudioAsset* audioAsset = nullptr;
-                scripting::extract(audio, audioAsset);
-                emitter << audioAsset->getHandle();
-            }
-            break;
-        }
-        case scripting::FieldType::AudioSource: {
-            MonoObject* audioSource = nullptr;
-            fw.getValue(&audioSource);
-            if (audioSource == nullptr) {
-                emitter << YAML::Null;
-            } else {
-                audio::AudioSource* source = nullptr;
-                scripting::extract(audioSource, source);
-                emitter << source->getName();
-            }
+            emitter << fw.getValueType<bool>();
             break;
         }
         default: {
-            emitter << YAML::Null;
+            io::ISerializable* serializable = fw.getSerializable();
+
+            if (serializable == nullptr) {
+                emitter << YAML::Null;
+            } else {
+                switch (fw.getType()) {
+                case scripting::FieldType::Mesh:
+                case scripting::FieldType::Material:
+                case scripting::FieldType::Audio: {
+                    // SerializableObject
+                    io::SerializableObject* object = static_cast<io::SerializableObject*>(serializable);
+                    emitter << object->getHandle();
+                    break;
+                }
+                case scripting::FieldType::AudioSource: {
+                    audio::AudioSource* source = static_cast<audio::AudioSource*>(serializable);
+                    emitter << source->getName();
+                    break;
+                }
+                default: {
+                    LOG_ERROR("[Scripting] Unknown implementation for serializing field of type {0}", fw.getType());
+                    emitter << YAML::Null;
+                }
+                }
+            }
         }
         }
     }
@@ -248,41 +219,33 @@ bool ScriptSystem::deserialize(io::Serializer* serializer, const YAML::Node& dat
         if (!fieldData.second.IsNull()) {
             switch (fw.getType()) {
             case scripting::FieldType::Float: {
-                float val = fieldData.second.as<float>();
-                fw.setValue(&val);
+                fw.setValueType(fieldData.second.as<float>());
                 break;
             }
             case scripting::FieldType::Boolean: {
-                bool val = fieldData.second.as<bool>();
-                fw.setValue(&val);
+                fw.setValueType(fieldData.second.as<bool>());
                 break;
             }
-            case scripting::FieldType::Mesh: {
-                asset::MeshAsset* mesh = static_cast<asset::MeshAsset*>(
-                    ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>()));
-                MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(mesh);
-                fw.setValue(obj);
-                break;
-            }
-            case scripting::FieldType::Material: {
-                asset::MaterialAsset* material = static_cast<asset::MaterialAsset*>(
-                    ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>()));
-                MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(material);
-                fw.setValue(obj);
-                break;
-            }
-            case scripting::FieldType::Audio: {
-                asset::AudioAsset* audio = static_cast<asset::AudioAsset*>(
-                    ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>()));
-                MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(audio);
-                fw.setValue(obj);
-                break;
-            }
-            case scripting::FieldType::AudioSource: {
-                audio::AudioSource* source = m_scene->getSource(fieldData.second.as<std::string>());
-                MonoObject* obj = ::aderite::Engine::getScriptManager()->getLocator().create(source);
-                fw.setValue(obj);
-                break;
+            default: {
+                switch (fw.getType()) {
+                case scripting::FieldType::Mesh:
+                case scripting::FieldType::Material:
+                case scripting::FieldType::Audio: {
+                    // Serializable object
+                    io::SerializableObject* object =
+                        ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>());
+                    fw.setSerializable(object);
+                    break;
+                }
+                case scripting::FieldType::AudioSource: {
+                    audio::AudioSource* source = m_scene->getSource(fieldData.second.as<std::string>());
+                    fw.setSerializable(source);
+                    break;
+                }
+                default: {
+                    LOG_ERROR("[Scripting] Unknown implementation for deserializing field of type {0}", fw.getType());
+                }
+                }
             }
             }
         }

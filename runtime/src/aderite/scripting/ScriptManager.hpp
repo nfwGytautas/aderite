@@ -5,6 +5,7 @@
 
 #include <mono/jit/jit.h>
 
+#include "aderite/io/Forward.hpp"
 #include "aderite/scripting/Forward.hpp"
 #include "aderite/scripting/LibClassLocator.hpp"
 
@@ -53,6 +54,14 @@ public:
     MonoImage* getCodeImage() const {
         return m_codeImage;
     }
+
+    /**
+     * @brief Create C# instance of a serializable, multiple calls with the same serializable will return the same object instance this way
+     * saving on memory and time
+     * @param serializable Serializable to create for
+     * @return MonoObject instance
+     */
+    MonoObject* createInstance(io::ISerializable* serializable);
 
     /**
      * @brief Returns a system MonoClass instance
@@ -161,6 +170,7 @@ private:
 
     // Vector containing the names of systems that exist in the image
     std::unordered_map<std::string, MonoClass*> m_knownSystems;
+    std::unordered_map<io::ISerializable*, MonoObject*> m_objectCache;
 };
 
 } // namespace scripting

@@ -73,25 +73,5 @@ std::string toString(MonoObject* object) {
     return str;
 }
 
-void extract(MonoObject* object, asset::MeshAsset*& mesh) {
-    FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"), object);
-    fw.getValue(&mesh);
-}
-
-void extract(MonoObject* object, asset::MaterialAsset*& material) {
-    FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"), object);
-    fw.getValue(&material);
-}
-
-void extract(MonoObject* object, asset::AudioAsset*& audio) {
-    FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"), object);
-    fw.getValue(&audio);
-}
-
-void extract(MonoObject* object, audio::AudioSource*& source) {
-    FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"), object);
-    fw.getValue(&source);
-}
-
 } // namespace scripting
 } // namespace aderite

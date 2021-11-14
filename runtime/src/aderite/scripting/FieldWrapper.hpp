@@ -4,6 +4,7 @@
 
 #include <mono/jit/jit.h>
 
+#include "aderite/io/Forward.hpp"
 #include "aderite/scripting/FieldType.hpp"
 
 namespace aderite {
@@ -44,6 +45,45 @@ public:
      * @param value New value to set
      */
     void setValue(void* value) const;
+
+    // ============================================================================
+    // Helper functions for converting to and from C++ objects
+    // ============================================================================
+
+    /**
+     * @brief Get the field value as a value type object
+     * @tparam T Type of the field
+     * @return Value of the field
+     */
+    template<typename T>
+    T getValueType() const {
+        // Just create object and create a copy
+        T value;
+        this->getValue(&value);
+        return value;
+    }
+
+    /**
+     * @brief Set the field value
+     * @tparam T Type of the field
+     * @param value New value of the field
+     */
+    template<typename T>
+    void setValueType(T value) const {
+        this->setValue(&value);
+    }
+
+    /**
+     * @brief If the type is of serializable, then this method can be used to directly extract the C++ instance
+     * @return ISerializable instance
+     */
+    io::ISerializable* getSerializable() const;
+
+    /**
+     * @brief If the type is of serializable, then this method can be used to directly set the instance of it
+     * @param serializable New instance of the field
+     */
+    void setSerializable(io::ISerializable* serializable) const;
 
 private:
     MonoClassField* m_field = nullptr;

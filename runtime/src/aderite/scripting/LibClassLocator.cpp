@@ -1,7 +1,12 @@
 #include "LibClassLocator.hpp"
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AudioAsset.hpp"
+#include "aderite/asset/MaterialAsset.hpp"
+#include "aderite/asset/MeshAsset.hpp"
+#include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/PhysicsActor.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -104,6 +109,30 @@ bool LibClassLocator::isSystem(MonoClass* klass) const {
     }
 
     return false;
+}
+
+MonoObject* LibClassLocator::create(io::ISerializable* serializable) {
+    switch (static_cast<reflection::RuntimeTypes>(serializable->getType())) {
+    case reflection::RuntimeTypes::ENTITY: {
+        return this->create(static_cast<scene::Entity*>(serializable));
+    }
+    case reflection::RuntimeTypes::MESH: {
+        return this->create(static_cast<asset::MeshAsset*>(serializable));
+    }
+    case reflection::RuntimeTypes::MATERIAL: {
+        return this->create(static_cast<asset::MaterialAsset*>(serializable));
+    }
+    case reflection::RuntimeTypes::AUDIO: {
+        return this->create(static_cast<asset::AudioAsset*>(serializable));
+    }
+    case reflection::RuntimeTypes::AUDIO_SOURCE: {
+        return this->create(static_cast<audio::AudioSource*>(serializable));
+    }
+    default: {
+        LOG_ERROR("[Scripting] Unknown implementation for creating a {0} serializable", serializable->getType());
+        return nullptr;
+    }
+    }
 }
 
 MonoObject* LibClassLocator::create(scene::Entity* entity) {

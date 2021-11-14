@@ -4,6 +4,7 @@
 
 #include "aderite/asset/Forward.hpp"
 #include "aderite/audio/Forward.hpp"
+#include "aderite/io/Forward.hpp"
 #include "aderite/physics/PhysicsEventList.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/scripting/FieldType.hpp"
@@ -76,6 +77,13 @@ public:
      * @return True if the class is or inherits from system class, false otherwise
      */
     bool isSystem(MonoClass* klass) const;
+
+    /**
+     * @brief Create a C# script instance object from generic C++ serializable object
+     * @param serializable Serializable object
+     * @return MonoObject instance
+    */
+    MonoObject* create(io::ISerializable* serializable);
 
     /**
      * @brief Creates a C# script Entity object from C++ entity

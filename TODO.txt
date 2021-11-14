@@ -59,8 +59,6 @@ Refactor to be more intuitive
 Remove files that don't physically exist anymore
 
 Scripting:
-FieldWrapper helpers for extracting asset types
-Cache MonoObject instances in objects to not create uneccesary new ones
 Generate .csproj file for easier coding
 Dont kill entire editor on script run error
 Load on project open

@@ -56,33 +56,5 @@ void* unbox(MonoObject* object);
  */
 std::string toString(MonoObject* object);
 
-/**
- * @brief Extract mesh field from mono object
- * @param object Object to extract from
- * @param mesh Pointer where to store value
- */
-void extract(MonoObject* object, asset::MeshAsset*& mesh);
-
-/**
- * @brief Extract material field from mono object
- * @param object Object to extract from
- * @param material Pointer where to store value
- */
-void extract(MonoObject* object, asset::MaterialAsset*& material);
-
-/**
- * @brief Extract audio field from mono object
- * @param object Object to extract from
- * @param audio Pointer where to store value
- */
-void extract(MonoObject* object, asset::AudioAsset*& audio);
-
-/**
- * @brief Extract source field from mono object
- * @param object Object to extract from
- * @param source Pointer where to store value
- */
-void extract(MonoObject* object, audio::AudioSource*& source);
-
 } // namespace scripting
 } // namespace aderite
