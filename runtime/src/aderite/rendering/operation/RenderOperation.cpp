@@ -5,8 +5,6 @@
 
 #include "aderite/rendering/DrawCall.hpp"
 #include "aderite/rendering/PipelineState.hpp"
-#include "aderite/scene/Transform.hpp"
-#include "aderite/utility/Log.hpp"
 
 namespace aderite {
 namespace rendering {

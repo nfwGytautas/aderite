@@ -1,13 +1,11 @@
 #pragma once
 
-#include <vector>
+#include <string>
 
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "aderite/asset/Forward.hpp"
-#include "aderite/audio/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 
 namespace aderite {

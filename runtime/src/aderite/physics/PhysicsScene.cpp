@@ -1,14 +1,12 @@
 #include "PhysicsScene.hpp"
 
 #include "aderite/Aderite.hpp"
-#include "aderite/io/Serializer.hpp"
 #include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/PhysicsActor.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/StaticActor.hpp"
 #include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace physics {

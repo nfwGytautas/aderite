@@ -5,8 +5,8 @@
 #include "aderite/asset/Forward.hpp"
 #include "aderite/audio/Forward.hpp"
 #include "aderite/physics/PhysicsEventList.hpp"
-#include "aderite/scene/Entity.hpp"
-#include "aderite/scripting/FieldWrapper.hpp"
+#include "aderite/scene/Forward.hpp"
+#include "aderite/scripting/FieldType.hpp"
 
 namespace aderite {
 namespace scripting {

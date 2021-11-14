@@ -1,7 +1,5 @@
 #pragma once
 
-#include "aderite/utility/Macros.hpp"
-
 namespace aderite {
 namespace utility {
 

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "aderite/io/Serializer.hpp"
-#include "aderite/scene/Entity.hpp"
+#include <yaml-cpp/yaml.h>
+
+#include "aderite/io/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 
 namespace aderite {

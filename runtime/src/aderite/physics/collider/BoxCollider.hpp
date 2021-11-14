@@ -1,7 +1,6 @@
 #pragma once
 
 #include "aderite/physics/Collider.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace physics {

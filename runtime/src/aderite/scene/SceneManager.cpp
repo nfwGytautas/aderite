@@ -1,5 +1,4 @@
 #include "SceneManager.hpp"
-#include <thread>
 
 #include "aderite/Aderite.hpp"
 #include "aderite/scene/Scene.hpp"

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "aderite/io/Loader.hpp"
+#include "aderite/io/ILoadable.hpp"
 #include "aderite/io/SerializableObject.hpp"
-#include "aderite/audio/AudioInstance.hpp"
 
 namespace aderite {
 namespace asset {
@@ -17,7 +16,7 @@ public:
     /**
      * @brief Set the name of the audio event
      * @param name Name of the event
-    */
+     */
     void setEventName(const std::string& name);
 
     /**

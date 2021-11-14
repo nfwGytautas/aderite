@@ -8,6 +8,7 @@
 #include "aderite/physics/Collider.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/PhysicsEventList.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/LogExtensions.hpp"
@@ -154,6 +155,8 @@ bool aderite::physics::PhysicsActor::deserialize(io::Serializer* serializer, con
 
     return true;
 }
+
+aderite::physics::PhysicsActor::PhysicsActor() {}
 
 } // namespace physics
 } // namespace aderite

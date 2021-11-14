@@ -17,6 +17,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/io/FileHandler.hpp"
+#include "aderite/io/ILoadable.hpp"
 #include "aderite/io/LoaderPool.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -283,7 +284,8 @@ Loader::ShaderLoadResult Loader::loadShader(LoadableHandle handle) const {
     std::memcpy(result.VertexSource.data(), chunk.Data.data() + sizeof(std::uint64_t), vertexSize);
     std::memcpy(result.FragmentSource.data(), chunk.Data.data() + sizeof(std::uint64_t) + vertexSize, fragmentSize);
 
-    LOG_INFO("[Asset] {0} loaded ({1} vertex shader size, {2} fragment shader size, {3} fragment shader start offset)", handle, vertexSize, fragmentSize, vertexSize);
+    LOG_INFO("[Asset] {0} loaded ({1} vertex shader size, {2} fragment shader size, {3} fragment shader start offset)", handle, vertexSize,
+             fragmentSize, vertexSize);
 
     return result;
 }

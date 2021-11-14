@@ -1,8 +1,9 @@
 #include "TargetProvideOperation.hpp"
 
 #include <bx/string.h>
-#include "aderite/utility/Log.hpp"
+
 #include "aderite/rendering/PipelineState.hpp"
+#include "aderite/utility/Log.hpp"
 
 namespace aderite {
 namespace rendering {
@@ -91,7 +92,7 @@ void TargetProvideOperation::createFramebuffer() {
     m_handle = bgfx::createFrameBuffer(attachments, textures, true);
 
     if (!bgfx::isValid(m_handle)) {
-        LOG_WARN("Failed to create framebuffer");
+        LOG_WARN("[Rendering] Failed to create framebuffer");
     }
 
     ADERITE_DEBUG_SECTION(bgfx::setName(m_handle, this->getName().c_str());)

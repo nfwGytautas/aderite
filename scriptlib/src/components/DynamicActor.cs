@@ -12,38 +12,38 @@ namespace Aderite
         /// Set actor kinematic property, kinematic objects are handled differently than simple dynamic objects.
         /// These objects are moved by the physics engine regardless of forces affecting them
         /// </summary>
-        public bool Kinematic { get { return __GetKinematic(scene, entity); } set { __SetKinematic(scene, entity, value); } }
+        public bool Kinematic { get { return __GetKinematic(Instance); } set { __SetKinematic(Instance, value); } }
 
         /// <summary>
         /// Actor gravity property if this is true then the actor is affected by gravity
         /// </summary>
-        public bool HasGravity { get { return __GetGravity(scene, entity); } set { __SetGravity(scene, entity, value); } }
+        public bool HasGravity { get { return __GetGravity(Instance); } set { __SetGravity(Instance, value); } }
 
         /// <summary>
         /// Mass of the actor
         /// </summary>
-        public float Mass { get { return __GetMass(scene, entity); } set { __SetMass(scene, entity, value); } }
+        public float Mass { get { return __GetMass(Instance); } set { __SetMass(Instance, value); } }
 
-        internal DynamicActor(IntPtr scene, UIntPtr entity) : base(scene, entity)
+        internal DynamicActor(IntPtr instance) : base(instance)
         {
         }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static bool __GetKinematic(IntPtr scene, UIntPtr entity);
+        private extern static bool __GetKinematic(IntPtr instance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static bool __GetGravity(IntPtr scene, UIntPtr entity);
+        private extern static bool __GetGravity(IntPtr instance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static float __GetMass(IntPtr scene, UIntPtr entity);
+        private extern static float __GetMass(IntPtr instance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static void __SetKinematic(IntPtr scene, UIntPtr entity, bool value);
+        private extern static void __SetKinematic(IntPtr instance, bool value);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static void __SetGravity(IntPtr scene, UIntPtr entity, bool value);
+        private extern static void __SetGravity(IntPtr instance, bool value);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static void __SetMass(IntPtr scene, UIntPtr entity, float mass);
+        private extern static void __SetMass(IntPtr instance, float mass);
     }
 }

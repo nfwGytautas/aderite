@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <type_traits>
 
 #include "aderite/reflection/Forward.hpp"

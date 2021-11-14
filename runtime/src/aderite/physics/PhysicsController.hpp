@@ -7,8 +7,6 @@
 #include <extensions/PxExtensionsAPI.h>
 
 #include "aderite/physics/Forward.hpp"
-#include "aderite/scene/Entity.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 class Engine;

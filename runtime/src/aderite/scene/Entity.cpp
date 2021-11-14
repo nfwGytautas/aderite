@@ -5,6 +5,7 @@
 #include "aderite/physics/PhysicsScene.hpp"
 #include "aderite/rendering/Renderable.hpp"
 #include "aderite/scene/Scene.hpp"
+#include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {

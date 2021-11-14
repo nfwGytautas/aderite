@@ -7,8 +7,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "aderite/audio/Forward.hpp"
-
 namespace aderite {
 namespace audio {
 

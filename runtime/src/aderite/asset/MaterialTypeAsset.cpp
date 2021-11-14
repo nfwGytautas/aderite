@@ -1,6 +1,8 @@
 #include "MaterialTypeAsset.hpp"
 
+#include "aderite/io/Loader.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace asset {

@@ -1,5 +1,6 @@
 #include "TagSelector.hpp"
 
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/utility/Log.hpp"
 

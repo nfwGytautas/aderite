@@ -1,12 +1,8 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include <glm/glm.hpp>
-
-#include "aderite/input/Forward.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 class Engine;

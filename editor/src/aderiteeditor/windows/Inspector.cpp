@@ -27,6 +27,7 @@
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/EntitySelector.hpp"
 #include "aderite/scene/Scene.hpp"
+#include "aderite/scene/Transform.hpp"
 #include "aderite/scene/selectors/TagSelector.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/MonoUtils.hpp"

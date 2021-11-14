@@ -1,11 +1,8 @@
 #pragma once
 
-#include <bgfx/bgfx.h>
 #include <glm/glm.hpp>
 
-#include "aderite/config.hpp"
 #include "aderite/rendering/Forward.hpp"
-#include "aderite/window/Forward.hpp"
 
 namespace aderite {
 class Engine;

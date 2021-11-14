@@ -4,7 +4,6 @@
 
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/rendering/Forward.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace rendering {

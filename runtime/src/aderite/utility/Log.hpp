@@ -4,8 +4,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include "aderite/utility/Macros.hpp"
-
 namespace aderite {
 
 /**

@@ -1,17 +1,13 @@
 #include "EntityProvideOperation.hpp"
-#include <functional>
-
-#include <bgfx/bgfx.h>
 
 #include "aderite/Aderite.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
-#include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
-#include "aderite/asset/TextureAsset.hpp"
-#include "aderite/io/LoaderPool.hpp"
 #include "aderite/rendering/Renderable.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Utility.hpp"
 

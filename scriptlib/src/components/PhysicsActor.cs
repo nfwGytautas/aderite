@@ -8,8 +8,7 @@ namespace Aderite
     /// </summary>
     public class PhysicsActor
     {
-        protected internal IntPtr scene = IntPtr.Zero;
-        protected internal UIntPtr entity = UIntPtr.Zero;
+        protected IntPtr Instance = IntPtr.Zero;
 
         /// <summary>
         /// Move attached object to the specified position instantly
@@ -17,7 +16,7 @@ namespace Aderite
         /// <param name="position">Position to move to</param>
         public void TeleportTo(Vector3 position)
         {
-            __Move(scene, entity, position);
+            __Move(Instance, position);
         }
 
         /// <summary>
@@ -26,19 +25,27 @@ namespace Aderite
         /// <param name="rotation">New rotation of the object</param>
         public void Rotate(Quaternion rotation)
         {
-            __Rotate(scene, entity, rotation);
+            __Rotate(Instance, rotation);
         }
 
-        internal PhysicsActor(IntPtr scene, UIntPtr entity)
+        internal PhysicsActor(IntPtr instance)
         {
-            this.scene = scene;
-            this.entity = entity;
+            Instance = instance;
+        }
+
+        /// <summary>
+        /// Returns the C++ instance of the audio
+        /// </summary>
+        /// <returns>IntPtr where the C++ object is located at</returns>
+        internal IntPtr GetInstance()
+        {
+            return Instance;
         }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static void __Move(IntPtr scene, UIntPtr entity, Vector3 position);
+        private extern static void __Move(IntPtr instance, Vector3 position);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static void __Rotate(IntPtr scene, UIntPtr entity, Quaternion rotation);
+        private extern static void __Rotate(IntPtr instance, Quaternion rotation);
     }
 }

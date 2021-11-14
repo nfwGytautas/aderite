@@ -2,7 +2,8 @@
 
 #include <string>
 
-#include "aderite/scene/Entity.hpp"
+#include "aderite/io/SerializableObject.hpp"
+#include "aderite/scene/Forward.hpp"
 
 namespace aderite {
 namespace scene {

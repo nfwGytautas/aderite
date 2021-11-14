@@ -4,8 +4,6 @@
 #include <unordered_map>
 
 #include <mono/jit/jit.h>
-#include <mono/metadata/assembly.h>
-#include <mono/metadata/debug-helpers.h>
 
 #include "aderite/scripting/Forward.hpp"
 #include "aderite/scripting/LibClassLocator.hpp"

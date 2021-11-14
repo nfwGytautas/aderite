@@ -4,7 +4,7 @@
 
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
-#include "aderite/scene/Entity.hpp"
+#include "aderite/scene/Forward.hpp"
 
 namespace aderite {
 namespace physics {

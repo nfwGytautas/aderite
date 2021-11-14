@@ -2,13 +2,11 @@
 
 #include <filesystem>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include <fmod_studio.hpp>
 
 #include "aderite/audio/Forward.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 class Engine;
@@ -70,7 +68,7 @@ public:
 
     /**
      * @brief Returns the fmod system instance of aderite
-    */
+     */
     FMOD::Studio::System* getFmodSystem() const {
         return m_fmodSystem;
     }

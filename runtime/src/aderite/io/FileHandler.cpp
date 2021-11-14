@@ -78,7 +78,8 @@ DataChunk FileHandler::openLoadable(SerializableHandle handle) const {
 }
 
 void FileHandler::commit(const DataChunk& chunk) const {
-    LOG_TRACE("[IO] Commiting chunk of size {0}(Was: {3}) to {1} at offset {2}", chunk.Data.size(), chunk.Name, chunk.Offset, chunk.OriginalSize);
+    LOG_TRACE("[IO] Commiting chunk of size {0}(Was: {3}) to {1} at offset {2}", chunk.Data.size(), chunk.Name, chunk.Offset,
+              chunk.OriginalSize);
 
     // TODO: Resize and move depending on size change
     std::filesystem::path outPath = m_rootDir / std::string(chunk.Name);

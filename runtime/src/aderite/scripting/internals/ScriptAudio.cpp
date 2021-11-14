@@ -2,6 +2,7 @@
 
 #include <mono/jit/jit.h>
 
+#include "aderite/asset/AudioAsset.hpp"
 #include "aderite/audio/AudioInstance.hpp"
 #include "aderite/audio/AudioSource.hpp"
 

@@ -1,6 +1,6 @@
 #include "LoaderPool.hpp"
-#include <thread>
 
+#include "aderite/io/ILoadable.hpp"
 #include "aderite/io/Loader.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/LogExtensions.hpp"

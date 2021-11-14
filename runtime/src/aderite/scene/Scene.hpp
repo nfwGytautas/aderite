@@ -2,12 +2,11 @@
 
 #include <vector>
 
-#include "aderite/Config.hpp"
 #include "aderite/audio/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
-#include "aderite/scene/Entity.hpp"
+#include "aderite/scene/Forward.hpp"
 #include "aderite/scripting/Forward.hpp"
 
 namespace aderite {

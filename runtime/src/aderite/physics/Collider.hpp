@@ -1,14 +1,10 @@
 #pragma once
 
-#include <vector>
-
 #include <PxShape.h>
 #include <glm/glm.hpp>
 
-#include "aderite/asset/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace physics {
@@ -24,12 +20,12 @@ public:
     /**
      * @brief Set the scale of the collider
      * @param scale New scale
-    */
+     */
     void setScale(const glm::vec3& scale);
 
     /**
      * @brief Returns the scale of the collider
-    */
+     */
     const glm::vec3& getScale() const {
         return p_scale;
     }
@@ -51,7 +47,7 @@ public:
 
     /**
      * @brief Returns the actor of the collider
-    */
+     */
     physics::PhysicsActor* getActor() const;
 
     // Inherited via ISerializable

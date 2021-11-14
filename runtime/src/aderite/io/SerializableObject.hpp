@@ -6,7 +6,6 @@
 
 #include "aderite/io/Forward.hpp"
 #include "aderite/reflection/Reflectable.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace io {

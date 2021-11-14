@@ -1,4 +1,5 @@
 #include "ShaderEvaluator.hpp"
+#include <iomanip>
 
 #include "aderite/Aderite.hpp"
 #include "aderite/utility/Log.hpp"

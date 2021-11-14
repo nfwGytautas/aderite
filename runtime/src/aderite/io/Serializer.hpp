@@ -39,15 +39,12 @@
  * to necessary type or used as is.
  */
 
-#include <filesystem>
-#include <map>
 #include <vector>
 
 #include <yaml-cpp/yaml.h>
 
 #include "aderite/io/Forward.hpp"
 #include "aderite/io/Versions.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 class Engine;

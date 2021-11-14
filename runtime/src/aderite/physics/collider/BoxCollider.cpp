@@ -5,7 +5,6 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/physics/PhysicsController.hpp"
-#include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/utility/YAML.hpp"
 
 namespace aderite {

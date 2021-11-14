@@ -2,12 +2,7 @@
 #include <sstream>
 
 #include <mono/jit/jit.h>
-#include <mono/metadata/assembly.h>
-#include <mono/metadata/attrdefs.h>
 #include <mono/metadata/debug-helpers.h>
-#include <mono/metadata/mono-gc.h>
-#include <mono/metadata/threads.h>
-#include <mono/metadata/tokentype.h>
 
 #include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/utility/Log.hpp"

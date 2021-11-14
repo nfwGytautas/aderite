@@ -4,10 +4,8 @@
 
 #include <bgfx/bgfx.h>
 
-#include "aderite/asset/Forward.hpp"
-#include "aderite/io/Loader.hpp"
+#include "aderite/io/ILoadable.hpp"
 #include "aderite/io/SerializableObject.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace asset {

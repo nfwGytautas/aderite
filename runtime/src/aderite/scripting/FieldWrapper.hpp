@@ -4,23 +4,10 @@
 
 #include <mono/jit/jit.h>
 
+#include "aderite/scripting/FieldType.hpp"
+
 namespace aderite {
 namespace scripting {
-
-/**
- * @brief Enum for getting the type of a field
- */
-enum class FieldType {
-    Null,
-    Float,
-    Boolean,
-    Object,
-    Mesh,
-    Material,
-    System,
-    Audio,
-    AudioSource,
-};
 
 /**
  * @brief Wrappper for mono fields

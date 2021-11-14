@@ -24,6 +24,7 @@
 #include "aderite/rendering/operation/OutputToScreenOperation.hpp"
 #include "aderite/rendering/operation/RenderOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/Transform.hpp"
 #include "aderite/scene/selectors/TagSelector.hpp"

@@ -7,7 +7,7 @@ namespace Aderite
     /// </summary>
     public class StaticActor : PhysicsActor
     {
-        internal StaticActor(IntPtr scene, UIntPtr entity) : base(scene, entity)
+        internal StaticActor(IntPtr instance) : base(instance)
         {
         }
     }

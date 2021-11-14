@@ -1,9 +1,7 @@
 #pragma once
 
-#include <bgfx/bgfx.h>
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
-#include "aderite/rendering/operation/Forward.hpp"
 
 namespace aderite {
 namespace rendering {

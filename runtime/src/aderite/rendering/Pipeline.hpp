@@ -3,9 +3,8 @@
 #include <vector>
 
 #include "aderite/io/SerializableObject.hpp"
+#include "aderite/rendering/Forward.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
-#include "aderite/rendering/operation/OperationBase.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace rendering {

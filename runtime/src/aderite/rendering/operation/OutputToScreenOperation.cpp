@@ -1,9 +1,5 @@
 #include "OutputToScreenOperation.hpp"
 
-#include "aderite/rendering/Pipeline.hpp"
-#include "aderite/rendering/operation/TargetProvideOperation.hpp"
-#include "aderite/utility/Log.hpp"
-
 namespace aderite {
 namespace rendering {
 

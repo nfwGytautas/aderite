@@ -8,7 +8,6 @@
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
-#include "aderite/scripting/Forward.hpp"
 
 namespace aderite {
 namespace physics {
@@ -48,7 +47,7 @@ public:
     /**
      * @brief Sets the entity of this actor
      * @param entity Entity instance
-    */
+     */
     void setEntity(scene::Entity* entity);
 
     /**
@@ -103,6 +102,9 @@ public:
     virtual reflection::Type getType() const override;
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+
+protected:
+    PhysicsActor();
 
 private:
     friend class PhysicsScene;

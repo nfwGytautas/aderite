@@ -2,7 +2,6 @@
 
 #include <bgfx/bgfx.h>
 
-#include "aderite/rendering/operation/Forward.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
 
 namespace aderite {

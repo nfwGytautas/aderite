@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include "aderite/utility/macros.hpp"
-
 namespace aderite {
 namespace utility {
 

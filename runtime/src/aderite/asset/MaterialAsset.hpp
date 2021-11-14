@@ -6,9 +6,8 @@
 #include <bgfx/bgfx.h>
 
 #include "aderite/asset/Forward.hpp"
-#include "aderite/io/Loader.hpp"
+#include "aderite/io/ILoadable.hpp"
 #include "aderite/io/SerializableObject.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace asset {
@@ -64,10 +63,16 @@ public:
         return m_info;
     }
 
+    /**
+     * @brief Returns material property data array
+     */
     float* getPropertyData() const {
         return m_udata;
     }
 
+    /**
+     * @brief Returns the sampler data vector
+     */
     std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> getSamplerData() const;
 
 private:

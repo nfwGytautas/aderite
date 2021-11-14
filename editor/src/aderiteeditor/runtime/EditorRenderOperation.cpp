@@ -12,8 +12,10 @@
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
 #include "aderiteeditor/compiler/ShaderCompiler.hpp"
@@ -111,7 +113,8 @@ void EditorRenderOperation::renderBoxCollider(physics::BoxCollider* collider, co
     glm::vec3 extents = collider->getSize();
 
     glm::mat4 rotation = glm::toMat4(transform->rotation());
-    glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), transform->position()) * rotation * glm::scale(glm::mat4(1.0f), (transform->scale() * collider->getSize()));
+    glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), transform->position()) * rotation *
+                                glm::scale(glm::mat4(1.0f), (transform->scale() * collider->getSize()));
 
     if (collider->isTrigger()) {
         wfColor[0] = 0.0f;

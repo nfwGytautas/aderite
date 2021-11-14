@@ -3,7 +3,6 @@
 #include <glm/glm.hpp>
 
 #include "aderite/input/InputEnums.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 class Engine;

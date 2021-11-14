@@ -4,7 +4,6 @@
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
-#include "aderite/scene/Transform.hpp"
 
 namespace aderite {
 namespace scene {
