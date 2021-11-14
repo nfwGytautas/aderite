@@ -34,7 +34,9 @@ public:
     /**
      * @brief Returns the selected behavior wrapper
      */
-    scripting::BehaviorWrapper* getSelectedBehavior() const;
+    const std::string& getSelected() const {
+        return m_selected;
+    }
 
     /**
      * @brief Resets the selected behavior
@@ -45,7 +47,7 @@ private:
     bool m_visible = false;
     bool m_show = false;
 
-    scripting::BehaviorWrapper* m_selected = nullptr;
+    std::string m_selected = "";
 };
 
 } // namespace editor_ui

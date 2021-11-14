@@ -9,9 +9,9 @@ namespace aderite {
 namespace scripting {
 
 class ScriptManager;
-class BehaviorWrapper;
-class ScriptList;
-class Script;
+class LibClassLocator;
+
+class ScriptSystem;
 class FieldWrapper;
 
 } // namespace scripting

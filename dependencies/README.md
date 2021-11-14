@@ -18,7 +18,6 @@ The provided dependencies.7z (Currently only provided for windows) contains all 
 - https://github.com/g-truc/glm (Math library)
 - https://github.com/assimp/assimp (Mesh and object loading)
 - https://github.com/nothings/stb (Image loading)
-- https://github.com/skypjack/entt (ECS system)
 - https://github.com/jbeder/yaml-cpp (Serialization)
 
 ### Editor:

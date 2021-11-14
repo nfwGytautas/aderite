@@ -5,20 +5,28 @@
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/reflection/Reflector.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/LogExtensions.hpp"
 #include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace io {
 
 bool Serializer::init() {
-    LOG_TRACE("Initializing serializer, current version {0}", c_CurrentVersion);
+    ADERITE_LOG_BLOCK;
+    LOG_DEBUG("[Asset] Initializing serializer, current version {0}", c_CurrentVersion);
+    LOG_INFO("[Asset] Serializer initialized");
     return true;
 }
 
 void Serializer::shutdown() {
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[Asset] Shutting down serializer, deleting {0} stored objects", m_objects.size());
     for (auto obj : m_objects) {
-        delete obj;
+        if (obj != nullptr) {
+            delete obj;
+        }
     }
+    LOG_INFO("[Asset] Serializer shutdown");
 }
 
 SerializableObject* Serializer::parseType(const YAML::Node& data) {
@@ -82,7 +90,22 @@ ISerializable* Serializer::parseUntrackedType(const YAML::Node& data) {
     return instance;
 }
 
-void Serializer::writeUntrackedType(YAML::Emitter& emitter, ISerializable* object) const {
+void Serializer::fillData(ISerializable* object, const YAML::Node& data) {
+    ADERITE_DYNAMIC_ASSERT(object != nullptr, "Trying to fill nullptr object");
+
+    ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
+    ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
+
+    reflection::Type type = data["Type"].as<reflection::Type>();
+
+    // Check if types match
+    ADERITE_DYNAMIC_ASSERT(type == object->getType(), "Type mismatch");
+
+    // Deserialize
+    object->deserialize(this, data["Data"]);
+}
+
+void Serializer::writeUntrackedType(YAML::Emitter& emitter, const ISerializable* object) const {
     emitter << YAML::BeginMap;
     emitter << YAML::Key << "Type" << YAML::Value << object->getType();
     emitter << YAML::Key << "Data" << YAML::BeginMap;
@@ -91,13 +114,15 @@ void Serializer::writeUntrackedType(YAML::Emitter& emitter, ISerializable* objec
     emitter << YAML::EndMap;
 }
 
-SerializableObject* Serializer::get(SerializableHandle handle) {
+SerializableObject* Serializer::get(SerializableHandle handle) const {
+    LOG_TRACE("[Asset] Getting {0}", handle);
     ADERITE_DYNAMIC_ASSERT(handle != c_InvalidHandle, "Invalid handle passed to serializer get method");
     ADERITE_DYNAMIC_ASSERT(m_objects.size() <= handle, "Requested non existing object");
     return m_objects[handle];
 }
 
 void Serializer::add(SerializableObject* object) {
+    LOG_TRACE("[Asset] Adding {0}", object->getHandle());
     ADERITE_DYNAMIC_ASSERT(object->getHandle() == c_InvalidHandle, "Tried to add an already existing object to Serializer");
     SerializableHandle handle = this->nextAvailableHandle();
     object->m_handle = handle;
@@ -105,8 +130,15 @@ void Serializer::add(SerializableObject* object) {
 }
 
 void Serializer::remove(SerializableHandle handle) {
+    LOG_TRACE("[Asset] Removing {0}", handle);
     ADERITE_DYNAMIC_ASSERT(m_objects.size() >= handle, "Tried to remove non existing object");
-    delete m_objects[handle];
+
+    if (m_objects[handle] != nullptr) {
+        delete m_objects[handle];
+    } else {
+        LOG_WARN("[Asset] Tried to delete {0}, but it was already deleted, ignoring", handle);
+    }
+
     m_objects[handle] = nullptr;
     m_hasNull = true;
 }
@@ -135,8 +167,10 @@ void Serializer::reread(SerializableObject* object) {
     object->deserialize(this, data["Data"]);
 }
 
-void Serializer::save(SerializableObject* object) {
+void Serializer::save(SerializableObject* object) const {
     YAML::Emitter out;
+
+    LOG_TRACE("[Asset] Saving {0}", object->getHandle());
 
     ADERITE_DYNAMIC_ASSERT(object->getHandle() != c_InvalidHandle, "SerializableObject with invalid handle passed");
 
@@ -149,7 +183,7 @@ void Serializer::save(SerializableObject* object) {
     out << YAML::Key << "Data" << YAML::BeginMap;
 
     if (!object->serialize(this, out)) {
-        LOG_ERROR("Failed to serialize object handle: {0}", object->getHandle());
+        LOG_ERROR("[Asset] Failed to serialize object handle: {0}", object->getHandle());
         return;
     }
 
@@ -157,28 +191,27 @@ void Serializer::save(SerializableObject* object) {
     out << YAML::EndMap;
 
     // Resolve where to store this object
+    LOG_TRACE("[Asset] Emitting {0} to DataChunk", object->getHandle());
     DataChunk chunk = aderite::Engine::getFileHandler()->openSerializable(object->getHandle());
     chunk.Data.resize(out.size());
     std::memcpy(chunk.Data.data(), out.c_str(), chunk.Data.size());
     aderite::Engine::getFileHandler()->commit(chunk);
 }
 
-void Serializer::saveAll() {
+void Serializer::saveAll() const {
+    LOG_TRACE("[Asset] Saving all objects");
     for (SerializableObject* obj : m_objects) {
-        this->save(obj);
+        if (obj != nullptr) {
+            this->save(obj);
+        }
     }
-}
-
-void Serializer::setData(void* data) {
-    m_data = data;
-}
-
-void* Serializer::getData() const {
-    return m_data;
+    LOG_INFO("[Asset] All objects saved");
 }
 
 SerializableHandle Serializer::nextAvailableHandle() {
+    LOG_TRACE("[Asset] Querying next available handle");
     if (!m_hasNull) {
+        LOG_TRACE("[Asset] No null handles, adding new object");
         m_objects.push_back(nullptr);
         return m_objects.size() - 1;
     }
@@ -186,11 +219,13 @@ SerializableHandle Serializer::nextAvailableHandle() {
     // Find next nullptr
     for (size_t i = 0; i < m_objects.size(); i++) {
         if (m_objects[i] == nullptr) {
+            LOG_TRACE("[Asset] Found null handle at {0}", i);
             return i;
         }
     }
 
     // Was a false positive null flag
+    LOG_WARN("[Asset] False positive null flag, creating new object");
     m_hasNull = false;
     m_objects.push_back(nullptr);
     return m_objects.size() - 1;

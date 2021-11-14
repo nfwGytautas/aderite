@@ -13,6 +13,7 @@ class MaterialAsset;
 class MaterialTypeAsset;
 class MeshAsset;
 class TextureAsset;
+class AudioAsset;
 
 } // namespace asset
 } // namespace aderite

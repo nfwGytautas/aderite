@@ -6,7 +6,6 @@
 
 #include "aderite/io/Forward.hpp"
 #include "aderite/reflection/Reflectable.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace io {
@@ -24,7 +23,7 @@ public:
      * @param emitter Emmitter to serialize to
      * @return True if serialized without errors, false otherwise
      */
-    virtual bool serialize(const Serializer* serializer, YAML::Emitter& emitter) = 0;
+    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const = 0;
 
     /**
      * @brief Deserialize object from data node
@@ -40,7 +39,7 @@ public:
  */
 class SerializableObject : public ISerializable {
 public:
-    virtual ~SerializableObject() {}
+    virtual ~SerializableObject();
 
     /**
      * @brief Returns the handle of this serializable object

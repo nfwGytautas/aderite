@@ -1,24 +1,13 @@
 General:
 Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
-Animations
-Scripting
-Include BGFX stats to ImGui
-Fix dependencies folder and CMake
-Optimize component include
-Memory manager
-Propogate physics events
-BGFX leaks
 Event system?
-Recovery from failure
-Move Property and MaterialType to editor, cause they are not mutable during runtime
-Rework pin type to be enum
+Animations
+Fix dependencies folder and CMake
+Memory manager
+BGFX leaks
 Profiling
 Compiler switch to disable some setters in runtime
-Namespace refactoring
-Move objects for editor so that they don't get destroyed on pipeline change
-
-ECS:
-Parent
+Handle storage?
 
 Licensing:
 FMOD splash screen
@@ -27,6 +16,7 @@ bgfx splash screen
 
 Serialization:
 Name resolve
+Return true/false on writeUntrackedType, fillData
 
 Asset manager:
 Asset ref counting
@@ -38,51 +28,57 @@ Property for ALL items
 
 FPRP:
 Array operation
-Change pipeline when scene changes
 Operation resize events
 Base vertex shader compiling
 Varying generation
 Compiling shaders from C++ code
-Move MaterialTypeAsset::recalculate to editor
-Move MaterialAsset::setType to editor
-Move MaterialTypeAsset to editor
 Pipeline verification
 
 Rendering:
 BGFX multithread encoder
 
 Audio:
-Fix inspector selection
-Rethink serialization
 3D audio
-
-Components:
-Meta enabled field
-Handle to ColliderList, audio list etc., managers take care of these lists
+Clear finished one shot instances
 
 Physics:
-Static/Dynamic PhysicsActor component
+Move kinematic to base actor
 Multithreading
-Substeps
 Physics material asset
 Disable/enable actors at runtime
 Disable/enable colliders at runtime
 Broad-Phase callbacks
+Scene queries
 Collision layers
-Rethink the collision callback architecture
+
+Selectors:
+Any/All for TagSelector
 
 VFS:
 Refactor to be more intuitive
 Remove files that don't physically exist anymore
 
 Scripting:
-Set fields after initializing object
 Generate .csproj file for easier coding
 Dont kill entire editor on script run error
 Load on project open
-Improve engine class finding
 
 Editor:
+Move objects for editor so that they don't get destroyed on pipeline change
+Prefabs
+Include BGFX stats to ImGui
+Recovery from failure
+Rework pin type to be enum
+Move radio buttons for entities to Base tab
+Icons
+Provide default utility scripts
+List item select (merge SelectScriptModal, SelectClipModal)
+Enable depth for wireframe
+Split inspector to not be so monolithic
+On material type property delete link gets disconnected
+Mass on dynamic body not alligned
+Delete renaming content asset browser
+Collider list preview window
 Don't compile when loading project
 Loading bar
 Dont load scripts if they are out of date
@@ -125,20 +121,11 @@ Rename dynamic text API
 Tooltips?
 
 Code:
+Get/Set checks
 DLLs instead of static libs
-this for self invokes
 Middleware sections
-Remove virtual from places that don't need it
-Add consts where no modifications are done
-Add final to classes
-Add inline
 Utility operators for types
-Asserts
-Error checking
 Check memory leaks
-Case surround with braces
-Move enums to files
 Move logger to engine system
-More verbose logging
 Remove pointers where not needed
-Some files start with lowercase
+default/delete modifiers

@@ -1,100 +1,131 @@
 #pragma once
 
-#include <entt/Entity/registry.hpp>
-
+#include "aderite/io/SerializableObject.hpp"
+#include "aderite/physics/Forward.hpp"
+#include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
-#include "aderite/scene/Scene.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace scene {
 
 /**
- * @brief Wrapper for entt Entity
+ * @brief Entity class is used to represent an object in the world
  */
-class Entity {
+class Entity final : public io::ISerializable {
 public:
-    Entity() = default;
-    Entity(entt::entity handle, Scene* scene);
-    Entity(const Entity& other) = default;
+    Entity();
+    ~Entity();
 
     /**
-     * @brief Add component to Entity
+     * @brief Adds a tag to the entity
+     * @param tag Tag to add
      */
-    template<typename T, typename... Args>
-    T& addComponent(Args&&... args) {
-        T& component = m_scene->getEntityRegistry().emplace<T>(m_handle, std::forward<Args>(args)...);
-        m_scene->onComponentAdded<T>(*this, component);
-        return component;
-    }
+    void addTag(size_t tag);
 
     /**
-     * @brief Get component
+     * @brief Remove tag from the entity
+     * @param tag Tag to remove
      */
-    template<typename T>
-    T& getComponent() {
-        return m_scene->getEntityRegistry().get<T>(m_handle);
-    }
+    void removeTag(size_t tag);
 
     /**
-     * @brief Check if Entity has component
+     * @brief Returns true if the entity has the specified tag, false otherwise
      */
-    template<typename T>
-    bool hasComponent() {
-        return m_scene->getEntityRegistry().try_get<T>(m_handle) != nullptr;
-    }
+    bool hasTag(size_t tag) const;
 
     /**
-     * @brief Remove component
+     * @brief Set the scene of the entity, this will transfer actor to the new scene
+     * @param scene New scene
      */
-    template<typename T>
-    void removeComponent() {
-        m_scene->onComponentRemoved<T>(*this, getComponent<T>());
-        m_scene->getEntityRegistry().remove<T>(m_handle);
-    }
-
-    operator bool() const {
-        return m_handle != entt::null;
-    }
-    operator entt::entity() const {
-        return m_handle;
-    }
-    operator uint32_t() const {
-        return (uint32_t)m_handle;
-    }
-
-    bool operator==(const Entity& other) const {
-        return m_handle == other.m_handle && m_scene == other.m_scene;
-    }
-
-    bool operator!=(const Entity& other) const {
-        return !(*this == other);
-    }
+    void setScene(Scene* scene);
 
     /**
-     * @brief Returns the Scene that the Entity belongs to
+     * @brief Set the actor for the entity
+     * @param actor Physics actor instance
+     * @param keepColliders If true then colliders will be moved from previous actor to the new one
      */
-    Scene* getScene() const {
-        return m_scene;
-    }
+    void setActor(physics::PhysicsActor* actor, bool keepColliders = false);
 
     /**
-     * @brief Returns the handle of this entity
+     * @brief Set the renderable for the entity
+     * @param renderable Renderable instance
      */
-    entt::entity getHandle() const {
-        return m_handle;
-    }
+    void setRenderable(rendering::Renderable* renderable);
 
     /**
-     * @brief Returns empty Entity
+     * @brief Set the name of the entity
+     * @param name New name of the entity
      */
-    static Entity null() {
-        return Entity(entt::null, nullptr);
-    }
+    void setName(const std::string& name);
+
+    /**
+     * @brief Returns the scene of the entity
+     */
+    Scene* getScene() const;
+
+    /**
+     * @brief Returns the transform of the entity
+     */
+    Transform* getTransform() const;
+
+    /**
+     * @brief Returns the physics actor of the entity
+     */
+    physics::PhysicsActor* getActor() const;
+
+    /**
+     * @brief Returns the renderable of this entity
+     */
+    rendering::Renderable* getRenderable() const;
+
+    /**
+     * @brief Returns the tagset of this entity
+     */
+    const size_t getTags() const;
+
+    /**
+     * @brief Returns the name of this entity
+     */
+    const std::string& getName() const;
+
+    // Inherited via ISerializable
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
-    entt::entity m_handle {entt::null};
+    friend class Scene;
+
+private:
+    /**
+     * @brief Scene this entity belongs to
+     */
     Scene* m_scene = nullptr;
+
+    /**
+     * @brief Transform of the entity
+     */
+    Transform* m_transform = nullptr;
+
+    /**
+     * @brief Tag bitset
+     */
+    size_t m_tags = 0;
+
+    /**
+     * @brief Name of the entity
+     */
+    std::string m_name = "";
+
+    /**
+     * @brief Physics actor of the entity
+     */
+    physics::PhysicsActor* m_actor = nullptr;
+
+    /**
+     * @brief Renderable of the entity
+     */
+    rendering::Renderable* m_renderable = nullptr;
 };
 
 } // namespace scene

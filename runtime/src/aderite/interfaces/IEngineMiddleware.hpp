@@ -2,7 +2,6 @@
 
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace interfaces {

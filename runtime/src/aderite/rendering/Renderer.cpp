@@ -10,6 +10,7 @@
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/LogExtensions.hpp"
 #include "aderite/window/WindowManager.hpp"
 
 namespace impl {
@@ -22,7 +23,7 @@ public:
     virtual ~bgfxCallback() {}
     virtual void fatal(const char* filePath, uint16_t line, bgfx::Fatal::Enum code, const char* str) override {
         if (code != bgfx::Fatal::DebugCheck) {
-            LOG_FATAL("{0}", str);
+            LOG_FATAL("[Rendering] {0}", str);
         }
     }
 
@@ -60,7 +61,8 @@ namespace aderite {
 namespace rendering {
 
 bool Renderer::init() {
-    LOG_DEBUG("BGFX Renderer");
+    ADERITE_LOG_BLOCK;
+    LOG_DEBUG("[Rendering] Initializing BGFX Renderer");
 
     auto windowManager = ::aderite::Engine::getWindowManager();
     glm::i32vec2 size = windowManager->getSize();
@@ -80,27 +82,34 @@ bool Renderer::init() {
     // TODO: Add multi threaded
 
     if (!bgfx::init(bgfxInit)) {
-        LOG_ERROR("Failed to initialize BGFX");
+        LOG_ERROR("[Rendering] Failed to initialize BGFX");
     }
 
     // Initial view rect
     auto windowSize = ::aderite::Engine::getWindowManager()->getSize();
-    onWindowResized(windowSize.x, windowSize.y, false);
+    this->onWindowResized(windowSize.x, windowSize.y, false);
 
     // Finish any queued operations
     bgfx::frame();
 
     m_isInitialized = true;
     ::aderite::Engine::get()->onRendererInitialized();
+
+    LOG_INFO("[Rendering] BGFX renderer initialized");
+
     return true;
 }
 
 void Renderer::shutdown() {
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[Rendering] Shutting down");
     if (m_pipeline) {
         m_pipeline->shutdown();
     }
 
     bgfx::shutdown();
+
+    LOG_INFO("[Rendering] Renderer shutdown");
 }
 
 void Renderer::setVsync(bool enabled) {
@@ -108,7 +117,8 @@ void Renderer::setVsync(bool enabled) {
 }
 
 void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight, bool reset) {
-    setResolution(glm::uvec2(newWidth, newHeight));
+    LOG_TRACE("[Rendering] Resizing window (width: {0}, height: {1})", newWidth, newHeight);
+    this->setResolution(glm::uvec2(newWidth, newHeight));
 
     if (reset) {
         bgfx::reset(newWidth, newHeight);
@@ -116,7 +126,7 @@ void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight, bo
 }
 
 void Renderer::render() {
-    if (!isReady()) {
+    if (!this->isReady()) {
         return;
     }
     // TODO: Status in editor
@@ -137,7 +147,7 @@ void Renderer::render() {
     m_pipeline->execute();
 }
 
-bool Renderer::isReady() {
+bool Renderer::isReady() const {
     return m_isInitialized;
 }
 
@@ -149,7 +159,7 @@ void Renderer::setResolution(const glm::uvec2& size) {
     // TODO: Forward to render passes
 }
 
-void Renderer::commit() {
+void Renderer::commit() const {
     // Commit
     bgfx::frame(false);
     // TODO: Display stats in editor
@@ -162,6 +172,8 @@ Pipeline* Renderer::getPipeline() const {
 }
 
 void Renderer::setPipeline(Pipeline* pipeline) {
+    LOG_TRACE("[Rendering] Changing pipeline to {0:p}", static_cast<void*>(pipeline));
+
     // Shutdown previous
     if (m_pipeline) {
         m_pipeline->shutdown();

@@ -1,22 +1,17 @@
 #include "MeshAsset.hpp"
-#include <fstream>
-
-#include <yaml-cpp/yaml.h>
 
 #include "aderite/Aderite.hpp"
-#include "aderite/asset/TextureAsset.hpp"
 #include "aderite/io/Loader.hpp"
-#include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace asset {
 
 MeshAsset::~MeshAsset() {
-    // TODO: Check for either handle to be valid
-    if (bgfx::isValid(m_vbh)) {
-        LOG_WARN("Deleting a loaded mesh asset {0}", getHandle());
+    LOG_TRACE("[Asset] Destroying {0}", this->getHandle());
+
+    if (bgfx::isValid(m_vbh) || bgfx::isValid(m_ibh)) {
+        this->unload();
     }
 }
 
@@ -25,6 +20,7 @@ bool MeshAsset::isValid() const {
 }
 
 void MeshAsset::load(const io::Loader* loader) {
+    LOG_TRACE("[Asset] Loading {0}", this->getHandle());
     ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_vbh), "Tried to load already loaded mesh");
 
     // Create layout
@@ -39,6 +35,7 @@ void MeshAsset::load(const io::Loader* loader) {
     if (m_info.IsStatic) {
         io::Loader::MeshLoadResult result = loader->loadMesh(this->getHandle());
         if (!result.Error.empty()) {
+            LOG_WARN("[Asset] Mesh load error: {0}", result.Error);
             return;
         }
 
@@ -47,12 +44,16 @@ void MeshAsset::load(const io::Loader* loader) {
         m_vbh = bgfx::createVertexBuffer(bgfx::copy(positionData.data(), sizeof(float) * positionData.size()), layout);
         m_ibh = bgfx::createIndexBuffer(bgfx::copy(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
     } else {
-        LOG_ERROR("Unimplemented dynamic mesh");
+        LOG_ERROR("[Asset] Unimplemented dynamic mesh");
         return;
     }
+
+    LOG_INFO("[Asset] Loaded {0}", this->getHandle());
 }
 
 void MeshAsset::unload() {
+    LOG_TRACE("[Asset] Unloading {0}", this->getHandle());
+
     if (bgfx::isValid(m_vbh)) {
         bgfx::destroy(m_vbh);
         m_vbh = BGFX_INVALID_HANDLE;
@@ -62,9 +63,11 @@ void MeshAsset::unload() {
         bgfx::destroy(m_ibh);
         m_ibh = BGFX_INVALID_HANDLE;
     }
+
+    LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
 }
 
-bool MeshAsset::needsLoading() {
+bool MeshAsset::needsLoading() const {
     return !this->isValid();
 }
 
@@ -72,7 +75,7 @@ reflection::Type MeshAsset::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::MESH);
 }
 
-bool MeshAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool MeshAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     // Layout
     emitter << YAML::Key << "IsStatic" << YAML::Value << m_info.IsStatic;
     return true;
@@ -81,6 +84,22 @@ bool MeshAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitt
 bool MeshAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     m_info.IsStatic = data["IsStatic"].as<bool>();
     return true;
+}
+
+MeshAsset::fields MeshAsset::getFields() const {
+    return m_info;
+}
+
+MeshAsset::fields& MeshAsset::getFieldsMutable() {
+    return m_info;
+}
+
+bgfx::VertexBufferHandle MeshAsset::getVboHandle() const {
+    return m_vbh;
+}
+
+bgfx::IndexBufferHandle MeshAsset::getIboHandle() const {
+    return m_ibh;
 }
 
 } // namespace asset

@@ -7,11 +7,13 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
+#include "aderite/io/FileHandler.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
 
 #include "aderiteeditor/compiler/ScriptCompiler.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
+#include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/windows/FileDialog.hpp"
 #include "aderiteeditor/windows/Modals.hpp"
@@ -115,18 +117,28 @@ void Menubar::render() {
                 LOG_WARN("Not implemented feature called 'Recompile shaders'");
             }
 
-            if (ImGui::MenuItem("Reload FMOD audio banks")) {
-                //::aderite::Engine::getAudioController()->loadMasterBank(::aderite::Engine::getAssetManager()->getRawDir());
+            if (ImGui::MenuItem("Link FMOD project")) {
+                // Required name and directory
+                std::string dir = FileDialog::selectDirectory();
+                editor::State::Project->linkFmodProject(dir);
+            }
 
-                // for (audio::Bank* bank : *::aderite::Engine::getAudioController()) {
-                //	for (audio::AudioEvent* e : *bank) {
-                //		if (e->isLoaded()) {
-                //			// Unload and load
-                //			e->unload();
-                //			e->load();
-                //		}
-                //	}
-                //}
+            if (ImGui::MenuItem("Reload FMOD audio banks")) {
+                auto fmodProject = editor::State::Project->getFmodProjectDir();
+                if (std::filesystem::exists(fmodProject)) {
+                    // Copy master and strings bank
+                    const auto copyOptions = std::filesystem::copy_options::overwrite_existing;
+
+                    // Copy files
+                    std::filesystem::copy(fmodProject, editor::State::Project->getRootDir() / "Data/", copyOptions);
+
+                    // Rename master and strings
+                    std::filesystem::rename(editor::State::Project->getRootDir() / "Data/Master.bank", aderite::Engine::getFileHandler()->pathToReserved(io::FileHandler::Reserved::MasterAudioBank));
+                    std::filesystem::rename(editor::State::Project->getRootDir() / "Data/Master.strings.bank", aderite::Engine::getFileHandler()->pathToReserved(io::FileHandler::Reserved::StringsAudioBank));
+
+                    // Tell aderite audio engine to reload them
+                    ::aderite::Engine::getAudioController()->loadMasterBank();
+                }
             }
 
             ImGui::EndMenu();

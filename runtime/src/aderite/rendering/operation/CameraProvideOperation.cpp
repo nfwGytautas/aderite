@@ -18,22 +18,21 @@ void CameraProvideOperation::execute(PipelineState* state) {
         return;
     }
 
-    // Entity group
-    auto cameras =
-        currentScene->getEntityRegistry().group<scene::CameraComponent>(entt::get<scene::TransformComponent>);
+    //// Entity group
+    //auto cameras = currentScene->getEntityRegistry().group<scene::CameraComponent>(entt::get<scene::TransformComponent>);
 
-    for (auto entity : cameras) {
-        auto [camera, transform] = cameras.get(entity);
+    //for (auto entity : cameras) {
+    //    auto [camera, transform] = cameras.get(entity);
 
-        if (camera.Main) {
-            // TODO: Calculate matrices
-            m_viewMatrix = glm::mat4(1);
-            m_projMatrix = glm::mat4(1);
+    //    if (camera.Main) {
+    //        // TODO: Calculate matrices
+    //        m_viewMatrix = glm::mat4(1);
+    //        m_projMatrix = glm::mat4(1);
 
-            state->pushEye({m_viewMatrix, m_projMatrix});
-            return;
-        }
-    }
+    //        state->pushEye({m_viewMatrix, m_projMatrix});
+    //        return;
+    //    }
+    //}
 
     // Push invalid eye
     state->pushEye({glm::mat4(1), glm::mat4(1), false});
@@ -43,7 +42,7 @@ reflection::Type CameraProvideOperation::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_CAMERA);
 }
 
-bool CameraProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool CameraProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     return true;
 }
 

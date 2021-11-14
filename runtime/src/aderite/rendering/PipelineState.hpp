@@ -65,6 +65,11 @@ public:
      */
     void reset();
 
+    /**
+     * @brief Returns true if a render operation can be executed, false otherwise
+    */
+    bool canExecuteRender() const;
+
 private:
     DrawCallList* m_drawCalls = nullptr;
     std::stack<bgfx::FrameBufferHandle> m_targets;

@@ -16,7 +16,7 @@ public:
     /**
      * @brief Returns the type of the reflectable
      */
-    virtual Type getType() const = 0;
+    virtual reflection::Type getType() const = 0;
 };
 
 } // namespace reflection

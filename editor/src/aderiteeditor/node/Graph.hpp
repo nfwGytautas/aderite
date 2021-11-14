@@ -92,7 +92,7 @@ public:
 
     // Inherited via ISerializable
     virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:

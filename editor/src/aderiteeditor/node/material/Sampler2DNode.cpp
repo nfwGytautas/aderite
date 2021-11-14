@@ -36,7 +36,7 @@ reflection::Type Sampler2DNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::Sampler2DNode);
 }
 
-bool Sampler2DNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool Sampler2DNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     serializeData(emitter);
     return true;
 }

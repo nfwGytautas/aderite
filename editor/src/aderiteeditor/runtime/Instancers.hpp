@@ -80,6 +80,8 @@ void linkInstancers() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, editor::EditorRenderOperation, reflection::EditorTypes::EditorRenderOp);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, editor::EditorTargetOperation, reflection::EditorTypes::EditorTargetOp);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, editor::OperationArray, reflection::EditorTypes::ArrayOp);
+
+    // Extensions
 }
 
 } // namespace utility

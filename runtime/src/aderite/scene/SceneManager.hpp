@@ -1,9 +1,6 @@
 #pragma once
 
-#include <vector>
-
 #include "aderite/scene/Forward.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 class Engine;
@@ -12,7 +9,7 @@ namespace scene {
 /**
  * @brief Scene manager for aderite
  */
-class SceneManager {
+class SceneManager final {
 public:
     // TODO: Queue scene load API
 

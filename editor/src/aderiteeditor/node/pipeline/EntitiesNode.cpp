@@ -31,7 +31,7 @@ reflection::Type EntitiesNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::EntitiesNode);
 }
 
-bool EntitiesNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool EntitiesNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     serializeData(emitter);
     return true;
 }

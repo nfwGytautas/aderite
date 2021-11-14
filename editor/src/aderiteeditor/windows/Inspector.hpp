@@ -17,15 +17,15 @@ public:
     virtual void render() override;
 
 private:
+    // Entity
     void renderEntity();
-    void renderTransform(scene::Entity entity);
-    void renderMeshrenderer(scene::Entity entity);
-    void renderRigidbody(scene::Entity entity);
-    void renderAudioListener(scene::Entity entity);
-    void renderAudioSource(scene::Entity entity);
-    void renderColliders(scene::Entity entity);
-    void renderScripts(scene::Entity entity);
 
+    // Physics
+    void renderActor(physics::PhysicsActor* actor);
+    void renderDynamicActor(physics::DynamicActor* actor);
+    void renderStaticActor(physics::StaticActor* actor);
+
+    // Assets
     void renderAsset();
     void renderMesh(io::SerializableObject* asset);
     void renderTexture(io::SerializableObject* asset);
@@ -33,6 +33,14 @@ private:
     void renderMaterialType(io::SerializableObject* asset);
     void renderScene(io::SerializableObject* asset);
     void renderPipeline(io::SerializableObject* asset);
+    void renderAudio(io::SerializableObject* asset);
+
+    // Serializables
+    void renderSerializable();
+    void renderAudioSource(io::ISerializable* serializable);
+    void renderScriptSystem(io::ISerializable* serializable);
+    void renderEntitySelector(io::ISerializable* serializable);
+    void renderAudioListener(io::ISerializable* serializable);
 };
 
 } // namespace editor_ui

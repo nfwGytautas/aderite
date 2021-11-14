@@ -17,7 +17,7 @@ reflection::Type EditorCameraOperation::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::EditorCameraOp);
 }
 
-bool EditorCameraOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool EditorCameraOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     return true;
 }
 

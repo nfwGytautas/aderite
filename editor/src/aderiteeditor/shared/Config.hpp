@@ -35,9 +35,9 @@ constexpr char* DDPayloadID__SceneAsset = "DDPayloadID__SceneAsset";
 constexpr char* DDPayloadID__TextureAsset = "DDPayloadID__TextureAsset";
 
 /**
- * @brief Drag and drop id passed when the object that is being dragged is a audio bank
+ * @brief Drag and drop id passed when the object that is being dragged is a audio object
  */
-constexpr char* DDPayloadID__AudioBank = "DDPayloadID__AudioBank";
+constexpr char* DDPayloadID__AudioAsset = "DDPayloadID__AudioAsset";
 
 /**
  * @brief Drag and drop id passed when the object that is being dragged is a directory
@@ -53,6 +53,21 @@ constexpr char* DDPayloadID__MaterialType = "DDPayloadID__MaterialType";
  * @brief Drag and drop ip passed when the object that is being dragged is a pipeline object
  */
 constexpr char* DDPayloadID__PipelineAsset = "DDPayloadID__PipelineAsset";
+
+/**
+ * @brief Drag and drop ip passed when the object that is being dragged is a collider list object
+*/
+constexpr char* DDPayloadID__ColliderListAsset = "DDPayloadID__ColliderListAsset";
+
+/**
+ * @brief Drag and drop ip passed when the object that is being dragged is a audio source object
+ */
+constexpr char* DDPayloadID__AudioSource = "DDPayloadID__AudioSource";
+
+constexpr char* DDPayloadID__Entity = "DDPayloadID__Entity";
+constexpr char* DDPayloadID__ScriptSystem = "DDPayloadID__ScriptSystem";
+constexpr char* DDPayloadID__EntitySelector = "DDPayloadID__EntitySelector";
+constexpr char* DDPayloadID__AudioListener = "DDPayloadID__AudioListener";
 
 /**
  * @brief Drag and drop id passed when the object that is being dragged is a raw file

@@ -41,13 +41,17 @@
 #else
 #define ADERITE_DEBUG_SECTION(code)
 #define ADERITE_STATIC_ASSERT(check, message)
-#define ADERITE_DYNAMIC_ASSERT(check, message)
+#define ADERITE_DYNAMIC_ASSERT(check, message) LOG_ERROR("Failed check {0}, in {1} at line {2}, {3}", #check, __FILE__, __LINE__, message)
 #endif
 
 #if MIDDLEWARE_ENABLED == 1
 #define ADERITE_MIDDLEWARE_SECTION(code) code
+#define ADERITE_MIDDLEWARE_FINAL 
+#define ADERITE_MIDDLEWARE_VIRTUAL virtual 
 #else
 #define ADERITE_MIDDLEWARE_SECTION(code)
+#define ADERITE_MIDDLEWARE_FINAL final 
+#define ADERITE_MIDDLEWARE_VIRTUAL 
 #endif
 
 #define ADERITE_STRINGIZE(var) #var

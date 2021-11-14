@@ -98,7 +98,7 @@ reflection::Type RenderNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::RenderNode);
 }
 
-bool RenderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool RenderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "IsArray" << YAML::Value << m_array;
     serializeData(emitter);
     return true;

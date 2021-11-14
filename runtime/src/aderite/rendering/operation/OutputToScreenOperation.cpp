@@ -1,9 +1,5 @@
 #include "OutputToScreenOperation.hpp"
 
-#include "aderite/rendering/Pipeline.hpp"
-#include "aderite/rendering/operation/TargetProvideOperation.hpp"
-#include "aderite/utility/Log.hpp"
-
 namespace aderite {
 namespace rendering {
 
@@ -15,7 +11,7 @@ reflection::Type OutputToScreenOperation::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_SCREEN);
 }
 
-bool OutputToScreenOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool OutputToScreenOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     return true;
 }
 

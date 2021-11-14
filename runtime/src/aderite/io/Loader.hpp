@@ -12,34 +12,6 @@ namespace aderite {
 namespace io {
 
 /**
- * @brief Class to specify that the class uses loader
- */
-class ILoadable {
-public:
-    virtual ~ILoadable() {};
-
-    /**
-     * @brief Load the object data, this function is executed in a separate thread
-     * @param loader Loader instance
-     */
-    virtual void load(const Loader* loader) = 0;
-
-    /**
-     * @brief Unload the object
-     */
-    virtual void unload() = 0;
-
-    /**
-     * @brief Returns true if the object needs loading, false otherwise
-     */
-    virtual bool needsLoading() = 0;
-
-private:
-    friend class Loader;
-    friend class LoaderPool;
-};
-
-/**
  * @brief A general purpose data loader, each loader runs on it's own thread
  */
 class Loader final {
@@ -61,6 +33,11 @@ public: // Thread handling
      * @brief Returns the current loadable of the loader
      */
     ILoadable* current() const;
+
+    /**
+     * @brief Returns true if the loader instance is ready to load
+     */
+    bool isReady() const;
 
 public: // Loading operations
     template<class T>
@@ -136,6 +113,7 @@ private:
     LoaderPool* m_pool;
     std::thread m_thread;
     bool m_terminated = false;
+    bool m_ready = false;
 
     class LoaderImpl;
     LoaderImpl* m_impl = nullptr;

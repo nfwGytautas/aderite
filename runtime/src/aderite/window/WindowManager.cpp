@@ -4,6 +4,7 @@
 #include "aderite/Config.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/LogExtensions.hpp"
 
 #if GLFW_BACKEND
 #ifdef ADERITE_PLATFORM_WINDOWS
@@ -44,33 +45,39 @@ public:
 // ---------------------------------
 
 bool WindowManager::init() {
-    LOG_TRACE("Initializing window manager");
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[Window] Initializing window manager");
     m_impl = new PlatformImpl();
 
-    if (!backendInit()) {
-        LOG_ERROR("Failed to initialize backend");
+    if (!this->backendInit()) {
+        LOG_ERROR("[Window] Failed to initialize backend");
         return false;
     }
 
-    if (!backendCreateWindow()) {
-        LOG_ERROR("Failed to create window");
+    if (!this->backendCreateWindow()) {
+        LOG_ERROR("[Window] Failed to create window");
         return false;
     }
+
+    LOG_INFO("[Window] Window manager initialized");
 
     return true;
 }
 
 void WindowManager::shutdown() {
-    backendShutdown();
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[Window] Shutting down window manager");
+    this->backendShutdown();
     delete m_impl;
     m_impl = nullptr;
+    LOG_INFO("[Window] Window manager shutdown");
 }
 
-void* WindowManager::getNativeHandle() {
+void* WindowManager::getNativeHandle() const {
     return static_cast<void*>(m_impl->NativeWindow);
 }
 
-void* WindowManager::getImplementationHandle() {
+void* WindowManager::getImplementationHandle() const {
     return static_cast<void*>(m_impl->ImplementationWindow);
 }
 
@@ -80,46 +87,52 @@ void* WindowManager::getImplementationHandle() {
 
 #if GLFW_BACKEND == 1
 
-void WindowManager::setSize(unsigned int width, unsigned int height) {
+void WindowManager::setSize(unsigned int width, unsigned int height) const {
     glfwSetWindowSize(m_impl->ImplementationWindow, width, height);
 }
 
-glm::i32vec2 WindowManager::getSize() {
+glm::i32vec2 WindowManager::getSize() const {
     glm::i32vec2 size = {};
     glfwGetWindowSize(m_impl->ImplementationWindow, &size.x, &size.y);
     return size;
 }
 
-bool WindowManager::isClosed() {
+bool WindowManager::isClosed() const {
     return glfwWindowShouldClose(m_impl->ImplementationWindow) == 1;
 }
 
-void WindowManager::setTitle(const std::string& title) {
+void WindowManager::setTitle(const std::string& title) const {
     glfwSetWindowTitle(m_impl->ImplementationWindow, title.c_str());
 }
 
-bool WindowManager::backendInit() {
-    LOG_DEBUG("GLFW backend");
+bool WindowManager::backendInit() const {
+    LOG_DEBUG("[Window] GLFW backend");
 
     glfwSetErrorCallback([](int error, const char* description) {
-        LOG_ERROR("GLFW error: {0}, {1}", error, description);
+        LOG_ERROR("[Window] GLFW error: {0}, {1}", error, description);
     });
 
+    LOG_TRACE("[Window] Initializing GLFW");
     if (!glfwInit()) {
+        LOG_ERROR("[Window] Failed to initialize GLFW");
         return false;
     }
+    LOG_INFO("[Window] GLFW initialized");
 
     // BGFX should take care of the context
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
+    LOG_INFO("[Window] Backend initialized");
+
     return true;
 }
 
-bool WindowManager::backendCreateWindow() {
+bool WindowManager::backendCreateWindow() const {
+    LOG_TRACE("[Window] Creating window");
     m_impl->ImplementationWindow = glfwCreateWindow(1280, 720, "Aderite", NULL, NULL);
 
     if (!m_impl->ImplementationWindow) {
-        LOG_ERROR("Failed to create window");
+        LOG_ERROR("[Window] Failed to create window");
         return false;
     }
 
@@ -127,12 +140,16 @@ bool WindowManager::backendCreateWindow() {
     m_impl->NativeWindow = glfwGetWin32Window(m_impl->ImplementationWindow);
 #endif
 
+    LOG_INFO("[Window] Window created");
+
     return true;
 }
 
-void WindowManager::backendShutdown() {
+void WindowManager::backendShutdown() const {
+    LOG_TRACE("[Window] Shutting down backend");
     glfwDestroyWindow(m_impl->ImplementationWindow);
     glfwTerminate();
+    LOG_INFO("[Window] Backend shutdown");
 }
 
 #endif

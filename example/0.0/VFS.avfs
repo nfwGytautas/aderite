@@ -1,0 +1,19 @@
+Root:
+  Name: /
+  Directories:
+    []
+  Files:
+    - Name: Main
+      Content: 0
+    - Name: Pipeline
+      Content: 1
+    - Name: Cube
+      Content: 2
+    - Name: Container
+      Content: 3
+    - Name: TextureColorMaterial
+      Content: 4
+    - Name: TextureColorMaterialType
+      Content: 5
+    - Name: BoingClip
+      Content: 8

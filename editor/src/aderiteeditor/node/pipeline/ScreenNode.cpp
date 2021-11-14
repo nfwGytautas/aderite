@@ -36,7 +36,7 @@ reflection::Type ScreenNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::ScreenNode);
 }
 
-bool ScreenNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool ScreenNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     serializeData(emitter);
     return true;
 }

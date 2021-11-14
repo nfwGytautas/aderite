@@ -2,9 +2,8 @@
 
 #include <bgfx/bgfx.h>
 
-#include "aderite/io/Loader.hpp"
+#include "aderite/io/ILoadable.hpp"
 #include "aderite/io/SerializableObject.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace asset {
@@ -12,7 +11,7 @@ namespace asset {
 /**
  * @brief Mesh asset implementation
  */
-class MeshAsset : public io::SerializableObject, public io::ILoadable {
+class MeshAsset final : public io::SerializableObject, public io::ILoadable {
 public:
     /**
      * @brief Editable fields of the asset, this information is stored inside the asset file
@@ -30,36 +29,35 @@ public:
     bool isValid() const;
 
     // Inherited via ILoadable
-    virtual void load(const io::Loader* loader) override;
-    virtual void unload() override;
-    virtual bool needsLoading() override;
+    void load(const io::Loader* loader) override;
+    void unload() override;
+    bool needsLoading() const override;
 
     // Inherited via SerializableObject
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
     /**
      * @brief Returns the info of mesh fields
      */
-    fields getFields() const {
-        return m_info;
-    }
+    fields getFields() const;
 
     /**
      * @brief Returns mutable field structure
      */
-    fields& getFieldsMutable() {
-        return m_info;
-    }
+    fields& getFieldsMutable();
 
-    bgfx::VertexBufferHandle getVboHandle() const {
-        return m_vbh;
-    }
+    /**
+     * @brief Returns the vertex buffer handle of the mesh
+     */
+    bgfx::VertexBufferHandle getVboHandle() const;
 
-    bgfx::IndexBufferHandle getIboHandle() const {
-        return m_ibh;
-    }
+    /**
+     * @brief Returns the index buffer handle of the mesh
+     * @return
+     */
+    bgfx::IndexBufferHandle getIboHandle() const;
 
 private:
     // BGFX resource handles

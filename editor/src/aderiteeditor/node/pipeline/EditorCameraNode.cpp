@@ -31,7 +31,7 @@ reflection::Type EditorCameraNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::EditorCameraNode);
 }
 
-bool EditorCameraNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool EditorCameraNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     serializeData(emitter);
     return true;
 }

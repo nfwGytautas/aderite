@@ -10,8 +10,14 @@ namespace aderite {
 namespace physics {
 
 class PhysicsController;
-struct PhysicsEntity;
-class ColliderList;
+
+class PhysicsScene;
+class PhysicsEventList;
+
+class PhysicsActor;
+class DynamicActor;
+class StaticActor;
+
 class Collider;
 
 } // namespace physics

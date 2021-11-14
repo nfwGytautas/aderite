@@ -11,7 +11,13 @@ namespace scene {
 
 class SceneManager;
 class Scene;
+class SceneSerializer;
+
 class Entity;
+class Transform;
+
+class EntitySelector;
+class TagSelector;
 
 } // namespace scene
 } // namespace aderite

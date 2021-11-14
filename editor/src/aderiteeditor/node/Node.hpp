@@ -113,7 +113,7 @@ protected:
     /**
      * @brief Serializes pins and position
      */
-    void serializeData(YAML::Emitter& out);
+    void serializeData(YAML::Emitter& out) const;
 
     /**
      * @brief Deserializes pins and position

@@ -1,13 +1,13 @@
 #include "Pipeline.hpp"
 
 #include <bgfx/bgfx.h>
-#include "aderite/utility/Log.hpp"
-#include "aderite/reflection/RuntimeTypes.hpp"
-#include "aderite/io/Serializer.hpp"
 
 #include "aderite/Aderite.hpp"
+#include "aderite/io/Serializer.hpp"
 #include "aderite/reflection/Reflector.hpp"
 #include "aderite/rendering/PipelineState.hpp"
+#include "aderite/rendering/operation/OperationBase.hpp"
+#include "aderite/utility/Log.hpp"
 
 namespace aderite {
 namespace rendering {
@@ -52,7 +52,7 @@ reflection::Type Pipeline::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::PIPELINE);
 }
 
-bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Operations" << YAML::BeginSeq;
     for (size_t i = 0; i < m_operations.size(); i++) {
         serializer->writeUntrackedType(emitter, m_operations[i]);
