@@ -107,6 +107,14 @@ void ScriptManager::loadAssemblies() {
     LOG_INFO("[Scripting] Assemblies loaded");
 }
 
+MonoDomain* ScriptManager::getDomain() const {
+    return m_currentDomain;
+}
+
+MonoImage* ScriptManager::getCodeImage() const {
+    return m_codeImage;
+}
+
 MonoObject* ScriptManager::createInstance(io::ISerializable* serializable) {
     ADERITE_DYNAMIC_ASSERT(serializable != nullptr, "Nullptr serializable passed to createInstance");
 
@@ -131,7 +139,7 @@ MonoClass* ScriptManager::getSystemClass(const std::string& name) const {
     return it->second;
 }
 
-MonoClass* ScriptManager::resolveClass(const std::string& nSpace, const std::string& name) {
+MonoClass* ScriptManager::resolveClass(const std::string& nSpace, const std::string& name) const {
     MonoClass* klass = mono_class_from_name(m_codeImage, nSpace.c_str(), name.c_str());
     if (klass == nullptr) {
         LOG_ERROR("[Scripting] Failed to find class {0} in namespace {1}", name, nSpace);
@@ -140,7 +148,7 @@ MonoClass* ScriptManager::resolveClass(const std::string& nSpace, const std::str
     return klass;
 }
 
-MonoObject* ScriptManager::instantiate(MonoClass* klass) {
+MonoObject* ScriptManager::instantiate(MonoClass* klass) const {
     // Create object
     MonoObject* object = mono_object_new(m_currentDomain, klass);
 
@@ -151,7 +159,7 @@ MonoObject* ScriptManager::instantiate(MonoClass* klass) {
     return object;
 }
 
-std::vector<FieldWrapper> ScriptManager::getPublicFields(MonoObject* object) {
+std::vector<FieldWrapper> ScriptManager::getPublicFields(MonoObject* object) const {
     std::vector<FieldWrapper> result;
     void* iter = NULL;
     MonoClassField* field;
@@ -163,7 +171,7 @@ std::vector<FieldWrapper> ScriptManager::getPublicFields(MonoObject* object) {
     return result;
 }
 
-MonoMethod* ScriptManager::getMethod(MonoClass* klass, const std::string& name, size_t paramCount) {
+MonoMethod* ScriptManager::getMethod(MonoClass* klass, const std::string& name, size_t paramCount) const {
     MonoMethod* method = mono_class_get_method_from_name(klass, name.c_str(), paramCount);
     if (method == nullptr) {
         LOG_ERROR("[Scripting] Failed to find {0} method in {1}", name, mono_class_get_name(klass));
@@ -172,9 +180,13 @@ MonoMethod* ScriptManager::getMethod(MonoClass* klass, const std::string& name, 
     return method;
 }
 
-MonoMethod* ScriptManager::getMethod(const std::string& signature) {
+MonoMethod* ScriptManager::getMethod(const std::string& signature) const {
     ADERITE_UNIMPLEMENTED;
     return nullptr;
+}
+
+std::unordered_map<std::string, MonoClass*> ScriptManager::getKnownSystems() const {
+    return m_knownSystems;
 }
 
 FieldType ScriptManager::getType(MonoType* type) const {

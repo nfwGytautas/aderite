@@ -20,18 +20,18 @@ public:
     /**
      * @brief Start playing audio
      */
-    void start();
+    void start() const;
 
     /**
      * @brief Stop playing immediately
      */
-    void stop();
+    void stop() const;
 
     /**
      * @brief Sets the volume of the instance
      * @param volume Volume from 0.0 to 1.0
      */
-    void setVolume(float volume);
+    void setVolume(float volume) const;
 
     /**
      * @brief Sets the spatial attributes of the audio instance
@@ -39,7 +39,7 @@ public:
      * @param rotation Rotation of the audio source
      * @param velocity Velocity at which the audio is moving
      */
-    void setAttributes(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& velocity);
+    void setAttributes(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& velocity) const;
 
 private:
     AudioInstance(FMOD::Studio::EventInstance* instance);

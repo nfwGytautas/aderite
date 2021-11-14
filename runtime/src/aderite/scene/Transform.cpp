@@ -7,6 +7,30 @@
 namespace aderite {
 namespace scene {
 
+glm::vec3& Transform::position() {
+    return m_position;
+}
+
+const glm::vec3& Transform::position() const {
+    return m_position;
+}
+
+glm::quat& Transform::rotation() {
+    return m_rotation;
+}
+
+const glm::quat& Transform::rotation() const {
+    return m_rotation;
+}
+
+glm::vec3& Transform::scale() {
+    return m_scale;
+}
+
+const glm::vec3& Transform::scale() const {
+    return m_scale;
+}
+
 glm::mat4 Transform::computeTransform() const {
     glm::mat4 rotation = glm::toMat4(m_rotation);
     return glm::translate(glm::mat4(1.0f), m_position) * rotation * glm::scale(glm::mat4(1.0f), m_scale);

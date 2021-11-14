@@ -95,6 +95,10 @@ ILoadable* Loader::current() const {
     return m_impl->Current;
 }
 
+bool Loader::isReady() const {
+    return m_ready;
+}
+
 Loader::MeshLoadResult Loader::loadMesh(LoadableHandle handle) const {
     LOG_TRACE("[Asset] Loading mesh from {0}", handle);
     DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);

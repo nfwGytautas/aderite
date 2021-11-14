@@ -44,16 +44,12 @@ public:
     /**
      * @brief Returns the current domain
      */
-    MonoDomain* getDomain() const {
-        return m_currentDomain;
-    }
+    MonoDomain* getDomain() const;
 
     /**
      * @brief Returns the image of the code assembly
      */
-    MonoImage* getCodeImage() const {
-        return m_codeImage;
-    }
+    MonoImage* getCodeImage() const;
 
     /**
      * @brief Create C# instance of a serializable, multiple calls with the same serializable will return the same object instance this way
@@ -76,21 +72,21 @@ public:
      * @param name Name of the class
      * @return MonoClass instance or nullptr if failed to resolve
      */
-    MonoClass* resolveClass(const std::string& nSpace, const std::string& name);
+    MonoClass* resolveClass(const std::string& nSpace, const std::string& name) const;
 
     /**
      * @brief Instantiate the specified object (0 argument constructor)
      * @param klass Class to initialize
      * @return MonoObject instance
      */
-    MonoObject* instantiate(MonoClass* klass);
+    MonoObject* instantiate(MonoClass* klass) const;
 
     /**
      * @brief Returns public fields of the specified object
      * @param object Object instance
      * @return Vector of FieldWrapper objects
      */
-    std::vector<FieldWrapper> getPublicFields(MonoObject* object);
+    std::vector<FieldWrapper> getPublicFields(MonoObject* object) const;
 
     /**
      * @brief Tries to locate a method in the code assembly and returns it
@@ -99,21 +95,19 @@ public:
      * @param paramCount Number of arguments in the method
      * @return MonoMethod instance or nullptr
      */
-    MonoMethod* getMethod(MonoClass* klass, const std::string& name, size_t paramCount);
+    MonoMethod* getMethod(MonoClass* klass, const std::string& name, size_t paramCount) const;
 
     /**
      * @brief Tries to locate a method in the code assembly and returns it
      * @param signature Method signature
      * @return MonoMethod instance or nullptr
      */
-    MonoMethod* getMethod(const std::string& signature);
+    MonoMethod* getMethod(const std::string& signature) const;
 
     /**
      * @brief Returns a list of known systems and their names
      */
-    std::unordered_map<std::string, MonoClass*> getKnownSystems() const {
-        return m_knownSystems;
-    }
+    std::unordered_map<std::string, MonoClass*> getKnownSystems() const;
 
     /**
      * @brief Returns FieldType from the MonoType

@@ -14,7 +14,7 @@ namespace input {
  * this class is closely related to the WindowManager, cause all inputs come through the window
  * and the InputManager is tasked with handling them
  */
-class InputManager {
+class InputManager final {
 public:
     /**
      * @brief Initializes the input manager

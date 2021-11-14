@@ -67,7 +67,7 @@ void MeshAsset::unload() {
     LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
 }
 
-bool MeshAsset::needsLoading() {
+bool MeshAsset::needsLoading() const {
     return !this->isValid();
 }
 
@@ -84,6 +84,22 @@ bool MeshAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitt
 bool MeshAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     m_info.IsStatic = data["IsStatic"].as<bool>();
     return true;
+}
+
+MeshAsset::fields MeshAsset::getFields() const {
+    return m_info;
+}
+
+MeshAsset::fields& MeshAsset::getFieldsMutable() {
+    return m_info;
+}
+
+bgfx::VertexBufferHandle MeshAsset::getVboHandle() const {
+    return m_vbh;
+}
+
+bgfx::IndexBufferHandle MeshAsset::getIboHandle() const {
+    return m_ibh;
 }
 
 } // namespace asset

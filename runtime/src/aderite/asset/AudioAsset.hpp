@@ -25,14 +25,14 @@ public:
     std::string getEventName() const;
 
     // Inherited via ILoadable
-    virtual void load(const io::Loader* loader) override;
-    virtual void unload() override;
-    virtual bool needsLoading() override;
+    void load(const io::Loader* loader) override;
+    void unload() override;
+    bool needsLoading() const override;
 
     // Inherited via SerializableObject
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     std::string m_name = "";

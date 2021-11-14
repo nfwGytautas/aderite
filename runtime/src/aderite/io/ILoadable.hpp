@@ -26,7 +26,7 @@ public:
     /**
      * @brief Returns true if the object needs loading, false otherwise
      */
-    virtual bool needsLoading() = 0;
+    virtual bool needsLoading() const = 0;
 
 private:
     friend class Loader;

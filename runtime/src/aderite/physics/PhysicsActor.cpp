@@ -72,14 +72,22 @@ void PhysicsActor::transferColliders(PhysicsActor* actor) {
     LOG_INFO("[Physics] Colliders transfered from {0:p} to {1:p}", static_cast<void*>(this), static_cast<void*>(actor));
 }
 
+const std::vector<physics::Collider*>& PhysicsActor::getColliders() const {
+    return m_colliders;
+}
+
 void PhysicsActor::setEntity(scene::Entity* entity) {
     LOG_TRACE("[Physics] Changing {0:p} entity to {1:p}, was {2:p}", static_cast<void*>(this), static_cast<void*>(entity),
               static_cast<void*>(m_entity));
     m_entity = entity;
 }
 
-void PhysicsActor::moveActor(const glm::vec3& position) {
-    LOG_TRACE("[Physics] Moving {0:p} to {1}", static_cast<void*>(this), position);
+scene::Entity* PhysicsActor::getEntity() const {
+    return m_entity;
+}
+
+void PhysicsActor::moveActor(const glm::vec3& position) const {
+    LOG_TRACE("[Physics] Moving {0:p} to {1}", static_cast<const void*>(this), position);
     physx::PxTransform pxt = p_actor->getGlobalPose();
     pxt.p.x = position.x;
     pxt.p.y = position.y;
@@ -91,8 +99,8 @@ void PhysicsActor::moveActor(const glm::vec3& position) {
     // physx::PxSetGroup(*actor, 0);
 }
 
-void PhysicsActor::rotateActor(const glm::quat& rotation) {
-    LOG_TRACE("[Physics] Rotating {0:p} to {1}", static_cast<void*>(this), rotation);
+void PhysicsActor::rotateActor(const glm::quat& rotation) const {
+    LOG_TRACE("[Physics] Rotating {0:p} to {1}", static_cast<const void*>(this), rotation);
     physx::PxTransform pxt = p_actor->getGlobalPose();
     pxt.q.x = rotation.x;
     pxt.q.y = rotation.y;
@@ -115,19 +123,19 @@ void PhysicsActor::sync() const {
     }
 }
 
-void PhysicsActor::onTriggerEnter(PhysicsActor* trigger) {
+void PhysicsActor::onTriggerEnter(PhysicsActor* trigger) const {
     ::aderite::Engine::getPhysicsController()->getEventList()->registerEvent(TriggerEvent {trigger, this, true});
 }
 
-void PhysicsActor::onTriggerLeave(PhysicsActor* trigger) {
+void PhysicsActor::onTriggerLeave(PhysicsActor* trigger) const {
     ::aderite::Engine::getPhysicsController()->getEventList()->registerEvent(TriggerEvent {trigger, this, false});
 }
 
-void PhysicsActor::onCollisionEnter(PhysicsActor* collision) {
+void PhysicsActor::onCollisionEnter(PhysicsActor* collision) const {
     ::aderite::Engine::getPhysicsController()->getEventList()->registerEvent(CollisionEvent {collision, this, true});
 }
 
-void PhysicsActor::onCollisionLeave(PhysicsActor* collision) {
+void PhysicsActor::onCollisionLeave(PhysicsActor* collision) const {
     ::aderite::Engine::getPhysicsController()->getEventList()->registerEvent(CollisionEvent {collision, this, false});
 }
 

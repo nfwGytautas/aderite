@@ -30,16 +30,12 @@ public:
     /**
      * @brief Returns the entity selector instance of the system
      */
-    scene::EntitySelector* getSelector() const {
-        return m_selector;
-    }
+    scene::EntitySelector* getSelector() const;
 
     /**
      * @brief Returns the name of the system
      */
-    const std::string& getName() const {
-        return m_name;
-    }
+    const std::string& getName() const;
 
     /**
      * @brief Update the system
@@ -50,36 +46,36 @@ public:
     /**
      * @brief Initialize the system
      */
-    void init();
+    void init() const;
 
     /**
      * @brief Shutdown the system
      */
-    void shutdown();
+    void shutdown() const;
 
     /**
      * @brief Invokes a OnTriggerEnter method with the specified trigger event object
      * @param triggerEvent TriggerEvent instance
      */
-    void triggerEnter(MonoObject* triggerEvent);
+    void triggerEnter(MonoObject* triggerEvent) const;
 
     /**
      * @brief Invokes a OnTriggerLeave method with the specified trigger event object
      * @param triggerEvent TriggerEvent instance
      */
-    void triggerLeave(MonoObject* triggerEvent);
+    void triggerLeave(MonoObject* triggerEvent) const;
 
     /**
      * @brief Invokes a OnCollisionStart method with the specified collision event object
      * @param collisionEvent CollisionEvent instance
      */
-    void collisionStart(MonoObject* collisionEvent);
+    void collisionStart(MonoObject* collisionEvent) const;
 
     /**
      * @brief Invokes a OnCollisionEnd method with the specified collision event object
      * @param collisionEvent CollisionEvent instance
      */
-    void collisionEnd(MonoObject* collisionEvent);
+    void collisionEnd(MonoObject* collisionEvent) const;
 
     /**
      * @brief Loads the C# system instance into this instance
@@ -96,9 +92,7 @@ public:
     /**
      * @brief Returns the public fields of this system
      */
-    const std::vector<FieldWrapper>& getFields() const {
-        return m_fields;
-    }
+    const std::vector<FieldWrapper>& getFields() const;
 
     /**
      * @brief Returns true if the system has a field with the specified name
@@ -113,9 +107,9 @@ public:
     const FieldWrapper& getField(const std::string& name) const;
 
     // Inherited via ISerializable
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     /**

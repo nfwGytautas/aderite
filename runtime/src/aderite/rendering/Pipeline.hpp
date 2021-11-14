@@ -5,6 +5,7 @@
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
+#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace rendering {
@@ -13,10 +14,10 @@ namespace rendering {
  * @brief Rendering pipeline object, the rendering engine loops through the pipeline
  * operations executing them one by one
  */
-class Pipeline : public io::SerializableObject {
+class Pipeline ADERITE_MIDDLEWARE_FINAL : public io::SerializableObject {
 public:
     Pipeline();
-    virtual ~Pipeline();
+    ADERITE_MIDDLEWARE_VIRTUAL ~Pipeline();
 
     /**
      * @brief Adds operation to the pipeline, the pipeline takes ownership of the operation
@@ -43,9 +44,9 @@ public:
     void shutdown();
 
     // Inherited via ISerializable
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
     ADERITE_DEBUG_SECTION(void logPipeline() const;)
 private:

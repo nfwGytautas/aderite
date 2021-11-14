@@ -40,9 +40,7 @@ public:
     /**
      * @brief Returns the list of colliders for this actor
      */
-    const std::vector<physics::Collider*>& getColliders() const {
-        return m_colliders;
-    }
+    const std::vector<physics::Collider*>& getColliders() const;
 
     /**
      * @brief Sets the entity of this actor
@@ -53,21 +51,19 @@ public:
     /**
      * @brief Returns the entity of this actor
      */
-    scene::Entity* getEntity() const {
-        return m_entity;
-    }
+    scene::Entity* getEntity() const;
 
     /**
      * @brief Instantly moves the actor to the specified position
      * @param position New position of the actor
      */
-    void moveActor(const glm::vec3& position);
+    void moveActor(const glm::vec3& position) const;
 
     /**
      * @brief Instantly rotates the actor to the specified rotation
      * @param rotation New rotation of the actor
      */
-    void rotateActor(const glm::quat& rotation);
+    void rotateActor(const glm::quat& rotation) const;
 
     /**
      * @brief Synchronizes the physics actor with it's entity
@@ -78,30 +74,30 @@ public:
      * @brief Function called when the actor enters a trigger zone
      * @param trigger Trigger zone
      */
-    void onTriggerEnter(PhysicsActor* trigger);
+    void onTriggerEnter(PhysicsActor* trigger) const;
 
     /**
      * @brief Function called when the actor leaves a trigger zone
      * @param trigger Trigger zone
      */
-    void onTriggerLeave(PhysicsActor* trigger);
+    void onTriggerLeave(PhysicsActor* trigger) const;
 
     /**
      * @brief Function called when the actor starts colliding with another actor
      * @param collision Actor that is being collided with
      */
-    void onCollisionEnter(PhysicsActor* collision);
+    void onCollisionEnter(PhysicsActor* collision) const;
 
     /**
      * @brief Function called when the actor stops colliding with another actor
      * @param collision Actor that has stopped colliding with
      */
-    void onCollisionLeave(PhysicsActor* collision);
+    void onCollisionLeave(PhysicsActor* collision) const;
 
     // Inherited via ISerializable
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 protected:
     PhysicsActor();

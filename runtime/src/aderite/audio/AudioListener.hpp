@@ -14,7 +14,7 @@ namespace audio {
 /**
  * @brief Audio listener object used to denote a point in the world where audio is heard from
  */
-class AudioListener : public io::ISerializable {
+class AudioListener final : public io::ISerializable {
 public:
     AudioListener();
     virtual ~AudioListener();
@@ -22,7 +22,7 @@ public:
     /**
      * @brief Update audio source
      */
-    void update();
+    void update() const;
 
     /**
      * @brief Disables listener
@@ -37,9 +37,7 @@ public:
     /**
      * @brief Returns true if the listener is enabled, false otherwise
      */
-    bool isEnabled() const {
-        return m_enabled;
-    }
+    bool isEnabled() const;
 
     /**
      * @brief Set the name of the source
@@ -50,30 +48,22 @@ public:
     /**
      * @brief Returns the name of the source
      */
-    std::string getName() const {
-        return m_name;
-    }
+    std::string getName() const;
 
     /**
      * @brief Returns the position of the source
      */
-    glm::vec3 getPosition() const {
-        return m_position;
-    }
+    glm::vec3 getPosition() const;
 
     /**
      * @brief Returns the rotation of the source
      */
-    glm::quat getRotation() const {
-        return m_rotation;
-    }
+    glm::quat getRotation() const;
 
     /**
      * @brief Returns the velocity of the source
      */
-    glm::vec3 getVelocity() const {
-        return m_velocity;
-    }
+    glm::vec3 getVelocity() const;
 
     /**
      * @brief Sets the position of the source
@@ -94,9 +84,9 @@ public:
     void setVelocity(const glm::vec3& velocity);
 
     // Inherited via ISerializable
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     std::string m_name = "";

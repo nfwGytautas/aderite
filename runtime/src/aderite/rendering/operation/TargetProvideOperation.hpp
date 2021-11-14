@@ -3,13 +3,14 @@
 #include <bgfx/bgfx.h>
 
 #include "aderite/rendering/operation/OperationBase.hpp"
+#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace rendering {
 /**
  * @brief Operation used to provide a rendering target
  */
-class TargetProvideOperation : public OperationBase {
+class TargetProvideOperation ADERITE_MIDDLEWARE_FINAL : public OperationBase {
 public:
     /**
      * @brief Target parameters when creating the provider
@@ -66,7 +67,7 @@ public:
 
 public:
     TargetProvideOperation(const TargetParams& params = TargetParams());
-    virtual ~TargetProvideOperation();
+    ADERITE_MIDDLEWARE_VIRTUAL ~TargetProvideOperation();
 
     /**
      * @brief Returns the provider handle
@@ -74,12 +75,12 @@ public:
     bgfx::FrameBufferHandle getHandle() const;
 
     // Inherited via OperationBase
-    virtual void initialize() override;
-    virtual void execute(PipelineState* state) override;
-    virtual void shutdown() override;
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    void initialize() override;
+    void execute(PipelineState* state) override;
+    void shutdown() override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     void createFramebuffer();

@@ -108,7 +108,7 @@ ILoadable* LoaderPool::getNextLoadable() {
     return loadable;
 }
 
-bool LoaderPool::isLoading(ILoadable* loadable) {
+bool LoaderPool::isLoading(ILoadable* loadable) const {
     auto it = std::find(m_queue.begin(), m_queue.end(), loadable);
 
     if (it == m_queue.end()) {

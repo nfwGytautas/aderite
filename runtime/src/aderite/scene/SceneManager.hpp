@@ -9,7 +9,7 @@ namespace scene {
 /**
  * @brief Scene manager for aderite
  */
-class SceneManager {
+class SceneManager final {
 public:
     // TODO: Queue scene load API
 

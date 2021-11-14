@@ -11,7 +11,7 @@ namespace rendering {
 /**
  * @brief The Renderer of aderite powered by bgfx
  */
-class Renderer {
+class Renderer final {
 public:
     virtual ~Renderer() {}
 
@@ -45,7 +45,7 @@ public:
     /**
      * @brief Returns true if Renderer ready to render
      */
-    bool isReady();
+    bool isReady() const;
 
     /**
      * @brief Sets the resolution of the renderer
@@ -56,7 +56,7 @@ public:
     /**
      * @brief Advances to next frame
      */
-    void commit();
+    void commit() const;
 
     /**
      * @brief Returns the rendering pipeline instance

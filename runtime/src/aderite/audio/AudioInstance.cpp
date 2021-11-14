@@ -12,21 +12,21 @@ AudioInstance::~AudioInstance() {
     this->stop();
 }
 
-void AudioInstance::start() {
+void AudioInstance::start() const {
     LOG_TRACE("[Audio] Starting {0}", m_name);
     m_instance->start();
 }
 
-void AudioInstance::stop() {
+void AudioInstance::stop() const {
     LOG_TRACE("[Audio] Stopping {0}", m_name);
     m_instance->stop(FMOD_STUDIO_STOP_IMMEDIATE);
 }
 
-void AudioInstance::setVolume(float volume) {
+void AudioInstance::setVolume(float volume) const {
     m_instance->setVolume(volume);
 }
 
-void AudioInstance::setAttributes(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& velocity) {
+void AudioInstance::setAttributes(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& velocity) const {
     FMOD_3D_ATTRIBUTES source3dAttributes = {};
     source3dAttributes.position = {position.x, position.y, position.z};
     source3dAttributes.velocity = {velocity.x, velocity.y, velocity.z};

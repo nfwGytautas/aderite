@@ -83,7 +83,7 @@ void MaterialTypeAsset::unload() {
     LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
 }
 
-bool MaterialTypeAsset::needsLoading() {
+bool MaterialTypeAsset::needsLoading() const {
     return !this->isValid();
 }
 
@@ -101,6 +101,26 @@ bool MaterialTypeAsset::deserialize(io::Serializer* serializer, const YAML::Node
     m_info.Size = data["DataSize"].as<size_t>();
     m_info.NumSamplers = data["SamplerCount"].as<size_t>();
     return true;
+}
+
+bgfx::ProgramHandle MaterialTypeAsset::getShaderHandle() const {
+    return m_shaderHandle;
+}
+
+bgfx::UniformHandle MaterialTypeAsset::getUniformHandle() const {
+    return m_uniformHandle;
+}
+
+bgfx::UniformHandle MaterialTypeAsset::getSampler(size_t idx) const {
+    return m_samplers[idx];
+}
+
+MaterialTypeAsset::fields MaterialTypeAsset::getFields() const {
+    return m_info;
+}
+
+MaterialTypeAsset::fields& MaterialTypeAsset::getFieldsMutable() {
+    return m_info;
 }
 
 } // namespace asset

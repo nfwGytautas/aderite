@@ -52,7 +52,7 @@ PhysicsScene::~PhysicsScene() {
     LOG_INFO("[Physics] Physics scene destroyed");
 }
 
-void PhysicsScene::simulate(float step) {
+void PhysicsScene::simulate(float step) const {
     m_scene->simulate(step);
     m_scene->fetchResults(true);
 }
@@ -79,6 +79,10 @@ void PhysicsScene::detachActor(physics::PhysicsActor* actor) {
 
     delete *it;
     m_actors.erase(it);
+}
+
+const std::vector<PhysicsActor*>& PhysicsScene::getActors() const {
+    return m_actors;
 }
 
 void PhysicsScene::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) {

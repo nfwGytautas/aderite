@@ -37,9 +37,7 @@ public: // Thread handling
     /**
      * @brief Returns true if the loader instance is ready to load
      */
-    bool isReady() const {
-        return m_ready;
-    }
+    bool isReady() const;
 
 public: // Loading operations
     template<class T>

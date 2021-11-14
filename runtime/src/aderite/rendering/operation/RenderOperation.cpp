@@ -49,7 +49,7 @@ void RenderOperation::execute(PipelineState* state) {
 
     for (const DrawCall& dc : *state->getDrawCallList()) {
         bgfx::discard(BGFX_DISCARD_ALL);
-        executeDrawCall(dc);
+        this->executeDrawCall(dc);
     }
 }
 
@@ -72,7 +72,7 @@ bool RenderOperation::deserialize(io::Serializer* serializer, const YAML::Node& 
     return true;
 }
 
-void RenderOperation::executeDrawCall(const DrawCall& dc) {
+void RenderOperation::executeDrawCall(const DrawCall& dc) const {
     // Check if valid draw call
     if (dc.Skip) {
         return;

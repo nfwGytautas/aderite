@@ -18,44 +18,32 @@ public:
     /**
      * @brief Returns a mutable position vector
      */
-    glm::vec3& position() {
-        return m_position;
-    }
+    glm::vec3& position();
 
     /**
      * @brief Returns a immutable position vector
      */
-    const glm::vec3& position() const {
-        return m_position;
-    }
+    const glm::vec3& position() const;
 
     /**
      * @brief Returns a mutable rotation vector
      */
-    glm::quat& rotation() {
-        return m_rotation;
-    }
+    glm::quat& rotation();
 
     /**
      * @brief Returns a immutable rotation vector
      */
-    const glm::quat& rotation() const {
-        return m_rotation;
-    }
+    const glm::quat& rotation() const;
 
     /**
      * @brief Returns a mutable scale vector
      */
-    glm::vec3& scale() {
-        return m_scale;
-    }
+    glm::vec3& scale();
 
     /**
      * @brief Returns a immutable scale vector
      */
-    const glm::vec3& scale() const {
-        return m_scale;
-    }
+    const glm::vec3& scale() const;
 
     /**
      * @brief Computes the transformation matrix of the component
@@ -65,9 +53,9 @@ public:
     glm::mat4 computeTransform() const;
 
     // Inherited via ISerializable
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     glm::vec3 m_position = {0.0f, 0.0f, 0.0f};

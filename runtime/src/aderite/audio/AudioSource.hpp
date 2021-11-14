@@ -17,7 +17,7 @@ namespace audio {
 /**
  * @brief Audio source object used to denote a point in the world where audio is emitted from
  */
-class AudioSource : public io::ISerializable {
+class AudioSource final : public io::ISerializable {
 public:
     AudioSource();
     virtual ~AudioSource();
@@ -25,7 +25,7 @@ public:
     /**
      * @brief Update audio source
      */
-    void update();
+    void update() const;
 
     /**
      * @brief Creates an audio instance for the specified clip
@@ -65,37 +65,27 @@ public:
     /**
      * @brief Returns the name of the source
      */
-    std::string getName() const {
-        return m_name;
-    }
+    std::string getName() const;
 
     /**
      * @brief Returns the volume of the source
      */
-    float getVolume() const {
-        return m_volume;
-    }
+    float getVolume() const;
 
     /**
      * @brief Returns the position of the source
      */
-    glm::vec3 getPosition() const {
-        return m_position;
-    }
+    glm::vec3 getPosition() const;
 
     /**
      * @brief Returns the rotation of the source
      */
-    glm::quat getRotation() const {
-        return m_rotation;
-    }
+    glm::quat getRotation() const;
 
     /**
      * @brief Returns the velocity of the source
      */
-    glm::vec3 getVelocity() const {
-        return m_velocity;
-    }
+    glm::vec3 getVelocity() const;
 
     /**
      * @brief Sets the volume of the source
@@ -122,9 +112,9 @@ public:
     void setVelocity(const glm::vec3& velocity);
 
     // Inherited via ISerializable
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     /**

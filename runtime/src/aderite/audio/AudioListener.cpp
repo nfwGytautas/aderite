@@ -13,7 +13,7 @@ AudioListener::AudioListener() : m_name(utility::generateString(12)) {}
 
 AudioListener::~AudioListener() {}
 
-void AudioListener::update() {
+void AudioListener::update() const {
     FMOD_3D_ATTRIBUTES listener3dAttributes = {};
     listener3dAttributes.position = {m_position.x, m_position.y, m_position.z};
     listener3dAttributes.velocity = {m_velocity.x, m_velocity.y, m_velocity.z};
@@ -38,9 +38,29 @@ void AudioListener::enable() {
     m_enabled = true;
 }
 
+bool AudioListener::isEnabled() const {
+    return m_enabled;
+}
+
 void AudioListener::setName(const std::string& name) {
     LOG_TRACE("[Audio] Renaming listener {0} to ", m_name, name);
     m_name = name;
+}
+
+std::string AudioListener::getName() const {
+    return m_name;
+}
+
+glm::vec3 AudioListener::getPosition() const {
+    return m_position;
+}
+
+glm::quat AudioListener::getRotation() const {
+    return m_rotation;
+}
+
+glm::vec3 AudioListener::getVelocity() const {
+    return m_velocity;
 }
 
 void AudioListener::setPosition(const glm::vec3& position) {

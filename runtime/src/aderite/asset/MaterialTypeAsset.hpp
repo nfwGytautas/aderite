@@ -6,6 +6,7 @@
 
 #include "aderite/io/ILoadable.hpp"
 #include "aderite/io/SerializableObject.hpp"
+#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace asset {
@@ -13,7 +14,7 @@ namespace asset {
 /**
  * @brief Material type asset, is a collection of a shader, data uniform and samplers
  */
-class MaterialTypeAsset : public io::SerializableObject, public io::ILoadable {
+class MaterialTypeAsset ADERITE_MIDDLEWARE_FINAL : public io::SerializableObject, public io::ILoadable {
 public:
     /**
      * @brief Editable fields of the asset, this information is stored inside the asset file
@@ -24,7 +25,7 @@ public:
     };
 
 public:
-    virtual ~MaterialTypeAsset();
+    ADERITE_MIDDLEWARE_VIRTUAL ~MaterialTypeAsset();
 
     /**
      * @brief Returns true if the type is valid, false otherwise
@@ -32,40 +33,40 @@ public:
     bool isValid() const;
 
     // Inherited via ILoadable
-    virtual void load(const io::Loader* loader) override;
-    virtual void unload() override;
-    virtual bool needsLoading() override;
+    void load(const io::Loader* loader) override;
+    void unload() override;
+    bool needsLoading() const override;
 
     // Inherited via SerializableObject
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
-    bgfx::ProgramHandle getShaderHandle() const {
-        return m_shaderHandle;
-    }
+    /**
+     * @brief Get the shader handle of the material type
+     */
+    bgfx::ProgramHandle getShaderHandle() const;
 
-    bgfx::UniformHandle getUniformHandle() const {
-        return m_uniformHandle;
-    }
+    /**
+     * @brief Get the uniform handle of the material type
+     */
+    bgfx::UniformHandle getUniformHandle() const;
 
-    bgfx::UniformHandle getSampler(size_t idx) const {
-        return m_samplers[idx];
-    }
+    /**
+     * @brief Get sampler at the specified index
+     * @param idx Sampler index
+     */
+    bgfx::UniformHandle getSampler(size_t idx) const;
 
     /**
      * @brief Returns the info of shader fields
      */
-    fields getFields() const {
-        return m_info;
-    }
+    fields getFields() const;
 
     /**
      * @brief Returns mutable field structure
      */
-    fields& getFieldsMutable() {
-        return m_info;
-    }
+    fields& getFieldsMutable();
 
 private:
     // Shader

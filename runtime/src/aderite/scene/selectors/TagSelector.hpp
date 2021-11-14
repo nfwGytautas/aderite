@@ -8,7 +8,7 @@ namespace scene {
 /**
  * @brief Entity selector where entities that match the tag list are selected
  */
-class TagSelector : public EntitySelector {
+class TagSelector final : public EntitySelector {
 public:
     /**
      * @brief Add tag to the selector
@@ -30,19 +30,17 @@ public:
     /**
      * @brief Returns the tags of the selector
      */
-    size_t getTags() const {
-        return m_tags;
-    }
+    size_t getTags() const;
 
     // Inherited via IEntitySelector
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
-    virtual void onEntityAdded(scene::Entity* entity) override;
-    virtual bool isSelected(scene::Entity* entity) override;
-    virtual size_t size() const override;
-    virtual scene::Entity** getEntities() override;
-    virtual void regenerate() override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    void onEntityAdded(scene::Entity* entity) override;
+    bool isSelected(scene::Entity* entity) const override;
+    size_t size() const override;
+    scene::Entity** getEntities() override;
+    void regenerate() override;
 
 private:
     size_t m_tags = 0;

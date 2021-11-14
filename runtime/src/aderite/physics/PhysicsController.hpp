@@ -15,7 +15,7 @@ namespace physics {
 /**
  * @brief Class used to handle all physics related functionality for aderite
  */
-class PhysicsController {
+class PhysicsController final {
     static constexpr float c_FixedUpdateWindow = 0.02f;
 
 public:
@@ -43,17 +43,17 @@ public:
     /**
      * @brief Returns the PhysX physics object instance
      */
-    physx::PxPhysics* getPhysics();
+    physx::PxPhysics* getPhysics() const;
 
     /**
      * @brief Returns the PhysX CPU dispatcher
      */
-    physx::PxCpuDispatcher* getDispatcher();
+    physx::PxCpuDispatcher* getDispatcher() const;
 
     /**
      * @brief Returns the default physics material instance
      */
-    physx::PxMaterial* getDefaultMaterial();
+    physx::PxMaterial* getDefaultMaterial() const;
 
     /**
      * @brief Filter shader of the physics controller

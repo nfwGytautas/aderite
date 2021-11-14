@@ -111,7 +111,7 @@ bool LibClassLocator::isSystem(MonoClass* klass) const {
     return false;
 }
 
-MonoObject* LibClassLocator::create(io::ISerializable* serializable) {
+MonoObject* LibClassLocator::create(io::ISerializable* serializable) const {
     switch (static_cast<reflection::RuntimeTypes>(serializable->getType())) {
     case reflection::RuntimeTypes::ENTITY: {
         return this->create(static_cast<scene::Entity*>(serializable));
@@ -135,47 +135,79 @@ MonoObject* LibClassLocator::create(io::ISerializable* serializable) {
     }
 }
 
-MonoObject* LibClassLocator::create(scene::Entity* entity) {
+MonoObject* LibClassLocator::create(scene::Entity* entity) const {
     void* args[1] = {&entity};
     return this->genericInstanceCreate(m_entity.Klass, m_entity.Ctor, args);
 }
 
-MonoObject* LibClassLocator::create(asset::MeshAsset* mesh) {
+MonoObject* LibClassLocator::create(asset::MeshAsset* mesh) const {
     void* args[1] = {&mesh};
     return this->genericInstanceCreate(m_mesh.Klass, m_mesh.Ctor, args);
 }
 
-MonoObject* LibClassLocator::create(asset::MaterialAsset* material) {
+MonoObject* LibClassLocator::create(asset::MaterialAsset* material) const {
     void* args[1] = {&material};
     return this->genericInstanceCreate(m_material.Klass, m_material.Ctor, args);
 }
 
-MonoObject* LibClassLocator::create(asset::AudioAsset* audio) {
+MonoObject* LibClassLocator::create(asset::AudioAsset* audio) const {
     void* args[1] = {&audio};
     return this->genericInstanceCreate(m_audio.Klass, m_audio.Ctor, args);
 }
 
-MonoObject* LibClassLocator::create(audio::AudioSource* source) {
+MonoObject* LibClassLocator::create(audio::AudioSource* source) const {
     void* args[1] = {&source};
     return this->genericInstanceCreate(m_audioSource.Klass, m_audioSource.Ctor, args);
 }
 
-MonoObject* LibClassLocator::create(const physics::TriggerEvent& triggerEvent) {
+MonoObject* LibClassLocator::create(const physics::TriggerEvent& triggerEvent) const {
     void* args[2] = {create(triggerEvent.Actor->getEntity()), create(triggerEvent.Trigger->getEntity())};
     return this->genericInstanceCreate(m_triggerEvent.Klass, m_triggerEvent.Ctor, args);
 }
 
-MonoObject* LibClassLocator::create(const physics::CollisionEvent& collisionEvent) {
+MonoObject* LibClassLocator::create(const physics::CollisionEvent& collisionEvent) const {
     void* args[2] = {create(collisionEvent.Actor1->getEntity()), create(collisionEvent.Actor2->getEntity())};
     return this->genericInstanceCreate(m_collisionEvent.Klass, m_collisionEvent.Ctor, args);
 }
 
-void LibClassLocator::handleException(MonoObject* exception) {
+const LibClassLocator::ScriptSystem& LibClassLocator::getScriptSystem() const {
+    return m_system;
+}
+
+const LibClassLocator::Entity& LibClassLocator::getEntity() const {
+    return m_entity;
+}
+
+const LibClassLocator::Mesh& LibClassLocator::getMesh() const {
+    return m_mesh;
+}
+
+const LibClassLocator::Material& LibClassLocator::getMaterial() const {
+    return m_material;
+}
+
+const LibClassLocator::Audio& LibClassLocator::getAudio() const {
+    return m_audio;
+}
+
+const LibClassLocator::AudioSource& LibClassLocator::getAudioSource() const {
+    return m_audioSource;
+}
+
+const LibClassLocator::TriggerEvent& LibClassLocator::getTriggerEvent() const {
+    return m_triggerEvent;
+}
+
+const LibClassLocator::CollisionEvent& LibClassLocator::getCollisionEvent() const {
+    return m_collisionEvent;
+}
+
+void LibClassLocator::handleException(MonoObject* exception) const {
     // TODO: Implement
     LOG_ERROR("[Scripting] EXCEPTION THROWN IN C# CODE");
 }
 
-MonoObject* LibClassLocator::genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args) {
+MonoObject* LibClassLocator::genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args) const {
     // Create object
     MonoObject* object = mono_object_new(::aderite::Engine::getScriptManager()->getDomain(), klass);
     MonoObject* ex = nullptr;

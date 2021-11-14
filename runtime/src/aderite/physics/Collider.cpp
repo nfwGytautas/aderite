@@ -39,12 +39,16 @@ void Collider::setScale(const glm::vec3& scale) {
     this->updateGeometry();
 }
 
+const glm::vec3& Collider::getScale() const {
+    return p_scale;
+}
+
 bool Collider::isTrigger() const {
     return p_shape->getFlags() & physx::PxShapeFlag::eTRIGGER_SHAPE;
 }
 
-void Collider::setTrigger(bool value) {
-    LOG_TRACE("[Physics] Changing {0:p} collider trigger flag to {1}", static_cast<void*>(this), value);
+void Collider::setTrigger(bool value) const {
+    LOG_TRACE("[Physics] Changing {0:p} collider trigger flag to {1}", static_cast<const void*>(this), value);
 
     // Reset
     p_shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);

@@ -15,7 +15,7 @@ AudioSource::AudioSource() : m_name(utility::generateString(12)) {}
 
 AudioSource::~AudioSource() {}
 
-void AudioSource::update() {
+void AudioSource::update() const {
     // TODO: Clean one shots
 
     for (AudioInstance* instance : m_instances) {
@@ -65,6 +65,26 @@ void AudioSource::stop() {
 void AudioSource::setName(const std::string& name) {
     LOG_TRACE("[Audio] Renaming source {0} to {1}", m_name, name);
     m_name = name;
+}
+
+std::string AudioSource::getName() const {
+    return m_name;
+}
+
+float AudioSource::getVolume() const {
+    return m_volume;
+}
+
+glm::vec3 AudioSource::getPosition() const {
+    return m_position;
+}
+
+glm::quat AudioSource::getRotation() const {
+    return m_rotation;
+}
+
+glm::vec3 AudioSource::getVelocity() const {
+    return m_velocity;
 }
 
 void AudioSource::setVolume(const float volume) {

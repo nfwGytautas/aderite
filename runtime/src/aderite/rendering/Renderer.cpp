@@ -87,7 +87,7 @@ bool Renderer::init() {
 
     // Initial view rect
     auto windowSize = ::aderite::Engine::getWindowManager()->getSize();
-    onWindowResized(windowSize.x, windowSize.y, false);
+    this->onWindowResized(windowSize.x, windowSize.y, false);
 
     // Finish any queued operations
     bgfx::frame();
@@ -118,7 +118,7 @@ void Renderer::setVsync(bool enabled) {
 
 void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight, bool reset) {
     LOG_TRACE("[Rendering] Resizing window (width: {0}, height: {1})", newWidth, newHeight);
-    setResolution(glm::uvec2(newWidth, newHeight));
+    this->setResolution(glm::uvec2(newWidth, newHeight));
 
     if (reset) {
         bgfx::reset(newWidth, newHeight);
@@ -126,7 +126,7 @@ void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight, bo
 }
 
 void Renderer::render() {
-    if (!isReady()) {
+    if (!this->isReady()) {
         return;
     }
     // TODO: Status in editor
@@ -147,7 +147,7 @@ void Renderer::render() {
     m_pipeline->execute();
 }
 
-bool Renderer::isReady() {
+bool Renderer::isReady() const {
     return m_isInitialized;
 }
 
@@ -159,7 +159,7 @@ void Renderer::setResolution(const glm::uvec2& size) {
     // TODO: Forward to render passes
 }
 
-void Renderer::commit() {
+void Renderer::commit() const {
     // Commit
     bgfx::frame(false);
     // TODO: Display stats in editor

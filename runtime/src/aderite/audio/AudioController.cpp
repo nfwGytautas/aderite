@@ -207,7 +207,7 @@ bool AudioController::masterBanksLoaded() const {
     return m_masterBank != nullptr && m_stringBank != nullptr;
 }
 
-AudioInstance* aderite::audio::AudioController::createAudioInstance(const std::string name) {
+AudioInstance* aderite::audio::AudioController::createAudioInstance(const std::string name) const {
     FMOD::Studio::EventDescription* desc = nullptr;
     FMOD::Studio::EventInstance* instance;
     FMOD_STUDIO_LOADING_STATE loadState;
@@ -226,7 +226,11 @@ AudioInstance* aderite::audio::AudioController::createAudioInstance(const std::s
     return aderiteInstance;
 }
 
-void AudioController::setMute(bool value) {
+FMOD::Studio::System* AudioController::getFmodSystem() const {
+    return m_fmodSystem;
+}
+
+void AudioController::setMute(bool value) const {
     LOG_TRACE("[Audio] Changing mute state to {0}", value);
 
     scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
@@ -243,7 +247,7 @@ void AudioController::setMute(bool value) {
     }
 }
 
-void AudioController::disable(bool value) {
+void AudioController::disable(bool value) const {
     LOG_TRACE("[Audio] Changing enabled state to {0}", value);
 
     scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();

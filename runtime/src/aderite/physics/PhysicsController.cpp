@@ -202,15 +202,15 @@ PhysicsEventList* PhysicsController::getEventList() const {
     return m_events;
 }
 
-physx::PxPhysics* PhysicsController::getPhysics() {
+physx::PxPhysics* PhysicsController::getPhysics() const {
     return m_physics;
 }
 
-physx::PxCpuDispatcher* PhysicsController::getDispatcher() {
+physx::PxCpuDispatcher* PhysicsController::getDispatcher() const {
     return m_dispatcher;
 }
 
-physx::PxMaterial* PhysicsController::getDefaultMaterial() {
+physx::PxMaterial* PhysicsController::getDefaultMaterial() const {
     return m_defaultMaterial;
 }
 

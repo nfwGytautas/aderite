@@ -36,7 +36,7 @@ bgfx::FrameBufferHandle TargetProvideOperation::getHandle() const {
 }
 
 void TargetProvideOperation::initialize() {
-    createFramebuffer();
+    this->createFramebuffer();
 }
 
 void TargetProvideOperation::execute(PipelineState* state) {
@@ -45,6 +45,7 @@ void TargetProvideOperation::execute(PipelineState* state) {
 
 void TargetProvideOperation::shutdown() {
     bgfx::destroy(m_handle);
+    m_handle = BGFX_INVALID_HANDLE;
 }
 
 reflection::Type TargetProvideOperation::getType() const {

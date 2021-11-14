@@ -27,6 +27,14 @@ void PhysicsEventList::registerEvent(const CollisionEvent& ce) {
     }
 }
 
+const std::vector<TriggerEvent>& PhysicsEventList::getTriggerEvents() const {
+    return m_triggerEvents;
+}
+
+const std::vector<CollisionEvent>& PhysicsEventList::getCollisionEvents() const {
+    return m_collisionEvents;
+}
+
 void PhysicsEventList::clear() {
     m_triggerEvents.clear();
     m_collisionEvents.clear();

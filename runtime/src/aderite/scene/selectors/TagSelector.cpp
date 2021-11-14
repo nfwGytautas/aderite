@@ -21,6 +21,10 @@ bool TagSelector::hasTag(size_t tag) const {
     return m_tags & tag;
 }
 
+size_t TagSelector::getTags() const {
+    return m_tags;
+}
+
 reflection::Type TagSelector::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::TAG_SELECTOR);
 }
@@ -51,7 +55,7 @@ void TagSelector::onEntityAdded(scene::Entity* entity) {
     }
 }
 
-bool TagSelector::isSelected(scene::Entity* entity) {
+bool TagSelector::isSelected(scene::Entity* entity) const {
     return entity->getTags() & m_tags;
 }
 

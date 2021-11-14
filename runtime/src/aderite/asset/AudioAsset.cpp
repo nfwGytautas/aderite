@@ -26,7 +26,7 @@ void AudioAsset::unload() {
     LOG_TRACE("[Asset] Unloading {0}", this->getHandle());
 }
 
-bool AudioAsset::needsLoading() {
+bool AudioAsset::needsLoading() const {
     return false;
 }
 

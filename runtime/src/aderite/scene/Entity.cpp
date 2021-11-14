@@ -79,6 +79,30 @@ void Entity::setName(const std::string& name) {
     m_name = name;
 }
 
+Scene* Entity::getScene() const {
+    return m_scene;
+}
+
+Transform* Entity::getTransform() const {
+    return m_transform;
+}
+
+physics::PhysicsActor* Entity::getActor() const {
+    return m_actor;
+}
+
+rendering::Renderable* Entity::getRenderable() const {
+    return m_renderable;
+}
+
+const size_t Entity::getTags() const {
+    return m_tags;
+}
+
+const std::string& Entity::getName() const {
+    return m_name;
+}
+
 reflection::Type Entity::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::ENTITY);
 }

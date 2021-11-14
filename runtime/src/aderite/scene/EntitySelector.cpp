@@ -12,6 +12,14 @@ void EntitySelector::setScene(scene::Scene* scene) {
     this->regenerate();
 }
 
+const std::string& EntitySelector::getName() const {
+    return m_name;
+}
+
+const scene::Scene* EntitySelector::getScene() const {
+    return p_scene;
+}
+
 bool EntitySelector::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Name" << YAML::Value << m_name;
 

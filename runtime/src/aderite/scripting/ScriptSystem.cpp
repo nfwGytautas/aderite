@@ -18,6 +18,14 @@ void ScriptSystem::setSelector(scene::EntitySelector* selector) {
     m_selector = selector;
 }
 
+scene::EntitySelector* ScriptSystem::getSelector() const {
+    return m_selector;
+}
+
+const std::string& ScriptSystem::getName() const {
+    return m_name;
+}
+
 void ScriptSystem::update(float delta) {
     if (m_update) {
         this->updateEntitiesArray();
@@ -25,39 +33,39 @@ void ScriptSystem::update(float delta) {
     }
 }
 
-void ScriptSystem::init() {
+void ScriptSystem::init() const {
     LOG_TRACE("[Scripting] Initialzing {0}", m_name);
     if (m_init) {
         m_init();
     }
 }
 
-void ScriptSystem::shutdown() {
+void ScriptSystem::shutdown() const {
     LOG_TRACE("[Scripting] Shutting down {0}", m_name);
     if (m_shutdown) {
         m_shutdown();
     }
 }
 
-void ScriptSystem::triggerEnter(MonoObject* triggerEvent) {
+void ScriptSystem::triggerEnter(MonoObject* triggerEvent) const {
     if (m_triggerEnter) {
         m_triggerEnter(triggerEvent);
     }
 }
 
-void ScriptSystem::triggerLeave(MonoObject* triggerEvent) {
+void ScriptSystem::triggerLeave(MonoObject* triggerEvent) const {
     if (m_triggerLeave) {
         m_triggerLeave(triggerEvent);
     }
 }
 
-void ScriptSystem::collisionStart(MonoObject* collisionEvent) {
+void ScriptSystem::collisionStart(MonoObject* collisionEvent) const {
     if (m_collisionStart) {
         m_collisionStart(collisionEvent);
     }
 }
 
-void ScriptSystem::collisionEnd(MonoObject* collisionEvent) {
+void ScriptSystem::collisionEnd(MonoObject* collisionEvent) const {
     if (m_collisionEnd) {
         m_collisionEnd(collisionEvent);
     }
@@ -101,6 +109,10 @@ void ScriptSystem::load(const std::string& name) {
 void ScriptSystem::attachToScene(scene::Scene* scene) {
     LOG_TRACE("[Scripting] Attaching {0} to {1}", m_name, scene->getHandle());
     m_scene = scene;
+}
+
+const std::vector<FieldWrapper>& ScriptSystem::getFields() const {
+    return m_fields;
 }
 
 bool ScriptSystem::hasField(const std::string& name) const {

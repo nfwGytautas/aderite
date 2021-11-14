@@ -195,19 +195,19 @@ void Engine::abortExit() {
     m_wantsToShutdown = false;
 }
 
-void Engine::onRendererInitialized() {
+void Engine::onRendererInitialized() const {
     MIDDLEWARE_ACTION(onRendererInitialized);
 }
 
-void Engine::onPipelineChanged(rendering::Pipeline* pipeline) {
+void Engine::onPipelineChanged(rendering::Pipeline* pipeline) const {
     MIDDLEWARE_ACTION(onPipelineChanged, pipeline);
 }
 
-void Engine::onSceneChanged(scene::Scene* scene) {
+void Engine::onSceneChanged(scene::Scene* scene) const {
     MIDDLEWARE_ACTION(onSceneChanged, scene);
 }
 
-void Engine::onWindowResized(unsigned int newWidth, unsigned int newHeight) {
+void Engine::onWindowResized(unsigned int newWidth, unsigned int newHeight) const {
     // TODO: Event system?
     m_renderer->onWindowResized(newWidth, newHeight);
 }
@@ -251,7 +251,7 @@ void Engine::stopSceneUpdates() {
     m_willUpdateScenes = false;
 }
 
-void Engine::updateSystem(float delta) {
+void Engine::updateSystem(float delta) const {
     // Query events
     m_inputManager->update();
 
@@ -261,7 +261,7 @@ void Engine::updateSystem(float delta) {
     MIDDLEWARE_ACTION(onSystemUpdate, delta);
 }
 
-void Engine::updateScenes(float delta) {
+void Engine::updateScenes(float delta) const {
     if (!m_willUpdateScenes) {
         return;
     }
@@ -272,7 +272,7 @@ void Engine::updateScenes(float delta) {
     MIDDLEWARE_ACTION(onSceneUpdate, delta);
 }
 
-void Engine::updatePhysics(float delta) {
+void Engine::updatePhysics(float delta) const {
     if (!m_willUpdatePhysics) {
         return;
     }
@@ -282,7 +282,7 @@ void Engine::updatePhysics(float delta) {
     MIDDLEWARE_ACTION(onPhysicsUpdate, delta);
 }
 
-void Engine::updateScripts(float delta) {
+void Engine::updateScripts(float delta) const {
     if (!m_willUpdateScripts) {
         return;
     }

@@ -28,6 +28,14 @@ DrawCall Renderable::createDrawCall() const {
                      std::vector<glm::mat4>()};
 }
 
+asset::MeshAsset* Renderable::getMesh() const {
+    return m_meshHandle;
+}
+
+asset::MaterialAsset* Renderable::getMaterial() const {
+    return m_materialHandle;
+}
+
 bool Renderable::isValid() const {
     return m_meshHandle != nullptr && m_materialHandle != nullptr && m_meshHandle->isValid() && m_materialHandle->isValid();
 }

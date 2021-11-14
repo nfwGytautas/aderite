@@ -16,7 +16,7 @@ namespace audio {
 /**
  * @brief Class used to control audio API FMOD and provide a functionality to play audio in aderite
  */
-class AudioController {
+class AudioController final {
 public:
     /**
      * @brief Initializes the audio controller
@@ -46,13 +46,13 @@ public:
     /**
      * @brief If true all sounds will be muted (not stopped)
      */
-    void setMute(bool value);
+    void setMute(bool value) const;
 
     /**
      * @brief If true the audio controller will stop all audio instances and won't play any new ones
      * until false is passed. Every time this cycle is done play on start instances will start playing.
      */
-    void disable(bool value);
+    void disable(bool value) const;
 
     /**
      * @brief Returns vector of known events
@@ -64,14 +64,12 @@ public:
      * @param name Name of the audio
      * @return AudioIntance object
      */
-    AudioInstance* createAudioInstance(const std::string name);
+    AudioInstance* createAudioInstance(const std::string name) const;
 
     /**
      * @brief Returns the fmod system instance of aderite
      */
-    FMOD::Studio::System* getFmodSystem() const {
-        return m_fmodSystem;
-    }
+    FMOD::Studio::System* getFmodSystem() const;
 
 private:
     AudioController() {}

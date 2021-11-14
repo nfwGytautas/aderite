@@ -21,7 +21,7 @@ public:
      * @brief Physics update
      * @param step Fixed step size
      */
-    void simulate(float step);
+    void simulate(float step) const;
 
     /**
      * @brief Add a physics actor at the specified transform
@@ -39,18 +39,16 @@ public:
     /**
      * @brief Returns a vector of all actors in this scene
      */
-    const std::vector<PhysicsActor*>& getActors() const {
-        return m_actors;
-    }
+    const std::vector<PhysicsActor*>& getActors() const;
 
 private:
     // Inherited via PxSimulationEventCallback
-    virtual void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override;
-    virtual void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) override;
-    virtual void onConstraintBreak(physx::PxConstraintInfo*, physx::PxU32) {}
-    virtual void onWake(physx::PxActor**, physx::PxU32) {}
-    virtual void onSleep(physx::PxActor**, physx::PxU32) {}
-    virtual void onAdvance(const physx::PxRigidBody* const*, const physx::PxTransform*, const physx::PxU32) {}
+    void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override;
+    void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) override;
+    void onConstraintBreak(physx::PxConstraintInfo*, physx::PxU32) override {}
+    void onWake(physx::PxActor**, physx::PxU32) override {}
+    void onSleep(physx::PxActor**, physx::PxU32) override {}
+    void onAdvance(const physx::PxRigidBody* const*, const physx::PxTransform*, const physx::PxU32) override {}
 
 private:
     physx::PxScene* m_scene = nullptr;
@@ -58,9 +56,9 @@ private:
     std::vector<PhysicsActor*> m_actors;
 
     // Inherited via ISerializable
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 };
 
 } // namespace physics

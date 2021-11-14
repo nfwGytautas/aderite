@@ -28,7 +28,7 @@ namespace aderite {
 /**
  * @brief Main aderite engine instance
  */
-class Engine {
+class Engine final {
 public:
     /**
      * @brief Engine init options
@@ -70,25 +70,25 @@ public:
     /**
      * @brief Function is invoked when the Renderer was initialized
      */
-    void onRendererInitialized();
+    void onRendererInitialized() const;
 
     /**
      * @brief Function is invoked when the Renderer pipeline was changed
      * @param pipeline New pipeline
      */
-    void onPipelineChanged(rendering::Pipeline* pipeline);
+    void onPipelineChanged(rendering::Pipeline* pipeline) const;
 
     /**
      * @brief Function is invoked when the active scene was changed
      */
-    void onSceneChanged(scene::Scene* scene);
+    void onSceneChanged(scene::Scene* scene) const;
 
     /**
      * @brief Function invoked by input manager when the windows has been resized
      * @param newWidth New width of the window
      * @param newHeight New height of the window
      */
-    void onWindowResized(unsigned int newWidth, unsigned int newHeight);
+    void onWindowResized(unsigned int newWidth, unsigned int newHeight) const;
 
     /**
      * @brief Attaches a aderite middleware instance to the runtime, previous one is deleted
@@ -131,10 +131,10 @@ private:
     Engine(const Engine& o) = delete;
 
     // Update functions
-    void updateSystem(float delta);
-    void updateScenes(float delta);
-    void updatePhysics(float delta);
-    void updateScripts(float delta);
+    void updateSystem(float delta) const;
+    void updateScenes(float delta) const;
+    void updatePhysics(float delta) const;
+    void updateScripts(float delta) const;
 
 private:
     bool m_wantsToShutdown = false;

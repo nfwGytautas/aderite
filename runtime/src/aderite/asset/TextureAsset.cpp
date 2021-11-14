@@ -52,7 +52,7 @@ void TextureAsset::unload() {
     LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
 }
 
-bool TextureAsset::needsLoading() {
+bool TextureAsset::needsLoading() const {
     return !this->isValid();
 }
 
@@ -70,6 +70,18 @@ bool TextureAsset::deserialize(io::Serializer* serializer, const YAML::Node& dat
     m_info.IsHDR = data["IsHDR"].as<bool>();
     m_info.IsCubemap = data["IsCubemap"].as<bool>();
     return true;
+}
+
+TextureAsset::fields TextureAsset::getFields() const {
+    return m_info;
+}
+
+TextureAsset::fields& TextureAsset::getFieldsMutable() {
+    return m_info;
+}
+
+bgfx::TextureHandle TextureAsset::getTextureHandle() const {
+    return m_handle;
 }
 
 } // namespace asset

@@ -55,7 +55,7 @@ void MaterialAsset::unload() {
     LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
 }
 
-bool MaterialAsset::needsLoading() {
+bool MaterialAsset::needsLoading() const {
     return !this->isValid();
 }
 
@@ -156,6 +156,18 @@ void MaterialAsset::setType(MaterialTypeAsset* type) {
     for (size_t i = 0; i < m_info.Type->getFields().NumSamplers; i++) {
         m_info.Samplers.push_back(nullptr);
     }
+}
+
+MaterialAsset::fields MaterialAsset::getFields() const {
+    return m_info;
+}
+
+MaterialAsset::fields& MaterialAsset::getFieldsMutable() {
+    return m_info;
+}
+
+float* MaterialAsset::getPropertyData() const {
+    return m_udata;
 }
 
 std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> MaterialAsset::getSamplerData() const {

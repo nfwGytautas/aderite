@@ -32,16 +32,12 @@ public:
     /**
      * @brief Returns mesh instance
      */
-    asset::MeshAsset* getMesh() const {
-        return m_meshHandle;
-    }
+    asset::MeshAsset* getMesh() const;
 
     /**
      * @brief Returns material instance
      */
-    asset::MaterialAsset* getMaterial() const {
-        return m_materialHandle;
-    }
+    asset::MaterialAsset* getMaterial() const;
 
     /**
      * @brief Returns true if the renderable is valid and can be used to render, false otherwise
@@ -50,13 +46,13 @@ public:
 
     /**
      * @brief Loads the renderable assets if needed
-    */
+     */
     void loadIfNeeded();
 
     // Inherited via ISerializable
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     asset::MeshAsset* m_meshHandle = nullptr;

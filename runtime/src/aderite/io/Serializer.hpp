@@ -112,7 +112,7 @@ public:
      * @param handle Handle of the object
      * @return Serializable object instance
      */
-    SerializableObject* get(SerializableHandle handle);
+    SerializableObject* get(SerializableHandle handle) const;
 
     /**
      * @brief Adds an object to the Serializer look up table, if already existing object is added
@@ -145,12 +145,12 @@ public:
      * @brief Serializes object into a file
      * @param object Object to serialize
      */
-    void save(SerializableObject* object);
+    void save(SerializableObject* object) const;
 
     /**
      * @brief Utility method for saving all objects
      */
-    void saveAll();
+    void saveAll() const;
 
     auto begin() {
         return m_objects.begin();

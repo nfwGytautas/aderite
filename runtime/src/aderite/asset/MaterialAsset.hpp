@@ -15,7 +15,7 @@ namespace asset {
 /**
  * @brief Material asset implementation
  */
-class MaterialAsset : public io::SerializableObject, public io::ILoadable {
+class MaterialAsset final : public io::SerializableObject, public io::ILoadable {
 public:
     /**
      * @brief Editable fields of the asset, this information is stored inside the asset file
@@ -34,14 +34,14 @@ public:
     bool isValid() const;
 
     // Inherited via ILoadable
-    virtual void load(const io::Loader* loader) override;
-    virtual void unload() override;
-    virtual bool needsLoading() override;
+    void load(const io::Loader* loader) override;
+    void unload() override;
+    bool needsLoading() const override;
 
     // Inherited via SerializableObject
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
     /**
      * @brief Sets the type of the material
@@ -52,23 +52,17 @@ public:
     /**
      * @brief Returns the info of shader fields
      */
-    fields getFields() const {
-        return m_info;
-    }
+    fields getFields() const;
 
     /**
      * @brief Returns mutable field structure
      */
-    fields& getFieldsMutable() {
-        return m_info;
-    }
+    fields& getFieldsMutable();
 
     /**
      * @brief Returns material property data array
      */
-    float* getPropertyData() const {
-        return m_udata;
-    }
+    float* getPropertyData() const;
 
     /**
      * @brief Returns the sampler data vector

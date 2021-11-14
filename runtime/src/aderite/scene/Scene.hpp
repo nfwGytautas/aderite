@@ -18,12 +18,12 @@ namespace scene {
  * be it meshes, materials, etc. However these resources are loaded as trunks into the asset manager
  * the actual data is not loaded until needed.
  */
-class Scene : public io::SerializableObject {
+class Scene final : public io::SerializableObject {
     static constexpr size_t c_MaxTags = sizeof(size_t) * 8; // Bitflag
 
 public:
     Scene();
-    virtual ~Scene();
+    ~Scene();
 
     /**
      * @brief Update scene
@@ -117,49 +117,37 @@ public:
     /**
      * @brief Returns audio sources of this scene
      */
-    const std::vector<audio::AudioSource*>& getAudioSources() const {
-        return m_audioSources;
-    }
+    const std::vector<audio::AudioSource*>& getAudioSources() const;
 
     /**
      * @brief Returns audio listeners of this scene
      */
-    const std::vector<audio::AudioListener*>& getAudioListeners() const {
-        return m_audioListeners;
-    }
+    const std::vector<audio::AudioListener*>& getAudioListeners() const;
 
     /**
      * @brief Returns script systems active in this scene
      */
-    const std::vector<scripting::ScriptSystem*> getScriptSystems() const {
-        return m_systems;
-    }
+    const std::vector<scripting::ScriptSystem*> getScriptSystems() const;
 
     /**
      * @brief Returns the entity selectors defined in this scene
      */
-    const std::vector<EntitySelector*> getEntitySelectors() const {
-        return m_entitySelectors;
-    }
+    const std::vector<EntitySelector*> getEntitySelectors() const;
 
     /**
      * @brief Returns the tags of the scene
      */
-    const std::vector<std::string>& getTags() const {
-        return m_tags;
-    }
+    const std::vector<std::string>& getTags() const;
 
     /**
      * @brief Get entities in this scene
      */
-    const std::vector<Entity*> getEntities() const {
-        return m_entities;
-    }
+    const std::vector<Entity*> getEntities() const;
 
     // Inherited via SerializableObject
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     friend class SceneManager;

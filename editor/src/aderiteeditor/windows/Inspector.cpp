@@ -938,30 +938,25 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
 
             switch (fw.getType()) {
             case scripting::FieldType::Float: {
-                float val = 0.0f;
-                fw.getValue(&val);
+                float val = fw.getValueType<float>();
                 if (ImGui::InputFloat(std::string("#" + fw.getName()).c_str(), &val, NULL)) {
-                    fw.setValue(&val);
+                    fw.setValueType(val);
                 }
                 break;
             }
             case scripting::FieldType::Boolean: {
-                bool val = false;
-                fw.getValue(&val);
+                bool val = fw.getValueType<bool>();
                 if (ImGui::Checkbox(std::string("##" + fw.getName()).c_str(), &val)) {
-                    fw.setValue(&val);
+                    fw.setValueType(val);
                 }
                 break;
             }
             case scripting::FieldType::Mesh: {
-                MonoObject* mesh = fw.getValueObject();
+                asset::MeshAsset* handle = static_cast<asset::MeshAsset*>(fw.getSerializable());
 
-                if (mesh) {
-                    asset::MeshAsset* meshHandle = nullptr;
-                    scripting::extract(mesh, meshHandle);
-
-                    vfs::File* materialFile = editor::State::Project->getVfs()->getFile(meshHandle->getHandle());
-                    ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                if (handle) {
+                    vfs::File* file = editor::State::Project->getVfs()->getFile(handle->getHandle());
+                    ImGui::Button(file->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 } else {
                     ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 }
@@ -970,9 +965,9 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MeshAsset)) {
                         editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
                         vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-                        asset::MeshAsset* newMeshHandle =
+                        asset::MeshAsset* newHandle =
                             static_cast<asset::MeshAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                        fw.setValue(::aderite::Engine::getScriptManager()->getLocator().create(newMeshHandle));
+                        fw.setSerializable(newHandle);
                     }
 
                     ImGui::EndDragDropTarget();
@@ -980,15 +975,11 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
                 break;
             }
             case scripting::FieldType::Material: {
-                MonoObject* material = nullptr;
-                fw.getValue(&material);
+                asset::MaterialAsset* handle = static_cast<asset::MaterialAsset*>(fw.getSerializable());
 
-                if (material) {
-                    asset::MaterialAsset* materialHandle = nullptr;
-                    scripting::extract(material, materialHandle);
-
-                    vfs::File* materialFile = editor::State::Project->getVfs()->getFile(materialHandle->getHandle());
-                    ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                if (handle) {
+                    vfs::File* file = editor::State::Project->getVfs()->getFile(handle->getHandle());
+                    ImGui::Button(file->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 } else {
                     ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 }
@@ -997,9 +988,9 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__MaterialAsset)) {
                         editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
                         vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-                        asset::MaterialAsset* newMaterialHandle =
+                        asset::MaterialAsset* newHandle =
                             static_cast<asset::MaterialAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                        fw.setValue(::aderite::Engine::getScriptManager()->getLocator().create(newMaterialHandle));
+                        fw.setSerializable(newHandle);
                     }
 
                     ImGui::EndDragDropTarget();
@@ -1007,15 +998,11 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
                 break;
             }
             case scripting::FieldType::Audio: {
-                MonoObject* audio = nullptr;
-                fw.getValue(&audio);
+                asset::AudioAsset* handle = static_cast<asset::AudioAsset*>(fw.getSerializable());
 
-                if (audio) {
-                    asset::AudioAsset* audioHandle = nullptr;
-                    scripting::extract(audio, audioHandle);
-
-                    vfs::File* materialFile = editor::State::Project->getVfs()->getFile(audioHandle->getHandle());
-                    ImGui::Button(materialFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                if (handle) {
+                    vfs::File* file = editor::State::Project->getVfs()->getFile(handle->getHandle());
+                    ImGui::Button(file->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 } else {
                     ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 }
@@ -1024,9 +1011,9 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioAsset)) {
                         editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
                         vfs::File* file = static_cast<vfs::File*>(ddo->Data);
-                        asset::AudioAsset* newAudioHandle =
+                        asset::AudioAsset* newHandle =
                             static_cast<asset::AudioAsset*>(::aderite::Engine::getSerializer()->getOrRead(file->getHandle()));
-                        fw.setValue(::aderite::Engine::getScriptManager()->getLocator().create(newAudioHandle));
+                        fw.setSerializable(newHandle);
                     }
 
                     ImGui::EndDragDropTarget();
@@ -1034,14 +1021,10 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
                 break;
             }
             case scripting::FieldType::AudioSource: {
-                MonoObject* source = nullptr;
-                fw.getValue(&source);
+                audio::AudioSource* handle = static_cast<audio::AudioSource*>(fw.getSerializable());
 
-                if (source) {
-                    audio::AudioSource* audioHandle = nullptr;
-                    scripting::extract(source, audioHandle);
-
-                    ImGui::Button(audioHandle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                if (handle) {
+                    ImGui::Button(handle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 } else {
                     ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 }
@@ -1049,8 +1032,9 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
                 if (ImGui::BeginDragDropTarget()) {
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__AudioSource)) {
                         editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-                        audio::AudioSource* source = static_cast<audio::AudioSource*>(ddo->Data);
-                        fw.setValue(::aderite::Engine::getScriptManager()->getLocator().create(source));
+                        vfs::File* file = static_cast<vfs::File*>(ddo->Data);
+                        audio::AudioSource* newHandle = static_cast<audio::AudioSource*>(ddo->Data);
+                        fw.setSerializable(newHandle);
                     }
 
                     ImGui::EndDragDropTarget();

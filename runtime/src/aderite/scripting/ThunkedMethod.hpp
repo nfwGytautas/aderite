@@ -34,7 +34,7 @@ public:
     /**
      * @brief Invoke the thunked method with the given parameters
      */
-    Ret invoke(Args... args) {
+    Ret invoke(Args... args) const {
         ADERITE_DYNAMIC_ASSERT(this->valid(), "Invalid thunked method invoked");
         MonoException* exception = nullptr;
         Ret result = m_thunk(m_instance, args..., &exception);
@@ -55,7 +55,7 @@ public:
         return this->valid();
     }
 
-    Ret operator()(Args... args) {
+    Ret operator()(Args... args) const {
         return this->invoke(args...);
     }
 
@@ -94,7 +94,7 @@ public:
     /**
      * @brief Invoke the thunked method with the given parameters
      */
-    void invoke(Args... args) {
+    void invoke(Args... args) const {
         ADERITE_DYNAMIC_ASSERT(this->valid(), "Invalid thunked method invoked");
         MonoException* exception = nullptr;
         m_thunk(m_instance, args..., &exception);
@@ -114,7 +114,7 @@ public:
         return this->valid();
     }
 
-    void operator()(Args... args) {
+    void operator()(Args... args) const {
         this->invoke(args...);
     }
 

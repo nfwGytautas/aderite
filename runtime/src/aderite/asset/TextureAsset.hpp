@@ -11,7 +11,7 @@ namespace asset {
 /**
  * @brief Texture asset implementation
  */
-class TextureAsset : public io::SerializableObject, public io::ILoadable {
+class TextureAsset final : public io::SerializableObject, public io::ILoadable {
 public:
     /**
      * @brief Editable fields of the asset, this information is stored inside the asset file
@@ -31,35 +31,29 @@ public:
     bool isValid() const;
 
     // Inherited via ILoadable
-    virtual void load(const io::Loader* loader) override;
-    virtual void unload() override;
-    virtual bool needsLoading() override;
+    void load(const io::Loader* loader) override;
+    void unload() override;
+    bool needsLoading() const override;
 
     // Inherited via SerializableObject
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
     /**
      * @brief Returns the info of shader fields
      */
-    fields getFields() const {
-        return m_info;
-    }
+    fields getFields() const;
 
     /**
      * @brief Returns mutable field structure
      */
-    fields& getFieldsMutable() {
-        return m_info;
-    }
+    fields& getFieldsMutable();
 
     /**
      * @brief Returns texture handle of this asset
      */
-    bgfx::TextureHandle getTextureHandle() const {
-        return m_handle;
-    }
+    bgfx::TextureHandle getTextureHandle() const;
 
 private:
     bgfx::TextureHandle m_handle = BGFX_INVALID_HANDLE;

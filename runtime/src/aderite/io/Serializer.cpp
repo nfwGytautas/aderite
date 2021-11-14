@@ -114,7 +114,7 @@ void Serializer::writeUntrackedType(YAML::Emitter& emitter, const ISerializable*
     emitter << YAML::EndMap;
 }
 
-SerializableObject* Serializer::get(SerializableHandle handle) {
+SerializableObject* Serializer::get(SerializableHandle handle) const {
     LOG_TRACE("[Asset] Getting {0}", handle);
     ADERITE_DYNAMIC_ASSERT(handle != c_InvalidHandle, "Invalid handle passed to serializer get method");
     ADERITE_DYNAMIC_ASSERT(m_objects.size() <= handle, "Requested non existing object");
@@ -167,7 +167,7 @@ void Serializer::reread(SerializableObject* object) {
     object->deserialize(this, data["Data"]);
 }
 
-void Serializer::save(SerializableObject* object) {
+void Serializer::save(SerializableObject* object) const {
     YAML::Emitter out;
 
     LOG_TRACE("[Asset] Saving {0}", object->getHandle());
@@ -198,7 +198,7 @@ void Serializer::save(SerializableObject* object) {
     aderite::Engine::getFileHandler()->commit(chunk);
 }
 
-void Serializer::saveAll() {
+void Serializer::saveAll() const {
     LOG_TRACE("[Asset] Saving all objects");
     for (SerializableObject* obj : m_objects) {
         if (obj != nullptr) {

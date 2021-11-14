@@ -8,10 +8,10 @@ namespace physics {
 /**
  * @brief Dynamic physics actor, that is affected by gravity, can be applied with a force, etc.
  */
-class DynamicActor : public PhysicsActor {
+class DynamicActor final : public PhysicsActor {
 public:
     DynamicActor();
-    virtual ~DynamicActor() {}
+    ~DynamicActor() {}
 
     /**
      * @brief If value is true, then the actor will be made into a kinematic actor
@@ -45,9 +45,9 @@ public:
     float getMass() const;
 
     // Inherited via PhysicsActor
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 private:
 };
 

@@ -96,7 +96,7 @@ void FileHandler::setRoot(const std::filesystem::path& root) {
     m_rootDir = root;
 }
 
-void FileHandler::writePhysicalFile(LoadableHandle handle, const std::filesystem::path& file) {
+void FileHandler::writePhysicalFile(LoadableHandle handle, const std::filesystem::path& file) const {
     LOG_TRACE("[IO] Writing physical file to {0} from {1}", handle, file.string());
     // Load chunk
     DataChunk chunk = this->openLoadable(handle);

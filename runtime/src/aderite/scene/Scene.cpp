@@ -179,6 +179,30 @@ void Scene::addEntity(Entity* entity) {
     }
 }
 
+const std::vector<audio::AudioSource*>& Scene::getAudioSources() const {
+    return m_audioSources;
+}
+
+const std::vector<audio::AudioListener*>& Scene::getAudioListeners() const {
+    return m_audioListeners;
+}
+
+const std::vector<scripting::ScriptSystem*> Scene::getScriptSystems() const {
+    return m_systems;
+}
+
+const std::vector<EntitySelector*> Scene::getEntitySelectors() const {
+    return m_entitySelectors;
+}
+
+const std::vector<std::string>& Scene::getTags() const {
+    return m_tags;
+}
+
+const std::vector<Entity*> Scene::getEntities() const {
+    return m_entities;
+}
+
 reflection::Type Scene::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::SCENE);
 }

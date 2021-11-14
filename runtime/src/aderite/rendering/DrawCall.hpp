@@ -14,7 +14,7 @@ namespace rendering {
 /**
  * @brief Draw call information
  */
-class DrawCall {
+class DrawCall final {
 public:
     // Vertex buffer that contains data to be rendered
     bgfx::VertexBufferHandle VBO = BGFX_INVALID_HANDLE;

@@ -8,15 +8,15 @@ namespace physics {
 /**
  * @brief Static physics actor, which ideally should never move
  */
-class StaticActor : public PhysicsActor {
+class StaticActor final : public PhysicsActor {
 public:
     StaticActor();
-    virtual ~StaticActor() {}
+    ~StaticActor() {}
 
     // Inherited via PhysicsActor
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 };
 
 } // namespace physics

@@ -11,8 +11,8 @@ namespace physics {
  * @brief Trigger event
  */
 struct TriggerEvent {
-    PhysicsActor* Trigger = nullptr;
-    PhysicsActor* Actor = nullptr;
+    const PhysicsActor* Trigger = nullptr;
+    const PhysicsActor* Actor = nullptr;
 
     bool Enter = false;
 };
@@ -21,8 +21,8 @@ struct TriggerEvent {
  * @brief Collision event
  */
 struct CollisionEvent {
-    PhysicsActor* Actor1 = nullptr;
-    PhysicsActor* Actor2 = nullptr;
+    const PhysicsActor* Actor1 = nullptr;
+    const PhysicsActor* Actor2 = nullptr;
 
     bool Start = false;
 };
@@ -47,16 +47,12 @@ public:
     /**
      * @brief Returns the trigger events
      */
-    const std::vector<TriggerEvent>& getTriggerEvents() const {
-        return m_triggerEvents;
-    }
+    const std::vector<TriggerEvent>& getTriggerEvents() const;
 
     /**
      * @brief Returns the collision events
      */
-    const std::vector<CollisionEvent>& getCollisionEvents() const {
-        return m_collisionEvents;
-    }
+    const std::vector<CollisionEvent>& getCollisionEvents() const;
 
     /**
      * @brief Clears all events in the list

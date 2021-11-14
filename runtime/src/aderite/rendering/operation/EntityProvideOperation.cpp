@@ -24,7 +24,7 @@ void EntityProvideOperation::execute(PipelineState* state) {
     }
 
     // Clean transformations from previous call
-    cleanList();
+    this->cleanList();
 
     // Entity group
     for (scene::Entity* entity : currentScene->getEntities()) {

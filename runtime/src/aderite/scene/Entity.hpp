@@ -11,10 +11,10 @@ namespace scene {
 /**
  * @brief Entity class is used to represent an object in the world
  */
-class Entity : public io::ISerializable {
+class Entity final : public io::ISerializable {
 public:
     Entity();
-    virtual ~Entity();
+    ~Entity();
 
     /**
      * @brief Adds a tag to the entity
@@ -61,49 +61,37 @@ public:
     /**
      * @brief Returns the scene of the entity
      */
-    Scene* getScene() const {
-        return m_scene;
-    }
+    Scene* getScene() const;
 
     /**
      * @brief Returns the transform of the entity
      */
-    Transform* getTransform() const {
-        return m_transform;
-    }
+    Transform* getTransform() const;
 
     /**
      * @brief Returns the physics actor of the entity
      */
-    physics::PhysicsActor* getActor() const {
-        return m_actor;
-    }
+    physics::PhysicsActor* getActor() const;
 
     /**
      * @brief Returns the renderable of this entity
      */
-    rendering::Renderable* getRenderable() const {
-        return m_renderable;
-    }
+    rendering::Renderable* getRenderable() const;
 
     /**
      * @brief Returns the tagset of this entity
      */
-    const size_t getTags() const {
-        return m_tags;
-    }
+    const size_t getTags() const;
 
     /**
      * @brief Returns the name of this entity
      */
-    const std::string& getName() const {
-        return m_name;
-    }
+    const std::string& getName() const;
 
     // Inherited via ISerializable
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     friend class Scene;

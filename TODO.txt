@@ -1,10 +1,10 @@
 General:
 Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
+Event system?
 Animations
 Fix dependencies folder and CMake
 Memory manager
 BGFX leaks
-Event system?
 Profiling
 Compiler switch to disable some setters in runtime
 Handle storage?
@@ -121,15 +121,6 @@ Rename dynamic text API
 Tooltips?
 
 Code:
-this for self invokes
-Add consts where no modifications are done
-Add final to classes
-Add inline
-Move enums to files
-Case surround with braces
-Remove virtual from places that don't need it
-Macro to mark final unless in editor mode
-
 Get/Set checks
 DLLs instead of static libs
 Middleware sections
@@ -137,3 +128,4 @@ Utility operators for types
 Check memory leaks
 Move logger to engine system
 Remove pointers where not needed
+default/delete modifiers

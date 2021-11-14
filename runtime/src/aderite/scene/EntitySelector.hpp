@@ -13,7 +13,7 @@ namespace scene {
  */
 class EntitySelector : public io::ISerializable {
 public:
-    ~EntitySelector() {};
+    virtual ~EntitySelector() {}
 
     /**
      * @brief Sets the name of the selector
@@ -30,16 +30,12 @@ public:
     /**
      * @brief Returns the name of the selector
      */
-    const std::string& getName() const {
-        return m_name;
-    }
+    const std::string& getName() const;
 
     /**
      * @brief Returns the scene of the selector
      */
-    const scene::Scene* getScene() const {
-        return p_scene;
-    }
+    const scene::Scene* getScene() const;
 
     /**
      * @brief Function invoked when an entity was added, during this function the selector should update it's entity list
@@ -51,7 +47,7 @@ public:
      * @brief Returns true if the specified entity is part of the selector, false otherwise
      * @param entity Entity instance
      */
-    virtual bool isSelected(scene::Entity* entity) = 0;
+    virtual bool isSelected(scene::Entity* entity) const = 0;
 
     /**
      * @brief Number of entities in the selector
@@ -69,8 +65,8 @@ public:
     virtual void regenerate() = 0;
 
     // Inherited from ISerializable
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 protected:
     scene::Scene* p_scene = nullptr;

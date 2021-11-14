@@ -26,9 +26,7 @@ public:
     /**
      * @brief Returns the scale of the collider
      */
-    const glm::vec3& getScale() const {
-        return p_scale;
-    }
+    const glm::vec3& getScale() const;
 
     /**
      * @brief Returns true if the collider acts as a trigger or not
@@ -38,7 +36,7 @@ public:
     /**
      * @brief Converts the collider to a trigger if true, if false converts to collider
      */
-    void setTrigger(bool value);
+    void setTrigger(bool value) const;
 
     /**
      * @brief Sets the actor of the shape
@@ -51,15 +49,15 @@ public:
     physics::PhysicsActor* getActor() const;
 
     // Inherited via ISerializable
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 protected:
     /**
      * @brief Generate a geometry with specified globalScale
      * @return physx::PxGeometry instance
      */
-    virtual physx::PxGeometry* genGeometry() = 0;
+    virtual physx::PxGeometry* genGeometry() const = 0;
 
     /**
      * @brief Updates the geometry of the shape

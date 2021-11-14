@@ -82,97 +82,106 @@ public:
      * @brief Create a C# script instance object from generic C++ serializable object
      * @param serializable Serializable object
      * @return MonoObject instance
-    */
-    MonoObject* create(io::ISerializable* serializable);
+     */
+    MonoObject* create(io::ISerializable* serializable) const;
 
     /**
      * @brief Creates a C# script Entity object from C++ entity
      * @param entity Entity from which to create
      * @return MonoObject instance
      */
-    MonoObject* create(scene::Entity* entity);
+    MonoObject* create(scene::Entity* entity) const;
 
     /**
      * @brief Creates a C# mesh object from C++ asset
      * @param mesh Mesh from which to create
      * @return MonoObject instance
      */
-    MonoObject* create(asset::MeshAsset* mesh);
+    MonoObject* create(asset::MeshAsset* mesh) const;
 
     /**
      * @brief Creates a C# material object from C++ asset
      * @param material Material from which to create
      * @return MonoObject instance
      */
-    MonoObject* create(asset::MaterialAsset* material);
+    MonoObject* create(asset::MaterialAsset* material) const;
 
     /**
      * @brief Creates a C# audio object from C++ asset
      * @param audio Audio from which to create
      * @return MonoObject instance
      */
-    MonoObject* create(asset::AudioAsset* audio);
+    MonoObject* create(asset::AudioAsset* audio) const;
 
     /**
      * @brief Creates a C# audio source object from C++
      * @param source Source from which to create
      * @return MonoObject instance
      */
-    MonoObject* create(audio::AudioSource* source);
+    MonoObject* create(audio::AudioSource* source) const;
 
     /**
      * @brief Creates a C# trigger event object from C++
      * @param triggerEvent TriggerEvent object
      * @return MonoObject instance
      */
-    MonoObject* create(const physics::TriggerEvent& triggerEvent);
+    MonoObject* create(const physics::TriggerEvent& triggerEvent) const;
 
     /**
      * @brief Creates a C# collision event object from C++
      * @param collisionEvent CollisionEvent object
      * @return MonoObject instance
      */
-    MonoObject* create(const physics::CollisionEvent& collisionEvent);
+    MonoObject* create(const physics::CollisionEvent& collisionEvent) const;
 
     // Class getters
-    const ScriptSystem& getScriptSystem() const {
-        return m_system;
-    }
 
-    const Entity& getEntity() const {
-        return m_entity;
-    }
+    /**
+     * @brief Returns the script system mono information struct
+     */
+    const ScriptSystem& getScriptSystem() const;
 
-    const Mesh& getMesh() const {
-        return m_mesh;
-    }
+    /**
+     * @brief Returns the entity mono information struct
+     */
+    const Entity& getEntity() const;
 
-    const Material& getMaterial() const {
-        return m_material;
-    }
+    /**
+     * @brief Returns the mesh mono information struct
+     */
+    const Mesh& getMesh() const;
 
-    const Audio& getAudio() const {
-        return m_audio;
-    }
+    /**
+     * @brief Returns the material mono information struct
+     */
+    const Material& getMaterial() const;
 
-    const AudioSource& getAudioSource() const {
-        return m_audioSource;
-    }
+    /**
+     * @brief Returns the audio mono information struct
+     */
+    const Audio& getAudio() const;
 
-    const TriggerEvent& getTriggerEvent() const {
-        return m_triggerEvent;
-    }
+    /**
+     * @brief Returns the audio source mono information struct
+     */
+    const AudioSource& getAudioSource() const;
 
-    const CollisionEvent& getCollisionEvent() const {
-        return m_collisionEvent;
-    }
+    /**
+     * @brief Returns the trigger evnt mono information struct
+     */
+    const TriggerEvent& getTriggerEvent() const;
+
+    /**
+     * @brief Returns the collision event mono information struct
+     */
+    const CollisionEvent& getCollisionEvent() const;
 
 private:
     /**
      * @brief Handle mono exception object
      * @param exception Exception to handle
      */
-    void handleException(MonoObject* exception);
+    void handleException(MonoObject* exception) const;
 
     /**
      * @brief Generic instanced object creation function
@@ -181,7 +190,7 @@ private:
      * @param args Arguments to pass to constructor
      * @return MonoObject instance
      */
-    MonoObject* genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args);
+    MonoObject* genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args) const;
 
 private:
     ScriptSystem m_system;
