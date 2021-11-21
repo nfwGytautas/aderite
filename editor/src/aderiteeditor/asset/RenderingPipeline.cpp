@@ -8,7 +8,6 @@
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/pipeline/ScreenNode.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 namespace aderite {
 namespace asset {

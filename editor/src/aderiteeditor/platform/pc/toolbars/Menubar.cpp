@@ -1,0 +1,166 @@
+#include "Menubar.hpp"
+#include <filesystem>
+#include <vector>
+
+#include <imgui/imgui.h>
+
+#include "aderite/Aderite.hpp"
+#include "aderite/asset/MeshAsset.hpp"
+#include "aderite/audio/AudioController.hpp"
+#include "aderite/io/FileHandler.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/utility/Log.hpp"
+
+#include "aderiteeditor/compiler/ScriptCompiler.hpp"
+#include "aderiteeditor/platform/pc/modals/FileDialog.hpp"
+#include "aderiteeditor/shared/IEventSink.hpp"
+#include "aderiteeditor/shared/Project.hpp"
+#include "aderiteeditor/shared/State.hpp"
+
+namespace aderite {
+namespace editor {
+
+Menubar::Menubar() {}
+
+Menubar::~Menubar() {}
+
+bool Menubar::init() {
+    return true;
+}
+
+void Menubar::shutdown() {}
+
+void Menubar::render() {
+    if (!this->isProjectLoaded()) {
+        // No project so can't render this
+        return;
+    }
+
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("New project")) {
+                // TODO: Implement
+            }
+
+            if (ImGui::MenuItem("Save project")) {
+                editor::State::Sink->onSaveProject();
+            }
+
+            if (ImGui::MenuItem("Load project")) {
+                std::string file = FileDialog::selectFile("Select aderite project", {"Aderite project", "*.aproj"});
+
+                if (!file.empty()) {
+                    editor::State::Sink->onLoadProject(file);
+                }
+            }
+
+            ImGui::Separator();
+            if (ImGui::MenuItem("Exit")) {
+                ::aderite::Engine::get()->requestExit();
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Project")) {
+            if (ImGui::MenuItem("New scene")) {
+                /*m_textModal->setTitle("New scene");
+                m_textModal->setText("Scene name:");
+                m_textModal->setConfirmAction([&](const std::string& value) {
+                    editor::State::Sink->onNewScene(value);
+                });
+
+                m_textModal->show();*/
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Optimize Raw folder")) {
+                // Removes unused files from Raw folder
+                /*std::vector<std::filesystem::path> used = {};
+                for (asset::Asset* asset : *::aderite::Engine::getAssetManager()) {
+                    if (asset->isInGroup(asset::AssetGroup::DEPENDS_ON_RAW)) {
+                        switch (asset->type()) {
+                        case asset::AssetType::MESH: {
+                            used.push_back(::aderite::Engine::getAssetManager()->getRawDir() /
+                static_cast<asset::MeshAsset*>(asset)->getFields().SourceFile); break;
+                        }
+                        case asset::AssetType::SCENE:
+                        case asset::AssetType::MATERIAL: {
+                            continue;
+                        }
+                        default:
+                            LOG_WARN("Unimplemented type for DEPENDS_ON_RAW asset, aborting");
+                            return;
+                        }
+                    }
+                }
+
+                for (auto& file : std::filesystem::recursive_directory_iterator(::aderite::Engine::getAssetManager()->getRawDir())) {
+                    auto& it = std::find(used.begin(), used.end(), file.path());
+
+                    if (it == used.end()) {
+                        LOG_TRACE("Removing {0}", file.path().string());
+                        std::filesystem::remove(file.path());
+                    }
+                }*/
+            }
+
+            if (ImGui::MenuItem("Recompile shaders")) {
+                // Get all currently used shaders and then complete a unload/load cycle
+                LOG_WARN("Not implemented feature called 'Recompile shaders'");
+            }
+
+            if (ImGui::MenuItem("Link FMOD project")) {
+                // Required name and directory
+                std::string dir = FileDialog::selectDirectory();
+                editor::State::Project->linkFmodProject(dir);
+            }
+
+            if (ImGui::MenuItem("Reload FMOD audio banks")) {
+                auto fmodProject = editor::State::Project->getFmodProjectDir();
+                if (std::filesystem::exists(fmodProject)) {
+                    // Copy master and strings bank
+                    const auto copyOptions = std::filesystem::copy_options::overwrite_existing;
+
+                    // Copy files
+                    std::filesystem::copy(fmodProject, editor::State::Project->getRootDir() / "Data/", copyOptions);
+
+                    // Rename master and strings
+                    std::filesystem::rename(editor::State::Project->getRootDir() / "Data/Master.bank",
+                                            aderite::Engine::getFileHandler()->pathToReserved(io::FileHandler::Reserved::MasterAudioBank));
+                    std::filesystem::rename(editor::State::Project->getRootDir() / "Data/Master.strings.bank",
+                                            aderite::Engine::getFileHandler()->pathToReserved(io::FileHandler::Reserved::StringsAudioBank));
+
+                    // Tell aderite audio engine to reload them
+                    ::aderite::Engine::getAudioController()->loadMasterBank();
+                }
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Scripting")) {
+            if (ImGui::MenuItem("Compile scripts")) {
+                // Compile
+                LOG_TRACE("Compiling project scripts");
+                compiler::ScriptCompiler sc;
+                // TODO: Results, errors, warnings, etc.
+                sc.compile();
+
+                // Reload
+                LOG_TRACE("Reloading scripts");
+                ::aderite::Engine::getScriptManager()->loadAssemblies();
+            }
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenuBar();
+    }
+
+    //m_textModal->render();
+}
+
+} // namespace editor
+} // namespace aderite

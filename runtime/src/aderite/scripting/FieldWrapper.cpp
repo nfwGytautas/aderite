@@ -46,7 +46,12 @@ io::ISerializable* FieldWrapper::getSerializable() const {
 
     // Get the instance part of the object
     MonoClassField* intanceField = mono_class_get_field_from_name(mono_object_get_class(fieldValue), "Instance");
-    mono_field_get_value(m_instance, m_field, &result);
+
+    if (intanceField == nullptr) {
+        return nullptr;
+    }
+
+    mono_field_get_value(fieldValue, intanceField, &result);
 
     // Return the result
     return result;

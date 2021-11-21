@@ -10,7 +10,6 @@
 #include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/runtime/OperationArray.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 namespace aderite {
 namespace node {

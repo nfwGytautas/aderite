@@ -13,7 +13,7 @@
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/vfs/File.hpp"
 #include "aderiteeditor/vfs/VFS.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
+#include "aderiteeditor/platform/pc/backend/node/imnodes.h"
 
 namespace aderite {
 namespace node {
