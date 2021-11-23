@@ -48,6 +48,33 @@ public:
     void setTitle(const std::string& title) const;
 
     /**
+     * @brief Set the new position of the window
+     * @param position Position of the window
+     */
+    void setPosition(const glm::i32vec2& position) const;
+
+    /**
+     * @brief Returns the current position of the window
+     */
+    glm::i32vec2 getPosition() const;
+
+    /**
+     * @brief Centers the window to the screen
+     */
+    void centerOnScreen() const;
+
+    /**
+     * @brief Moves the window by specified delta
+     * @param delta Position delta
+     */
+    void moveWindow(const glm::i32vec2& delta) const;
+
+    /**
+     * @brief Minimize the window
+     */
+    void minimize() const;
+
+    /**
      * @brief Returns the native system handle of the display, for example on windows this will return HWND
      */
     void* getNativeHandle() const;

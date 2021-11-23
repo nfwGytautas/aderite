@@ -1,131 +1,116 @@
 General:
-Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
-Event system?
-Animations
-Fix dependencies folder and CMake
-Memory manager
-BGFX leaks
-Profiling
-Compiler switch to disable some setters in runtime
-Handle storage?
+	Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
+	Event system?
+	Animations
+	Fix dependencies folder and CMake
+	Memory manager
+	BGFX leaks
+	Profiling
+	Compiler switch to disable some setters in runtime
+	Handle storage?
 
 Licensing:
-FMOD splash screen
-PhysX splash screen
-bgfx splash screen
+	FMOD splash screen
+	PhysX splash screen
+	bgfx splash screen
 
-Serialization:
-Name resolve
-Return true/false on writeUntrackedType, fillData
-
-Asset manager:
-Asset ref counting
-
-Node editor:
-Clear graph on new select
-Constraints for number of nodes and deletion
-Property for ALL items
-
-FPRP:
-Array operation
-Operation resize events
-Base vertex shader compiling
-Varying generation
-Compiling shaders from C++ code
-Pipeline verification
-
-Rendering:
-BGFX multithread encoder
-
-Audio:
-3D audio
-Clear finished one shot instances
-
-Physics:
-Move kinematic to base actor
-Multithreading
-Physics material asset
-Disable/enable actors at runtime
-Disable/enable colliders at runtime
-Broad-Phase callbacks
-Scene queries
-Collision layers
-
-Selectors:
-Any/All for TagSelector
-
-VFS:
-Refactor to be more intuitive
-Remove files that don't physically exist anymore
-
-Scripting:
-Generate .csproj file for easier coding
-Dont kill entire editor on script run error
-Load on project open
+Runtime:
+	Serialization:
+		Name resolve
+		Return true/false on writeUntrackedType, fillData
+	Asset manager:
+		Asset ref counting
+	FPRP:
+		Array operation
+		Operation resize events
+		Base vertex shader compiling
+		Varying generation
+		Compiling shaders from C++ code
+		Pipeline verification
+	Rendering:
+		BGFX multithread encoder
+	Audio:
+		3D audio
+		Clear finished one shot instances
+	Physics:
+		Move kinematic to base actor
+		Multithreading
+		Physics material asset
+		Disable/enable actors at runtime
+		Disable/enable colliders at runtime
+		Broad-Phase callbacks
+		Scene queries
+		Collision layers
+	Selectors:
+		Any/All for TagSelector
+	Scripting:
+		Dont kill entire editor on script run error
+		Load on project open
+	Code:
+		Get/Set checks
+		DLLs instead of static libs
+		Middleware sections
+		Utility operators for types
+		Check memory leaks
+		Move logger to engine system
+		Remove pointers where not needed
+		default/delete modifiers
 
 Editor:
-Move objects for editor so that they don't get destroyed on pipeline change
-Prefabs
-Include BGFX stats to ImGui
-Recovery from failure
-Rework pin type to be enum
-Move radio buttons for entities to Base tab
-Icons
-Provide default utility scripts
-List item select (merge SelectScriptModal, SelectClipModal)
-Enable depth for wireframe
-Split inspector to not be so monolithic
-On material type property delete link gets disconnected
-Mass on dynamic body not alligned
-Delete renaming content asset browser
-Collider list preview window
-Don't compile when loading project
-Loading bar
-Dont load scripts if they are out of date
-Shared drag drop fields API (MeshDragDrop, MaterialDragDrop, etc.) elements
-Modal base class
-Speed up load time on project load
-Block from naming properties the same name
-Open graph when selecting apropriate asset
-Redo most of it
-Refactor drag and drop API
-Default pipeline for scenes
-Show if have a valid data source for texture and mesh
-Load last opened project
-On open directory show in navigator
-Directory renaming in tree node
-Navigator visual bug fixes
-Component architecture rethink
-Node editor middle mouse also moves scene view
-Copy bgfx shader includes to Raw/
-Internal system UI windows (loaded assets, asset manager, etc.)
-Unexpected exit or corrupted save restoration
-Fix modal architecture
-Doube click edit component
-Raw folder browser with filtering
-Log window
-Window resize for viewport
-Drag drop files from system
-Double clicking drag drop target show in asset browser
-3D gizmo
-Create build command, to build entire game
-Limit toolbar height
-Mass slider fill entire range
-Block edit on when in game mode
-Reset game state on game mode switch
-Master banks dir
-Link studio Build dir with editor
-Detect unloaded bank files
-Free scene on new project create
-Rename dynamic text API
-Tooltips?
-
-Code:
-Get/Set checks
-DLLs instead of static libs
-Middleware sections
-Utility operators for types
-Check memory leaks
-Move logger to engine system
-Remove pointers where not needed
-default/delete modifiers
+	VFS:
+		Load textures for preview on directory change
+		Unload texture previews on directory change
+		Refactor to be more intuitive
+		Remove files that don't physically exist anymore
+	Node editor:
+		Clear graph on new select
+		Constraints for number of nodes and deletion
+		Property for ALL items
+	Must have:
+		Reset game state on game mode switch
+		Block edit on when in game mode
+		3D gizmo
+		Create build command, to build entire game
+		Prefabs
+	Icons:
+		Handmade icons
+		Actual mesh instead of an icon in asset browser (cache result)
+		Actual materials instead of an icon in asset browser (cache result)
+	Panels/Components:
+		Include BGFX stats to ImGui
+		Loading bar
+		Internal system UI windows (loaded assets, asset manager, etc.)
+		Log window
+	Utility:
+		Provide default utility scripts
+		Speed up load time on project load
+		Default pipeline for scenes
+		Load last opened project
+		Drag drop files from system
+		Link FMOD studio Build dir with editor
+		Generate .csproj file for easier coding
+	Code:
+		Rework pin type to be enum
+		List item select (merge SelectScriptModal, SelectClipModal)
+		Split inspector to not be so monolithic
+		Shared drag drop fields API (MeshDragDrop, MaterialDragDrop, etc.) elements
+		Modal base class
+	UI improvements:
+		Remove tab bar button
+		Move radio buttons for entities to Base tab
+		Enable depth for wireframe
+		Delete renaming content asset browser
+		Open graph when selecting apropriate asset
+		Show if have a valid data source for texture and mesh
+		Directory renaming in tree node
+		Double clicking drag drop target show in asset browser
+	Bugs:
+		On material type property delete link gets disconnected
+		Recovery from failure
+		Block from naming properties the same name
+		Node editor middle mouse also moves scene view
+		Window resize for viewport
+	Maybe:
+		Don't compile when loading project
+		Dont load scripts if they are out of date
+		Tooltips

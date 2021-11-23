@@ -5,7 +5,6 @@
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 namespace aderite {
 namespace node {

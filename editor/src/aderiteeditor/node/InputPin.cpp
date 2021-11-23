@@ -4,7 +4,6 @@
 
 #include "aderiteeditor/node/Link.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 namespace aderite {
 namespace node {

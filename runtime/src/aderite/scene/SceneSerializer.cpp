@@ -104,24 +104,24 @@ bool SceneSerializer::deserialize(Scene* scene, io::Serializer* serializer, cons
 
     // Entities
     LOG_TRACE("[Asset] Deserializing entities {0}", scene->getHandle());
-    LOG_ERROR("[Asset] Failed to deserialize entities for {0}", scene->getHandle());
     if (!this->deserializeEntities(scene, serializer, data)) {
+        LOG_ERROR("[Asset] Failed to deserialize entities for {0}", scene->getHandle());
         return false;
     }
     LOG_INFO("[Asset] {0} entities deserialized", scene->getHandle());
 
     // Audio sources
     LOG_TRACE("[Asset] Deserializing audio {0}", scene->getHandle());
-    LOG_ERROR("[Asset] Failed to deserialize audio for {0}", scene->getHandle());
     if (!this->deserializeAudio(scene, serializer, data)) {
+        LOG_ERROR("[Asset] Failed to deserialize audio for {0}", scene->getHandle());
         return false;
     }
     LOG_INFO("[Asset] {0} audio deserialized", scene->getHandle());
 
     // Physics
     LOG_TRACE("[Asset] Deserializing physics {0}", scene->getHandle());
-    LOG_ERROR("[Asset] Failed to deserialize physics for {0}", scene->getHandle());
     if (!this->deserializePhysics(scene, serializer, data)) {
+        LOG_ERROR("[Asset] Failed to deserialize physics for {0}", scene->getHandle());
         return false;
     }
     LOG_INFO("[Asset] {0} physics deserialized", scene->getHandle());

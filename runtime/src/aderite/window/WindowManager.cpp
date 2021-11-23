@@ -73,6 +73,39 @@ void WindowManager::shutdown() {
     LOG_INFO("[Window] Window manager shutdown");
 }
 
+void WindowManager::setPosition(const glm::i32vec2& position) const {
+    glfwSetWindowPos(m_impl->ImplementationWindow, position.x, position.y);
+}
+
+glm::i32vec2 WindowManager::getPosition() const {
+    glm::i32vec2 pos;
+    glfwGetWindowPos(m_impl->ImplementationWindow, &pos.x, &pos.y);
+    return pos;
+}
+
+void WindowManager::centerOnScreen() const {
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+    // Get center
+    glm::i32vec2 center = {mode->width / 2, mode->height / 2};
+
+    // Get size
+    glm::i32vec2 size = this->getSize();
+
+    // Calculate new position and set it
+    glm::i32vec2 newPos = center - (size / 2);
+    this->setPosition(newPos);
+}
+
+void WindowManager::moveWindow(const glm::i32vec2& delta) const {
+    glm::i32vec2 position = this->getPosition();
+    this->setPosition(position + delta);
+}
+
+void WindowManager::minimize() const {
+    glfwIconifyWindow(m_impl->ImplementationWindow);
+}
+
 void* WindowManager::getNativeHandle() const {
     return static_cast<void*>(m_impl->NativeWindow);
 }
