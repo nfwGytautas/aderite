@@ -251,8 +251,8 @@ void EditorUI::setupImGuiStyle() {
     constexpr float secondaryBgHue = 25.0f / 255.0f;
     constexpr float textColorHue = 255.0f / 255.0f;
     constexpr float hoverHue = 72.0f / 255.0f;
-    constexpr float titleHue = 63.0f / 255.0f;
-    constexpr float activeTabHue = 30.0f / 255.0f;
+    constexpr float titleHue = 96.0f / 255.0f;
+    constexpr float activeTabHue = 72.0f / 255.0f;
     constexpr float checkmarkHue = 154.0f / 255.0f;
 
     constexpr float headerBgHue = 62.0f / 255.0f;
@@ -279,6 +279,9 @@ void EditorUI::setupImGuiStyle() {
         style.WindowRounding = 0.0f;
     }
 
+    // Font
+    io.Fonts->AddFontFromFileTTF("res/fonts/Consolas.ttf", 14);
+
     // Apply to style object
     style.FrameBorderSize = 1.0f;
 
@@ -286,8 +289,8 @@ void EditorUI::setupImGuiStyle() {
     style.Colors[ImGuiCol_WindowBg] = ImVec4(mainBgHue, mainBgHue, mainBgHue, 1.0);
     style.Colors[ImGuiCol_PopupBg] = ImVec4(secondaryBgHue, secondaryBgHue, secondaryBgHue, 1.0);
 
-    style.Colors[ImGuiCol_TitleBg] = ImVec4(mainBgHue, mainBgHue, mainBgHue, 1.0);
-    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(mainBgHue, mainBgHue, mainBgHue, 1.0);
+    style.Colors[ImGuiCol_TitleBg] = ImVec4(titleHue, titleHue, titleHue, 1.0);
+    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(titleHue, titleHue, titleHue, 1.0);
     style.Colors[ImGuiCol_MenuBarBg] = ImVec4(mainBgHue, mainBgHue, mainBgHue, 1.0);
 
     // Tabs

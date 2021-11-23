@@ -58,6 +58,8 @@ Runtime:
 
 Editor:
 	VFS:
+		Load textures for preview on directory change
+		Unload texture previews on directory change
 		Refactor to be more intuitive
 		Remove files that don't physically exist anymore
 	Node editor:
@@ -69,13 +71,11 @@ Editor:
 		Block edit on when in game mode
 		3D gizmo
 		Create build command, to build entire game
+		Prefabs
 	Icons:
 		Handmade icons
-		Actual textures instead of an icon in asset browser (cache result)
 		Actual mesh instead of an icon in asset browser (cache result)
 		Actual materials instead of an icon in asset browser (cache result)
-	Features:
-		Prefabs	
 	Panels/Components:
 		Include BGFX stats to ImGui
 		Loading bar
@@ -96,6 +96,7 @@ Editor:
 		Shared drag drop fields API (MeshDragDrop, MaterialDragDrop, etc.) elements
 		Modal base class
 	UI improvements:
+		Remove tab bar button
 		Move radio buttons for entities to Base tab
 		Enable depth for wireframe
 		Delete renaming content asset browser

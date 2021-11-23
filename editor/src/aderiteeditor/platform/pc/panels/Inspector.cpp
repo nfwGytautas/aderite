@@ -103,6 +103,8 @@ void Inspector::renderEntity() {
 
     ImGuiTabBarFlags tabBarFlags = ImGuiTabBarFlags_None;
     if (ImGui::BeginTabBar("EntityTabBar", ImGuiTabBarFlags_None)) {
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+        
         if (ImGui::BeginTabItem("Base")) {
             ImGui::Text("Transform");
 
@@ -305,6 +307,8 @@ void Inspector::renderEntity() {
 
             ImGui::EndTabItem();
         }
+
+        ImGui::PopStyleVar();
 
         ImGui::EndTabBar();
     }

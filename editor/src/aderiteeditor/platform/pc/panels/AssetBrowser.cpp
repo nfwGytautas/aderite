@@ -16,6 +16,7 @@
 
 #include "aderiteeditor/asset/EditorMaterialType.hpp"
 #include "aderiteeditor/asset/RenderingPipeline.hpp"
+#include "aderiteeditor/resources/EditorIcons.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/shared/Config.hpp"
 #include "aderiteeditor/shared/DragDropObject.hpp"
@@ -60,7 +61,7 @@ void AssetBrowser::renderItems() {
     }
 
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
-    
+
     if (ImGui::BeginTable("AssetItemBrowserTable", columnCount, flags)) {
         // Context menu
         if (ImGui::BeginPopupContextWindow()) {
@@ -111,42 +112,43 @@ void AssetBrowser::renderItems() {
         // Files
         for (vfs::File* file : m_currentDir->getFiles()) {
             io::SerializableObject* object = ::aderite::Engine::getSerializer()->getOrRead(file->getHandle());
-            std::string iconName = "";
+            bgfx::TextureHandle icon = BGFX_INVALID_HANDLE;
 
             ImGui::TableNextColumn();
 
             switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
             case reflection::RuntimeTypes::SCENE: {
-                iconName = "scene";
+                icon = editor::EditorIcons::getInstance().getIcon("scene");
                 break;
             }
             case reflection::RuntimeTypes::MATERIAL: {
-                iconName = "material";
+                icon = editor::EditorIcons::getInstance().getIcon("material");
                 break;
             }
             case reflection::RuntimeTypes::MESH: {
-                iconName = "mesh";
+                icon = editor::EditorIcons::getInstance().getIcon("mesh");
                 break;
             }
             case reflection::RuntimeTypes::TEXTURE: {
-                iconName = "texture";
+                icon = static_cast<asset::TextureAsset*>(object)->getTextureHandle();
                 break;
             }
             case reflection::RuntimeTypes::MAT_TYPE: {
-                iconName = "material_type";
+                icon = editor::EditorIcons::getInstance().getIcon("material_type");
                 break;
             }
             case reflection::RuntimeTypes::PIPELINE: {
-                iconName = "pipeline";
+                icon = editor::EditorIcons::getInstance().getIcon("pipeline");
                 break;
             }
             case reflection::RuntimeTypes::AUDIO: {
-                iconName = "audio_clip";
+                icon = editor::EditorIcons::getInstance().getIcon("audio_clip");
                 break;
             }
             }
 
-            if (this->renderIconButton(iconName, cellSize, cellSize)) {
+            if (this->renderImageButton(icon, cellSize, cellSize)) {
+
             }
 
             // Context menu
@@ -220,7 +222,7 @@ void AssetBrowser::renderItems() {
 
         ImGui::EndTable();
     }
-    
+
     ImGui::PopStyleVar();
 }
 

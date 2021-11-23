@@ -27,6 +27,10 @@ bool UIComponent::renderIconButton(const std::string& name, size_t width, size_t
     return ImGui::ImageButton((void*)(intptr_t)icon.idx, ImVec2(width, height), ImVec2(0, 1), ImVec2(1, 0), 0);
 }
 
+bool UIComponent::renderImageButton(bgfx::TextureHandle texture, size_t width, size_t height, const glm::vec2& uv0, const glm::vec2& uv1) {
+    return ImGui::ImageButton((void*)(intptr_t)texture.idx, ImVec2(width, height), ImVec2(uv0.x, uv0.y), ImVec2(uv1.x, uv1.y), 0);
+}
+
 void UIComponent::setCursorToCenter(const size_t elementWidth, const size_t elementHeight) {
     const ImVec2 wndSize = ImGui::GetWindowSize();
     const ImVec2 availableSize = ImGui::GetContentRegionAvail();

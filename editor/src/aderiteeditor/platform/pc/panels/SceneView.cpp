@@ -52,7 +52,7 @@ void SceneView::render() {
     m_size.y = viewportPanelSize.y;
     editor::State::EditorCamera->onViewportResize(m_size);
 
-    ImGui::Image((void*)(intptr_t)m_fbth.idx, viewportSize, ImVec2(1, 0), ImVec2(0, 1));
+    ImGui::Image((void*)(intptr_t)m_fbth.idx, viewportSize, ImVec2(0, 0), ImVec2(1, 1));
 
     ImGui::End();
     ImGui::PopStyleVar();

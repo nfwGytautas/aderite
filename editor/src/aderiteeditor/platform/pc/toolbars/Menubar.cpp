@@ -10,6 +10,7 @@
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/window/WindowManager.hpp"
 
 #include "aderiteeditor/compiler/ScriptCompiler.hpp"
 #include "aderiteeditor/platform/pc/modals/FileDialog.hpp"
@@ -158,8 +159,6 @@ void Menubar::render() {
 
         ImGui::EndMenuBar();
     }
-
-    //m_textModal->render();
 }
 
 } // namespace editor

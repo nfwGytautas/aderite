@@ -2,6 +2,9 @@
 
 #include <imgui/imgui.h>
 
+#include "aderite/Aderite.hpp"
+#include "aderite/window/WindowManager.hpp"
+
 #include "aderiteeditor/platform/pc/modals/FileDialog.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
 #include "aderiteeditor/shared/State.hpp"
@@ -11,6 +14,9 @@ namespace aderite {
 namespace editor {
 
 void StartupModal::show() {
+    // Center the window
+    ::aderite::Engine::getWindowManager()->centerOnScreen();
+
     m_visible = true;
     m_show = true;
 }

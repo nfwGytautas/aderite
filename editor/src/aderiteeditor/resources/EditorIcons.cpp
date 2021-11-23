@@ -1,9 +1,12 @@
 #include "EditorIcons.hpp"
 
+#include <GLFW/glfw3.h>
 #include <stb_image.h>
 
+#include "aderite/Aderite.hpp"
 #include "aderite/io/Loader.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/window/WindowManager.hpp"
 
 namespace aderite {
 namespace editor {
@@ -106,6 +109,21 @@ bool EditorIcons::loadIcon(const std::string& name, const std::filesystem::path&
         LOG_ERROR("[Editor] Failed to resolve format");
         return false;
     }
+    }
+
+    // Title icon
+    if (name == "logo") {
+        // TODO: Type and error check
+        GLFWimage icons[1];
+
+        // Fill data
+        icons[0].height = height;
+        icons[0].width = width;
+        icons[0].pixels = data;
+
+        // Set icon
+        GLFWwindow* window = static_cast<GLFWwindow*>(::aderite::Engine::getWindowManager()->getImplementationHandle());
+        glfwSetWindowIcon(window, 1, icons);
     }
 
     // Create handle

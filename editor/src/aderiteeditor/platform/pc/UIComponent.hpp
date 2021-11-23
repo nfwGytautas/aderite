@@ -2,6 +2,9 @@
 
 #include <string>
 
+#include <bgfx/bgfx.h>
+#include <glm/glm.hpp>
+
 namespace aderite {
 namespace editor {
 
@@ -53,14 +56,26 @@ protected:
      * @param width Width of the icon
      * @param height Height of the icon
      * @return True if clicked, false otherwise
-    */
+     */
     bool renderIconButton(const std::string& name, size_t width, size_t height);
+
+    /**
+     * @brief Renders an image button
+     * @param texture Texture of the button
+     * @param width Width of the icon
+     * @param height Height of the icon
+     * @param uv0 UV coordinate 1
+     * @param uv1 UV cooridnate 2
+     * @return True if image clicked, false otherwise
+     */
+    bool renderImageButton(bgfx::TextureHandle texture, size_t width, size_t height, const glm::vec2& uv0 = glm::vec2(0, 0),
+                           const glm::vec2& uv1 = glm::vec2(1, 1));
 
     /**
      * @brief Sets the imgui cursor to the center of the current window
      * @param elementWidth Element width
      * @param elementHeight Element height
-    */
+     */
     void setCursorToCenter(const size_t elementWidth, const size_t elementHeight);
 
 private:
