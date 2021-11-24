@@ -16,6 +16,7 @@ enum class FieldType {
     System,
     Audio,
     AudioSource,
+    Prefab,
 };
 
 } // namespace scripting

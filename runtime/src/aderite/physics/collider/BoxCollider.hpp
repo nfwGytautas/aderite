@@ -26,6 +26,7 @@ public:
     reflection::Type getType() const override;
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    Collider* clone() const override;
 
 protected:
     // Inherited via Collider

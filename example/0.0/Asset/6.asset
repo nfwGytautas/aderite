@@ -1,0 +1,32 @@
+Version: 2021_10_15r1
+Type: 7
+Handle: 6
+Data:
+  Prototype:
+    Type: 41
+    Data:
+      Prefab: ~
+      Transform:
+        Type: 40
+        Data:
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [1, 1, 1]
+      Tags: 1
+      Name: BoingBox1
+      Actor:
+        Type: 91
+        Data:
+          Colliders:
+            - Type: 51
+              Data:
+                IsTrigger: false
+                Size: [1, 1, 1]
+          IsKinematic: false
+          HasGravity: true
+          Mass: 1
+      Renderable:
+        Type: 42
+        Data:
+          Mesh: 2
+          Material: 4

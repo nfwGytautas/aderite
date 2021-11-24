@@ -122,6 +122,12 @@ public:
      */
     LibClassLocator& getLocator();
 
+    /**
+     * @brief Creates a MonoString from the specified value
+     * @return MonoString object
+    */
+    MonoString* string(const char* value) const;
+
 private:
     /**
      * @brief Resolves all system classes in the loaded assembly

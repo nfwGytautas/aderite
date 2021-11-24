@@ -21,6 +21,7 @@ enum class RuntimeTypes : Type {
     MAT_TYPE = 4,
     PIPELINE = 5,
     AUDIO = 6,
+    PREFAB = 7,
 
     // Audio
     AUDIO_SOURCE = 20,
@@ -51,7 +52,8 @@ enum class RuntimeTypes : Type {
     // Scripting
     SCRIPT_SYSTEM = 200,
 
-    TAG_SELECTOR = 210,
+    ENTITY_SELECTOR = 210,
+    TAG_SELECTOR = 211,
 
     // Last element of runtime types, used to specify the end runtime serializables
     RESERVED = 250,

@@ -39,6 +39,13 @@ bool BoxCollider::deserialize(io::Serializer* serializer, const YAML::Node& data
     return true;
 }
 
+Collider* BoxCollider::clone() const {
+    BoxCollider* collider = new BoxCollider();
+    collider->setSize(this->m_size);
+    this->cloneInto(collider);
+    return collider;
+}
+
 physx::PxGeometry* BoxCollider::genGeometry() const {
     return new physx::PxBoxGeometry((m_size.x * p_scale.x), (m_size.y * p_scale.y), (m_size.z * p_scale.z));
 }

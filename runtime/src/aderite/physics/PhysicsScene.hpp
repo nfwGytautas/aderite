@@ -1,9 +1,11 @@
 #pragma once
 
 #include <PxSimulationEventCallback.h>
+#include <glm/glm.hpp>
 
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
+#include "aderite/physics/PhysicsSceneQuery.hpp"
 #include "aderite/scene/Forward.hpp"
 
 namespace aderite {
@@ -40,6 +42,16 @@ public:
      * @brief Returns a vector of all actors in this scene
      */
     const std::vector<PhysicsActor*>& getActors() const;
+
+    /**
+     * @brief Do a first hit raycast
+     * @param result RaycastHit object where to store result
+     * @param from Point where to raycast from
+     * @param direction Direction which to raycast in
+     * @param maxDistance Maximum distance of the ray
+     * @return True if there was a hit, false otherwise
+     */
+    bool raycastSingle(RaycastHit& result, const glm::vec3& from, const glm::vec3& direction, float maxDistance);
 
 private:
     // Inherited via PxSimulationEventCallback

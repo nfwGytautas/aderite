@@ -208,6 +208,10 @@ LibClassLocator& ScriptManager::getLocator() {
     return m_locator;
 }
 
+MonoString* ScriptManager::string(const char* value) const {
+    return mono_string_new(m_currentDomain, value);
+}
+
 void ScriptManager::resolveSystemNames() {
     LOG_TRACE("[Scripting] Resolving systems");
     m_knownSystems.clear();

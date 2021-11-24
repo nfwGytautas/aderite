@@ -8,6 +8,8 @@ namespace Aderite
     /// </summary>
     public class Entity
     {
+        public string Name { get { return __GetEntityName(Instance); } }
+
         IntPtr Instance = IntPtr.Zero;
 
         internal Entity(IntPtr instance)
@@ -23,5 +25,8 @@ namespace Aderite
         {
             return Instance;
         }
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern static string __GetEntityName(IntPtr instance);
     }
 }

@@ -128,5 +128,9 @@ void Collider::createShape() {
     delete geometry;
 }
 
+void Collider::cloneInto(Collider* collider) const {
+    collider->setTrigger(collider->isTrigger());
+}
+
 } // namespace physics
 } // namespace aderite

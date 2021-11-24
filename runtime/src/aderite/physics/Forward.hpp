@@ -19,6 +19,7 @@ class DynamicActor;
 class StaticActor;
 
 class Collider;
+class RaycastHit;
 
 } // namespace physics
 } // namespace aderite

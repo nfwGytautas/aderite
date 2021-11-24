@@ -18,6 +18,11 @@
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
 
+// TEMPORARY
+#include "aderite/physics/PhysicsScene.hpp"
+#include "aderite/scene/Scene.hpp"
+#include "aderite/scene/SceneManager.hpp"
+
 namespace aderite {
 namespace editor {
 
@@ -152,6 +157,24 @@ void Menubar::render() {
                 // Reload
                 LOG_TRACE("Reloading scripts");
                 ::aderite::Engine::getScriptManager()->loadAssemblies();
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Debug")) {
+            if (ImGui::MenuItem("Do action")) {
+                static float y = 2.0f;
+                physics::RaycastHit result1;
+                physics::RaycastHit result2;
+                ::aderite::Engine::getSceneManager()->getCurrentScene()->getPhysicsScene()->raycastSingle(result1, {0.0f, y, 0.0f},
+                                                                                                          {0.0f, 1.0f, 0.0f}, 50);
+
+                ::aderite::Engine::getSceneManager()->getCurrentScene()->getPhysicsScene()->raycastSingle(result2, {0.0f, y, 0.0f},
+                                                                                                          {0.0f, -1.0f, 0.0f}, 50);
+
+                LOG_TRACE("{0}", result1.Distance);
+                LOG_TRACE("{0}", result2.Distance);
             }
 
             ImGui::EndMenu();

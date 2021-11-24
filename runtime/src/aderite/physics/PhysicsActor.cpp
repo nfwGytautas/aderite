@@ -31,6 +31,7 @@ PhysicsActor::~PhysicsActor() {
         }
 
         p_actor->release();
+        p_actor->userData = nullptr;
         p_actor = nullptr;
     } else {
         LOG_WARN("[Physics] {0:p} doesn't have an attached PhysX actor", static_cast<void*>(this));
@@ -80,6 +81,14 @@ void PhysicsActor::setEntity(scene::Entity* entity) {
     LOG_TRACE("[Physics] Changing {0:p} entity to {1:p}, was {2:p}", static_cast<void*>(this), static_cast<void*>(entity),
               static_cast<void*>(m_entity));
     m_entity = entity;
+
+    // Set collider scales
+    if (m_entity != nullptr) {
+        const scene::Transform* transform = m_entity->getTransform();
+        for (Collider* collider : m_colliders) {
+            collider->setScale(transform->scale());
+        }
+    }
 }
 
 scene::Entity* PhysicsActor::getEntity() const {
@@ -165,6 +174,13 @@ bool aderite::physics::PhysicsActor::deserialize(io::Serializer* serializer, con
 }
 
 aderite::physics::PhysicsActor::PhysicsActor() {}
+
+void aderite::physics::PhysicsActor::cloneInto(PhysicsActor* actor) const {
+    // Colliders
+    for (Collider* collider : m_colliders) {
+        actor->addCollider(collider->clone());
+    }
+}
 
 } // namespace physics
 } // namespace aderite

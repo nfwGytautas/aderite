@@ -31,5 +31,15 @@ bool StaticActor::deserialize(io::Serializer* serializer, const YAML::Node& data
     return true;
 }
 
+PhysicsActor* StaticActor::clone() const {
+    StaticActor* actor = new StaticActor();
+    
+    // Properties
+
+    // Colliders
+    this->cloneInto(actor);
+    return actor;
+}
+
 } // namespace physics
 } // namespace aderite

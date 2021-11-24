@@ -39,7 +39,6 @@ Runtime:
 		Disable/enable actors at runtime
 		Disable/enable colliders at runtime
 		Broad-Phase callbacks
-		Scene queries
 		Collision layers
 	Selectors:
 		Any/All for TagSelector
@@ -71,7 +70,6 @@ Editor:
 		Block edit on when in game mode
 		3D gizmo
 		Create build command, to build entire game
-		Prefabs
 	Icons:
 		Handmade icons
 		Actual mesh instead of an icon in asset browser (cache result)
@@ -89,11 +87,11 @@ Editor:
 		Drag drop files from system
 		Link FMOD studio Build dir with editor
 		Generate .csproj file for easier coding
+		Physics raycast debug visuals
 	Code:
 		Rework pin type to be enum
 		List item select (merge SelectScriptModal, SelectClipModal)
 		Split inspector to not be so monolithic
-		Shared drag drop fields API (MeshDragDrop, MaterialDragDrop, etc.) elements
 		Modal base class
 	UI improvements:
 		Remove tab bar button
@@ -110,6 +108,7 @@ Editor:
 		Block from naming properties the same name
 		Node editor middle mouse also moves scene view
 		Window resize for viewport
+		Drag drop files to folders
 	Maybe:
 		Don't compile when loading project
 		Dont load scripts if they are out of date

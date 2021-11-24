@@ -38,6 +38,12 @@ public:
     void addEntity(Entity* entity);
 
     /**
+     * @brief Remove entity from the scene
+     * @param entity Entity to remove
+    */
+    void removeEntity(Entity* entity);
+
+    /**
      * @brief Adds a script system to the scene
      * @param system System to add
      */

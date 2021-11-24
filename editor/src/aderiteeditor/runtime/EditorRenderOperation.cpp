@@ -70,6 +70,10 @@ void EditorRenderOperation::execute(rendering::PipelineState* state) {
 
     // Colliders and triggers
     for (scene::Entity* entity : currentScene->getEntities()) {
+        if (entity->getScene() != currentScene) {
+            continue;
+        }
+
         physics::PhysicsActor* actor = entity->getActor();
         if (actor != nullptr) {
             for (physics::Collider* collider : actor->getColliders()) {
@@ -110,8 +114,6 @@ void EditorRenderOperation::updateUniform() {
 }
 
 void EditorRenderOperation::renderBoxCollider(physics::BoxCollider* collider, const scene::Transform* transform) {
-    glm::vec3 extents = collider->getSize();
-
     glm::mat4 rotation = glm::toMat4(transform->rotation());
     glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), transform->position()) * rotation *
                                 glm::scale(glm::mat4(1.0f), (transform->scale() * collider->getSize()));

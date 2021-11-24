@@ -188,6 +188,16 @@ namespace Aderite
         }
 
 		/// <summary>
+		/// Returns true if the specified key was previously held down and released this frame
+		/// </summary>
+		/// <param name="key">Key code</param>
+		/// <returns>True if key was released this frame, false otherwise</returns>
+		public static bool WasKeyReleased(Key key)
+        {
+			return __WasKeyReleased(key);
+        }
+
+		/// <summary>
 		/// Returns true if the specified key is currently down
 		/// </summary>
 		/// <param name="key">Key code</param>
@@ -226,6 +236,9 @@ namespace Aderite
 
 		[MethodImpl(MethodImplOptions.InternalCall)]
 		private extern static bool __IsKeyDown(Key key);
+
+		[MethodImpl(MethodImplOptions.InternalCall)]
+		private extern static bool __WasKeyReleased(Key key);
 
 		[MethodImpl(MethodImplOptions.InternalCall)]
 		private extern static bool __IsMouseButtonDown(MouseKey key);

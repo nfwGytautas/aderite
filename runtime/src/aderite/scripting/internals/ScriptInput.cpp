@@ -12,6 +12,10 @@ bool IsKeyDown(input::Key key) {
     return ::aderite::Engine::getInputManager()->isKeyPressed(key);
 }
 
+bool WasKeyReleased(input::Key key) {
+    return ::aderite::Engine::getInputManager()->wasKeyReleased(key);
+}
+
 bool IsMouseButtonDown(input::MouseKey key) {
     return ::aderite::Engine::getInputManager()->isMouseKeyPressed(key);
 }
@@ -30,6 +34,7 @@ double GetScrollDelta() {
 
 void inputInternals() {
     mono_add_internal_call("Aderite.Input::__IsKeyDown(Aderite.Key)", reinterpret_cast<void*>(IsKeyDown));
+    mono_add_internal_call("Aderite.Input::__WasKeyReleased(Aderite.Key)", reinterpret_cast<void*>(WasKeyReleased));
     mono_add_internal_call("Aderite.Input::__IsMouseButtonDown(Aderite.MouseKey)", reinterpret_cast<void*>(IsMouseButtonDown));
     mono_add_internal_call("Aderite.Input::__GetMousePosition()", reinterpret_cast<void*>(GetMousePosition));
     mono_add_internal_call("Aderite.Input::__GetMouseDelta()", reinterpret_cast<void*>(GetMouseDelta));

@@ -67,5 +67,18 @@ bool DynamicActor::deserialize(io::Serializer* serializer, const YAML::Node& dat
     return true;
 }
 
+PhysicsActor* DynamicActor::clone() const {
+    DynamicActor* actor = new DynamicActor();
+
+    // Properties
+    actor->setKinematic(this->getKinematic());
+    actor->setGravity(this->getGravity());
+    actor->setMass(this->getMass());
+
+    // Colliders
+    this->cloneInto(actor);
+    return actor;
+}
+
 } // namespace physics
 } // namespace aderite

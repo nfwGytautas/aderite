@@ -7,6 +7,7 @@
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
+#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/Serializer.hpp"
@@ -18,8 +19,7 @@
 #include "aderiteeditor/asset/RenderingPipeline.hpp"
 #include "aderiteeditor/resources/EditorIcons.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
-#include "aderiteeditor/shared/Config.hpp"
-#include "aderiteeditor/shared/DragDropObject.hpp"
+#include "aderiteeditor/shared/DragDrop.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
@@ -88,16 +88,8 @@ void AssetBrowser::renderItems() {
                 ImGui::EndPopup();
             }
 
-            if (ImGui::BeginDragDropTarget()) {
-                this->directoryDragDropHandler(dir);
-                ImGui::EndDragDropTarget();
-            }
-
-            if (ImGui::BeginDragDropSource()) {
-                editor::DragDropObject obj {dir};
-                ImGui::SetDragDropPayload(editor::DDPayloadID__Directory, &obj, sizeof(editor::DragDropObject));
-                ImGui::EndDragDropSource();
-            }
+            this->directoryDragDropHandler(dir);
+            DragDrop::renderDirectorySource(dir);
 
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 m_currentDir = dir;
@@ -145,67 +137,29 @@ void AssetBrowser::renderItems() {
                 icon = editor::EditorIcons::getInstance().getIcon("audio_clip");
                 break;
             }
+            case reflection::RuntimeTypes::PREFAB: {
+                icon = editor::EditorIcons::getInstance().getIcon("prefab");
+                break;
+            }
             }
 
             if (this->renderImageButton(icon, cellSize, cellSize)) {
-
             }
 
             // Context menu
             if (ImGui::BeginPopupContextItem()) {
                 if (ImGui::MenuItem("Delete")) {
                     // TODO: Confirmation window
+                    // TODO: Unload from assets, etc.
                     editor::State::Project->getVfs()->remove(file);
                 }
 
                 ImGui::EndPopup();
             }
 
-            if (ImGui::BeginDragDropSource()) {
-                // Typed
-                std::string target = "";
-
-                switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
-                case reflection::RuntimeTypes::SCENE: {
-                    target = editor::DDPayloadID__SceneAsset;
-                    break;
-                }
-                case reflection::RuntimeTypes::MATERIAL: {
-                    target = editor::DDPayloadID__MaterialAsset;
-                    break;
-                }
-                case reflection::RuntimeTypes::MESH: {
-                    target = editor::DDPayloadID__MeshAsset;
-                    break;
-                }
-                case reflection::RuntimeTypes::TEXTURE: {
-                    target = editor::DDPayloadID__TextureAsset;
-                    break;
-                }
-                case reflection::RuntimeTypes::MAT_TYPE: {
-                    target = editor::DDPayloadID__MaterialType;
-                    break;
-                }
-                case reflection::RuntimeTypes::PIPELINE: {
-                    target = editor::DDPayloadID__PipelineAsset;
-                    break;
-                }
-                case reflection::RuntimeTypes::AUDIO: {
-                    target = editor::DDPayloadID__AudioAsset;
-                    break;
-                }
-                default: {
-                    target = editor::DDPayloadID__GenericAsset;
-                }
-                }
-
-                if (!target.empty()) {
-                    editor::DragDropObject obj {file};
-                    ImGui::SetDragDropPayload(target.c_str(), &obj, sizeof(editor::DragDropObject));
-                }
-
-                ImGui::EndDragDropSource();
-            }
+            // Source
+            DragDrop::renderSource(object);
+            //DragDrop::renderFileSource(file);
 
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 if (static_cast<reflection::RuntimeTypes>(object->getType()) == reflection::RuntimeTypes::SCENE) {
@@ -300,16 +254,8 @@ void AssetBrowser::renderDirectoryNode(vfs::Directory* dir) {
         m_currentDir = dir;
     }
 
-    if (ImGui::BeginDragDropTarget()) {
-        this->directoryDragDropHandler(dir);
-        ImGui::EndDragDropTarget();
-    }
-
-    if (ImGui::BeginDragDropSource()) {
-        editor::DragDropObject obj {dir};
-        ImGui::SetDragDropPayload(editor::DDPayloadID__Directory, &obj, sizeof(editor::DragDropObject));
-        ImGui::EndDragDropSource();
-    }
+    this->directoryDragDropHandler(dir);
+    DragDrop::renderDirectorySource(dir);
 
     if (ImGui::BeginPopupContextItem()) {
         if (ImGui::MenuItem("Delete")) {
@@ -330,18 +276,16 @@ void AssetBrowser::renderDirectoryNode(vfs::Directory* dir) {
 }
 
 void AssetBrowser::directoryDragDropHandler(vfs::Directory* dir) {
-    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__GenericAsset)) {
-        vfs::File* file = static_cast<vfs::File*>(payload->Data);
-
+    vfs::File* file = DragDrop::renderFileTarget();
+    if (file != nullptr) {
         // TODO: Message that already exists
 
         // Get asset from manager and move it to the new directory
         editor::State::Project->getVfs()->move(dir, file);
     }
 
-    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(editor::DDPayloadID__Directory)) {
-        editor::DragDropObject* ddo = static_cast<editor::DragDropObject*>(payload->Data);
-        vfs::Directory* payloadDir = static_cast<vfs::Directory*>(ddo->Data);
+    vfs::Directory* payloadDir = DragDrop::renderDirectoryTarget();
+    if (payloadDir != nullptr) {
         editor::State::Project->getVfs()->move(dir, payloadDir);
     }
 }
@@ -373,6 +317,18 @@ void AssetBrowser::render() {
 
     // Navigator
     if (ImGui::BeginTable("AssetBrowserTable", 2, 0)) {
+        scene::Entity* entity = static_cast<scene::Entity*>(
+            DragDrop::renderTarget(static_cast<aderite::reflection::Type>(aderite::reflection::RuntimeTypes::ENTITY)));
+        if (entity != nullptr) {
+            // Create prefab
+            asset::PrefabAsset* prefab = new asset::PrefabAsset();
+            prefab->setPrototype(entity);
+
+            ::aderite::Engine::getSerializer()->add(prefab);
+            ::aderite::Engine::getSerializer()->save(prefab);
+            vfs::File* file = new vfs::File(entity->getName() + "_prefab", prefab->getHandle(), m_currentDir);
+        }
+
         ImGui::TableSetupColumn("Navigator", ImGuiTableColumnFlags_WidthFixed, 200.0f);
         ImGui::TableSetupColumn("Items", ImGuiTableColumnFlags_None);
         ImGui::TableNextRow();

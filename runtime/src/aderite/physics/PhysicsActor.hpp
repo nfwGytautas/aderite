@@ -94,6 +94,12 @@ public:
      */
     void onCollisionLeave(PhysicsActor* collision) const;
 
+    /**
+     * @brief Creates a replica of this physics actor
+     * @return PhysicsActor instance
+     */
+    virtual PhysicsActor* clone() const = 0;
+
     // Inherited via ISerializable
     reflection::Type getType() const override;
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
@@ -101,6 +107,12 @@ public:
 
 protected:
     PhysicsActor();
+
+    /**
+     * @brief Clones this physics actor into the specified actor
+     * @param actor Actor to clone into
+     */
+    void cloneInto(PhysicsActor* actor) const;
 
 private:
     friend class PhysicsScene;

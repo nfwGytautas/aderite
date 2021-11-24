@@ -31,6 +31,15 @@ namespace Scripts
             }
 
             Source.OneShot(Boing);
+
+            if (collision.Actor2.Name == "Ground")
+            {
+                Destroy(collision.Actor1);
+            }
+            else if (collision.Actor1.Name == "Ground")
+            {
+                Destroy(collision.Actor2);
+            }
         }
     }
 }

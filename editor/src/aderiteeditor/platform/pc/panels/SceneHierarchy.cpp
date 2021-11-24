@@ -3,6 +3,7 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
@@ -17,8 +18,7 @@
 #include "aderite/utility/Random.hpp"
 
 #include "aderiteeditor/platform/pc/modals/SelectScriptModal.hpp"
-#include "aderiteeditor/shared/Config.hpp"
-#include "aderiteeditor/shared/DragDropObject.hpp"
+#include "aderiteeditor/shared/DragDrop.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/vfs/File.hpp"
@@ -111,6 +111,10 @@ void SceneHierarchy::renderEntities() {
 
     size_t idx = 0;
     for (scene::Entity* entity : currentScene->getEntities()) {
+        if (entity->getScene() != currentScene) {
+            continue;
+        }
+
         ImGuiTreeNodeFlags leafFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
         if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Entity &&
@@ -130,11 +134,7 @@ void SceneHierarchy::renderEntities() {
         }
 
         // Drag drop
-        if (ImGui::BeginDragDropSource()) {
-            editor::DragDropObject obj {entity};
-            ImGui::SetDragDropPayload(editor::DDPayloadID__Entity, &obj, sizeof(editor::DragDropObject));
-            ImGui::EndDragDropSource();
-        }
+        DragDrop::renderSource(entity);
 
         // Selection
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
@@ -159,11 +159,7 @@ void SceneHierarchy::renderAudio() {
 
             ImGui::TreeNodeEx(listener->getName().c_str(), nodeFlags, "%s", listener->getName().c_str());
 
-            if (ImGui::BeginDragDropSource()) {
-                editor::DragDropObject obj {listener};
-                ImGui::SetDragDropPayload(editor::DDPayloadID__AudioListener, &obj, sizeof(editor::DragDropObject));
-                ImGui::EndDragDropSource();
-            }
+            DragDrop::renderSource(listener);
 
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 editor::State::LastSelectedObject = editor::SelectableObject(listener);
@@ -186,11 +182,7 @@ void SceneHierarchy::renderAudio() {
 
             ImGui::TreeNodeEx(source->getName().c_str(), nodeFlags, "%s", source->getName().c_str());
 
-            if (ImGui::BeginDragDropSource()) {
-                editor::DragDropObject obj {source};
-                ImGui::SetDragDropPayload(editor::DDPayloadID__AudioSource, &obj, sizeof(editor::DragDropObject));
-                ImGui::EndDragDropSource();
-            }
+            DragDrop::renderSource(source);
 
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 editor::State::LastSelectedObject = editor::SelectableObject(source);
@@ -217,11 +209,7 @@ void SceneHierarchy::renderScripts() {
 
             ImGui::TreeNodeEx(selector->getName().c_str(), nodeFlags, "%s", selector->getName().c_str());
 
-            if (ImGui::BeginDragDropSource()) {
-                editor::DragDropObject obj {selector};
-                ImGui::SetDragDropPayload(editor::DDPayloadID__EntitySelector, &obj, sizeof(editor::DragDropObject));
-                ImGui::EndDragDropSource();
-            }
+            DragDrop::renderSource(selector, static_cast<reflection::Type>(reflection::RuntimeTypes::ENTITY_SELECTOR));
 
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 editor::State::LastSelectedObject = editor::SelectableObject(selector);
@@ -244,11 +232,7 @@ void SceneHierarchy::renderScripts() {
 
             ImGui::TreeNodeEx(system->getName().c_str(), nodeFlags, "%s", system->getName().c_str());
 
-            if (ImGui::BeginDragDropSource()) {
-                editor::DragDropObject obj {system};
-                ImGui::SetDragDropPayload(editor::DDPayloadID__ScriptSystem, &obj, sizeof(editor::DragDropObject));
-                ImGui::EndDragDropSource();
-            }
+            DragDrop::renderSource(system);
 
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 editor::State::LastSelectedObject = editor::SelectableObject(system);
@@ -315,6 +299,13 @@ void SceneHierarchy::render() {
     // Actual tree
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Entities")) {
+        asset::PrefabAsset* prefab = DragDrop::renderTarget<asset::PrefabAsset>(reflection::RuntimeTypes::PREFAB);
+        if (prefab != nullptr) {
+            if (prefab->getPrototype() != nullptr) {
+                prefab->instantiate(currentScene);
+            }
+        }
+
         this->renderEntities();
         ImGui::TreePop();
     }

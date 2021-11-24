@@ -28,6 +28,10 @@ void EntityProvideOperation::execute(PipelineState* state) {
 
     // Entity group
     for (scene::Entity* entity : currentScene->getEntities()) {
+        if (entity->getScene() != currentScene) {
+            continue;
+        }
+
         Renderable* renderable = entity->getRenderable();
         if (renderable != nullptr) {
             if (renderable->isValid()) {

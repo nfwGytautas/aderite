@@ -1,5 +1,6 @@
 #include "Entity.hpp"
 
+#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/physics/PhysicsActor.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
@@ -15,16 +16,26 @@ Entity::Entity() : m_transform(new Transform()) {}
 
 Entity::~Entity() {
     delete m_transform;
+
+    if (m_renderable != nullptr) {
+        delete m_renderable;
+    }
 }
 
 void Entity::addTag(size_t tag) {
     LOG_TRACE("[Scene] Added tag {0:b} to entity {1}", tag, this->getName());
     m_tags = m_tags | tag;
+
+    // No longer valid
+    m_prefab = nullptr;
 }
 
 void Entity::removeTag(size_t tag) {
     LOG_TRACE("[Scene] Removed tag {0:b} from entity {1}", tag, this->getName());
     m_tags = m_tags & ~tag;
+
+    // No longer valid
+    m_prefab = nullptr;
 }
 
 bool Entity::hasTag(size_t tag) const {
@@ -33,10 +44,16 @@ bool Entity::hasTag(size_t tag) const {
 
 void Entity::setScene(Scene* scene) {
     LOG_TRACE("[Scene] Setting {0} scene to {1:p}", this->getName(), static_cast<void*>(scene));
+
+    if (m_scene != nullptr) {
+        // Remove from previous scene
+        m_scene->removeEntity(this);
+    }
+
     m_scene = scene;
 
     // Add to new scene
-    if (m_actor != nullptr) {
+    if (m_actor != nullptr && m_scene != nullptr) {
         m_scene->getPhysicsScene()->addActor(m_actor, m_transform);
     }
 }
@@ -68,10 +85,14 @@ void Entity::setActor(physics::PhysicsActor* actor, bool keepColliders) {
 
     actor->setEntity(this);
     m_actor = actor;
+
+    // No longer valid
+    m_prefab = nullptr;
 }
 
 void Entity::setRenderable(rendering::Renderable* renderable) {
     m_renderable = renderable;
+    m_prefab = nullptr;
 }
 
 void Entity::setName(const std::string& name) {
@@ -103,59 +124,132 @@ const std::string& Entity::getName() const {
     return m_name;
 }
 
+Entity* Entity::clone() const {
+    Entity* result = new Entity();
+
+    // Copy asset type fields
+    result->m_tags = m_tags;
+    result->m_name = m_name;
+
+    // Renderable
+    if (m_renderable != nullptr) {
+        result->setRenderable(m_renderable->clone());
+    }
+
+    // Physics actor
+    if (m_actor != nullptr) {
+        result->setActor(m_actor->clone());
+    }
+
+    // Add to scene
+    if (m_scene != nullptr) {
+        result->setScene(m_scene);
+    }
+
+    result->m_prefab = m_prefab;
+
+    return result;
+}
+
 reflection::Type Entity::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::ENTITY);
 }
 
 bool Entity::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    // Transform
-    emitter << YAML::Key << "Transform";
-    serializer->writeUntrackedType(emitter, m_transform);
+    emitter << YAML::Key << "Prefab";
 
-    // Tag
-    emitter << YAML::Key << "Tags" << YAML::Value << m_tags;
-    emitter << YAML::Key << "Name" << YAML::Value << m_name;
+    if (m_prefab != nullptr) {
+        // Entity was created using a prefab
+        emitter << YAML::Value << m_prefab->getHandle();
 
-    // Actor
-    emitter << YAML::Key << "Actor";
-    if (m_actor != nullptr) {
-        serializer->writeUntrackedType(emitter, m_actor);
+        // Only the transform and name is serialized
+        emitter << YAML::Key << "Transform";
+        serializer->writeUntrackedType(emitter, m_transform);
+
+        emitter << YAML::Key << "Name" << YAML::Value << m_name;
     } else {
+        // Unique entity
         emitter << YAML::Null;
-    }
 
-    // Renderable
-    emitter << YAML::Key << "Renderable";
-    if (m_renderable != nullptr) {
-        serializer->writeUntrackedType(emitter, m_renderable);
-    } else {
-        emitter << YAML::Null;
+        // Transform
+        emitter << YAML::Key << "Transform";
+        serializer->writeUntrackedType(emitter, m_transform);
+
+        // Tag
+        emitter << YAML::Key << "Tags" << YAML::Value << m_tags;
+        emitter << YAML::Key << "Name" << YAML::Value << m_name;
+
+        // Actor
+        emitter << YAML::Key << "Actor";
+        if (m_actor != nullptr) {
+            serializer->writeUntrackedType(emitter, m_actor);
+        } else {
+            emitter << YAML::Null;
+        }
+
+        // Renderable
+        emitter << YAML::Key << "Renderable";
+        if (m_renderable != nullptr) {
+            serializer->writeUntrackedType(emitter, m_renderable);
+        } else {
+            emitter << YAML::Null;
+        }
     }
 
     return true;
 }
 
 bool Entity::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    // Transform
-    serializer->fillData(m_transform, data["Transform"]);
+    if (data["Prefab"] && !data["Prefab"].IsNull()) {
+        // Entity created from prefab
+        asset::PrefabAsset* prefab = static_cast<asset::PrefabAsset*>(serializer->getOrRead(data["Prefab"].as<io::SerializableHandle>()));
+        Entity* prototype = prefab->getPrototype();
 
-    // Tags
-    if (data["Tags"]) {
-        m_tags = data["Tags"].as<size_t>();
-    }
+        // Copy asset type fields
+        this->m_tags = prototype->getTags();
 
-    if (data["Name"]) {
-        m_name = data["Name"].as<std::string>();
-    }
+        // Renderable
+        if (prototype->m_renderable != nullptr) {
+            this->setRenderable(prototype->m_renderable->clone());
+        }
 
-    // Actor
-    if (data["Actor"] && !data["Actor"].IsNull()) {
-        this->setActor(static_cast<physics::PhysicsActor*>(serializer->parseUntrackedType(data["Actor"])));
-    }
+        // Physics actor
+        if (prototype->m_actor != nullptr) {
+            this->setActor(prototype->m_actor->clone());
+        }
 
-    // Renderable
-    if (data["Renderable"] && !data["Renderable"].IsNull()) {
-        this->setRenderable(static_cast<rendering::Renderable*>(serializer->parseUntrackedType(data["Renderable"])));
+        // Transform
+        serializer->fillData(m_transform, data["Transform"]);
+
+        if (data["Name"]) {
+            m_name = data["Name"].as<std::string>();
+        }
+
+        this->m_prefab = prefab;
+    } else {
+        // Unique entity
+        //
+        // Transform
+        serializer->fillData(m_transform, data["Transform"]);
+
+        // Tags
+        if (data["Tags"]) {
+            m_tags = data["Tags"].as<size_t>();
+        }
+
+        if (data["Name"]) {
+            m_name = data["Name"].as<std::string>();
+        }
+
+        // Actor
+        if (data["Actor"] && !data["Actor"].IsNull()) {
+            this->setActor(static_cast<physics::PhysicsActor*>(serializer->parseUntrackedType(data["Actor"])));
+        }
+
+        // Renderable
+        if (data["Renderable"] && !data["Renderable"].IsNull()) {
+            this->setRenderable(static_cast<rendering::Renderable*>(serializer->parseUntrackedType(data["Renderable"])));
+        }
     }
 
     return true;

@@ -54,6 +54,13 @@ void Renderable::loadIfNeeded() {
     }
 }
 
+Renderable* Renderable::clone() const {
+    Renderable* renderable = new Renderable();
+    renderable->m_meshHandle = m_meshHandle;
+    renderable->m_materialHandle = m_materialHandle;
+    return renderable;
+}
+
 reflection::Type Renderable::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::RENDERABLE);
 }

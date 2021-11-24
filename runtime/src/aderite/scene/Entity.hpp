@@ -1,5 +1,6 @@
 #pragma once
 
+#include "aderite/asset/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
@@ -88,6 +89,12 @@ public:
      */
     const std::string& getName() const;
 
+    /**
+     * @brief Create a replica of this entity
+     * @return Entity instance
+     */
+    Entity* clone() const;
+
     // Inherited via ISerializable
     reflection::Type getType() const override;
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
@@ -95,12 +102,18 @@ public:
 
 private:
     friend class Scene;
+    friend class asset::PrefabAsset;
 
 private:
     /**
      * @brief Scene this entity belongs to
      */
     Scene* m_scene = nullptr;
+
+    /**
+     * @brief Prefab of this entity
+     */
+    asset::PrefabAsset* m_prefab = nullptr;
 
     /**
      * @brief Transform of the entity

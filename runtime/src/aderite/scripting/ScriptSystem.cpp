@@ -170,6 +170,7 @@ bool ScriptSystem::serialize(const io::Serializer* serializer, YAML::Emitter& em
                 switch (fw.getType()) {
                 case scripting::FieldType::Mesh:
                 case scripting::FieldType::Material:
+                case scripting::FieldType::Prefab:
                 case scripting::FieldType::Audio: {
                     // SerializableObject
                     io::SerializableObject* object = static_cast<io::SerializableObject*>(serializable);
@@ -242,6 +243,7 @@ bool ScriptSystem::deserialize(io::Serializer* serializer, const YAML::Node& dat
                 switch (fw.getType()) {
                 case scripting::FieldType::Mesh:
                 case scripting::FieldType::Material:
+                case scripting::FieldType::Prefab:
                 case scripting::FieldType::Audio: {
                     // Serializable object
                     io::SerializableObject* object =

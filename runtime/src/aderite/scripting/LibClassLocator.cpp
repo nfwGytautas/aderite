@@ -4,6 +4,7 @@
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
+#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/PhysicsActor.hpp"
 #include "aderite/scene/Entity.hpp"
@@ -51,6 +52,8 @@ bool LibClassLocator::locate(MonoImage* image) {
     findClass(image, "Aderite", "AudioSource", m_audioSource.Klass, result);
     findClass(image, "Aderite", "TriggerEvent", m_triggerEvent.Klass, result);
     findClass(image, "Aderite", "CollisionEvent", m_collisionEvent.Klass, result);
+    findClass(image, "Aderite", "RaycastHit", m_raycastHit.Klass, result);
+    findClass(image, "Aderite", "Prefab", m_prefab.Klass, result);
 
     // Can't proceed if classes are not found
     if (result == false) {
@@ -68,6 +71,8 @@ bool LibClassLocator::locate(MonoImage* image) {
     findMethod(m_audioSource.Klass, ".ctor", 1, m_audioSource.Ctor, result);
     findMethod(m_triggerEvent.Klass, ".ctor", 2, m_triggerEvent.Ctor, result);
     findMethod(m_collisionEvent.Klass, ".ctor", 2, m_collisionEvent.Ctor, result);
+    findMethod(m_raycastHit.Klass, ".ctor", 2, m_raycastHit.Ctor, result);
+    findMethod(m_prefab.Klass, ".ctor", 1, m_prefab.Ctor, result);
 
     if (result) {
         LOG_INFO("[Scripting] Engine classed located");
@@ -92,6 +97,8 @@ FieldType LibClassLocator::getType(MonoType* type) const {
         return FieldType::System;
     } else if (klass == m_audioSource.Klass) {
         return FieldType::AudioSource;
+    } else if (klass == m_prefab.Klass) {
+        return FieldType::Prefab;
     }
 
     return FieldType::Null;
@@ -127,6 +134,9 @@ MonoObject* LibClassLocator::create(io::ISerializable* serializable) const {
     }
     case reflection::RuntimeTypes::AUDIO_SOURCE: {
         return this->create(static_cast<audio::AudioSource*>(serializable));
+    }
+    case reflection::RuntimeTypes::PREFAB: {
+        return this->create(static_cast<asset::PrefabAsset*>(serializable));
     }
     default: {
         LOG_ERROR("[Scripting] Unknown implementation for creating a {0} serializable", serializable->getType());
@@ -170,6 +180,16 @@ MonoObject* LibClassLocator::create(const physics::CollisionEvent& collisionEven
     return this->genericInstanceCreate(m_collisionEvent.Klass, m_collisionEvent.Ctor, args);
 }
 
+MonoObject* LibClassLocator::create(const physics::RaycastHit& hit) const {
+    void* args[2] = {create(hit.Actor->getEntity()), (void*)(&hit.Distance)};
+    return this->genericInstanceCreate(m_raycastHit.Klass, m_raycastHit.Ctor, args);
+}
+
+MonoObject* LibClassLocator::create(asset::PrefabAsset* prefab) const {
+    void* args[1] = {&prefab};
+    return this->genericInstanceCreate(m_prefab.Klass, m_prefab.Ctor, args);
+}
+
 const LibClassLocator::ScriptSystem& LibClassLocator::getScriptSystem() const {
     return m_system;
 }
@@ -200,6 +220,14 @@ const LibClassLocator::TriggerEvent& LibClassLocator::getTriggerEvent() const {
 
 const LibClassLocator::CollisionEvent& LibClassLocator::getCollisionEvent() const {
     return m_collisionEvent;
+}
+
+const LibClassLocator::RaycastHit& LibClassLocator::getRaycastHit() const {
+    return m_raycastHit;
+}
+
+const LibClassLocator::Prefab& LibClassLocator::getPrefab() const {
+    return m_prefab;
 }
 
 void LibClassLocator::handleException(MonoObject* exception) const {

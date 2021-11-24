@@ -48,6 +48,12 @@ public:
      */
     physics::PhysicsActor* getActor() const;
 
+    /**
+     * @brief Creates a replica of this collider
+     * @return Collider instance
+     */
+    virtual Collider* clone() const = 0;
+
     // Inherited via ISerializable
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
@@ -68,6 +74,12 @@ protected:
      * @brief Creates the shape of the collider
      */
     void createShape();
+
+    /**
+     * @brief Clones shared collider information into the specified collider
+     * @param collider Collider to clone into
+     */
+    void cloneInto(Collider* collider) const;
 
 protected:
     physx::PxShape* p_shape = nullptr;

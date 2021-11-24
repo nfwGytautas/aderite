@@ -6,6 +6,7 @@
 #include "aderite/audio/Forward.hpp"
 #include "aderite/io/Forward.hpp"
 #include "aderite/physics/PhysicsEventList.hpp"
+#include "aderite/physics/PhysicsSceneQuery.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/scripting/FieldType.hpp"
 
@@ -56,6 +57,16 @@ public:
         MonoMethod* Ctor = nullptr;
     };
 
+    struct RaycastHit {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    };
+
+    struct Prefab {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    };
+
 public:
     /**
      * @brief Locates engine classes from the specified image
@@ -77,6 +88,10 @@ public:
      * @return True if the class is or inherits from system class, false otherwise
      */
     bool isSystem(MonoClass* klass) const;
+
+    // ====================================================================================
+    // Object creators
+    // ====================================================================================
 
     /**
      * @brief Create a C# script instance object from generic C++ serializable object
@@ -134,7 +149,23 @@ public:
      */
     MonoObject* create(const physics::CollisionEvent& collisionEvent) const;
 
+    /**
+     * @brief Creates a C# raycast hit object from C++
+     * @param hit RaycastHit object
+     * @return MonoObject instance
+     */
+    MonoObject* create(const physics::RaycastHit& hit) const;
+
+    /**
+     * @brief Creates a C# prefab object from C++
+     * @param prefab Prefab object
+     * @return MonoObject instance
+     */
+    MonoObject* create(asset::PrefabAsset* prefab) const;
+
+    // ====================================================================================
     // Class getters
+    // ====================================================================================
 
     /**
      * @brief Returns the script system mono information struct
@@ -176,6 +207,16 @@ public:
      */
     const CollisionEvent& getCollisionEvent() const;
 
+    /**
+     * @brief Returns the raycast hit mono information struct
+     */
+    const RaycastHit& getRaycastHit() const;
+
+    /**
+     * @brief Returns the prefab mono information struct
+     */
+    const Prefab& getPrefab() const;
+
 private:
     /**
      * @brief Handle mono exception object
@@ -201,6 +242,8 @@ private:
     AudioSource m_audioSource;
     TriggerEvent m_triggerEvent;
     CollisionEvent m_collisionEvent;
+    RaycastHit m_raycastHit;
+    Prefab m_prefab;
 };
 
 } // namespace scripting

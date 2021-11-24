@@ -4,6 +4,7 @@
 #include "aderite/physics/DynamicActor.hpp"
 #include "aderite/physics/PhysicsActor.hpp"
 #include "aderite/physics/PhysicsController.hpp"
+#include "aderite/physics/PhysicsSceneQuery.hpp"
 #include "aderite/physics/StaticActor.hpp"
 #include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
@@ -85,6 +86,21 @@ const std::vector<PhysicsActor*>& PhysicsScene::getActors() const {
     return m_actors;
 }
 
+bool PhysicsScene::raycastSingle(RaycastHit& result, const glm::vec3& from, const glm::vec3& direction, float maxDistance) {
+    physx::PxRaycastBuffer hit;
+    const bool hadHit = m_scene->raycast({from.x, from.y, from.z}, {direction.x, direction.y, direction.z}, maxDistance, hit);
+    if (!hadHit) {
+        // No hits
+        return false;
+    }
+
+    // Fill result
+    result.Actor = static_cast<PhysicsActor*>(hit.block.actor->userData);
+    result.Distance = hit.block.distance;
+
+    return true;
+}
+
 void PhysicsScene::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) {
     for (physx::PxU32 i = 0; i < nbPairs; i++) {
         const physx::PxContactPair& cp = pairs[i];
@@ -94,6 +110,10 @@ void PhysicsScene::onContact(const physx::PxContactPairHeader& pairHeader, const
 
         PhysicsActor* e1 = static_cast<PhysicsActor*>(actor1->userData);
         PhysicsActor* e2 = static_cast<PhysicsActor*>(actor2->userData);
+
+        if (e1 == nullptr || e2 == nullptr) {
+            continue;
+        }
 
         // Send notifications
         if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
@@ -115,6 +135,10 @@ void PhysicsScene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) 
 
         PhysicsActor* paA = static_cast<PhysicsActor*>(actor->userData);
         PhysicsActor* paT = static_cast<PhysicsActor*>(trigger->userData);
+
+        if (paA == nullptr || paT == nullptr) {
+            continue;
+        }
 
         // Send notifications
         if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {

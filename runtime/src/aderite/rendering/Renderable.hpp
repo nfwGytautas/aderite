@@ -49,6 +49,12 @@ public:
      */
     void loadIfNeeded();
 
+    /**
+     * @brief Creates a replica of this renderable
+     * @return Renderable instance
+     */
+    Renderable* clone() const;
+
     // Inherited via ISerializable
     reflection::Type getType() const override;
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;

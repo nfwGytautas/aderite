@@ -10,6 +10,7 @@
 #include "aderite/scene/Transform.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/Random.hpp"
 
 namespace aderite {
 namespace scene {
@@ -171,12 +172,38 @@ void Scene::setPipeline(rendering::Pipeline* pipeline) {
 }
 
 void Scene::addEntity(Entity* entity) {
+    // Make sure name is unique
+    auto it = std::find_if(m_entities.begin(), m_entities.end(), [&](const Entity* e) {
+        return e->getName() == entity->getName();
+    });
+    if (it != m_entities.end()) {
+        entity->setName(entity->getName() + " (" + utility::generateString(6) + ")");
+    }
+
+    // Add entity
     entity->setScene(this);
     m_entities.push_back(entity);
 
     for (EntitySelector* selector : m_entitySelectors) {
         selector->onEntityAdded(entity);
     }
+}
+
+void Scene::removeEntity(Entity* entity) {
+    ADERITE_DYNAMIC_ASSERT(entity != nullptr, "Tried to remove nullptr entity");
+    auto it = std::find_if(m_entities.begin(), m_entities.end(), [&](const Entity* e) {
+        return entity->getScene() == this && e->getName() == entity->getName();
+    });
+    ADERITE_DYNAMIC_ASSERT(it != m_entities.end(), "Tried to remove entity that doesn't exist in the scene");
+    m_entities.erase(it);
+
+    entity->m_scene = nullptr;
+
+    if (entity->m_actor != nullptr) {
+        m_physics->detachActor(entity->m_actor);
+    }
+
+    delete entity;
 }
 
 const std::vector<audio::AudioSource*>& Scene::getAudioSources() const {

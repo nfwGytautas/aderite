@@ -6,6 +6,7 @@
 #include "aderite/scripting/internals/ScriptEntity.hpp"
 #include "aderite/scripting/internals/ScriptInput.hpp"
 #include "aderite/scripting/internals/ScriptPhysics.hpp"
+#include "aderite/scripting/internals/ScriptSystemInternals.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -20,6 +21,7 @@ void linkInternals() {
     inputInternals();
     physicsInternals();
     audioInternals();
+    systemInternals();
 
     LOG_TRACE("[Scripting] Internals linked");
 }
