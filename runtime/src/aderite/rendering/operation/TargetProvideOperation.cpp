@@ -1,8 +1,9 @@
 #include "TargetProvideOperation.hpp"
 
 #include <bx/string.h>
-#include "aderite/utility/Log.hpp"
+
 #include "aderite/rendering/PipelineState.hpp"
+#include "aderite/utility/Log.hpp"
 
 namespace aderite {
 namespace rendering {
@@ -35,7 +36,7 @@ bgfx::FrameBufferHandle TargetProvideOperation::getHandle() const {
 }
 
 void TargetProvideOperation::initialize() {
-    createFramebuffer();
+    this->createFramebuffer();
 }
 
 void TargetProvideOperation::execute(PipelineState* state) {
@@ -44,13 +45,14 @@ void TargetProvideOperation::execute(PipelineState* state) {
 
 void TargetProvideOperation::shutdown() {
     bgfx::destroy(m_handle);
+    m_handle = BGFX_INVALID_HANDLE;
 }
 
 reflection::Type TargetProvideOperation::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_TARGET);
 }
 
-bool TargetProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool TargetProvideOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Blittable" << YAML::Value << m_params.Blittable;
     emitter << YAML::Key << "DepthAttachment" << YAML::Value << m_params.DepthAttachment;
     emitter << YAML::Key << "StencilAttachment" << YAML::Value << m_params.StencilAttachment;
@@ -91,7 +93,7 @@ void TargetProvideOperation::createFramebuffer() {
     m_handle = bgfx::createFrameBuffer(attachments, textures, true);
 
     if (!bgfx::isValid(m_handle)) {
-        LOG_WARN("Failed to create framebuffer");
+        LOG_WARN("[Rendering] Failed to create framebuffer");
     }
 
     ADERITE_DEBUG_SECTION(bgfx::setName(m_handle, this->getName().c_str());)

@@ -10,17 +10,17 @@ namespace scripting {
 
 void Trace(MonoObject* message) {
     std::string msg = toString(message);
-    LOG_TRACE(msg);
+    LOG_TRACE("[Game code] {0}", msg);
 }
 
 void Warn(MonoObject* message) {
     std::string msg = toString(message);
-    LOG_WARN(msg);
+    LOG_WARN("[Game code] {0}", msg);
 }
 
 void Error(MonoObject* message) {
     std::string msg = toString(message);
-    LOG_ERROR(msg);
+    LOG_ERROR("[Game code] {0}", msg);
 }
 
 void logInternals() {

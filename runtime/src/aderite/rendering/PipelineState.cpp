@@ -35,14 +35,18 @@ EyeInformation PipelineState::popEye() {
 
 void PipelineState::reset() {
     if (m_eyes.size() > 0) {
-        LOG_WARN("Not all eyes was used in last pipeline cycle");
+        LOG_WARN("[Rendering] Not all eyes was used in last pipeline cycle");
         m_eyes = {};
     }
 
     if (m_targets.size() > 0) {
-        LOG_WARN("Not all targets was used in last pipeline cycle");
+        LOG_WARN("[Rendering] Not all targets was used in last pipeline cycle");
         m_targets = {};
     }
+}
+
+bool PipelineState::canExecuteRender() const {
+    return m_eyes.size() > 0 && m_targets.size() > 0 && m_drawCalls != nullptr;
 }
 
 } // namespace rendering

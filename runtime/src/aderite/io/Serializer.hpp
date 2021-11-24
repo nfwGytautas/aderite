@@ -39,15 +39,12 @@
  * to necessary type or used as is.
  */
 
-#include <filesystem>
-#include <map>
 #include <vector>
 
 #include <yaml-cpp/yaml.h>
 
 #include "aderite/io/Forward.hpp"
 #include "aderite/io/Versions.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 class Engine;
@@ -96,18 +93,26 @@ public:
     ISerializable* parseUntrackedType(const YAML::Node& data);
 
     /**
+     * @brief Fills the specified object with data from the node. This method is similar to parseUntrackedType, but is used when an instance
+     * already exists and should just be filled with data form disk
+     * @param object Object to fill
+     * @param data Data to fill with
+     */
+    void fillData(ISerializable* object, const YAML::Node& data);
+
+    /**
      * @brief Write an untracked object to the specified emitter
      * @param emitter Emitter to write to
      * @param object Object to write
      */
-    void writeUntrackedType(YAML::Emitter& emitter, ISerializable* object) const;
+    void writeUntrackedType(YAML::Emitter& emitter, const ISerializable* object) const;
 
     /**
      * @brief Returns object associated with the serializable handle
      * @param handle Handle of the object
      * @return Serializable object instance
      */
-    SerializableObject* get(SerializableHandle handle);
+    SerializableObject* get(SerializableHandle handle) const;
 
     /**
      * @brief Adds an object to the Serializer look up table, if already existing object is added
@@ -140,23 +145,12 @@ public:
      * @brief Serializes object into a file
      * @param object Object to serialize
      */
-    void save(SerializableObject* object);
+    void save(SerializableObject* object) const;
 
     /**
      * @brief Utility method for saving all objects
      */
-    void saveAll();
-
-    /**
-     * @brief Allows to pass any data to subsequent callers
-     * @param data Data to be passed
-     */
-    void setData(void* data);
-
-    /**
-     * @brief Returns the argument of setData
-     */
-    void* getData() const;
+    void saveAll() const;
 
     auto begin() {
         return m_objects.begin();
@@ -188,7 +182,6 @@ private:
 private:
     std::vector<SerializableObject*> m_objects;
     bool m_hasNull = false;
-    void* m_data = nullptr;
 };
 
 } // namespace io

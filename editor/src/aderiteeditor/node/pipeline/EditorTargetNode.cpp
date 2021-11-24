@@ -31,7 +31,7 @@ reflection::Type EditorTargetNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::EditorTargetNode);
 }
 
-bool EditorTargetNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool EditorTargetNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     serializeData(emitter);
     return true;
 }

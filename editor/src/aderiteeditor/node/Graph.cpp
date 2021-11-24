@@ -10,8 +10,8 @@
 #include "aderiteeditor/node/Link.hpp"
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
+#include "aderiteeditor/platform/pc/backend/node/imnodes.h"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 namespace aderite {
 namespace node {
@@ -232,7 +232,7 @@ reflection::Type Graph::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::GraphAsset);
 }
 
-bool Graph::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool Graph::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "NextId" << YAML::Value << m_nextId;
 
     emitter << YAML::Key << "LastNode" << YAML::Value;

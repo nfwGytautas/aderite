@@ -1,7 +1,7 @@
 #include "editor.hpp"
 
 // TODO: Macro switch
-#include "aderiteeditor/windows/WindowsEditor.hpp"
+#include "aderiteeditor/platform/pc/WindowsEditor.hpp"
 
 namespace aderite {
 

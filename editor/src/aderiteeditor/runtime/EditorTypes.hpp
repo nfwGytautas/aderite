@@ -11,12 +11,12 @@ namespace reflection {
  */
 enum class EditorTypes : Type {
     // Nodes
-    AddNode = 50,
+    AddNode = 500,
     MaterialInputNode,
     MaterialOutputNode,
     Sampler2DNode,
 
-    CameraProviderNode = 75,
+    CameraProviderNode = 750,
     ConcatObjectsNode,
     EditorCameraNode,
     EditorRenderNode,
@@ -28,18 +28,21 @@ enum class EditorTypes : Type {
     SelectObjectNode,
     TargetProviderNode,
 
-    ConvertNode = 125,
+    ConvertNode = 1250,
 
     // Assets
-    RenderingPipelineAsset = 150,
+    RenderingPipelineAsset = 1500,
     GraphAsset,
     TypeAsset,
 
     // Operations
-    EditorCameraOp = 200,
-    EditorRenderOp = 201,
-    EditorTargetOp = 202,
-    ArrayOp = 203,
+    EditorCameraOp = 2000,
+    EditorRenderOp,
+    EditorTargetOp,
+    ArrayOp,
+
+    // Extensions
+    AudioSource = 3000,
 };
 
 } // namespace reflection

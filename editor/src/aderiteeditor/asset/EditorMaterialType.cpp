@@ -15,7 +15,6 @@
 #include "aderiteeditor/node/material/MaterialOutputNode.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 namespace aderite {
 namespace asset {
@@ -39,7 +38,7 @@ EditorMaterialType::~EditorMaterialType() {
     }
 }
 
-bool EditorMaterialType::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool EditorMaterialType::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     MaterialTypeAsset::serialize(serializer, emitter);
 
     emitter << YAML::Key << "Properties" << YAML::BeginSeq;

@@ -7,12 +7,15 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/physics/Collider.hpp"
-#include "aderite/physics/ColliderList.hpp"
+#include "aderite/physics/PhysicsActor.hpp"
+#include "aderite/physics/PhysicsScene.hpp"
 #include "aderite/physics/collider/BoxCollider.hpp"
 #include "aderite/rendering/operation/CameraProvideOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 
 #include "aderiteeditor/compiler/ShaderCompiler.hpp"
@@ -50,34 +53,7 @@ void EditorRenderOperation::initialize() {
 
 void EditorRenderOperation::execute(rendering::PipelineState* state) {
     bgfx::discard(BGFX_DISCARD_ALL);
-    this->renderPhysicsObjects();
-    bgfx::discard(BGFX_DISCARD_ALL);
-}
 
-void EditorRenderOperation::shutdown() {
-    bgfx::destroy(m_editorUniform);
-    bgfx::destroy(m_wireframeShader);
-    bgfx::destroy(m_bcCube);
-    bgfx::destroy(m_bcCubeIbo);
-}
-
-reflection::Type EditorRenderOperation::getType() const {
-    return static_cast<reflection::Type>(reflection::EditorTypes::EditorRenderOp);
-}
-
-bool EditorRenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
-    return true;
-}
-
-bool EditorRenderOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    return true;
-}
-
-void EditorRenderOperation::updateUniform() {
-    bgfx::setUniform(m_editorUniform, &EditorParameters[0], 2);
-}
-
-void EditorRenderOperation::renderPhysicsObjects() {
     // Bind state
     bgfx::setViewFrameBuffer(c_ViewId, editor::State::DebugRenderHandle);
     bgfx::touch(c_ViewId);
@@ -93,29 +69,54 @@ void EditorRenderOperation::renderPhysicsObjects() {
     }
 
     // Colliders and triggers
-    auto colliderGroup =
-        ::aderite::Engine::getSceneManager()->getCurrentScene()->getEntityRegistry().group<scene::CollidersComponent>(
-            entt::get<scene::TransformComponent>);
-    for (auto entity : colliderGroup) {
-        auto [colliders, transform] =
-            colliderGroup.get<scene::CollidersComponent, scene::TransformComponent>(entity);
+    for (scene::Entity* entity : currentScene->getEntities()) {
+        if (entity->getScene() != currentScene) {
+            continue;
+        }
 
-        for (physics::Collider* collider : *colliders.Colliders) {
-            switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {
-            case reflection::RuntimeTypes::BOX_CLDR: {
-                this->renderBoxCollider(static_cast<physics::BoxCollider*>(collider), transform);
-                break;
-            }
+        physics::PhysicsActor* actor = entity->getActor();
+        if (actor != nullptr) {
+            for (physics::Collider* collider : actor->getColliders()) {
+                switch (static_cast<reflection::RuntimeTypes>(collider->getType())) {
+                case reflection::RuntimeTypes::BOX_CLDR: {
+                    this->renderBoxCollider(static_cast<physics::BoxCollider*>(collider), entity->getTransform());
+                    break;
+                }
+                }
             }
         }
     }
+
+    bgfx::discard(BGFX_DISCARD_ALL);
 }
 
-void EditorRenderOperation::renderBoxCollider(physics::BoxCollider* collider, const scene::TransformComponent& transform) {
-    glm::vec3 extents = collider->getSize();
+void EditorRenderOperation::shutdown() {
+    bgfx::destroy(m_editorUniform);
+    bgfx::destroy(m_wireframeShader);
+    bgfx::destroy(m_bcCube);
+    bgfx::destroy(m_bcCubeIbo);
+}
 
-    scene::TransformComponent tempTransform = transform;
-    tempTransform.Scale *= extents;
+reflection::Type EditorRenderOperation::getType() const {
+    return static_cast<reflection::Type>(reflection::EditorTypes::EditorRenderOp);
+}
+
+bool EditorRenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
+    return true;
+}
+
+bool EditorRenderOperation::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+    return true;
+}
+
+void EditorRenderOperation::updateUniform() {
+    bgfx::setUniform(m_editorUniform, &EditorParameters[0], 2);
+}
+
+void EditorRenderOperation::renderBoxCollider(physics::BoxCollider* collider, const scene::Transform* transform) {
+    glm::mat4 rotation = glm::toMat4(transform->rotation());
+    glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), transform->position()) * rotation *
+                                glm::scale(glm::mat4(1.0f), (transform->scale() * collider->getSize()));
 
     if (collider->isTrigger()) {
         wfColor[0] = 0.0f;
@@ -133,7 +134,7 @@ void EditorRenderOperation::renderBoxCollider(physics::BoxCollider* collider, co
     uint64_t state = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_WRITE_Z | BGFX_STATE_CULL_CCW |
                      BGFX_STATE_MSAA | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 
-    bgfx::setTransform(glm::value_ptr(scene::TransformComponent::computeTransform(tempTransform)));
+    bgfx::setTransform(glm::value_ptr(transformMatrix));
     bgfx::setState(state);
 
     bgfx::setVertexBuffer(0, m_bcCube);

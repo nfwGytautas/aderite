@@ -27,7 +27,7 @@ reflection::Type MaterialOutputNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::MaterialOutputNode);
 }
 
-bool MaterialOutputNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool MaterialOutputNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     serializeData(emitter);
     return true;
 }

@@ -19,7 +19,7 @@ reflection::Type OperationArray::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::ArrayOp);
 }
 
-bool OperationArray::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool OperationArray::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     return true;
 }
 

@@ -8,7 +8,6 @@
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/pipeline/ScreenNode.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 namespace aderite {
 namespace asset {
@@ -16,7 +15,7 @@ namespace asset {
 RenderingPipeline::RenderingPipeline() : m_graph(new node::Graph()) {
     node::ScreenNode* sn = m_graph->addNode<node::ScreenNode>();
     m_graph->setLastNode(sn);
-    ImNodes::SetNodeGridSpacePos(sn->getId(), ImVec2(200, 200));
+    sn->setPosition({400, 200});
 }
 
 RenderingPipeline::~RenderingPipeline() {
@@ -36,7 +35,7 @@ void RenderingPipeline::compile() {
     evaluator.transferToPipeline(this);
 }
 
-bool RenderingPipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool RenderingPipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     Pipeline::serialize(serializer, emitter);
 
     emitter << YAML::Key << "Graph";

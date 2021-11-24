@@ -74,7 +74,7 @@ void EditorCamera::update(float delta) {
             glm::vec2 mouseDelta = inputManager->getMouseDelta();
 
             float yawSign = getUpDirection().y < 0 ? -1.0f : 1.0f;
-            m_yaw += delta * yawSign * mouseDelta.x * Settings::EditorCameraRotationSpeed;
+            m_yaw -= delta * yawSign * mouseDelta.x * Settings::EditorCameraRotationSpeed;
             m_pitch += delta * mouseDelta.y * Settings::EditorCameraRotationSpeed;
 
             wasUpdated = true;

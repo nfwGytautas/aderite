@@ -47,6 +47,8 @@ bool Project::save() {
         out << YAML::Null;
     }
 
+    out << YAML::Key << "FMODProject" << YAML::Value << m_fmodProjectDirectory.string();
+
     out << YAML::EndMap; // Root
 
     m_vfs->save(this->getRootDir());
@@ -86,6 +88,10 @@ Project* Project::load(const std::string& path) {
         p->m_activeScene = c_InvalidHandle;
     }
 
+    if (data["FMODProject"]) {
+        p->m_fmodProjectDirectory = data["FMODProject"].as<std::string>();
+    }
+
     p->m_vfs = vfs::VFS::load(p->getRootDir());
 
     return p;
@@ -97,6 +103,19 @@ std::string Project::getName() const {
 
 std::filesystem::path Project::getRootDir() const {
     return m_directory;
+}
+
+std::filesystem::path Project::getFmodProjectDir() const {
+    return m_fmodProjectDirectory;
+}
+
+void Project::linkFmodProject(std::filesystem::path project) {
+    if (!std::filesystem::exists(project)) {
+        LOG_WARN("Invalid project directory");
+        return;
+    }
+
+    m_fmodProjectDirectory = project;
 }
 
 io::SerializableHandle Project::getActiveScene() const {

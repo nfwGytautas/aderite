@@ -9,17 +9,24 @@
 namespace aderite {
 constexpr size_t c_InvalidHandle = 0xffffffffffffffff; // std::numeric_limits<size_t>::max() or ULLONG_MAX
 
+using HandleType = size_t;
+using UniversalHandle = HandleType;
+
 namespace reflection {
-using Type = size_t;
+using Type = HandleType;
 }
 
 namespace io {
-using SerializableHandle = size_t;
-using LoadableHandle = size_t;
+using SerializableHandle = HandleType;
+using LoadableHandle = HandleType;
 } // namespace io
 
 namespace audio {
-using AudioInstanceId = size_t;
+using SourceHandle = HandleType;
+}
+
+namespace scene {
+using TransformHandle = HandleType;
 }
 
 } // namespace aderite

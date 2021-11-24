@@ -3,6 +3,7 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/Config.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/utility/LogExtensions.hpp"
 #include "aderite/window/WindowManager.hpp"
 
 #if GLFW_BACKEND
@@ -14,13 +15,19 @@ namespace aderite {
 namespace input {
 
 bool InputManager::init() {
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[IO] Initializing input manager");
+
 #if GLFW_BACKEND == 1
+    LOG_DEBUG("[IO] GLFW backend IO");
+
     GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(::aderite::Engine::getWindowManager()->getImplementationHandle());
     glfwSetWindowUserPointer(glfwWindow, this);
 
-    glfwGetCursorPos(glfwWindow, &m_mousePosition.x, &m_mousePosition.y);
+    glfwGetCursorPos(glfwWindow, &m_currentFrameState.MousePosition.x, &m_currentFrameState.MousePosition.y);
 
     // Install event callbacks
+    LOG_TRACE("[IO] Setting input callbacks for GLFW");
 
     // Framebuffer size
     glfwSetFramebufferSizeCallback(glfwWindow, [](GLFWwindow* window, int width, int height) {
@@ -56,19 +63,26 @@ bool InputManager::init() {
         im->onMouseScrolled(ypos);
     });
 
+    LOG_INFO("[IO] Callbacks installed");
+
 #else
 #error "Unsupported backend for input manager"
 #endif
 
+    LOG_INFO("[IO] Input manager initialized");
     return true;
 }
 
-void InputManager::shutdown() {}
+void InputManager::shutdown() {
+    ADERITE_LOG_BLOCK;
+    LOG_TRACE("[IO] Shutting down input manager");
+    LOG_INFO("[IO] Input manager shutdown");
+}
 
 void InputManager::update() {
-    // Reset delta
-    m_mouseDelta = {};
-    m_mouseScrollDelta = 0.0;
+    // Copy state
+    m_previousFrameState = m_currentFrameState;
+    m_currentFrameState.MouseScroll = 0;
 
 #if GLFW_BACKEND == 1
     glfwPollEvents();
@@ -85,11 +99,11 @@ void InputManager::onKeyStateChange(Key key, KeyAction action, KeyModifier modif
     switch (action) {
     case KeyAction::PRESS:
     case KeyAction::REPEAT: {
-        m_keyStates[static_cast<size_t>(key)] = true;
+        m_currentFrameState.KeyStates[static_cast<size_t>(key)] = true;
         break;
     }
     default: {
-        m_keyStates[static_cast<size_t>(key)] = false;
+        m_currentFrameState.KeyStates[static_cast<size_t>(key)] = false;
     }
     }
 }
@@ -98,24 +112,22 @@ void InputManager::onMouseKeyStateChange(MouseKey key, KeyAction action, KeyModi
     switch (action) {
     case KeyAction::PRESS:
     case KeyAction::REPEAT: {
-        m_mouseKeyStates[static_cast<size_t>(key)] = true;
+        m_currentFrameState.MouseKeyStates[static_cast<size_t>(key)] = true;
         break;
     }
     default: {
-        m_mouseKeyStates[static_cast<size_t>(key)] = false;
+        m_currentFrameState.MouseKeyStates[static_cast<size_t>(key)] = false;
     }
     }
 }
 
 void InputManager::onMouseMove(double xPos, double yPos) {
-    m_mouseDelta.x = xPos - m_mousePosition.x;
-    m_mouseDelta.y = (yPos - m_mousePosition.y) * -1; // Inverted here, so that it would be more intuitive
-    m_mousePosition.x = xPos;
-    m_mousePosition.y = yPos;
+    m_currentFrameState.MousePosition.x = xPos;
+    m_currentFrameState.MousePosition.y = yPos;
 }
 
 void InputManager::onMouseScrolled(double yOffset) {
-    m_mouseScrollDelta = yOffset;
+    m_currentFrameState.MouseScroll = yOffset;
 }
 
 void InputManager::onWindowClosed() {
@@ -124,24 +136,31 @@ void InputManager::onWindowClosed() {
 
 bool InputManager::isKeyPressed(Key key) const {
     // TODO: Bound check
-    return m_keyStates[static_cast<size_t>(key)];
+    return m_currentFrameState.KeyStates[static_cast<size_t>(key)];
+}
+
+bool InputManager::wasKeyReleased(Key key) const {
+    return m_previousFrameState.KeyStates[static_cast<size_t>(key)] == true && m_currentFrameState.KeyStates[static_cast<size_t>(key)] == false;
 }
 
 bool InputManager::isMouseKeyPressed(MouseKey key) const {
     // TODO: Bound check
-    return m_mouseKeyStates[static_cast<size_t>(key)];
+    return m_currentFrameState.MouseKeyStates[static_cast<size_t>(key)];
 }
 
 glm::dvec2 InputManager::getMousePosition() const {
-    return m_mousePosition;
+    return m_currentFrameState.MousePosition;
 }
 
 glm::dvec2 InputManager::getMouseDelta() const {
-    return m_mouseDelta;
+    glm::dvec2 result = m_currentFrameState.MousePosition;
+    result.x = result.x - m_previousFrameState.MousePosition.x;
+    result.y = (result.y - m_previousFrameState.MousePosition.y) * -1; // Inverted here, so that it would be more intuitive
+    return result;
 }
 
 double InputManager::getScrollDelta() const {
-    return m_mouseScrollDelta;
+    return m_currentFrameState.MouseScroll;
 }
 
 } // namespace input

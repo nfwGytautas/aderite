@@ -31,7 +31,7 @@ reflection::Type TargetProviderNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::TargetProviderNode);
 }
 
-bool TargetProviderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool TargetProviderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     serializeData(emitter);
     return true;
 }

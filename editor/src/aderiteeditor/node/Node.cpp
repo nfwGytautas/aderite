@@ -4,7 +4,7 @@
 
 #include "aderiteeditor/node/InputPin.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
+#include "aderiteeditor/platform/pc/backend/node/imnodes.h"
 
 namespace aderite {
 namespace node {
@@ -83,7 +83,7 @@ glm::vec2 Node::getPosition() const {
     return m_position;
 }
 
-void Node::serializeData(YAML::Emitter& out) {
+void Node::serializeData(YAML::Emitter& out) const {
     out << YAML::Key << "InputPins" << YAML::Flow << YAML::BeginSeq;
     for (InputPin* pin : getInputPins()) {
         out << pin->getId();

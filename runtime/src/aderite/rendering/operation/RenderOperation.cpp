@@ -5,8 +5,6 @@
 
 #include "aderite/rendering/DrawCall.hpp"
 #include "aderite/rendering/PipelineState.hpp"
-#include "aderite/scene/components/Components.hpp"
-#include "aderite/utility/Log.hpp"
 
 namespace aderite {
 namespace rendering {
@@ -25,6 +23,10 @@ void RenderOperation::initialize() {
 }
 
 void RenderOperation::execute(PipelineState* state) {
+    if (!state->canExecuteRender()) {
+        return;
+    }
+
     bgfx::FrameBufferHandle target = state->popTarget();
     EyeInformation eye = state->popEye();
 
@@ -47,7 +49,7 @@ void RenderOperation::execute(PipelineState* state) {
 
     for (const DrawCall& dc : *state->getDrawCallList()) {
         bgfx::discard(BGFX_DISCARD_ALL);
-        executeDrawCall(dc);
+        this->executeDrawCall(dc);
     }
 }
 
@@ -55,7 +57,7 @@ reflection::Type RenderOperation::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::OP_RENDER);
 }
 
-bool RenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool RenderOperation::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "ViewId" << YAML::Value << (int)m_viewId;
     return true;
 }
@@ -70,7 +72,7 @@ bool RenderOperation::deserialize(io::Serializer* serializer, const YAML::Node& 
     return true;
 }
 
-void RenderOperation::executeDrawCall(const DrawCall& dc) {
+void RenderOperation::executeDrawCall(const DrawCall& dc) const {
     // Check if valid draw call
     if (dc.Skip) {
         return;
@@ -99,7 +101,7 @@ void RenderOperation::executeDrawCall(const DrawCall& dc) {
     bgfx::setState(state);
 
     for (auto& transform : dc.Transformations) {
-        bgfx::setTransform(glm::value_ptr(scene::TransformComponent::computeTransform(*transform)));
+        bgfx::setTransform(glm::value_ptr(transform));
 
         // Submit draw call
         uint8_t flags = BGFX_DISCARD_ALL &

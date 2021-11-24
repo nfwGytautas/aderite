@@ -1,0 +1,99 @@
+Version: 2021_10_15r1
+Type: 3
+Handle: 0
+Data:
+  Entities:
+    - Type: 41
+      Data:
+        Prefab: ~
+        Transform:
+          Type: 40
+          Data:
+            Position: [0, 0, 0]
+            Rotation: [1, 0, 0, 0]
+            Scale: [10, 0.200000003, 10]
+        Tags: 0
+        Name: Ground
+        Actor:
+          Type: 92
+          Data:
+            Colliders:
+              - Type: 51
+                Data:
+                  IsTrigger: false
+                  Size: [1, 1, 1]
+        Renderable:
+          Type: 42
+          Data:
+            Mesh: 2
+            Material: 4
+    - Type: 41
+      Data:
+        Prefab: 6
+        Transform:
+          Type: 40
+          Data:
+            Position: [0, 5, 0]
+            Rotation: [1, 0, 0, 0]
+            Scale: [1, 1, 1]
+        Name: BoingBox1
+    - Type: 41
+      Data:
+        Prefab: 6
+        Transform:
+          Type: 40
+          Data:
+            Position: [3.9000001, 4.9000001, 0]
+            Rotation: [1, 0, 0, 0]
+            Scale: [1, 1, 1]
+        Name: BoingBox1 (0)
+  Audio:
+    Listeners:
+      - Type: 21
+        Data:
+          Name: Origin
+          Enabled: true
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0, 0]
+          Velocity: [0, 0, 0]
+    Sources:
+      - Type: 20
+        Data:
+          Name: Origin
+          Volume: 1
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0, 0]
+          Velocity: [0, 0, 0]
+  Physics:
+    Type: 93
+    Data:
+      {}
+  Pipeline: 1
+  Tags: [jFxBhvLPWqyr, z4EqCykUA5pI, jSp7xeTXUIDp, FSIUGZJUSFOq, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+  Scripting:
+    Selectors:
+      - Type: 211
+        Data:
+          Name: BoingCubeSelector
+          Tags: 1
+    Systems:
+      - Type: 200
+        Data:
+          Name: Scripts.BoingSystem
+          Selector: BoingCubeSelector
+          Fields:
+            Source: Origin
+            Boing: 8
+      - Type: 200
+        Data:
+          Name: Scripts.RayCaster
+          Selector: ~
+          Fields:
+            From: ~
+            Distance: 10
+      - Type: 200
+        Data:
+          Name: Scripts.Spawner
+          Selector: ~
+          Fields:
+            Prefab: 6

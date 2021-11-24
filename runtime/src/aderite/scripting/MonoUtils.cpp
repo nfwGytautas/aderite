@@ -2,12 +2,7 @@
 #include <sstream>
 
 #include <mono/jit/jit.h>
-#include <mono/metadata/assembly.h>
-#include <mono/metadata/attrdefs.h>
 #include <mono/metadata/debug-helpers.h>
-#include <mono/metadata/mono-gc.h>
-#include <mono/metadata/threads.h>
-#include <mono/metadata/tokentype.h>
 
 #include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/utility/Log.hpp"
@@ -76,16 +71,6 @@ std::string toString(MonoObject* object) {
     std::string str = reinterpret_cast<std::string::value_type*>(pStr);
     mono_free(pStr);
     return str;
-}
-
-void extractMesh(MonoObject* object, asset::MeshAsset*& mesh) {
-    static FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"));
-    return fw.getValue(object, &mesh);
-}
-
-void extractMaterial(MonoObject* object, asset::MaterialAsset*& material) {
-    static FieldWrapper fw(mono_class_get_field_from_name(mono_object_get_class(object), "Instance"));
-    return fw.getValue(object, &material);
 }
 
 } // namespace scripting

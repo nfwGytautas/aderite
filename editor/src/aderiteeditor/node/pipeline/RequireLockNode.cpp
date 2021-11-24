@@ -37,7 +37,7 @@ reflection::Type RequireLockNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::ConcatObjectsNode);
 }
 
-bool RequireLockNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool RequireLockNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     serializeData(emitter);
     return true;
 }

@@ -3,7 +3,6 @@
 #include <glm/glm.hpp>
 
 #include "aderite/input/InputEnums.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 class Engine;
@@ -15,7 +14,7 @@ namespace input {
  * this class is closely related to the WindowManager, cause all inputs come through the window
  * and the InputManager is tasked with handling them
  */
-class InputManager {
+class InputManager final {
 public:
     /**
      * @brief Initializes the input manager
@@ -79,6 +78,11 @@ public:
     bool isKeyPressed(Key key) const;
 
     /**
+     * @brief Returns true if the specified key was released this frame, false otherwise
+     */
+    bool wasKeyReleased(Key key) const;
+
+    /**
      * @brief Returns true if the specified mouse key is pressed, false otherwise
      */
     bool isMouseKeyPressed(MouseKey key) const;
@@ -103,31 +107,31 @@ private:
     friend Engine;
 
 private:
-    /**
-     * @brief True if key is down, false otherwise, slight waste of memory here because,
-     * Key enum isn't fully sequential and as such there are gaps
-     */
-    bool m_keyStates[(size_t)Key::COUNT] = {false};
+    struct InputManagerState {
+        /**
+         * @brief True if key is down, false otherwise, slight waste of memory here because,
+         * Key enum isn't fully sequential and as such there are gaps
+         */
+        bool KeyStates[(size_t)Key::COUNT] = {false};
 
-    /**
-     * @brief True if key is down, false otherwise
-     */
-    bool m_mouseKeyStates[(size_t)MouseKey::COUNT] = {false};
+        /**
+         * @brief True if key is down, false otherwise
+         */
+        bool MouseKeyStates[(size_t)MouseKey::COUNT] = {false};
 
-    /**
-     * @brief Mouse position
-     */
-    glm::dvec2 m_mousePosition;
+        /**
+         * @brief Mouse position
+         */
+        glm::dvec2 MousePosition;
 
-    /**
-     * @brief Delta move between frames
-     */
-    glm::dvec2 m_mouseDelta;
+        /**
+         * @brief Mouse scroll current position
+         */
+        double MouseScroll = 0.0;
+    };
 
-    /**
-     * @brief Mouse scroll delta between frames
-     */
-    double m_mouseScrollDelta = 0.0;
+    InputManagerState m_currentFrameState;
+    InputManagerState m_previousFrameState;
 };
 
 } // namespace input

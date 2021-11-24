@@ -23,7 +23,7 @@ namespace reflection {
 /**
  * @brief Reflector is responsible for the entire aderite reflection system
  */
-class Reflector {
+class Reflector final {
 public:
     /**
      * @brief Initializes the reflector

@@ -2,18 +2,12 @@
 
 #include <vector>
 
-#include <PxSimulationEventCallback.h>
-#include <entt/entity/registry.hpp>
-
-#include "aderite/Config.hpp"
-#include "aderite/asset/Forward.hpp"
-#include "aderite/io/Loader.hpp"
+#include "aderite/audio/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
-#include "aderite/scene/components/Components.hpp"
-#include "aderite/utility/Macros.hpp"
+#include "aderite/scripting/Forward.hpp"
 
 namespace aderite {
 namespace scene {
@@ -24,17 +18,12 @@ namespace scene {
  * be it meshes, materials, etc. However these resources are loaded as trunks into the asset manager
  * the actual data is not loaded until needed.
  */
-class Scene : public io::SerializableObject, public physx::PxSimulationEventCallback {
+class Scene final : public io::SerializableObject {
+    static constexpr size_t c_MaxTags = sizeof(size_t) * 8; // Bitflag
+
 public:
     Scene();
-    virtual ~Scene();
-
-    /**
-     * @brief Returns entt registry
-     */
-    entt::registry& getEntityRegistry() {
-        return m_registry;
-    }
+    ~Scene();
 
     /**
      * @brief Update scene
@@ -43,32 +32,40 @@ public:
     void update(float delta);
 
     /**
-     * @brief Physics update
-     * @param step Fixed step size
+     * @brief Add entity to the scene
+     * @param entity Entity to add
      */
-    void fixedUpdate(float step);
+    void addEntity(Entity* entity);
 
     /**
-     * @brief Create Entity with a MetaComponent component
-     * @param meta MetaComponent of the entity
-     * @return Entity instance
-     */
-    Entity createEntity(const MetaComponent& meta);
+     * @brief Remove entity from the scene
+     * @param entity Entity to remove
+    */
+    void removeEntity(Entity* entity);
 
     /**
-     * @brief Destroy an Entity
+     * @brief Adds a script system to the scene
+     * @param system System to add
      */
-    void destroyEntity(Entity entity);
+    void addScriptSystem(scripting::ScriptSystem* system);
 
     /**
-     * @brief Returns the physics scene
+     * @brief Adds a entity selector to the scene
+     * @param selector Selector instance
      */
-    physx::PxScene* getPhysicsScene() const;
+    void addEntitySelector(EntitySelector* selector);
 
     /**
-     * @brief Returns the pipeline of this scene
+     * @brief Adds a audio listener to the scene
+     * @param listener AudioListener instance
      */
-    rendering::Pipeline* getPipeline() const;
+    void addAudioListener(audio::AudioListener* listener);
+
+    /**
+     * @brief Adds a audio source to the scene
+     * @param source AudioSource instance
+     */
+    void addAudioSource(audio::AudioSource* source);
 
     /**
      * @brief Sets the pipeline of the scene
@@ -76,57 +73,102 @@ public:
      */
     void setPipeline(rendering::Pipeline* pipeline);
 
+    /**
+     * @brief Add tag to the scene
+     * @param name
+     */
+    void addTag(const std::string& name);
+
+    /**
+     * @brief Removes tag from the scene
+     * @param name
+     */
+    void removeTag(const std::string& name);
+
+    /**
+     * @brief Returns the number of empty tag slots
+     */
+    size_t getFreeTagSlots() const;
+
+    /**
+     * @brief Returns the index of the specified tag
+     * @param name Name of the tag
+     */
+    size_t getTagIndex(const std::string& name) const;
+
+    /**
+     * @brief Returns the pipeline of this scene
+     */
+    rendering::Pipeline* getPipeline() const;
+
+    /**
+     * @brief Returns the physics scene attached to this one
+     */
+    physics::PhysicsScene* getPhysicsScene() const;
+
+    /**
+     * @brief Returns the selector with the specified name
+     * @param name Name of the selector
+     * @return EntitySelector instance or nullptr if not found
+     */
+    EntitySelector* getSelector(const std::string& name) const;
+
+    /**
+     * @brief Returns the audio source with the specified name
+     * @param name Name of the source
+     * @return AudioSource instance or nullptr if not found
+     */
+    audio::AudioSource* getSource(const std::string& name) const;
+
+    /**
+     * @brief Returns audio sources of this scene
+     */
+    const std::vector<audio::AudioSource*>& getAudioSources() const;
+
+    /**
+     * @brief Returns audio listeners of this scene
+     */
+    const std::vector<audio::AudioListener*>& getAudioListeners() const;
+
+    /**
+     * @brief Returns script systems active in this scene
+     */
+    const std::vector<scripting::ScriptSystem*> getScriptSystems() const;
+
+    /**
+     * @brief Returns the entity selectors defined in this scene
+     */
+    const std::vector<EntitySelector*> getEntitySelectors() const;
+
+    /**
+     * @brief Returns the tags of the scene
+     */
+    const std::vector<std::string>& getTags() const;
+
+    /**
+     * @brief Get entities in this scene
+     */
+    const std::vector<Entity*> getEntities() const;
+
     // Inherited via SerializableObject
-    virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    reflection::Type getType() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
-    /**
-     * @brief Function invoked right after a component was added to entity
-     */
-    template<typename T>
-    void onComponentAdded(Entity entity, T& component);
-
-    /**
-     * @brief Function invoked right before a component is removed from entity
-     */
-    template<typename T>
-    void onComponentRemoved(Entity entity, T& component);
-
-    // Inherited via PxSimulationEventCallback
-    virtual void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override;
-    virtual void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) override;
-    virtual void onConstraintBreak(physx::PxConstraintInfo*, physx::PxU32) {}
-    virtual void onWake(physx::PxActor**, physx::PxU32) {}
-    virtual void onSleep(physx::PxActor**, physx::PxU32) {}
-    virtual void onAdvance(const physx::PxRigidBody* const*, const physx::PxTransform*, const physx::PxU32) {}
-
-    /**
-     * @brief Syncs physics actor to ECS entity state
-     * @param actor Actor to sync
-     * @param colliders Colliders component of the entity
-     * @param transform Entity transform to sync with
-     */
-    void syncActorToEcs(physx::PxRigidActor* actor, const scene::CollidersComponent& colliders, const scene::TransformComponent& transform);
-
-    /**
-     * @brief Syncs ECS state to physics
-     */
-    void syncEcsToPhysics();
-
-    /**
-     * @brief Syncs physics state to ECS
-     */
-    void syncPhysicsToEcs();
-
-    friend class Entity;
     friend class SceneManager;
+    friend class SceneSerializer;
 
 private:
-    entt::registry m_registry;
-    physx::PxScene* m_physicsScene = nullptr;
+    physics::PhysicsScene* m_physics = nullptr;
     rendering::Pipeline* m_pipeline = nullptr;
+
+    std::vector<audio::AudioSource*> m_audioSources;
+    std::vector<audio::AudioListener*> m_audioListeners;
+    std::vector<Entity*> m_entities;
+    std::vector<scripting::ScriptSystem*> m_systems;
+    std::vector<EntitySelector*> m_entitySelectors;
+    std::vector<std::string> m_tags;
 };
 
 } // namespace scene

@@ -56,7 +56,7 @@ reflection::Type SelectObjectNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::ConcatObjectsNode);
 }
 
-bool SelectObjectNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool SelectObjectNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "PinType" << YAML::Value << m_currentType;
     emitter << YAML::Key << "SelectIndex" << YAML::Value << m_index;
     serializeData(emitter);

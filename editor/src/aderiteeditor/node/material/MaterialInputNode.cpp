@@ -13,7 +13,7 @@
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/vfs/File.hpp"
 #include "aderiteeditor/vfs/VFS.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
+#include "aderiteeditor/platform/pc/backend/node/imnodes.h"
 
 namespace aderite {
 namespace node {
@@ -76,7 +76,7 @@ reflection::Type MaterialInputNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::MaterialInputNode);
 }
 
-bool MaterialInputNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool MaterialInputNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Material" << YAML::Value << m_material->getHandle();
     serializeData(emitter);
     return true;

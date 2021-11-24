@@ -1,7 +1,7 @@
 #pragma once
 
 #include "aderite/io/Forward.hpp"
-#include "aderite/scene/Entity.hpp"
+#include "aderite/scene/Forward.hpp"
 
 namespace aderite {
 namespace editor {
@@ -12,6 +12,7 @@ namespace editor {
 enum class SelectableObjectType {
     None,
     Asset,
+    Serializable,
     Entity,
 };
 
@@ -22,7 +23,8 @@ class SelectableObject {
 public:
     SelectableObject();
     SelectableObject(io::SerializableObject* asset);
-    SelectableObject(scene::Entity entity);
+    SelectableObject(scene::Entity* entity);
+    SelectableObject(io::ISerializable* serializable);
 
     /**
      * @brief Returns the type of the object
@@ -37,14 +39,20 @@ public:
     /**
      * @brief Returns the entity of the selectable
      */
-    scene::Entity getEntity() const;
+    scene::Entity* getEntity() const;
+
+    /**
+     * @brief Returns the object part of the selectable
+     */
+    io::ISerializable* getSerializable() const;
 
 private:
     SelectableObjectType m_type = SelectableObjectType::None;
 
     union {
         io::SerializableObject* Object;
-        scene::Entity Entity;
+        io::ISerializable* Serializable;
+        scene::Entity* Entity;
     } m_data;
 };
 

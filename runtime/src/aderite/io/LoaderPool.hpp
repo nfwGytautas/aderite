@@ -58,7 +58,7 @@ private:
      * @brief Returns true if the specified loadable is already in load queue, false otherwise
      * @param loadable Loadable to check
      */
-    bool isLoading(ILoadable* loadable);
+    bool isLoading(ILoadable* loadable) const;
 
     friend class Loader;
 

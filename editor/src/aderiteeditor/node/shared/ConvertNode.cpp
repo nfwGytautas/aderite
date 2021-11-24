@@ -10,7 +10,6 @@
 #include "aderiteeditor/node/shared/Properties.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/runtime/OperationArray.hpp"
-#include "aderiteeditor/windows/backend/node/imnodes.h"
 
 namespace aderite {
 namespace node {
@@ -83,7 +82,7 @@ reflection::Type ConvertNode::getType() const {
     return static_cast<reflection::Type>(reflection::EditorTypes::ConvertNode);
 }
 
-bool ConvertNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) {
+bool ConvertNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "From" << YAML::Value << p_inputs[0]->getType();
     emitter << YAML::Key << "To" << YAML::Value << p_outputs[0]->getType();
     serializeData(emitter);

@@ -7,8 +7,6 @@
 #include <extensions/PxExtensionsAPI.h>
 
 #include "aderite/physics/Forward.hpp"
-#include "aderite/scene/Entity.hpp"
-#include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 class Engine;
@@ -17,7 +15,9 @@ namespace physics {
 /**
  * @brief Class used to handle all physics related functionality for aderite
  */
-class PhysicsController {
+class PhysicsController final {
+    static constexpr float c_FixedUpdateWindow = 0.02f;
+
 public:
     /**
      * @brief Initializes the physics controller
@@ -36,29 +36,24 @@ public:
     void update(float delta);
 
     /**
-     * @brief Creates a static rigidbody and returns it
+     * @brief Returns the physics event list instance
      */
-    physx::PxRigidStatic* createStaticBody();
-
-    /**
-     * @brief Creates a dynamic rigidbody and returns it
-     */
-    physx::PxRigidDynamic* createDynamicBody();
+    PhysicsEventList* getEventList() const;
 
     /**
      * @brief Returns the PhysX physics object instance
      */
-    physx::PxPhysics* getPhysics();
+    physx::PxPhysics* getPhysics() const;
 
     /**
      * @brief Returns the PhysX CPU dispatcher
      */
-    physx::PxCpuDispatcher* getDispatcher();
+    physx::PxCpuDispatcher* getDispatcher() const;
 
     /**
      * @brief Returns the default physics material instance
      */
-    physx::PxMaterial* getDefaultMaterial();
+    physx::PxMaterial* getDefaultMaterial() const;
 
     /**
      * @brief Filter shader of the physics controller
@@ -76,6 +71,17 @@ public:
                                              physx::PxPairFlags& pairFlags, const void* constantBlock, physx::PxU32 constantBlockSize);
 
 private:
+    /**
+     * @brief Synchronize changes between physics world and ECS
+     */
+    void syncChanges();
+
+    /**
+     * @brief Removes detached actors from pool
+     */
+    void removeDetached();
+
+private:
     PhysicsController() {}
     friend Engine;
 
@@ -86,6 +92,9 @@ private:
     physx::PxDefaultCpuDispatcher* m_dispatcher = nullptr;
     physx::PxMaterial* m_defaultMaterial = nullptr;
     physx::PxPvd* m_pvd = nullptr;
+
+    float m_accumulator = 0.0f;
+    PhysicsEventList* m_events = nullptr;
 
     bool m_recordMemoryAllocations = true;
     size_t m_numThreads = 2;

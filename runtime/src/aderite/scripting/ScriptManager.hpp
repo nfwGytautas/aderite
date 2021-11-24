@@ -1,14 +1,13 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 #include <mono/jit/jit.h>
-#include <mono/metadata/assembly.h>
-#include <mono/metadata/debug-helpers.h>
 
-#include "aderite/scene/Entity.hpp"
+#include "aderite/io/Forward.hpp"
 #include "aderite/scripting/Forward.hpp"
+#include "aderite/scripting/LibClassLocator.hpp"
 
 namespace aderite {
 class Engine;
@@ -48,62 +47,92 @@ public:
     MonoDomain* getDomain() const;
 
     /**
-     * @brief Returns all behaviors that the script manager knows off
+     * @brief Returns the image of the code assembly
      */
-    std::vector<BehaviorWrapper*> getAllBehaviors() const;
+    MonoImage* getCodeImage() const;
 
     /**
-     * @brief Returns the behavior instance with the specified name
-     * @param name Name of the behavior
-     * @return BehaviorWrapper instance or nullptr if doesn't exist
-     */
-    BehaviorWrapper* getBehavior(const std::string& name);
-
-    /**
-     * @brief Creates a C# script Entity object from C++ entity
-     * @param entity Entity from which to create
+     * @brief Create C# instance of a serializable, multiple calls with the same serializable will return the same object instance this way
+     * saving on memory and time
+     * @param serializable Serializable to create for
      * @return MonoObject instance
      */
-    MonoObject* createEntityObject(scene::Entity entity);
+    MonoObject* createInstance(io::ISerializable* serializable);
 
     /**
-     * @brief Creates a C# mesh object from C++ asset
-     * @param mesh Mesh from which to create
+     * @brief Returns a system MonoClass instance
+     * @param name Name of the system
+     * @return System MonoClass instance or nullptr if a system with the specified name doesn't exist
+     */
+    MonoClass* getSystemClass(const std::string& name) const;
+
+    /**
+     * @brief Tries to resolve a class with the specified name
+     * @param nSpace Namespace of the class
+     * @param name Name of the class
+     * @return MonoClass instance or nullptr if failed to resolve
+     */
+    MonoClass* resolveClass(const std::string& nSpace, const std::string& name) const;
+
+    /**
+     * @brief Instantiate the specified object (0 argument constructor)
+     * @param klass Class to initialize
      * @return MonoObject instance
      */
-    MonoObject* createMeshObject(asset::MeshAsset* mesh);
+    MonoObject* instantiate(MonoClass* klass) const;
 
     /**
-     * @brief Creates a C# material object from C++ asset
-     * @param material Material from which to create
-     * @return MonoObject instance
+     * @brief Returns public fields of the specified object
+     * @param object Object instance
+     * @return Vector of FieldWrapper objects
      */
-    MonoObject* createMaterialObject(asset::MaterialAsset* material);
+    std::vector<FieldWrapper> getPublicFields(MonoObject* object) const;
 
     /**
-     * @brief Returns the ScriptedBehavior.Entity field
+     * @brief Tries to locate a method in the code assembly and returns it
+     * @param klass Class to search in
+     * @param signature Method signature
+     * @param paramCount Number of arguments in the method
+     * @return MonoMethod instance or nullptr
      */
-    MonoClassField* getBehaviorEntityField() const;
+    MonoMethod* getMethod(MonoClass* klass, const std::string& name, size_t paramCount) const;
 
     /**
-     * @brief Returns the Mesh class
+     * @brief Tries to locate a method in the code assembly and returns it
+     * @param signature Method signature
+     * @return MonoMethod instance or nullptr
      */
-    MonoClass* getMeshClass() const {
-        return m_meshClass;
-    }
+    MonoMethod* getMethod(const std::string& signature) const;
 
     /**
-     * @brief Returns the Material class
+     * @brief Returns a list of known systems and their names
      */
-    MonoClass* getMaterialClass() const {
-        return m_materialClass;
-    }
+    std::unordered_map<std::string, MonoClass*> getKnownSystems() const;
+
+    /**
+     * @brief Returns FieldType from the MonoType
+     * @param type MonoType instance
+     * @return Corresponding FieldType enum value
+     */
+    FieldType getType(MonoType* type) const;
+
+    /**
+     * @brief Returns the script lib locator
+     * @return Locator reference
+     */
+    LibClassLocator& getLocator();
+
+    /**
+     * @brief Creates a MonoString from the specified value
+     * @return MonoString object
+    */
+    MonoString* string(const char* value) const;
 
 private:
     /**
-     * @brief Resolves all Behavior classes in the loaded assembly
+     * @brief Resolves all system classes in the loaded assembly
      */
-    void resolveBehaviors();
+    void resolveSystemNames();
 
     /**
      * @brief Sets up all engine runtime related assemblies and information
@@ -116,11 +145,6 @@ private:
     bool setupCodeAssemblies();
 
     /**
-     * @brief Returns true if the specified class has ScriptedBehavior attribute
-     */
-    bool classMarkedAsBehavior(MonoClass* klass);
-
-    /**
      * @brief Cleans up all data
      */
     void clean();
@@ -130,6 +154,8 @@ private:
     friend Engine;
 
 private:
+    LibClassLocator m_locator;
+
     MonoDomain* m_jitDomain = nullptr;
 
     MonoDomain* m_currentDomain = nullptr;
@@ -138,23 +164,13 @@ private:
     MonoAssembly* m_scriptlibAssembly = nullptr;
     MonoImage* m_scriptlibImage = nullptr;
 
-    MonoClass* m_sbClass = nullptr; // ScriptedBehavior
-    MonoClassField* m_sbEntityField = nullptr;
-
-    MonoClass* m_entityClass = nullptr; // Entity
-    MonoClassField* m_entitySceneField = nullptr;
-    MonoClassField* m_entityEntityField = nullptr;
-
-    MonoClass* m_meshClass = nullptr;
-    MonoMethod* m_meshCtor = nullptr;
-    MonoClass* m_materialClass = nullptr;
-    MonoMethod* m_materialCtor = nullptr;
-
     // Code assemblies
     MonoAssembly* m_codeAssembly = nullptr;
     MonoImage* m_codeImage = nullptr;
 
-    std::vector<BehaviorWrapper*> m_behaviors;
+    // Vector containing the names of systems that exist in the image
+    std::unordered_map<std::string, MonoClass*> m_knownSystems;
+    std::unordered_map<io::ISerializable*, MonoObject*> m_objectCache;
 };
 
 } // namespace scripting

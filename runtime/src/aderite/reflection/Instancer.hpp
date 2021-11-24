@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <type_traits>
 
 #include "aderite/reflection/Forward.hpp"
@@ -21,7 +20,7 @@ public:
      * @brief Create Reflectable instance
      * @return Reflectable instance
      */
-    virtual Reflectable* create() = 0;
+    virtual Reflectable* create() const = 0;
 };
 
 /**
@@ -29,9 +28,9 @@ public:
  * @tparam T Instancer type, T must inherit from Reflectable
  */
 template<typename T>
-class Instancer : public InstancerBase {
+class Instancer final : public InstancerBase {
 public:
-    virtual Reflectable* create() override {
+    Reflectable* create() const override {
         ADERITE_STATIC_ASSERT((std::is_base_of<Reflectable, T>::value), "Instancer can only be used with types that inherit from "
                                                                         "Reflectable");
         return static_cast<Reflectable*>(new T());

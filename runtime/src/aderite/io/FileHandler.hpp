@@ -1,9 +1,8 @@
 #pragma once
 
 #include <filesystem>
-#include <unordered_map>
 
-#include "aderite/io/Forward.hpp"
+#include "aderite/Handles.hpp"
 
 namespace aderite {
 namespace io {
@@ -89,7 +88,7 @@ public:
      * @param handle Handle to write to
      * @param file Physical file to write
      */
-    void writePhysicalFile(LoadableHandle handle, const std::filesystem::path& file);
+    void writePhysicalFile(LoadableHandle handle, const std::filesystem::path& file) const;
 
 private:
     struct ChunkLocator {

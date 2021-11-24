@@ -10,7 +10,7 @@
 #include "aderite/physics/collider/Forward.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
-#include "aderite/scene/components/Forward.hpp"
+#include "aderite/scene/Forward.hpp"
 
 #include "aderiteeditor/utility/Macros.hpp"
 
@@ -33,15 +33,14 @@ public:
     virtual void execute(rendering::PipelineState* state) override;
     virtual void shutdown() override;
     virtual reflection::Type getType() const override;
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) override;
+    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     void updateUniform();
 
     // Rendering operations
-    void renderPhysicsObjects();
-    void renderBoxCollider(physics::BoxCollider* collider, const scene::TransformComponent& transform);
+    void renderBoxCollider(physics::BoxCollider* collider, const scene::Transform* transform);
 
     // Helpers
     void loadMeshes();
