@@ -77,13 +77,13 @@ public:
      * @brief If the type is of serializable, then this method can be used to directly extract the C++ instance
      * @return ISerializable instance
      */
-    io::ISerializable* getSerializable() const;
+    io::NamedSerializable* getSerializable() const;
 
     /**
      * @brief If the type is of serializable, then this method can be used to directly set the instance of it
      * @param serializable New instance of the field
      */
-    void setSerializable(io::ISerializable* serializable) const;
+    void setSerializable(io::NamedSerializable* serializable) const;
 
 private:
     MonoClassField* m_field = nullptr;

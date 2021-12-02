@@ -20,18 +20,9 @@
 #include <pvd/PxPvdTransport.h>
 
 #include "aderite/Aderite.hpp"
-#include "aderite/physics/Collider.hpp"
-#include "aderite/physics/DynamicActor.hpp"
-#include "aderite/physics/PhysicsEventList.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
-#include "aderite/physics/StaticActor.hpp"
-#include "aderite/scene/Entity.hpp"
-#include "aderite/scene/EntitySelector.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
-#include "aderite/scripting/LibClassLocator.hpp"
-#include "aderite/scripting/ScriptManager.hpp"
-#include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/LogExtensions.hpp"
 
@@ -147,9 +138,6 @@ bool PhysicsController::init() {
     // Configure collision filter
     physx::PxSetGroupCollisionFlag(0, 0, true);
 
-    // Create event list
-    m_events = new PhysicsEventList();
-
     LOG_INFO("[Physics] Physics controller initialized");
 
     return true;
@@ -165,8 +153,6 @@ void PhysicsController::shutdown() {
     m_pvd->release();
     PxCloseExtensions();
     m_foundation->release();
-
-    delete m_events;
 
     LOG_INFO("[Physics] Physics controller shutdown");
 }
@@ -184,9 +170,6 @@ void PhysicsController::update(float delta) {
         return;
     }
 
-    // Remove detached
-    this->removeDetached();
-
     m_accumulator += delta;
 
     if (m_accumulator < c_FixedUpdateWindow) {
@@ -195,11 +178,7 @@ void PhysicsController::update(float delta) {
 
     m_accumulator -= c_FixedUpdateWindow;
     physicsScene->simulate(c_FixedUpdateWindow);
-    this->syncChanges();
-}
-
-PhysicsEventList* PhysicsController::getEventList() const {
-    return m_events;
+    physicsScene->sendEvents();
 }
 
 physx::PxPhysics* PhysicsController::getPhysics() const {
@@ -229,73 +208,6 @@ physx::PxFilterFlags PhysicsController::filterShader(physx::PxFilterObjectAttrib
     pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND | physx::PxPairFlag::eNOTIFY_TOUCH_LOST;
 
     return physx::PxFilterFlag::eDEFAULT;
-}
-
-void PhysicsController::syncChanges() {
-    auto currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-
-    PhysicsScene* scene = currentScene->getPhysicsScene();
-
-    for (physics::PhysicsActor* actor : scene->getActors()) {
-        actor->sync();
-    }
-
-    // Send physics events to scripts
-    auto& locator = ::aderite::Engine::getScriptManager()->getLocator();
-
-    for (const TriggerEvent& te : m_events->getTriggerEvents()) {
-        MonoObject* triggerObject = locator.create(te);
-        for (scripting::ScriptSystem* system : currentScene->getScriptSystems()) {
-            scene::EntitySelector* selector = system->getSelector();
-
-            if (selector == nullptr) {
-                // No selector so system doesn't receive any entity events
-                continue;
-            }
-
-            if (!selector->isSelected(te.Actor->getEntity()) && !selector->isSelected(te.Trigger->getEntity())) {
-                // System is not interested in either of the entities
-                continue;
-            }
-
-            if (te.Enter) {
-                system->triggerEnter(triggerObject);
-            } else {
-                system->triggerLeave(triggerObject);
-            }
-        }
-    }
-
-    for (const CollisionEvent& ce : m_events->getCollisionEvents()) {
-        MonoObject* collisionObject = locator.create(ce);
-        for (scripting::ScriptSystem* system : currentScene->getScriptSystems()) {
-            scene::EntitySelector* selector = system->getSelector();
-
-            if (selector == nullptr) {
-                // No selector so system doesn't receive any entity events
-                continue;
-            }
-
-            if (!selector->isSelected(ce.Actor1->getEntity()) && !selector->isSelected(ce.Actor2->getEntity())) {
-                // System is not interested in either of the entities
-                continue;
-            }
-
-            if (ce.Start) {
-                system->collisionStart(collisionObject);
-            } else {
-                system->collisionEnd(collisionObject);
-            }
-        }
-    }
-
-    // Clear events
-    m_events->clear();
-}
-
-void PhysicsController::removeDetached() {
-    // TODO: Iterate and remove actors
-    // TODO: Also detach shapes from the actor
 }
 
 } // namespace physics

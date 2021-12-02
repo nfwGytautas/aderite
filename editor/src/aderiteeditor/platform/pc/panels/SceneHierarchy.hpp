@@ -27,9 +27,14 @@ private:
     void renderContextMenu();
 
     /**
-     * @brief Renders entity tree node of the scene
-     */
-    void renderEntities();
+     * @brief Renders visuals tree node of the scene
+    */
+    void renderVisuals();
+
+    /**
+     * @brief Renders scenery tree node of the scene
+    */
+    void renderScenery();
 
     /**
      * @brief Renders audio tree node of the scene

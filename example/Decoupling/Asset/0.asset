@@ -1,0 +1,12 @@
+Type: 3
+Handle: 0
+Name: Decoupling
+Data:
+  Visuals:
+    - Type: 43
+      Name: mFRFmtunNhSR
+      Data:
+        Transform:
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [1, 1, 1]

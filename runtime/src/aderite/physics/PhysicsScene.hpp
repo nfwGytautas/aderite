@@ -14,7 +14,7 @@ namespace physics {
 /**
  * @brief Physics scene for aderite
  */
-class PhysicsScene final : public physx::PxSimulationEventCallback, public io::ISerializable {
+class PhysicsScene final : public physx::PxSimulationEventCallback, public io::NamedSerializable {
 public:
     PhysicsScene();
     ~PhysicsScene();
@@ -26,22 +26,15 @@ public:
     void simulate(float step) const;
 
     /**
-     * @brief Add a physics actor at the specified transform
+     * @brief Add actor to the scene
      * @param actor Actor to add
-     * @param initialTransform Optional initial transform
-     */
-    void addActor(physics::PhysicsActor* actor, const scene::Transform* initialTransform = nullptr);
+    */
+    void addActor(BasePhysicsActor* actor);
 
     /**
-     * @brief Detach the specified actor from physics scene
-     * @param actor Actor to detach
-     */
-    void detachActor(physics::PhysicsActor* actor);
-
-    /**
-     * @brief Returns a vector of all actors in this scene
-     */
-    const std::vector<PhysicsActor*>& getActors() const;
+     * @brief Sends queued physics events to specified user callbacks
+    */
+    void sendEvents();
 
     /**
      * @brief Do a first hit raycast
@@ -64,8 +57,7 @@ private:
 
 private:
     physx::PxScene* m_scene = nullptr;
-
-    std::vector<PhysicsActor*> m_actors;
+    PhysicsEventList* m_events = nullptr;
 
     // Inherited via ISerializable
     reflection::Type getType() const override;

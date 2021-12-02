@@ -5,68 +5,35 @@
 #include <yaml-cpp/yaml.h>
 
 #include "aderite/io/Forward.hpp"
+#include "aderite/io/ISerializable.hpp"
 #include "aderite/reflection/Reflectable.hpp"
 
 namespace aderite {
 namespace io {
 
 /**
- * @brief Base class providing serializable interface
+ * @brief A class that represents a single serializable object
  */
-class ISerializable : public reflection::Reflectable {
+class SerializableObject : public ISerializable, public reflection::Reflectable {
 public:
-    virtual ~ISerializable() {}
+    SerializableObject();
+    virtual ~SerializableObject() = default;
 
     /**
-     * @brief Serialize object to emmitter
-     * @param serializer Serializer instance
-     * @param emitter Emmitter to serialize to
-     * @return True if serialized without errors, false otherwise
+     * @brief Returns the name of the serializable object
      */
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const = 0;
+    std::string getName() const;
 
     /**
-     * @brief Deserialize object from data node
-     * @param serializer Serializer instance
-     * @param data Data node
-     * @return True if deserialized, false otherwise
+     * @brief Sets the name of the serializable object
+     * @param name Name of the object
      */
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) = 0;
-};
-
-/**
- * @brief Base class for all serializable objects (object is something that has an ID)
- */
-class SerializableObject : public ISerializable {
-public:
-    virtual ~SerializableObject();
-
-    /**
-     * @brief Returns the handle of this serializable object
-     * @return Object handle
-     */
-    SerializableHandle getHandle() const;
-
-    /**
-     * @brief Returns the number of outstanding references to this object
-     */
-    size_t getRefCount() const;
-
-    /**
-     * @brief Releases a reference, this doesn't actually delete if a 0 is reached, this is mandated by the serializer
-     */
-    void release();
-
-    /**
-     * @brief Acquires a reference
-     */
-    void acquire();
+    void setName(const std::string& name);
 
 public:
-    friend class Serializer; // Used to set the handle
+    friend class Serializer; // Used to set the name
 private:
-    SerializableHandle m_handle = c_InvalidHandle;
-    size_t m_refCount = 0;
+    std::string m_name = "";
 };
 
 } // namespace io

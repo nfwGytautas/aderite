@@ -3,7 +3,6 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/Serializer.hpp"
-#include "aderite/scene/EntitySelector.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
@@ -13,14 +12,6 @@ namespace aderite {
 namespace scripting {
 
 ScriptSystem::ScriptSystem() {}
-
-void ScriptSystem::setSelector(scene::EntitySelector* selector) {
-    m_selector = selector;
-}
-
-scene::EntitySelector* ScriptSystem::getSelector() const {
-    return m_selector;
-}
 
 const std::string& ScriptSystem::getName() const {
     return m_name;
@@ -139,14 +130,6 @@ bool ScriptSystem::serialize(const io::Serializer* serializer, YAML::Emitter& em
     // Meta information
     emitter << YAML::Key << "Name" << YAML::Value << m_name;
 
-    // Selector
-    emitter << YAML::Key << "Selector" << YAML::Value;
-    if (m_selector != nullptr) {
-        emitter << m_selector->getName();
-    } else {
-        emitter << YAML::Null;
-    }
-
     // Fields
     emitter << YAML::Key << "Fields" << YAML::BeginMap;
     for (const scripting::FieldWrapper& fw : m_fields) {
@@ -162,7 +145,7 @@ bool ScriptSystem::serialize(const io::Serializer* serializer, YAML::Emitter& em
             break;
         }
         default: {
-            io::ISerializable* serializable = fw.getSerializable();
+            io::NamedSerializable* serializable = fw.getSerializable();
 
             if (serializable == nullptr) {
                 emitter << YAML::Null;
@@ -211,11 +194,6 @@ bool ScriptSystem::deserialize(io::Serializer* serializer, const YAML::Node& dat
     if (m_instance == nullptr) {
         // No instance abort
         return false;
-    }
-
-    // Selector
-    if (data["Selector"] && !data["Selector"].IsNull()) {
-        m_selector = m_scene->getSelector(data["Selector"].as<std::string>());
     }
 
     // Fields
@@ -269,31 +247,31 @@ bool ScriptSystem::deserialize(io::Serializer* serializer, const YAML::Node& dat
 }
 
 void ScriptSystem::updateEntitiesArray() {
-    size_t length = m_selector != nullptr ? m_selector->size() : 0;
+    //size_t length = m_selector != nullptr ? m_selector->size() : 0;
 
-    auto& locator = ::aderite::Engine::getScriptManager()->getLocator();
+    //auto& locator = ::aderite::Engine::getScriptManager()->getLocator();
 
-    if (m_entities == nullptr) {
-        // Create
-        m_entities = mono_array_new(::aderite::Engine::getScriptManager()->getDomain(), locator.getEntity().Klass, length);
-    } else {
-        // Check if there is a need for realloc
-        if (length != mono_array_length(m_entities)) {
-            LOG_TRACE("[Scripting] Reallocating entity array for system {0}, previous length: {1}, new length: {2}", m_name,
-                      mono_array_length(m_entities), length);
-            m_entities = mono_array_new(::aderite::Engine::getScriptManager()->getDomain(), locator.getEntity().Klass, length);
-        }
-    }
+    //if (m_entities == nullptr) {
+    //    // Create
+    //    m_entities = mono_array_new(::aderite::Engine::getScriptManager()->getDomain(), locator.getEntity().Klass, length);
+    //} else {
+    //    // Check if there is a need for realloc
+    //    if (length != mono_array_length(m_entities)) {
+    //        LOG_TRACE("[Scripting] Reallocating entity array for system {0}, previous length: {1}, new length: {2}", m_name,
+    //                  mono_array_length(m_entities), length);
+    //        m_entities = mono_array_new(::aderite::Engine::getScriptManager()->getDomain(), locator.getEntity().Klass, length);
+    //    }
+    //}
 
-    if (m_selector == nullptr) {
-        return;
-    }
+    //if (m_selector == nullptr) {
+    //    return;
+    //}
 
-    // Set elements
-    scene::Entity** entities = m_selector->getEntities();
-    for (size_t i = 0; i < length; i++) {
-        mono_array_setref(m_entities, i, locator.create(entities[i]));
-    }
+    //// Set elements
+    //scene::Entity** entities = m_selector->getEntities();
+    //for (size_t i = 0; i < length; i++) {
+    //    mono_array_setref(m_entities, i, locator.create(entities[i]));
+    //}
 }
 
 } // namespace scripting

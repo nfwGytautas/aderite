@@ -6,7 +6,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "aderite/io/SerializableObject.hpp"
+#include "aderite/io/SerializableAsset.hpp"
 
 namespace aderite {
 namespace audio {
@@ -14,7 +14,7 @@ namespace audio {
 /**
  * @brief Audio listener object used to denote a point in the world where audio is heard from
  */
-class AudioListener final : public io::ISerializable {
+class AudioListener final : public io::SerializableAsset {
 public:
     AudioListener();
     virtual ~AudioListener();
@@ -83,7 +83,7 @@ public:
      */
     void setVelocity(const glm::vec3& velocity);
 
-    // Inherited via ISerializable
+    // Inherited via SerializableAsset
     reflection::Type getType() const override;
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;

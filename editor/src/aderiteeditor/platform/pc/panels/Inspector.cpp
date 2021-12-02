@@ -367,7 +367,7 @@ void Inspector::renderStaticActor(physics::StaticActor* actor) {
 void Inspector::renderAsset() {
     static vfs::File* cacheFile = nullptr;
     static utility::InlineRename renamer;
-    io::SerializableObject* object = editor::State::LastSelectedObject.getAsset();
+    io::SerializableAsset* object = editor::State::LastSelectedObject.getAsset();
 
     if (cacheFile == nullptr || cacheFile->getHandle() != object->getHandle()) {
         // Refind
@@ -417,7 +417,7 @@ void Inspector::renderAsset() {
     }
 }
 
-void Inspector::renderMesh(io::SerializableObject* asset) {
+void Inspector::renderMesh(io::SerializableAsset* asset) {
     asset::MeshAsset* mesh = static_cast<asset::MeshAsset*>(asset);
     asset::MeshAsset::fields& finfo = mesh->getFieldsMutable();
 
@@ -438,7 +438,7 @@ void Inspector::renderMesh(io::SerializableObject* asset) {
     // TODO: Preview
 }
 
-void Inspector::renderTexture(io::SerializableObject* asset) {
+void Inspector::renderTexture(io::SerializableAsset* asset) {
     asset::TextureAsset* texture = static_cast<asset::TextureAsset*>(asset);
     asset::TextureAsset::fields& finfo = texture->getFieldsMutable();
 
@@ -484,7 +484,7 @@ void Inspector::renderTexture(io::SerializableObject* asset) {
     }
 }
 
-void Inspector::renderMaterial(io::SerializableObject* asset) {
+void Inspector::renderMaterial(io::SerializableAsset* asset) {
     asset::MaterialAsset* material = static_cast<asset::MaterialAsset*>(asset);
     asset::MaterialAsset::fields& finfo = material->getFieldsMutable();
 
@@ -607,7 +607,7 @@ void Inspector::renderMaterial(io::SerializableObject* asset) {
     }
 }
 
-void Inspector::renderMaterialType(io::SerializableObject* asset) {
+void Inspector::renderMaterialType(io::SerializableAsset* asset) {
     static utility::InlineRename renamer;
 
     asset::EditorMaterialType* type = static_cast<asset::EditorMaterialType*>(asset);
@@ -712,7 +712,7 @@ void Inspector::renderMaterialType(io::SerializableObject* asset) {
     }
 }
 
-void Inspector::renderScene(io::SerializableObject* asset) {
+void Inspector::renderScene(io::SerializableAsset* asset) {
     static vfs::File* cacheFile = nullptr;
     scene::Scene* type = static_cast<scene::Scene*>(asset);
 
@@ -741,7 +741,7 @@ void Inspector::renderScene(io::SerializableObject* asset) {
     }
 }
 
-void Inspector::renderPipeline(io::SerializableObject* asset) {
+void Inspector::renderPipeline(io::SerializableAsset* asset) {
     asset::RenderingPipeline* type = static_cast<asset::RenderingPipeline*>(asset);
 
     ImGui::PushItemWidth(-FLT_MIN);
@@ -755,7 +755,7 @@ void Inspector::renderPipeline(io::SerializableObject* asset) {
     ImGui::PopItemWidth();
 }
 
-void Inspector::renderAudio(io::SerializableObject* asset) {
+void Inspector::renderAudio(io::SerializableAsset* asset) {
     static SelectAudioModal sam;
 
     asset::AudioAsset* audio = static_cast<asset::AudioAsset*>(asset);
@@ -794,7 +794,7 @@ void Inspector::renderAudio(io::SerializableObject* asset) {
 }
 
 void Inspector::renderSerializable() {
-    io::ISerializable* object = editor::State::LastSelectedObject.getSerializable();
+    io::NamedSerializable* object = editor::State::LastSelectedObject.getSerializable();
 
     switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
     case reflection::RuntimeTypes::AUDIO_SOURCE: {
@@ -818,7 +818,7 @@ void Inspector::renderSerializable() {
     }
 }
 
-void Inspector::renderAudioSource(io::ISerializable* serializable) {
+void Inspector::renderAudioSource(io::NamedSerializable* serializable) {
     static utility::InlineRename renamer;
     audio::AudioSource* source = static_cast<audio::AudioSource*>(serializable);
 
@@ -832,7 +832,7 @@ void Inspector::renderAudioSource(io::ISerializable* serializable) {
     ImGui::Separator();
 }
 
-void Inspector::renderScriptSystem(io::ISerializable* serializable) {
+void Inspector::renderScriptSystem(io::NamedSerializable* serializable) {
     scripting::ScriptSystem* system = static_cast<scripting::ScriptSystem*>(serializable);
 
     ImGui::Text(system->getName().c_str());
@@ -989,7 +989,7 @@ void Inspector::renderScriptSystem(io::ISerializable* serializable) {
     }
 }
 
-void Inspector::renderEntitySelector(io::ISerializable* serializable) {
+void Inspector::renderEntitySelector(io::NamedSerializable* serializable) {
     static utility::InlineRename renamer;
     scene::EntitySelector* selector = static_cast<scene::EntitySelector*>(serializable);
 
@@ -1034,7 +1034,7 @@ void Inspector::renderEntitySelector(io::ISerializable* serializable) {
     }
 }
 
-void Inspector::renderAudioListener(io::ISerializable* serializable) {
+void Inspector::renderAudioListener(io::NamedSerializable* serializable) {
     static utility::InlineRename renamer;
     audio::AudioListener* listener = static_cast<audio::AudioListener*>(serializable);
 
@@ -1083,7 +1083,7 @@ void Inspector::render() {
         this->renderEntity();
         break;
     }
-    case editor::SelectableObjectType::Serializable: {
+    case editor::SelectableObjectType::NamedSerializable: {
         this->renderSerializable();
         break;
     }

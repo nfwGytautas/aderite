@@ -33,14 +33,17 @@ SerializableObject* Serializer::parseType(const YAML::Node& data) {
     ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in scope");
     ADERITE_DYNAMIC_ASSERT(data["Handle"], "No handle specified in scope");
     ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
+    ADERITE_DYNAMIC_ASSERT(data["Name"], "No name specified in scope");
 
     // Get resolver for type
     reflection::Type type = data["Type"].as<reflection::Type>();
     SerializableHandle handle = data["Handle"].as<SerializableHandle>();
+    std::string name = data["Name"].as<std::string>();
 
     // Create object
     SerializableObject* instance = ::aderite::Engine::getReflector()->reflect<SerializableObject>(type);
     instance->m_handle = handle;
+    instance->m_name = name;
 
     ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
 
@@ -62,11 +65,12 @@ SerializableObject* Serializer::parseType(const YAML::Node& data) {
 }
 
 void Serializer::writeType(YAML::Emitter& emitter, SerializableObject* object) const {
-    ADERITE_DYNAMIC_ASSERT(object->getHandle() == c_InvalidHandle, "Invalid handle passed to writeType");
+    ADERITE_DYNAMIC_ASSERT(object->getHandle() != c_InvalidHandle, "Invalid handle passed to writeType");
 
     emitter << YAML::BeginMap;
     emitter << YAML::Key << "Type" << YAML::Value << object->getType();
     emitter << YAML::Key << "Handle" << YAML::Value << object->getHandle();
+    emitter << YAML::Key << "Name" << YAML::Value << object->getName();
     emitter << YAML::Key << "Data" << YAML::BeginMap;
     object->serialize(this, emitter);
     emitter << YAML::EndMap;
@@ -76,11 +80,14 @@ void Serializer::writeType(YAML::Emitter& emitter, SerializableObject* object) c
 ISerializable* Serializer::parseUntrackedType(const YAML::Node& data) {
     ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
     ADERITE_DYNAMIC_ASSERT(data["Data"], "No data specified in scope");
+    ADERITE_DYNAMIC_ASSERT(data["Name"], "No name specified in scope");
 
     reflection::Type type = data["Type"].as<reflection::Type>();
+    std::string name = data["Name"].as<std::string>();
 
     // Create object
-    SerializableObject* instance = ::aderite::Engine::getReflector()->reflect<SerializableObject>(type);
+    ISerializable* instance = ::aderite::Engine::getReflector()->reflect<ISerializable>(type);
+    instance->m_name = name;
 
     ADERITE_DYNAMIC_ASSERT(instance->getType() == type, "Types don't match between instancer created instance and file stored type");
 
@@ -90,7 +97,7 @@ ISerializable* Serializer::parseUntrackedType(const YAML::Node& data) {
     return instance;
 }
 
-void Serializer::fillData(ISerializable* object, const YAML::Node& data) {
+void Serializer::fillData(NamedSerializable* object, const YAML::Node& data) {
     ADERITE_DYNAMIC_ASSERT(object != nullptr, "Trying to fill nullptr object");
 
     ADERITE_DYNAMIC_ASSERT(data["Type"], "No type specified in data scope");
@@ -105,9 +112,10 @@ void Serializer::fillData(ISerializable* object, const YAML::Node& data) {
     object->deserialize(this, data["Data"]);
 }
 
-void Serializer::writeUntrackedType(YAML::Emitter& emitter, const ISerializable* object) const {
+void Serializer::writeUntrackedType(YAML::Emitter& emitter, const NamedSerializable* object) const {
     emitter << YAML::BeginMap;
     emitter << YAML::Key << "Type" << YAML::Value << object->getType();
+    emitter << YAML::Key << "Name" << YAML::Value << object->getName();
     emitter << YAML::Key << "Data" << YAML::BeginMap;
     object->serialize(this, emitter);
     emitter << YAML::EndMap;
@@ -153,7 +161,7 @@ SerializableObject* Serializer::getOrRead(SerializableHandle handle) {
     YAML::Node data = YAML::Load(reinterpret_cast<const char*>(chunk.Data.data()));
 
     // Check version
-    ADERITE_DYNAMIC_ASSERT(data["Version"], "Tried to read a file without a specified version");
+    //ADERITE_DYNAMIC_ASSERT(data["Version"], "Tried to read a file without a specified version");
 
     // TODO: Check version and upgrade if needed
     SerializableObject* type = this->parseType(data);
@@ -174,21 +182,8 @@ void Serializer::save(SerializableObject* object) const {
 
     ADERITE_DYNAMIC_ASSERT(object->getHandle() != c_InvalidHandle, "SerializableObject with invalid handle passed");
 
-    out << YAML::BeginMap;
-
     // Common
-    out << YAML::Key << "Version" << YAML::Value << c_CurrentVersion;
-    out << YAML::Key << "Type" << YAML::Value << object->getType();
-    out << YAML::Key << "Handle" << YAML::Value << object->getHandle();
-    out << YAML::Key << "Data" << YAML::BeginMap;
-
-    if (!object->serialize(this, out)) {
-        LOG_ERROR("[Asset] Failed to serialize object handle: {0}", object->getHandle());
-        return;
-    }
-
-    out << YAML::EndMap;
-    out << YAML::EndMap;
+    this->writeType(out, object);
 
     // Resolve where to store this object
     LOG_TRACE("[Asset] Emitting {0} to DataChunk", object->getHandle());

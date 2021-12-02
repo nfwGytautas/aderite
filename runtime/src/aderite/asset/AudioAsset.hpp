@@ -1,7 +1,7 @@
 #pragma once
 
 #include "aderite/io/ILoadable.hpp"
-#include "aderite/io/SerializableObject.hpp"
+#include "aderite/io/SerializableAsset.hpp"
 
 namespace aderite {
 namespace asset {
@@ -9,7 +9,7 @@ namespace asset {
 /**
  * @brief Class representing an audio asset with it's own properties
  */
-class AudioAsset final : public io::SerializableObject, public io::ILoadable {
+class AudioAsset final : public io::SerializableAsset, public io::ILoadable {
 public:
     ~AudioAsset();
 
@@ -29,7 +29,7 @@ public:
     void unload() override;
     bool needsLoading() const override;
 
-    // Inherited via SerializableObject
+    // Inherited via SerializableAsset
     reflection::Type getType() const override;
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;

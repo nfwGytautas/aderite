@@ -4,10 +4,8 @@
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/rendering/Renderable.hpp"
-#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
-#include "aderite/scene/Transform.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Utility.hpp"
 
@@ -27,29 +25,29 @@ void EntityProvideOperation::execute(PipelineState* state) {
     this->cleanList();
 
     // Entity group
-    for (scene::Entity* entity : currentScene->getEntities()) {
-        if (entity->getScene() != currentScene) {
-            continue;
-        }
+    //for (scene::Entity* entity : currentScene->getEntities()) {
+    //    if (entity->getScene() != currentScene) {
+    //        continue;
+    //    }
 
-        Renderable* renderable = entity->getRenderable();
-        if (renderable != nullptr) {
-            if (renderable->isValid()) {
-                // Check if draw call already exists
-                size_t hash = utility::combineHash(renderable->getMesh()->getHandle(), renderable->getMaterial()->getHandle());
+    //    Renderable* renderable = entity->getRenderable();
+    //    if (renderable != nullptr) {
+    //        if (renderable->isValid()) {
+    //            // Check if draw call already exists
+    //            size_t hash = utility::combineHash(renderable->getMesh()->getHandle(), renderable->getMaterial()->getHandle());
 
-                if (m_lookup.find(hash) == m_lookup.end()) {
-                    // Create new drawcall and insert
-                    m_drawcalls.insert(m_drawcalls.end(), renderable->createDrawCall());
-                    m_lookup[hash] = m_drawcalls.size() - 1;
-                }
+    //            if (m_lookup.find(hash) == m_lookup.end()) {
+    //                // Create new drawcall and insert
+    //                m_drawcalls.insert(m_drawcalls.end(), renderable->createDrawCall());
+    //                m_lookup[hash] = m_drawcalls.size() - 1;
+    //            }
 
-                m_drawcalls[m_lookup[hash]].Transformations.push_back(entity->getTransform()->computeTransform());
-            } else {
-                renderable->loadIfNeeded();
-            }
-        }
-    }
+    //            m_drawcalls[m_lookup[hash]].Transformations.push_back(entity->getTransform()->computeTransform());
+    //        } else {
+    //            renderable->loadIfNeeded();
+    //        }
+    //    }
+    //}
 
     state->setDrawCallList(&m_drawcalls);
 }

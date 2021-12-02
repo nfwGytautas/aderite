@@ -33,8 +33,8 @@ void FieldWrapper::setValue(void* value) const {
     mono_field_set_value(m_instance, m_field, value);
 }
 
-io::ISerializable* FieldWrapper::getSerializable() const {
-    io::ISerializable* result = nullptr;
+io::NamedSerializable* FieldWrapper::getSerializable() const {
+    io::NamedSerializable* result = nullptr;
 
     // Get the mono object of the field first
     MonoObject* fieldValue = this->getValueObject();
@@ -57,7 +57,7 @@ io::ISerializable* FieldWrapper::getSerializable() const {
     return result;
 }
 
-void FieldWrapper::setSerializable(io::ISerializable* serializable) const {
+void FieldWrapper::setSerializable(io::NamedSerializable* serializable) const {
     this->setValue(::aderite::Engine::getScriptManager()->createInstance(serializable));
 }
 

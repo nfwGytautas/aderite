@@ -68,51 +68,39 @@ public:
     void shutdown();
 
     /**
-     * @brief Parses the type inside the current data scope and returns it
-     * @param data Data node, must have Type and Handle keys
+     * @brief Parses the object inside the current data scope and returns it
+     * @param data Data node, must have Type, Name keys
      * @return SerializableObject instance
      */
-    SerializableObject* parseType(const YAML::Node& data);
+    SerializableObject* parseObject(const YAML::Node& data);
 
     /**
      * @brief Write an object to the specified emitter
      * @param emitter Emitter to write to
      * @param object Object to write
      */
-    void writeType(YAML::Emitter& emitter, SerializableObject* object) const;
+    void writeObject(YAML::Emitter& emitter, SerializableObject* object) const;
 
     /**
-     * @brief Parses the type inside the current data scope, but DOES NOT track the object, meaning
-     * the user is responsible for calling delete on it and this object cannot be received through the
-     * serializer. This is mainly used when having nested objects who are managed by their parents, example
-     * editor graphs. This method allows the user to interact with the mini reflection system that serializer
-     * uses internally.
-     * @param data Data node, must have Type key
-     * @return ISerializable instance
+     * @brief Parses the asset inside the current data scope and returns it
+     * @param data Data node, must have Type, Name and Handle keys
+     * @return SerializableAsset instance
      */
-    ISerializable* parseUntrackedType(const YAML::Node& data);
+    SerializableAsset* parseAsset(const YAML::Node& data);
 
     /**
-     * @brief Fills the specified object with data from the node. This method is similar to parseUntrackedType, but is used when an instance
-     * already exists and should just be filled with data form disk
-     * @param object Object to fill
-     * @param data Data to fill with
-     */
-    void fillData(ISerializable* object, const YAML::Node& data);
-
-    /**
-     * @brief Write an untracked object to the specified emitter
+     * @brief Write an asset to the specified emitter
      * @param emitter Emitter to write to
-     * @param object Object to write
+     * @param asset Asset to write
      */
-    void writeUntrackedType(YAML::Emitter& emitter, const ISerializable* object) const;
+    void writeAsset(YAML::Emitter& emitter, SerializableAsset* asset) const;
 
     /**
      * @brief Returns object associated with the serializable handle
      * @param handle Handle of the object
      * @return Serializable object instance
      */
-    SerializableObject* get(SerializableHandle handle) const;
+    SerializableAsset* get(SerializableHandle handle) const;
 
     /**
      * @brief Adds an object to the Serializer look up table, if already existing object is added
@@ -134,12 +122,6 @@ public:
      * @return SerializableObject instance
      */
     SerializableObject* getOrRead(SerializableHandle handle);
-
-    /**
-     * @brief Rereads the meta data of the specified object
-     * @param object Object whose meta data to reread
-     */
-    void reread(SerializableObject* object);
 
     /**
      * @brief Serializes object into a file
@@ -174,13 +156,13 @@ private:
 
 private:
     /**
-     * @brief Returns the next available handle for an object, expanding the object vector as needed
+     * @brief Returns the next available handle for an asset, expanding the asset vector as needed
      * @return Next available handle
      */
     SerializableHandle nextAvailableHandle();
 
 private:
-    std::vector<SerializableObject*> m_objects;
+    std::vector<SerializableAsset*> m_objects;
     bool m_hasNull = false;
 };
 

@@ -11,7 +11,7 @@ namespace rendering {
 /**
  * @brief Rendering operation base class
  */
-class OperationBase : public io::ISerializable {
+class OperationBase : public io::NamedSerializable {
 public:
     virtual ~OperationBase() {};
 

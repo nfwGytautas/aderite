@@ -9,7 +9,7 @@
 
 #include "aderite/asset/Forward.hpp"
 #include "aderite/audio/Forward.hpp"
-#include "aderite/io/SerializableObject.hpp"
+#include "aderite/io/SerializableAsset.hpp"
 
 namespace aderite {
 namespace audio {
@@ -17,7 +17,7 @@ namespace audio {
 /**
  * @brief Audio source object used to denote a point in the world where audio is emitted from
  */
-class AudioSource final : public io::ISerializable {
+class AudioSource final : public io::SerializableAsset {
 public:
     AudioSource();
     virtual ~AudioSource();
@@ -111,7 +111,7 @@ public:
      */
     void setVelocity(const glm::vec3& velocity);
 
-    // Inherited via ISerializable
+    // Inherited via SerializableAsset
     reflection::Type getType() const override;
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;

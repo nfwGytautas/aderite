@@ -102,6 +102,7 @@ Editor:
 		Show if have a valid data source for texture and mesh
 		Directory renaming in tree node
 		Double clicking drag drop target show in asset browser
+		Save after renaming
 	Bugs:
 		On material type property delete link gets disconnected
 		Recovery from failure

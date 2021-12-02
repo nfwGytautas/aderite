@@ -1,15 +1,17 @@
 #pragma once
 
-#include "aderite/physics/Collider.hpp"
+#include "aderite/physics/geometry/Geometry.hpp"
 
 namespace aderite {
 namespace physics {
 
 /**
- * @brief Simple box collider
+ * @brief Simple 3D box geometry
  */
-class BoxCollider final : public Collider {
+class BoxGeometry : public Geometry {
 public:
+    BoxGeometry();
+
     /**
      * @brief Returns the size of the box collider
      * @return Box collider size
@@ -22,18 +24,15 @@ public:
      */
     void setSize(const glm::vec3 size);
 
-    // Inherited via Collider
-    reflection::Type getType() const override;
+    // Inherited via Geometry
+    void applyScale(const glm::vec3& scale) override;
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
-    Collider* clone() const override;
-
-protected:
-    // Inherited via Collider
-    virtual physx::PxGeometry* genGeometry() const override;
+    reflection::Type getType() const override;
 
 private:
     glm::vec3 m_size = glm::vec3(1.0f);
+
 };
 
 } // namespace physics

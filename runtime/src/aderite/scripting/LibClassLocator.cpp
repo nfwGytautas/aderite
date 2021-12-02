@@ -4,10 +4,7 @@
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
-#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/audio/AudioSource.hpp"
-#include "aderite/physics/PhysicsActor.hpp"
-#include "aderite/scene/Entity.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -118,11 +115,8 @@ bool LibClassLocator::isSystem(MonoClass* klass) const {
     return false;
 }
 
-MonoObject* LibClassLocator::create(io::ISerializable* serializable) const {
+MonoObject* LibClassLocator::create(io::NamedSerializable* serializable) const {
     switch (static_cast<reflection::RuntimeTypes>(serializable->getType())) {
-    case reflection::RuntimeTypes::ENTITY: {
-        return this->create(static_cast<scene::Entity*>(serializable));
-    }
     case reflection::RuntimeTypes::MESH: {
         return this->create(static_cast<asset::MeshAsset*>(serializable));
     }
@@ -135,19 +129,11 @@ MonoObject* LibClassLocator::create(io::ISerializable* serializable) const {
     case reflection::RuntimeTypes::AUDIO_SOURCE: {
         return this->create(static_cast<audio::AudioSource*>(serializable));
     }
-    case reflection::RuntimeTypes::PREFAB: {
-        return this->create(static_cast<asset::PrefabAsset*>(serializable));
-    }
     default: {
         LOG_ERROR("[Scripting] Unknown implementation for creating a {0} serializable", serializable->getType());
         return nullptr;
     }
     }
-}
-
-MonoObject* LibClassLocator::create(scene::Entity* entity) const {
-    void* args[1] = {&entity};
-    return this->genericInstanceCreate(m_entity.Klass, m_entity.Ctor, args);
 }
 
 MonoObject* LibClassLocator::create(asset::MeshAsset* mesh) const {
@@ -170,25 +156,25 @@ MonoObject* LibClassLocator::create(audio::AudioSource* source) const {
     return this->genericInstanceCreate(m_audioSource.Klass, m_audioSource.Ctor, args);
 }
 
-MonoObject* LibClassLocator::create(const physics::TriggerEvent& triggerEvent) const {
-    void* args[2] = {create(triggerEvent.Actor->getEntity()), create(triggerEvent.Trigger->getEntity())};
-    return this->genericInstanceCreate(m_triggerEvent.Klass, m_triggerEvent.Ctor, args);
-}
+//MonoObject* LibClassLocator::create(const physics::TriggerEvent& triggerEvent) const {
+//    void* args[2] = {create(triggerEvent.Actor->getEntity()), create(triggerEvent.Trigger->getEntity())};
+//    return this->genericInstanceCreate(m_triggerEvent.Klass, m_triggerEvent.Ctor, args);
+//}
+//
+//MonoObject* LibClassLocator::create(const physics::CollisionEvent& collisionEvent) const {
+//    void* args[2] = {create(collisionEvent.Actor1->getEntity()), create(collisionEvent.Actor2->getEntity())};
+//    return this->genericInstanceCreate(m_collisionEvent.Klass, m_collisionEvent.Ctor, args);
+//}
+//
+//MonoObject* LibClassLocator::create(const physics::RaycastHit& hit) const {
+//    void* args[2] = {create(hit.Actor->getEntity()), (void*)(&hit.Distance)};
+//    return this->genericInstanceCreate(m_raycastHit.Klass, m_raycastHit.Ctor, args);
+//}
 
-MonoObject* LibClassLocator::create(const physics::CollisionEvent& collisionEvent) const {
-    void* args[2] = {create(collisionEvent.Actor1->getEntity()), create(collisionEvent.Actor2->getEntity())};
-    return this->genericInstanceCreate(m_collisionEvent.Klass, m_collisionEvent.Ctor, args);
-}
-
-MonoObject* LibClassLocator::create(const physics::RaycastHit& hit) const {
-    void* args[2] = {create(hit.Actor->getEntity()), (void*)(&hit.Distance)};
-    return this->genericInstanceCreate(m_raycastHit.Klass, m_raycastHit.Ctor, args);
-}
-
-MonoObject* LibClassLocator::create(asset::PrefabAsset* prefab) const {
-    void* args[1] = {&prefab};
-    return this->genericInstanceCreate(m_prefab.Klass, m_prefab.Ctor, args);
-}
+//MonoObject* LibClassLocator::create(asset::PrefabAsset* prefab) const {
+//    void* args[1] = {&prefab};
+//    return this->genericInstanceCreate(m_prefab.Klass, m_prefab.Ctor, args);
+//}
 
 const LibClassLocator::ScriptSystem& LibClassLocator::getScriptSystem() const {
     return m_system;

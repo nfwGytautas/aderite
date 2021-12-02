@@ -10,11 +10,13 @@
 namespace aderite {
 namespace io {
 
-// Classes
 class FileHandler;
-class Serializer;
+
 class ISerializable;
+class SerializableAsset;
 class SerializableObject;
+class Serializer;
+
 class ILoadable;
 class Loader;
 class LoaderPool;

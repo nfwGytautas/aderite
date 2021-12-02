@@ -1,12 +1,11 @@
 #include "PhysicsScene.hpp"
 
 #include "aderite/Aderite.hpp"
-#include "aderite/physics/DynamicActor.hpp"
-#include "aderite/physics/PhysicsActor.hpp"
+#include "aderite/physics/BasePhysicsActor.hpp"
 #include "aderite/physics/PhysicsController.hpp"
+#include "aderite/physics/PhysicsEventList.hpp"
 #include "aderite/physics/PhysicsSceneQuery.hpp"
-#include "aderite/physics/StaticActor.hpp"
-#include "aderite/scene/Transform.hpp"
+#include "aderite/physics/geometry/Geometry.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -28,6 +27,9 @@ PhysicsScene::PhysicsScene() {
     m_scene->userData = this;
     ADERITE_DYNAMIC_ASSERT(m_scene != nullptr, "Failed to create a PhysX scene");
 
+    // Create event list
+    m_events = new PhysicsEventList();
+
     LOG_INFO("[Physics] Physics scene created");
 }
 
@@ -35,20 +37,12 @@ PhysicsScene::~PhysicsScene() {
     LOG_TRACE("[Physics] Destroying physics scene");
 
     if (m_scene != nullptr) {
-        size_t count = m_scene->getNbActors(physx::PxActorTypeFlag::eRIGID_STATIC | physx::PxActorTypeFlag::eRIGID_DYNAMIC);
-        std::vector<physx::PxActor*> actors;
-        actors.resize(count);
-
-        m_scene->getActors(physx::PxActorTypeFlag::eRIGID_STATIC | physx::PxActorTypeFlag::eRIGID_DYNAMIC, actors.data(), count);
-
-        for (physx::PxActor* actor : actors) {
-            delete static_cast<physics::PhysicsActor*>(actor->userData);
-        }
-
         m_scene->release();
     } else {
         LOG_WARN("[Physics] nullptr PhysX scene");
     }
+
+    delete m_events;
 
     LOG_INFO("[Physics] Physics scene destroyed");
 }
@@ -58,32 +52,34 @@ void PhysicsScene::simulate(float step) const {
     m_scene->fetchResults(true);
 }
 
-void PhysicsScene::addActor(physics::PhysicsActor* actor, const scene::Transform* initialTransform) {
-    // TODO: Check if not already attached, if attached to another scene move
-
-    // Initial position
-    if (initialTransform != nullptr) {
-        actor->moveActor(initialTransform->position());
-        actor->rotateActor(initialTransform->rotation());
-    }
-
-    this->m_scene->addActor(*actor->p_actor);
-    this->m_actors.push_back(actor);
+void PhysicsScene::addActor(BasePhysicsActor* actor) {
+    m_scene->addActor(*actor->p_actor);
 }
 
-void PhysicsScene::detachActor(physics::PhysicsActor* actor) {
-    auto it = std::find(m_actors.begin(), m_actors.end(), actor);
-
-    if (it == m_actors.end()) {
-        return;
+void PhysicsScene::sendEvents() {
+    // TODO: Think if only to send to trigger
+    for (const TriggerEvent& te : m_events->getTriggerEvents()) {
+        if (te.Enter) {
+            te.Actor->onPhysicsEventEnter(te.Trigger);
+            te.Trigger->onPhysicsEventEnter(te.Actor);
+        } else {
+            te.Actor->onPhysicsEventLeave(te.Trigger);
+            te.Trigger->onPhysicsEventLeave(te.Actor);
+        }
     }
 
-    delete *it;
-    m_actors.erase(it);
-}
+    for (const CollisionEvent& ce : m_events->getCollisionEvents()) {
+        if (ce.Start) {
+            ce.Actor1->onPhysicsEventEnter(ce.Actor2);
+            ce.Actor2->onPhysicsEventEnter(ce.Actor1);
+        } else {
+            ce.Actor1->onPhysicsEventLeave(ce.Actor2);
+            ce.Actor2->onPhysicsEventLeave(ce.Actor1);
+        }
+    }
 
-const std::vector<PhysicsActor*>& PhysicsScene::getActors() const {
-    return m_actors;
+    // Clear old events
+    m_events->clear();
 }
 
 bool PhysicsScene::raycastSingle(RaycastHit& result, const glm::vec3& from, const glm::vec3& direction, float maxDistance) {
@@ -95,7 +91,7 @@ bool PhysicsScene::raycastSingle(RaycastHit& result, const glm::vec3& from, cons
     }
 
     // Fill result
-    result.Actor = static_cast<PhysicsActor*>(hit.block.actor->userData);
+    result.Actor = static_cast<BasePhysicsActor*>(hit.block.actor->userData);
     result.Distance = hit.block.distance;
 
     return true;
@@ -108,20 +104,18 @@ void PhysicsScene::onContact(const physx::PxContactPairHeader& pairHeader, const
         physx::PxRigidActor* actor1 = pairHeader.actors[0];
         physx::PxRigidActor* actor2 = pairHeader.actors[1];
 
-        PhysicsActor* e1 = static_cast<PhysicsActor*>(actor1->userData);
-        PhysicsActor* e2 = static_cast<PhysicsActor*>(actor2->userData);
+        Geometry* geom1 = static_cast<Geometry*>(cp.shapes[0]->userData);
+        Geometry* geom2 = static_cast<Geometry*>(cp.shapes[1]->userData);
 
-        if (e1 == nullptr || e2 == nullptr) {
+        if (geom1 == nullptr || geom2 == nullptr) {
             continue;
         }
 
         // Send notifications
         if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-            e1->onCollisionEnter(e2);
-            e2->onCollisionEnter(e1);
+            m_events->registerEvent(CollisionEvent {geom1, geom2, true});
         } else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-            e1->onCollisionLeave(e2);
-            e2->onCollisionLeave(e1);
+            m_events->registerEvent(CollisionEvent {geom1, geom2, false});
         }
     }
 }
@@ -133,20 +127,18 @@ void PhysicsScene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) 
         physx::PxRigidActor* actor = cp.otherActor;
         physx::PxRigidActor* trigger = cp.triggerActor;
 
-        PhysicsActor* paA = static_cast<PhysicsActor*>(actor->userData);
-        PhysicsActor* paT = static_cast<PhysicsActor*>(trigger->userData);
+        Geometry* actorGeom = static_cast<Geometry*>(cp.otherShape->userData);
+        Geometry* triggerGeom = static_cast<Geometry*>(cp.triggerShape->userData);
 
-        if (paA == nullptr || paT == nullptr) {
+        if (actorGeom == nullptr || triggerGeom == nullptr) {
             continue;
         }
 
         // Send notifications
         if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-            paA->onTriggerEnter(paT);
-            paT->onTriggerEnter(paA);
+            m_events->registerEvent(TriggerEvent {triggerGeom, actorGeom, true});
         } else if (cp.status & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) {
-            paA->onTriggerLeave(paT);
-            paT->onTriggerLeave(paA);
+            m_events->registerEvent(TriggerEvent {triggerGeom, actorGeom, false});
         }
     }
 }

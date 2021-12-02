@@ -103,7 +103,7 @@ void AssetBrowser::renderItems() {
 
         // Files
         for (vfs::File* file : m_currentDir->getFiles()) {
-            io::SerializableObject* object = ::aderite::Engine::getSerializer()->getOrRead(file->getHandle());
+            io::SerializableAsset* object = ::aderite::Engine::getSerializer()->getOrRead(file->getHandle());
             bgfx::TextureHandle icon = BGFX_INVALID_HANDLE;
 
             ImGui::TableNextColumn();
@@ -182,7 +182,7 @@ void AssetBrowser::renderItems() {
 
 void AssetBrowser::renderAddItemPopup() {
     std::string newName = "";
-    io::SerializableObject* object = nullptr;
+    io::SerializableAsset* object = nullptr;
 
     if (ImGui::MenuItem("New folder")) {
         m_currentDir->createDirectory("New folder");

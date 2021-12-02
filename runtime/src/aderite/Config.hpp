@@ -3,7 +3,8 @@
 // Version of the engine
 // History:
 //		0.0 - Initial release
-constexpr const char* EngineVersion = "0.0";
+//		0.1 - TBD
+constexpr const char* EngineVersion = "0.1";
 
 // ---------------------------------
 // WINDOWING BACKENDS

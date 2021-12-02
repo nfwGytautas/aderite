@@ -115,7 +115,7 @@ MonoImage* ScriptManager::getCodeImage() const {
     return m_codeImage;
 }
 
-MonoObject* ScriptManager::createInstance(io::ISerializable* serializable) {
+MonoObject* ScriptManager::createInstance(io::NamedSerializable* serializable) {
     ADERITE_DYNAMIC_ASSERT(serializable != nullptr, "Nullptr serializable passed to createInstance");
 
     // Check if an object already exists

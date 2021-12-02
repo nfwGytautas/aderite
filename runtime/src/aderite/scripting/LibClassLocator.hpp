@@ -98,14 +98,7 @@ public:
      * @param serializable Serializable object
      * @return MonoObject instance
      */
-    MonoObject* create(io::ISerializable* serializable) const;
-
-    /**
-     * @brief Creates a C# script Entity object from C++ entity
-     * @param entity Entity from which to create
-     * @return MonoObject instance
-     */
-    MonoObject* create(scene::Entity* entity) const;
+    MonoObject* create(io::NamedSerializable* serializable) const;
 
     /**
      * @brief Creates a C# mesh object from C++ asset
@@ -135,33 +128,33 @@ public:
      */
     MonoObject* create(audio::AudioSource* source) const;
 
-    /**
-     * @brief Creates a C# trigger event object from C++
-     * @param triggerEvent TriggerEvent object
-     * @return MonoObject instance
-     */
-    MonoObject* create(const physics::TriggerEvent& triggerEvent) const;
+    ///**
+    // * @brief Creates a C# trigger event object from C++
+    // * @param triggerEvent TriggerEvent object
+    // * @return MonoObject instance
+    // */
+    //MonoObject* create(const physics::TriggerEvent& triggerEvent) const;
 
-    /**
-     * @brief Creates a C# collision event object from C++
-     * @param collisionEvent CollisionEvent object
-     * @return MonoObject instance
-     */
-    MonoObject* create(const physics::CollisionEvent& collisionEvent) const;
+    ///**
+    // * @brief Creates a C# collision event object from C++
+    // * @param collisionEvent CollisionEvent object
+    // * @return MonoObject instance
+    // */
+    //MonoObject* create(const physics::CollisionEvent& collisionEvent) const;
 
-    /**
-     * @brief Creates a C# raycast hit object from C++
-     * @param hit RaycastHit object
-     * @return MonoObject instance
-     */
-    MonoObject* create(const physics::RaycastHit& hit) const;
+    ///**
+    // * @brief Creates a C# raycast hit object from C++
+    // * @param hit RaycastHit object
+    // * @return MonoObject instance
+    // */
+    //MonoObject* create(const physics::RaycastHit& hit) const;
 
-    /**
-     * @brief Creates a C# prefab object from C++
-     * @param prefab Prefab object
-     * @return MonoObject instance
-     */
-    MonoObject* create(asset::PrefabAsset* prefab) const;
+    ///**
+    // * @brief Creates a C# prefab object from C++
+    // * @param prefab Prefab object
+    // * @return MonoObject instance
+    // */
+    //MonoObject* create(asset::PrefabAsset* prefab) const;
 
     // ====================================================================================
     // Class getters

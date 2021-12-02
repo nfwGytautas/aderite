@@ -1,0 +1,7 @@
+Root:
+  Name: /
+  Directories:
+    []
+  Files:
+    - Name: Decoupling
+      Content: 0

@@ -14,7 +14,7 @@ namespace rendering {
  * @brief Rendering pipeline object, the rendering engine loops through the pipeline
  * operations executing them one by one
  */
-class Pipeline ADERITE_MIDDLEWARE_FINAL : public io::SerializableObject {
+class Pipeline ADERITE_MIDDLEWARE_FINAL : public io::SerializableAsset {
 public:
     Pipeline();
     ADERITE_MIDDLEWARE_VIRTUAL ~Pipeline();

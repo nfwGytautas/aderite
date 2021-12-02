@@ -17,20 +17,9 @@ namespace scripting {
 /**
  * @brief ScriptSystem class is used to provide scripting engine the functionality to add it's own system that can handle any type of data
  */
-class ScriptSystem final : public io::ISerializable {
+class ScriptSystem final : public io::NamedSerializable {
 public:
     ScriptSystem();
-
-    /**
-     * @brief Set the entity selector of the system, this will be able to reached through this.Entities field in the C# script
-     * @param selector Selector instance to set
-     */
-    void setSelector(scene::EntitySelector* selector);
-
-    /**
-     * @brief Returns the entity selector instance of the system
-     */
-    scene::EntitySelector* getSelector() const;
 
     /**
      * @brief Returns the name of the system
@@ -118,7 +107,6 @@ private:
     void updateEntitiesArray();
 
 private:
-    scene::EntitySelector* m_selector = nullptr;
     scene::Scene* m_scene = nullptr;
     std::string m_name = "";
 

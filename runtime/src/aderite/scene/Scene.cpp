@@ -4,10 +4,8 @@
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
 #include "aderite/rendering/Pipeline.hpp"
-#include "aderite/scene/Entity.hpp"
-#include "aderite/scene/EntitySelector.hpp"
 #include "aderite/scene/SceneSerializer.hpp"
-#include "aderite/scene/Transform.hpp"
+#include "aderite/scene/Visual.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
@@ -15,11 +13,44 @@
 namespace aderite {
 namespace scene {
 
+template<typename T>
+bool addObject(std::vector<T*>& list, T* object) {
+    ADERITE_DYNAMIC_ASSERT(object != nullptr, "Passed nullptr to addObject");
+
+    // Check if a object with the same name exists
+    auto it = std::find_if(list.begin(), list.end(), [object](const T* obj) {
+        return obj->getName() == object->getName();
+    });
+
+    if (it != list.end()) {
+        LOG_WARN("[Scene] Tried to add a object that already exists in the scene {0}", object->getName());
+        return false;
+    }
+
+    list.push_back(object);
+    return true;
+}
+
+template<typename T>
+void removeObject(std::vector<T*>& list, T* object) {
+    ADERITE_DYNAMIC_ASSERT(object != nullptr, "Tried to remove nullptr object");
+    auto it = std::find_if(list.begin(), list.end(), [object](const T* obj) {
+        return object->getName() == obj->getName();
+    });
+    ADERITE_DYNAMIC_ASSERT(it != list.end(), "Tried to remove entity that doesn't exist in the scene");
+    list.erase(it);
+    delete object;
+}
+
 Scene::~Scene() {
     LOG_TRACE("[Scene] Deleting scene {0}", this->getHandle());
 
     // Free resources
     delete m_physics;
+
+    for (Visual* visual : m_visuals) {
+        delete visual;
+    }
 
     for (audio::AudioSource* source : m_audioSources) {
         delete source;
@@ -29,26 +60,37 @@ Scene::~Scene() {
         delete listener;
     }
 
-    for (Entity* entity : m_entities) {
-        delete entity;
-    }
-
     for (scripting::ScriptSystem* system : m_systems) {
         delete system;
-    }
-
-    for (EntitySelector* selector : m_entitySelectors) {
-        delete selector;
     }
 
     LOG_INFO("[Scene] Scene {0} deleted", this->getHandle());
 }
 
-void Scene::update(float delta) {
-    for (EntitySelector* selector : m_entitySelectors) {
-        // Regenerate selector views
-        selector->regenerate();
-    }
+void Scene::update(float delta) {}
+
+void Scene::addVisual(Visual* visual) {
+    addObject(m_visuals, visual);
+}
+
+void Scene::removeVisual(Visual* visual) {
+    removeObject(m_visuals, visual);
+}
+
+const std::vector<Visual*> Scene::getVisuals() const {
+    return m_visuals;
+}
+
+void Scene::addScenery(Scenery* scenery) {
+    addObject(m_scenery, scenery);
+}
+
+void Scene::removeScenery(Scenery* scenery) {
+    removeObject(m_scenery, scenery);
+}
+
+const std::vector<Scenery*> Scene::getScenery() const {
+    return m_scenery;
 }
 
 void Scene::addScriptSystem(scripting::ScriptSystem* system) {
@@ -69,20 +111,12 @@ void Scene::addScriptSystem(scripting::ScriptSystem* system) {
     m_systems.push_back(system);
 }
 
-void Scene::addEntitySelector(EntitySelector* selector) {
-    LOG_TRACE("[Scene] Adding entity selector {0} to scene {1}", selector->getName(), this->getHandle());
-    m_entitySelectors.push_back(selector);
-    selector->setScene(this);
-}
-
 void Scene::addAudioListener(audio::AudioListener* listener) {
-    LOG_TRACE("[Scene] Adding audio listener {0} to scene {1}", listener->getName(), this->getHandle());
-    m_audioListeners.push_back(listener);
+    addObject(m_audioListeners, listener);
 }
 
 void Scene::addAudioSource(audio::AudioSource* source) {
-    LOG_TRACE("[Scene] Adding audio source {0} to scene {1}", source->getName(), this->getHandle());
-    m_audioSources.push_back(source);
+    addObject(m_audioSources, source);
 }
 
 size_t Scene::getFreeTagSlots() const {
@@ -140,19 +174,6 @@ physics::PhysicsScene* Scene::getPhysicsScene() const {
     return m_physics;
 }
 
-EntitySelector* Scene::getSelector(const std::string& name) const {
-    auto it = std::find_if(m_entitySelectors.begin(), m_entitySelectors.end(), [name](const EntitySelector* selector) {
-        return selector->getName() == name;
-    });
-
-    if (it == m_entitySelectors.end()) {
-        LOG_WARN("[Scene] Tried to get selector {0} from scene {1}, but the scene doesn't have it", name, this->getHandle());
-        return nullptr;
-    }
-
-    return *it;
-}
-
 audio::AudioSource* Scene::getSource(const std::string& name) const {
     auto it = std::find_if(m_audioSources.begin(), m_audioSources.end(), [name](const audio::AudioSource* source) {
         return source->getName() == name;
@@ -171,41 +192,6 @@ void Scene::setPipeline(rendering::Pipeline* pipeline) {
     m_pipeline = pipeline;
 }
 
-void Scene::addEntity(Entity* entity) {
-    // Make sure name is unique
-    auto it = std::find_if(m_entities.begin(), m_entities.end(), [&](const Entity* e) {
-        return e->getName() == entity->getName();
-    });
-    if (it != m_entities.end()) {
-        entity->setName(entity->getName() + " (" + utility::generateString(6) + ")");
-    }
-
-    // Add entity
-    entity->setScene(this);
-    m_entities.push_back(entity);
-
-    for (EntitySelector* selector : m_entitySelectors) {
-        selector->onEntityAdded(entity);
-    }
-}
-
-void Scene::removeEntity(Entity* entity) {
-    ADERITE_DYNAMIC_ASSERT(entity != nullptr, "Tried to remove nullptr entity");
-    auto it = std::find_if(m_entities.begin(), m_entities.end(), [&](const Entity* e) {
-        return entity->getScene() == this && e->getName() == entity->getName();
-    });
-    ADERITE_DYNAMIC_ASSERT(it != m_entities.end(), "Tried to remove entity that doesn't exist in the scene");
-    m_entities.erase(it);
-
-    entity->m_scene = nullptr;
-
-    if (entity->m_actor != nullptr) {
-        m_physics->detachActor(entity->m_actor);
-    }
-
-    delete entity;
-}
-
 const std::vector<audio::AudioSource*>& Scene::getAudioSources() const {
     return m_audioSources;
 }
@@ -218,16 +204,8 @@ const std::vector<scripting::ScriptSystem*> Scene::getScriptSystems() const {
     return m_systems;
 }
 
-const std::vector<EntitySelector*> Scene::getEntitySelectors() const {
-    return m_entitySelectors;
-}
-
 const std::vector<std::string>& Scene::getTags() const {
     return m_tags;
-}
-
-const std::vector<Entity*> Scene::getEntities() const {
-    return m_entities;
 }
 
 reflection::Type Scene::getType() const {

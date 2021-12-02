@@ -57,7 +57,7 @@ public:
      * @param serializable Serializable to create for
      * @return MonoObject instance
      */
-    MonoObject* createInstance(io::ISerializable* serializable);
+    MonoObject* createInstance(io::NamedSerializable* serializable);
 
     /**
      * @brief Returns a system MonoClass instance
@@ -170,7 +170,7 @@ private:
 
     // Vector containing the names of systems that exist in the image
     std::unordered_map<std::string, MonoClass*> m_knownSystems;
-    std::unordered_map<io::ISerializable*, MonoObject*> m_objectCache;
+    std::unordered_map<io::NamedSerializable*, MonoObject*> m_objectCache;
 };
 
 } // namespace scripting

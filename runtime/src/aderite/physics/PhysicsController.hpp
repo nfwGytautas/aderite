@@ -36,11 +36,6 @@ public:
     void update(float delta);
 
     /**
-     * @brief Returns the physics event list instance
-     */
-    PhysicsEventList* getEventList() const;
-
-    /**
      * @brief Returns the PhysX physics object instance
      */
     physx::PxPhysics* getPhysics() const;
@@ -71,17 +66,6 @@ public:
                                              physx::PxPairFlags& pairFlags, const void* constantBlock, physx::PxU32 constantBlockSize);
 
 private:
-    /**
-     * @brief Synchronize changes between physics world and ECS
-     */
-    void syncChanges();
-
-    /**
-     * @brief Removes detached actors from pool
-     */
-    void removeDetached();
-
-private:
     PhysicsController() {}
     friend Engine;
 
@@ -94,7 +78,6 @@ private:
     physx::PxPvd* m_pvd = nullptr;
 
     float m_accumulator = 0.0f;
-    PhysicsEventList* m_events = nullptr;
 
     bool m_recordMemoryAllocations = true;
     size_t m_numThreads = 2;

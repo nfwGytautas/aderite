@@ -21,7 +21,7 @@ enum class GraphType { RENDER_PIPELINE, MATERIAL };
 /**
  * @brief Main node editor object which represent the current graph state
  */
-class Graph : public io::ISerializable {
+class Graph : public io::NamedSerializable {
 public:
     Graph();
     virtual ~Graph();

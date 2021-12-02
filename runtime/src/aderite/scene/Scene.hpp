@@ -32,28 +32,44 @@ public:
     void update(float delta);
 
     /**
-     * @brief Add entity to the scene
-     * @param entity Entity to add
+     * @brief Add a visual to the scene (scene takes ownership of the visual)
+     * @param visual Visual to add
      */
-    void addEntity(Entity* entity);
+    void addVisual(Visual* visual);
 
     /**
-     * @brief Remove entity from the scene
-     * @param entity Entity to remove
-    */
-    void removeEntity(Entity* entity);
+     * @brief Remove visual from the scene
+     * @param visual Visual to remove
+     */
+    void removeVisual(Visual* visual);
+
+    /**
+     * @brief Returns the visuals of this scene
+     */
+    const std::vector<Visual*> getVisuals() const;
+
+    /**
+     * @brief Add a scenery to the scene (scene takes ownership of the scenery)
+     * @param scenery Scenery to add
+     */
+    void addScenery(Scenery* scenery);
+
+    /**
+     * @brief Remove visual from the scene
+     * @param scenery Scenery to remove
+     */
+    void removeScenery(Scenery* scenery);
+
+    /**
+     * @brief Returns the scenery of this scene
+     */
+    const std::vector<Scenery*> getScenery() const;
 
     /**
      * @brief Adds a script system to the scene
      * @param system System to add
      */
     void addScriptSystem(scripting::ScriptSystem* system);
-
-    /**
-     * @brief Adds a entity selector to the scene
-     * @param selector Selector instance
-     */
-    void addEntitySelector(EntitySelector* selector);
 
     /**
      * @brief Adds a audio listener to the scene
@@ -107,13 +123,6 @@ public:
     physics::PhysicsScene* getPhysicsScene() const;
 
     /**
-     * @brief Returns the selector with the specified name
-     * @param name Name of the selector
-     * @return EntitySelector instance or nullptr if not found
-     */
-    EntitySelector* getSelector(const std::string& name) const;
-
-    /**
      * @brief Returns the audio source with the specified name
      * @param name Name of the source
      * @return AudioSource instance or nullptr if not found
@@ -136,19 +145,9 @@ public:
     const std::vector<scripting::ScriptSystem*> getScriptSystems() const;
 
     /**
-     * @brief Returns the entity selectors defined in this scene
-     */
-    const std::vector<EntitySelector*> getEntitySelectors() const;
-
-    /**
      * @brief Returns the tags of the scene
      */
     const std::vector<std::string>& getTags() const;
-
-    /**
-     * @brief Get entities in this scene
-     */
-    const std::vector<Entity*> getEntities() const;
 
     // Inherited via SerializableObject
     reflection::Type getType() const override;
@@ -163,11 +162,13 @@ private:
     physics::PhysicsScene* m_physics = nullptr;
     rendering::Pipeline* m_pipeline = nullptr;
 
+    std::vector<Visual*> m_visuals;
+    std::vector<Scenery*> m_scenery;
+
     std::vector<audio::AudioSource*> m_audioSources;
     std::vector<audio::AudioListener*> m_audioListeners;
-    std::vector<Entity*> m_entities;
+
     std::vector<scripting::ScriptSystem*> m_systems;
-    std::vector<EntitySelector*> m_entitySelectors;
     std::vector<std::string> m_tags;
 };
 

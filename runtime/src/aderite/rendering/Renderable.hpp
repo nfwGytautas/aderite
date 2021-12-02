@@ -2,16 +2,17 @@
 
 #include "aderite/asset/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
-#include "aderite/rendering/DrawCall.hpp"
 
 namespace aderite {
 namespace rendering {
 
 /**
- * @brief Renderable class that contains data needed to render an object, including mesh, material and other rendering data
+ * @brief A class that provides functionality for renderable objects
  */
-class Renderable final : public io::ISerializable {
+class Renderable : public io::ISerializable {
 public:
+    virtual ~Renderable() = default;
+
     /**
      * @brief Set the mesh of the renderable
      * @param mesh Mesh to set
@@ -25,11 +26,6 @@ public:
     void setMaterial(asset::MaterialAsset* material);
 
     /**
-     * @brief Creates and returns a DrawCall object from this renderable
-     */
-    DrawCall createDrawCall() const;
-
-    /**
      * @brief Returns mesh instance
      */
     asset::MeshAsset* getMesh() const;
@@ -39,30 +35,14 @@ public:
      */
     asset::MaterialAsset* getMaterial() const;
 
-    /**
-     * @brief Returns true if the renderable is valid and can be used to render, false otherwise
-     */
-    bool isValid() const;
-
-    /**
-     * @brief Loads the renderable assets if needed
-     */
-    void loadIfNeeded();
-
-    /**
-     * @brief Creates a replica of this renderable
-     * @return Renderable instance
-     */
-    Renderable* clone() const;
-
     // Inherited via ISerializable
-    reflection::Type getType() const override;
-    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
-    asset::MeshAsset* m_meshHandle = nullptr;
-    asset::MaterialAsset* m_materialHandle = nullptr;
+    asset::MeshAsset* m_mesh = nullptr;
+    asset::MaterialAsset* m_material = nullptr;
+
 };
 
 } // namespace rendering

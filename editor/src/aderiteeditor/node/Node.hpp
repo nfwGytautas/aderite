@@ -15,7 +15,7 @@ namespace node {
  * @brief Base node class
  * NOTES: Inherited nodes should define their constructor as (id, Graph*, args...)
  */
-class Node : public io::ISerializable {
+class Node : public io::NamedSerializable {
 public:
     Node();
     Node(int id);

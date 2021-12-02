@@ -21,20 +21,17 @@ enum class RuntimeTypes : Type {
     MAT_TYPE = 4,
     PIPELINE = 5,
     AUDIO = 6,
-    PREFAB = 7,
 
     // Audio
     AUDIO_SOURCE = 20,
     AUDIO_LISTENER = 21,
 
     // Entity
-    TRANSFORM = 40,
-    ENTITY = 41,
-    RENDERABLE = 42,
+    VISUAL = 40,
+    SCENERY = 41,
 
-    // Colliders
-    CLDR_LIST = 50,
-    BOX_CLDR,
+    // Geometry
+    BOX_GEOMETRY = 75,
 
     // Physics
     PHYSICS_ACTOR = 90,
@@ -56,6 +53,7 @@ enum class RuntimeTypes : Type {
     TAG_SELECTOR = 211,
 
     // Last element of runtime types, used to specify the end runtime serializables
+    UNDEFINED = 249,
     RESERVED = 250,
     // END used to extend runtime types
     END

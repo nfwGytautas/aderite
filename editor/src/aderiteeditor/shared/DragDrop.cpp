@@ -6,11 +6,11 @@ namespace aderite {
 namespace editor {
 
 struct DragDropInfo {
-    io::ISerializable* Data = nullptr;
+    io::NamedSerializable* Data = nullptr;
 };
 
 
-void DragDrop::renderSource(io::ISerializable* serializable) {
+void DragDrop::renderSource(io::NamedSerializable* serializable) {
     if (serializable == nullptr) {
         return;
     }
@@ -22,19 +22,19 @@ void DragDrop::renderSource(io::ISerializable* serializable) {
     }
 }
 
-void DragDrop::renderSource(io::ISerializable* serializable, reflection::Type as) {
+void DragDrop::renderSource(io::NamedSerializable* serializable, reflection::Type as) {
     if (serializable == nullptr) {
         return;
     }
 
     if (ImGui::BeginDragDropSource()) {
-        ImGui::SetDragDropPayload(std::to_string(as).c_str(), serializable, sizeof(io::ISerializable*));
+        ImGui::SetDragDropPayload(std::to_string(as).c_str(), serializable, sizeof(io::NamedSerializable*));
         ImGui::EndDragDropSource();
     }
 }
 
-io::ISerializable* DragDrop::renderTarget(reflection::Type type) {
-    io::ISerializable* result = nullptr;
+io::NamedSerializable* DragDrop::renderTarget(reflection::Type type) {
+    io::NamedSerializable* result = nullptr;
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::to_string(type).c_str())) {
@@ -47,23 +47,23 @@ io::ISerializable* DragDrop::renderTarget(reflection::Type type) {
     return result;
 }
 
-void DragDrop::renderGenericSource(io::ISerializable* serializable) {
+void DragDrop::renderGenericSource(io::NamedSerializable* serializable) {
     if (serializable == nullptr) {
         return;
     }
 
     if (ImGui::BeginDragDropSource()) {
-        ImGui::SetDragDropPayload("GenericDD", serializable, sizeof(io::ISerializable*));
+        ImGui::SetDragDropPayload("GenericDD", serializable, sizeof(io::NamedSerializable*));
         ImGui::EndDragDropSource();
     }
 }
 
-io::ISerializable* DragDrop::renderGenericTarget() {
-    io::ISerializable* result = nullptr;
+io::NamedSerializable* DragDrop::renderGenericTarget() {
+    io::NamedSerializable* result = nullptr;
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GenericDD")) {
-            result = static_cast<io::ISerializable*>(payload->Data);
+            result = static_cast<io::NamedSerializable*>(payload->Data);
         }
 
         ImGui::EndDragDropTarget();

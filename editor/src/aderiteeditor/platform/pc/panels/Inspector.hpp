@@ -29,20 +29,20 @@ private:
 
     // Assets
     void renderAsset();
-    void renderMesh(io::SerializableObject* asset);
-    void renderTexture(io::SerializableObject* asset);
-    void renderMaterial(io::SerializableObject* asset);
-    void renderMaterialType(io::SerializableObject* asset);
-    void renderScene(io::SerializableObject* asset);
-    void renderPipeline(io::SerializableObject* asset);
-    void renderAudio(io::SerializableObject* asset);
+    void renderMesh(io::SerializableAsset* asset);
+    void renderTexture(io::SerializableAsset* asset);
+    void renderMaterial(io::SerializableAsset* asset);
+    void renderMaterialType(io::SerializableAsset* asset);
+    void renderScene(io::SerializableAsset* asset);
+    void renderPipeline(io::SerializableAsset* asset);
+    void renderAudio(io::SerializableAsset* asset);
 
     // Serializables
     void renderSerializable();
-    void renderAudioSource(io::ISerializable* serializable);
-    void renderScriptSystem(io::ISerializable* serializable);
-    void renderEntitySelector(io::ISerializable* serializable);
-    void renderAudioListener(io::ISerializable* serializable);
+    void renderAudioSource(io::NamedSerializable* serializable);
+    void renderScriptSystem(io::NamedSerializable* serializable);
+    void renderEntitySelector(io::NamedSerializable* serializable);
+    void renderAudioListener(io::NamedSerializable* serializable);
 };
 
 } // namespace editor
