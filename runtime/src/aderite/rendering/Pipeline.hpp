@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "aderite/io/SerializableObject.hpp"
+#include "aderite/io/SerializableAsset.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
 #include "aderite/utility/Macros.hpp"
@@ -43,7 +43,7 @@ public:
      */
     void shutdown();
 
-    // Inherited via ISerializable
+    // Inherited via SerializableObject
     reflection::Type getType() const override;
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;

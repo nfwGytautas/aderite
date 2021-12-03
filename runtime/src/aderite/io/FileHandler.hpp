@@ -40,6 +40,7 @@ public:
         static constexpr LoadableHandle StringsAudioBank = 1;
         static constexpr LoadableHandle ScriptLibCode = 2;
         static constexpr LoadableHandle GameCode = 3;
+        static constexpr LoadableHandle AssetRegistry = 4;
     };
 
 public:

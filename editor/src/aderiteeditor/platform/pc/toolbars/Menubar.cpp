@@ -164,7 +164,7 @@ void Menubar::render() {
 
         if (ImGui::BeginMenu("Debug")) {
             if (ImGui::MenuItem("Do action")) {
-                static float y = 2.0f;
+                /*static float y = 2.0f;
                 physics::RaycastHit result1;
                 physics::RaycastHit result2;
                 ::aderite::Engine::getSceneManager()->getCurrentScene()->getPhysicsScene()->raycastSingle(result1, {0.0f, y, 0.0f},
@@ -174,7 +174,7 @@ void Menubar::render() {
                                                                                                           {0.0f, -1.0f, 0.0f}, 50);
 
                 LOG_TRACE("{0}", result1.Distance);
-                LOG_TRACE("{0}", result2.Distance);
+                LOG_TRACE("{0}", result2.Distance);*/
             }
 
             ImGui::EndMenu();

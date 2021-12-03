@@ -14,5 +14,7 @@ class LibClassLocator;
 class ScriptSystem;
 class FieldWrapper;
 
+class ScriptEventMap;
+
 } // namespace scripting
 } // namespace aderite

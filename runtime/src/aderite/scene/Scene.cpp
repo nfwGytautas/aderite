@@ -2,9 +2,12 @@
 
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
-#include "aderite/physics/PhysicsScene.hpp"
+#include "aderite/io/Serializer.hpp"
 #include "aderite/rendering/Pipeline.hpp"
-#include "aderite/scene/SceneSerializer.hpp"
+#include "aderite/scene/DynamicPhysicsRegion.hpp"
+#include "aderite/scene/Entity.hpp"
+#include "aderite/scene/Scenery.hpp"
+#include "aderite/scene/StaticPhysicsRegion.hpp"
 #include "aderite/scene/Visual.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
@@ -12,6 +15,25 @@
 
 namespace aderite {
 namespace scene {
+
+#define SERIALIZE_LIST(rootName, objects)               \
+    emitter << YAML::Key << rootName << YAML::BeginSeq; \
+    for (const auto* object : objects) {                \
+        serializer->writeObject(emitter, object);       \
+    }                                                   \
+    emitter << YAML::EndSeq;
+
+// TODO: Check for failed parsing
+#define DESERIALIZE_LIST(rootName, type)                                            \
+    {                                                                               \
+        auto objects = data[rootName];                                              \
+        if (objects) {                                                              \
+            for (auto object : objects) {                                           \
+                type* parsed = static_cast<type*>(serializer->parseObject(object)); \
+                this->add(parsed);                                                  \
+            }                                                                       \
+        }                                                                           \
+    }
 
 template<typename T>
 bool addObject(std::vector<T*>& list, T* object) {
@@ -43,37 +65,45 @@ void removeObject(std::vector<T*>& list, T* object) {
 }
 
 Scene::~Scene() {
-    LOG_TRACE("[Scene] Deleting scene {0}", this->getHandle());
+    LOG_TRACE("[Scene] Deleting scene {0}", this->getName());
 
-    // Free resources
-    delete m_physics;
-
+    // Objects
     for (Visual* visual : m_visuals) {
         delete visual;
     }
+    for (Scenery* scenery : m_scenery) {
+        delete scenery;
+    }
+    for (Entity* entity : m_entities) {
+        delete entity;
+    }
 
+    // Physics
+    for (StaticPhysicsRegion* region : m_staticPhysicsRegions) {
+        delete region;
+    }
+    for (DynamicPhysicsRegion* region : m_dynamicPhysicsRegions) {
+        delete region;
+    }
+
+    // Audio
     for (audio::AudioSource* source : m_audioSources) {
         delete source;
     }
-
     for (audio::AudioListener* listener : m_audioListeners) {
         delete listener;
     }
 
-    for (scripting::ScriptSystem* system : m_systems) {
-        delete system;
-    }
-
-    LOG_INFO("[Scene] Scene {0} deleted", this->getHandle());
+    LOG_INFO("[Scene] Scene {0} deleted", this->getName());
 }
 
 void Scene::update(float delta) {}
 
-void Scene::addVisual(Visual* visual) {
+void Scene::add(Visual* visual) {
     addObject(m_visuals, visual);
 }
 
-void Scene::removeVisual(Visual* visual) {
+void Scene::remove(Visual* visual) {
     removeObject(m_visuals, visual);
 }
 
@@ -81,11 +111,11 @@ const std::vector<Visual*> Scene::getVisuals() const {
     return m_visuals;
 }
 
-void Scene::addScenery(Scenery* scenery) {
+void Scene::add(Scenery* scenery) {
     addObject(m_scenery, scenery);
 }
 
-void Scene::removeScenery(Scenery* scenery) {
+void Scene::remove(Scenery* scenery) {
     removeObject(m_scenery, scenery);
 }
 
@@ -93,85 +123,68 @@ const std::vector<Scenery*> Scene::getScenery() const {
     return m_scenery;
 }
 
-void Scene::addScriptSystem(scripting::ScriptSystem* system) {
-    LOG_TRACE("[Scene] Adding system {0} to scene {1}", system->getName(), this->getHandle());
-    ADERITE_DYNAMIC_ASSERT(system != nullptr, "Passed nullptr scripting::ScriptSystem to addScriptSystem");
-
-    // Check if a system with the same name exists
-    auto it = std::find_if(m_systems.begin(), m_systems.end(), [system](const scripting::ScriptSystem* sys) {
-        return sys->getName() == system->getName();
-    });
-
-    if (it != m_systems.end()) {
-        LOG_ERROR("[Scene] Tried to add a system that already exists in the scene {0}", system->getName());
-        return;
-    }
-
-    system->attachToScene(this);
-    m_systems.push_back(system);
+void Scene::add(Entity* entity) {
+    addObject(m_entities, entity);
 }
 
-void Scene::addAudioListener(audio::AudioListener* listener) {
+void Scene::remove(Entity* entity) {
+    removeObject(m_entities, entity);
+}
+
+const std::vector<Entity*> Scene::getEntities() const {
+    return m_entities;
+}
+
+void Scene::add(StaticPhysicsRegion* region) {
+    addObject(m_staticPhysicsRegions, region);
+}
+
+void Scene::remove(StaticPhysicsRegion* region) {
+    removeObject(m_staticPhysicsRegions, region);
+}
+
+const std::vector<StaticPhysicsRegion*> Scene::getStaticPhysicsRegions() const {
+    return m_staticPhysicsRegions;
+}
+
+void Scene::add(DynamicPhysicsRegion* region) {
+    addObject(m_dynamicPhysicsRegions, region);
+}
+
+void Scene::remove(DynamicPhysicsRegion* region) {
+    removeObject(m_dynamicPhysicsRegions, region);
+}
+
+const std::vector<DynamicPhysicsRegion*> Scene::getDynamicPhysicsRegions() const {
+    return m_dynamicPhysicsRegions;
+}
+
+void Scene::add(audio::AudioListener* listener) {
     addObject(m_audioListeners, listener);
 }
 
-void Scene::addAudioSource(audio::AudioSource* source) {
+void Scene::remove(audio::AudioListener* listener) {
+    removeObject(m_audioListeners, listener);
+}
+
+const std::vector<audio::AudioListener*>& Scene::getAudioListeners() const {
+    return m_audioListeners;
+}
+
+void Scene::add(audio::AudioSource* source) {
     addObject(m_audioSources, source);
 }
 
-size_t Scene::getFreeTagSlots() const {
-    size_t count = 0;
-    for (const std::string& tag : m_tags) {
-        if (tag.empty()) {
-            count++;
-        }
-    }
-
-    return count;
+void Scene::remove(audio::AudioSource* source) {
+    removeObject(m_audioSources, source);
 }
 
-size_t Scene::getTagIndex(const std::string& name) const {
-    for (size_t i = 0; i < m_tags.size(); i++) {
-        if (m_tags[i] == name) {
-            return i + 1;
-        }
-    }
-
-    return c_MaxTags + 2;
-}
-
-void Scene::addTag(const std::string& name) {
-    LOG_TRACE("[Scene] Adding tag {0} to scene {1}", name, this->getHandle());
-    ADERITE_DYNAMIC_ASSERT(this->getFreeTagSlots() > 0, "No more tags can be inserted into the scene tag list");
-
-    // Check if a tag with the same name already exists
-    auto it = std::find(m_tags.begin(), m_tags.end(), name);
-    if (it != m_tags.end()) {
-        LOG_WARN("[Scene] Tried to add a tag {0} that already exists", name);
-        return;
-    }
-
-    // Add tag
-    auto it2 = std::find(m_tags.begin(), m_tags.end(), "");
-    *it2 = name;
-}
-
-void Scene::removeTag(const std::string& name) {
-    auto it = std::find(m_tags.begin(), m_tags.end(), name);
-    if (it == m_tags.end()) {
-        LOG_WARN("[Scene] Tried to remove tag {0} that the scene {1} doesn't have", name, this->getHandle());
-        return;
-    }
-
-    *it = "";
+const std::vector<audio::AudioSource*>& Scene::getAudioSources() const {
+    return m_audioSources;
 }
 
 rendering::Pipeline* Scene::getPipeline() const {
     return m_pipeline;
-}
-
-physics::PhysicsScene* Scene::getPhysicsScene() const {
-    return m_physics;
 }
 
 audio::AudioSource* Scene::getSource(const std::string& name) const {
@@ -180,7 +193,7 @@ audio::AudioSource* Scene::getSource(const std::string& name) const {
     });
 
     if (it == m_audioSources.end()) {
-        LOG_WARN("[Scene] Tried to get audio source {0} from scene {1}, but the scene doesn't have it", name, this->getHandle());
+        LOG_WARN("[Scene] Tried to get audio source {0} from scene {1}, but the scene doesn't have it", name, this->getName());
         return nullptr;
     }
 
@@ -188,24 +201,8 @@ audio::AudioSource* Scene::getSource(const std::string& name) const {
 }
 
 void Scene::setPipeline(rendering::Pipeline* pipeline) {
-    LOG_WARN("[Scene] Setting scene {0} pipeline to {1}", this->getHandle(), pipeline->getHandle());
+    LOG_WARN("[Scene] Setting scene {0} pipeline to {1}", this->getName(), pipeline->getHandle());
     m_pipeline = pipeline;
-}
-
-const std::vector<audio::AudioSource*>& Scene::getAudioSources() const {
-    return m_audioSources;
-}
-
-const std::vector<audio::AudioListener*>& Scene::getAudioListeners() const {
-    return m_audioListeners;
-}
-
-const std::vector<scripting::ScriptSystem*> Scene::getScriptSystems() const {
-    return m_systems;
-}
-
-const std::vector<std::string>& Scene::getTags() const {
-    return m_tags;
 }
 
 reflection::Type Scene::getType() const {
@@ -213,19 +210,52 @@ reflection::Type Scene::getType() const {
 }
 
 bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    SceneSerializer ss;
-    return ss.serialize(this, serializer, emitter);
+    if (!PhysicsScene::serialize(serializer, emitter)) {
+        return false;
+    }
+
+    if (!ScriptEventMap::serialize(serializer, emitter)) {
+        return false;
+    }
+
+    // Object
+    SERIALIZE_LIST("Visuals", m_visuals);
+    SERIALIZE_LIST("Scenery", m_scenery);
+    SERIALIZE_LIST("Entities", m_entities);
+
+    // Physics
+    SERIALIZE_LIST("StaticPhysicsRegions", m_staticPhysicsRegions);
+    SERIALIZE_LIST("DynamicPhysicsRegions", m_dynamicPhysicsRegions);
+
+    // Audio
+    SERIALIZE_LIST("AudioListeners", m_audioListeners);
+    SERIALIZE_LIST("AudioSources", m_audioSources);
 }
 
 bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    SceneSerializer ss;
-    return ss.deserialize(this, serializer, data);
+    if (!PhysicsScene::deserialize(serializer, data)) {
+        return false;
+    }
+
+    if (!ScriptEventMap::deserialize(serializer, data)) {
+        return false;
+    }
+
+    // Object
+    DESERIALIZE_LIST("Visuals", Visual);
+    DESERIALIZE_LIST("Scenery", Scenery);
+    DESERIALIZE_LIST("Entities", Entity);
+
+    // Physics
+    DESERIALIZE_LIST("StaticPhysicsRegions", StaticPhysicsRegion);
+    DESERIALIZE_LIST("DynamicPhysicsRegions", DynamicPhysicsRegion);
+
+    // Audio
+    DESERIALIZE_LIST("AudioListeners", audio::AudioListener);
+    DESERIALIZE_LIST("AudioSources", audio::AudioSource);
 }
 
-Scene::Scene() {
-    m_physics = new physics::PhysicsScene();
-    m_tags.resize(c_MaxTags, "");
-}
+Scene::Scene() {}
 
 } // namespace scene
 } // namespace aderite

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "aderite/io/Forward.hpp"
-#include "aderite/scene/Entity.hpp"
-
 #include "aderiteeditor/platform/pc/UIComponent.hpp"
 
 namespace aderite {
@@ -20,12 +18,12 @@ public:
 
 private:
     // Entity
-    void renderEntity();
+    //void renderEntity();
 
     // Physics
-    void renderActor(physics::PhysicsActor* actor);
+    /*void renderActor(physics::PhysicsActor* actor);
     void renderDynamicActor(physics::DynamicActor* actor);
-    void renderStaticActor(physics::StaticActor* actor);
+    void renderStaticActor(physics::StaticActor* actor);*/
 
     // Assets
     void renderAsset();
@@ -39,10 +37,9 @@ private:
 
     // Serializables
     void renderSerializable();
-    void renderAudioSource(io::NamedSerializable* serializable);
-    void renderScriptSystem(io::NamedSerializable* serializable);
-    void renderEntitySelector(io::NamedSerializable* serializable);
-    void renderAudioListener(io::NamedSerializable* serializable);
+    void renderAudioSource(io::SerializableObject* serializable);
+    void renderScriptSystem(io::SerializableObject* serializable);
+    void renderAudioListener(io::SerializableObject* serializable);
 };
 
 } // namespace editor

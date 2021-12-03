@@ -2,6 +2,7 @@
 
 #include <bx/timer.h>
 
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/input/InputManager.hpp"
 #include "aderite/io/FileHandler.hpp"
@@ -47,10 +48,19 @@ bool Engine::init(InitOptions options) {
     }
 #endif
 
+    // File handle
+    m_fileHandler = new io::FileHandler();
+
     // Loader pool
     // TODO: Configurable thread count
-    m_fileHandler = new io::FileHandler();
     m_loaderPool = new io::LoaderPool(2);
+
+    // Asset manager
+    m_assetManager = new asset::AssetManager();
+    if (!m_assetManager->init()) {
+        LOG_ERROR("[Engine] Aborting aderite initialization");
+        return false;
+    }
 
     // Scene manager
     m_sceneManager = new scene::SceneManager();
@@ -134,6 +144,7 @@ void Engine::shutdown() {
     m_inputManager->shutdown();
     m_serializer->shutdown();
     m_reflector->shutdown();
+    m_assetManager->shutdown();
     m_physicsController->shutdown();
     m_renderer->shutdown();
     m_windowManager->shutdown();
@@ -149,6 +160,7 @@ void Engine::shutdown() {
     delete m_fileHandler;
     delete m_reflector;
     delete m_scriptManager;
+    delete m_assetManager;
 
     delete m_middleware;
 

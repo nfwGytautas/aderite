@@ -39,7 +39,7 @@ bool RenderingPipeline::serialize(const io::Serializer* serializer, YAML::Emitte
     Pipeline::serialize(serializer, emitter);
 
     emitter << YAML::Key << "Graph";
-    serializer->writeUntrackedType(emitter, m_graph);
+    serializer->writeObject(emitter, m_graph);
     return true;
 }
 
@@ -47,7 +47,7 @@ bool RenderingPipeline::deserialize(io::Serializer* serializer, const YAML::Node
     Pipeline::deserialize(serializer, data);
 
     delete m_graph;
-    m_graph = static_cast<node::Graph*>(serializer->parseUntrackedType(data["Graph"]));
+    m_graph = static_cast<node::Graph*>(serializer->parseObject(data["Graph"]));
     return true;
 }
 

@@ -1,0 +1,75 @@
+Type: 3
+Name: LJNejSNYmwoc
+Data:
+  PhysicsScene:
+    {}
+  ScriptEventMap:
+    {}
+  Visuals:
+    - Type: 40
+      Name: KMYx2SMhof6P
+      Data:
+        Transform:
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [1, 1, 1]
+        Renderable:
+          {}
+  Scenery:
+    - Type: 41
+      Name: tpaXU2G43otM
+      Data:
+        StaticPhysicsActor:
+          BasePhysicsActor:
+            Geometry:
+              []
+        Renderable:
+          {}
+  Entities:
+    - Type: 42
+      Name: EZ8cNZM3Ttld
+      Data:
+        DynamicPhysicsActor:
+          BasePhysicsActor:
+            Geometry:
+              []
+          Mass: 1
+          HasGravity: true
+        Renderable:
+          {}
+  StaticPhysicsRegions:
+    - Type: 50
+      Name: 7U8qvA3oFe0y
+      Data:
+        StaticPhysicsActor:
+          BasePhysicsActor:
+            Geometry:
+              []
+  DynamicPhysicsRegions:
+    - Type: 51
+      Name: GDNO4OVraia0
+      Data:
+        DynamicPhysicsActor:
+          BasePhysicsActor:
+            Geometry:
+              []
+          Mass: 1
+          HasGravity: true
+  AudioListeners:
+    - Type: 21
+      Name: wEO36bXmkhTU
+      Data:
+        Name: RS4xumfjwu2h
+        Enabled: false
+        Position: [0, 0, 0]
+        Rotation: [1, 0, 0, 0]
+        Velocity: [0, 0, 0]
+  AudioSources:
+    - Type: 20
+      Name: V4ziwBIbL7I3
+      Data:
+        Name: PAPOrDDzd5tH
+        Volume: 1
+        Position: [0, 0, 0]
+        Rotation: [1, 0, 0, 0]
+        Velocity: [0, 0, 0]

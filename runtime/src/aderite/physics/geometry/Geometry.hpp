@@ -13,7 +13,7 @@ namespace physics {
 /**
  * @brief Geometry is the interface class for geometry types for collider shapes
  */
-class Geometry : public io::NamedSerializable {
+class Geometry : public io::SerializableObject {
 public:
     Geometry();
     virtual ~Geometry();

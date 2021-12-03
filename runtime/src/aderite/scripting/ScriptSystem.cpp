@@ -145,32 +145,32 @@ bool ScriptSystem::serialize(const io::Serializer* serializer, YAML::Emitter& em
             break;
         }
         default: {
-            io::NamedSerializable* serializable = fw.getSerializable();
+            //io::NamedSerializable* serializable = fw.getSerializable();
 
-            if (serializable == nullptr) {
-                emitter << YAML::Null;
-            } else {
-                switch (fw.getType()) {
-                case scripting::FieldType::Mesh:
-                case scripting::FieldType::Material:
-                case scripting::FieldType::Prefab:
-                case scripting::FieldType::Audio: {
-                    // SerializableObject
-                    io::SerializableObject* object = static_cast<io::SerializableObject*>(serializable);
-                    emitter << object->getHandle();
-                    break;
-                }
-                case scripting::FieldType::AudioSource: {
-                    audio::AudioSource* source = static_cast<audio::AudioSource*>(serializable);
-                    emitter << source->getName();
-                    break;
-                }
-                default: {
-                    LOG_ERROR("[Scripting] Unknown implementation for serializing field of type {0}", fw.getType());
-                    emitter << YAML::Null;
-                }
-                }
-            }
+            //if (serializable == nullptr) {
+            //    emitter << YAML::Null;
+            //} else {
+            //    switch (fw.getType()) {
+            //    case scripting::FieldType::Mesh:
+            //    case scripting::FieldType::Material:
+            //    case scripting::FieldType::Prefab:
+            //    case scripting::FieldType::Audio: {
+            //        // SerializableObject
+            //        io::SerializableObject* object = static_cast<io::SerializableObject*>(serializable);
+            //        emitter << object->getHandle();
+            //        break;
+            //    }
+            //    case scripting::FieldType::AudioSource: {
+            //        audio::AudioSource* source = static_cast<audio::AudioSource*>(serializable);
+            //        emitter << source->getName();
+            //        break;
+            //    }
+            //    default: {
+            //        LOG_ERROR("[Scripting] Unknown implementation for serializing field of type {0}", fw.getType());
+            //        emitter << YAML::Null;
+            //    }
+            //    }
+            //}
         }
         }
     }
@@ -224,9 +224,9 @@ bool ScriptSystem::deserialize(io::Serializer* serializer, const YAML::Node& dat
                 case scripting::FieldType::Prefab:
                 case scripting::FieldType::Audio: {
                     // Serializable object
-                    io::SerializableObject* object =
+                    /*io::SerializableObject* object =
                         ::aderite::Engine::getSerializer()->getOrRead(fieldData.second.as<io::SerializableHandle>());
-                    fw.setSerializable(object);
+                    fw.setSerializable(object);*/
                     break;
                 }
                 case scripting::FieldType::AudioSource: {

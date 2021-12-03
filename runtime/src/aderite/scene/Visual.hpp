@@ -11,7 +11,7 @@ namespace scene {
  * @brief Visual class is used to define an object in a scene that is just that a visual. These objects only have a mesh, material and
  * transform information. They are used to detail the world
  */
-class Visual final : public io::NamedSerializable, public ITransformProvider, public rendering::Renderable {
+class Visual final : public io::SerializableObject, public ITransformProvider, public rendering::Renderable {
 public:
     Visual();
 

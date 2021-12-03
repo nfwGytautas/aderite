@@ -102,7 +102,7 @@ bool BasePhysicsActor::serialize(const io::Serializer* serializer, YAML::Emitter
     emitter << YAML::Key << "Geometry";
     emitter << YAML::BeginSeq;
     for (Geometry* geom : this->getAttachedGeometries()) {
-        serializer->writeUntrackedType(emitter, geom);
+        serializer->writeObject(emitter, geom);
     }
     emitter << YAML::EndSeq;
 
@@ -119,7 +119,7 @@ bool BasePhysicsActor::deserialize(io::Serializer* serializer, const YAML::Node&
 
     // Geometry
     for (const YAML::Node& geometryNode : actorNode["Geometry"]) {
-        Geometry* geom = static_cast<Geometry*>(serializer->parseUntrackedType(geometryNode));
+        Geometry* geom = static_cast<Geometry*>(serializer->parseObject(geometryNode));
         this->addGeometry(geom);
     }
 

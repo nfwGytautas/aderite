@@ -11,7 +11,7 @@ namespace rendering {
 /**
  * @brief Rendering operation base class
  */
-class OperationBase : public io::NamedSerializable {
+class OperationBase : public io::SerializableObject {
 public:
     virtual ~OperationBase() {};
 
@@ -29,20 +29,6 @@ public:
      * @brief Free all resources
      */
     virtual void shutdown() {};
-
-    /**
-     * @brief Sets the name of the operation, should be unique pipeline wide
-     * @param name New name of the operation
-     */
-    void setName(const std::string& name);
-
-    /**
-     * @brief Returns the name of the operation
-     */
-    const std::string& getName() const;
-
-private:
-    std::string m_name = "";
 };
 
 } // namespace rendering

@@ -7,7 +7,6 @@
 #include <bgfx/bgfx.h>
 
 #include "aderite/physics/Forward.hpp"
-#include "aderite/physics/collider/Forward.hpp"
 #include "aderite/rendering/operation/Forward.hpp"
 #include "aderite/rendering/operation/OperationBase.hpp"
 #include "aderite/scene/Forward.hpp"
@@ -40,7 +39,7 @@ private:
     void updateUniform();
 
     // Rendering operations
-    void renderBoxCollider(physics::BoxCollider* collider, const scene::Transform* transform);
+    //void renderBoxCollider(physics::BoxCollider* collider, const scene::Transform* transform);
 
     // Helpers
     void loadMeshes();

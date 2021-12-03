@@ -55,7 +55,7 @@ reflection::Type Pipeline::getType() const {
 bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Operations" << YAML::BeginSeq;
     for (size_t i = 0; i < m_operations.size(); i++) {
-        serializer->writeUntrackedType(emitter, m_operations[i]);
+        serializer->writeObject(emitter, m_operations[i]);
     }
     emitter << YAML::EndSeq;
 
@@ -64,7 +64,7 @@ bool Pipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitte
 
 bool Pipeline::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     for (const YAML::Node& node : data["Operations"]) {
-        m_operations.push_back(static_cast<OperationBase*>(serializer->parseUntrackedType(node)));
+        m_operations.push_back(static_cast<OperationBase*>(serializer->parseObject(node)));
     }
     return true;
 }

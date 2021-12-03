@@ -17,7 +17,7 @@ namespace scripting {
 /**
  * @brief ScriptSystem class is used to provide scripting engine the functionality to add it's own system that can handle any type of data
  */
-class ScriptSystem final : public io::NamedSerializable {
+class ScriptSystem final : public io::SerializableObject {
 public:
     ScriptSystem();
 

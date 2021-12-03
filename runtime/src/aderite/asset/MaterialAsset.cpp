@@ -3,6 +3,7 @@
 #include <bgfx/bgfx.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/io/LoaderPool.hpp"
@@ -99,7 +100,7 @@ bool MaterialAsset::deserialize(io::Serializer* serializer, const YAML::Node& da
     }
     // TODO: Error check
     io::SerializableHandle typeName = data["MaterialType"].as<io::SerializableHandle>();
-    m_info.Type = static_cast<MaterialTypeAsset*>(serializer->getOrRead(typeName));
+    m_info.Type = static_cast<MaterialTypeAsset*>(::aderite::Engine::getAssetManager()->get(typeName));
     const size_t dataSize = m_info.Type->getFields().Size * 4 * sizeof(float);
     m_udata = static_cast<float*>(std::malloc(dataSize));
 
@@ -125,7 +126,8 @@ bool MaterialAsset::deserialize(io::Serializer* serializer, const YAML::Node& da
         TextureAsset* texture = nullptr;
 
         if (!sampler.IsNull()) {
-            m_info.Samplers.push_back(static_cast<TextureAsset*>(serializer->getOrRead(sampler.as<io::SerializableHandle>())));
+            m_info.Samplers.push_back(
+                static_cast<TextureAsset*>(::aderite::Engine::getAssetManager()->get(sampler.as<io::SerializableHandle>())));
         } else {
             m_info.Samplers.push_back(nullptr);
         }

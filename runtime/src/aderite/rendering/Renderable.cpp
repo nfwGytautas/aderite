@@ -1,5 +1,7 @@
 #include "Renderable.hpp"
 
+#include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/io/Serializer.hpp"
@@ -46,13 +48,13 @@ bool Renderable::deserialize(io::Serializer* serializer, const YAML::Node& data)
 
     if (renderNode["Mesh"]) {
         const io::SerializableHandle handle = data["Mesh"].as<io::SerializableHandle>();
-        m_mesh = static_cast<asset::MeshAsset*>(serializer->getOrRead(handle));
+        m_mesh = static_cast<asset::MeshAsset*>(::aderite::Engine::getAssetManager()->get(handle));
         ADERITE_DYNAMIC_ASSERT(m_mesh != nullptr, "Tried to use a deleted asset");
     }
 
     if (renderNode["Material"]) {
         const io::SerializableHandle handle = data["Material"].as<io::SerializableHandle>();
-        m_material = static_cast<asset::MaterialAsset*>(serializer->getOrRead(handle));
+        m_material = static_cast<asset::MaterialAsset*>(::aderite::Engine::getAssetManager()->get(handle));
         ADERITE_DYNAMIC_ASSERT(m_material != nullptr, "Tried to use a deleted asset");
     }
 

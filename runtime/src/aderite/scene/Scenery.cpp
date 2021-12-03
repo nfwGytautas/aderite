@@ -7,10 +7,6 @@ Scenery::Scenery() {}
 
 Scenery::~Scenery() {}
 
-reflection::Type Scenery::getType() const {
-    return static_cast<reflection::Type>(reflection::RuntimeTypes::SCENERY);
-}
-
 bool Scenery::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     // Physics
     if (!StaticPhysicsActor::serialize(serializer, emitter)) {
@@ -38,6 +34,11 @@ bool Scenery::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 
     return true;
 }
+
+reflection::Type Scenery::getType() const {
+    return static_cast<reflection::Type>(reflection::RuntimeTypes::SCENERY);
+}
+
 
 } // namespace scene
 } // namespace aderite

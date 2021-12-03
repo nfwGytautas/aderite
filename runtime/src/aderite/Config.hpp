@@ -3,7 +3,7 @@
 // Version of the engine
 // History:
 //		0.0 - Initial release
-//		0.1 - TBD
+//		0.1 - Asset manager, Entity split (Scenery, Visual, etc.), Engine event system, Script event map
 constexpr const char* EngineVersion = "0.1";
 
 // ---------------------------------

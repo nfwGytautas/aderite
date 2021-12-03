@@ -9,6 +9,7 @@
 namespace aderite {
 namespace asset {
 
+class AssetManager;
 class MaterialAsset;
 class MaterialTypeAsset;
 class MeshAsset;

@@ -1,6 +1,7 @@
 #include "MaterialInputNode.hpp"
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/io/Serializer.hpp"
 
 #include "aderiteeditor/asset/EditorMaterialType.hpp"
@@ -8,12 +9,12 @@
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 #include "aderiteeditor/node/Graph.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
+#include "aderiteeditor/platform/pc/backend/node/imnodes.h"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/vfs/File.hpp"
 #include "aderiteeditor/vfs/VFS.hpp"
-#include "aderiteeditor/platform/pc/backend/node/imnodes.h"
 
 namespace aderite {
 namespace node {
@@ -83,8 +84,8 @@ bool MaterialInputNode::serialize(const io::Serializer* serializer, YAML::Emitte
 }
 
 bool MaterialInputNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    m_material = static_cast<asset::EditorMaterialType*>(
-        ::aderite::Engine::getSerializer()->getOrRead(data["Material"].as<io::SerializableHandle>()));
+    m_material =
+        static_cast<asset::EditorMaterialType*>(::aderite::Engine::getAssetManager()->get(data["Material"].as<io::SerializableHandle>()));
 
     generatePins();
 

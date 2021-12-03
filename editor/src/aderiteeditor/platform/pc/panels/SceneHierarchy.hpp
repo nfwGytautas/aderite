@@ -1,6 +1,6 @@
 #pragma once
 
-#include "aderite/scene/Entity.hpp"
+#include <vector>
 
 #include "aderiteeditor/platform/pc/UIComponent.hpp"
 
@@ -11,6 +11,33 @@ namespace editor {
  * @brief Scene view is a component that displays all scene entities in a tree
  */
 class SceneHierarchy : public UIComponent {
+private:
+    class ISceneHierarchyNode {
+    public:
+        virtual ~ISceneHierarchyNode() = default;
+
+        virtual void render() = 0;
+        virtual void contextMenu() = 0;
+    };
+
+    class ObjectNode : public ISceneHierarchyNode {
+    public:
+        void render() override;
+        void contextMenu() override;
+    };
+
+    class AudioNode : public ISceneHierarchyNode {
+    public:
+        void render() override;
+        void contextMenu() override;
+    };
+
+    class PhysicsRegionNode : public ISceneHierarchyNode {
+    public:
+        void render() override;
+        void contextMenu() override;
+    };
+
 public:
     SceneHierarchy();
     virtual ~SceneHierarchy();
@@ -21,35 +48,10 @@ public:
     void render() override;
 
 private:
-    /**
-     * @brief Render context menu
-     */
-    void renderContextMenu();
+    void contextMenu();
 
-    /**
-     * @brief Renders visuals tree node of the scene
-    */
-    void renderVisuals();
-
-    /**
-     * @brief Renders scenery tree node of the scene
-    */
-    void renderScenery();
-
-    /**
-     * @brief Renders audio tree node of the scene
-     */
-    void renderAudio();
-
-    /**
-     * @brief Renders scripts tree node of the scene
-     */
-    void renderScripts();
-
-    /**
-     * @brief Renders settings nodes of the scene
-     */
-    void renderSettings();
+private:
+    std::vector<ISceneHierarchyNode*> m_nodes;
 };
 
 } // namespace editor

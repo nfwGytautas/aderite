@@ -244,7 +244,7 @@ bool Graph::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
 
     emitter << YAML::Key << "Nodes" << YAML::BeginSeq;
     for (Node* node : m_nodes) {
-        serializer->writeUntrackedType(emitter, node);
+        serializer->writeObject(emitter, node);
     }
     emitter << YAML::EndSeq;
 
@@ -267,7 +267,7 @@ bool Graph::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
 bool Graph::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     // Nodes
     for (const YAML::Node& node : data["Nodes"]) {
-        Node* n = static_cast<Node*>(serializer->parseUntrackedType(node));
+        Node* n = static_cast<Node*>(serializer->parseObject(node));
         m_nodes.push_back(n);
     }
 

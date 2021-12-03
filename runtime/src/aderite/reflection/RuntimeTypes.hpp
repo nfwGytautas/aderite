@@ -26,9 +26,14 @@ enum class RuntimeTypes : Type {
     AUDIO_SOURCE = 20,
     AUDIO_LISTENER = 21,
 
-    // Entity
+    // Object
     VISUAL = 40,
     SCENERY = 41,
+    ENTITY = 42,
+
+    // Physics
+    STATIC_PHYSICS_REGION = 50,
+    DYNAMIC_PHYSICS_REGION = 51,
 
     // Geometry
     BOX_GEOMETRY = 75,
@@ -37,7 +42,6 @@ enum class RuntimeTypes : Type {
     PHYSICS_ACTOR = 90,
     DYNAMIC_ACTOR,
     STATIC_ACTOR,
-    PHYSICS_SCENE,
 
     // Operations
     OP_CAMERA = 100,
@@ -48,9 +52,6 @@ enum class RuntimeTypes : Type {
 
     // Scripting
     SCRIPT_SYSTEM = 200,
-
-    ENTITY_SELECTOR = 210,
-    TAG_SELECTOR = 211,
 
     // Last element of runtime types, used to specify the end runtime serializables
     UNDEFINED = 249,

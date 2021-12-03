@@ -95,10 +95,10 @@ public:
 
     /**
      * @brief Create a C# script instance object from generic C++ serializable object
-     * @param serializable Serializable object
+     * @param serializable Serializable asset
      * @return MonoObject instance
      */
-    MonoObject* create(io::NamedSerializable* serializable) const;
+    MonoObject* create(io::SerializableAsset* serializable) const;
 
     /**
      * @brief Creates a C# mesh object from C++ asset

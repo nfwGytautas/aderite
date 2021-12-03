@@ -115,7 +115,7 @@ bool LibClassLocator::isSystem(MonoClass* klass) const {
     return false;
 }
 
-MonoObject* LibClassLocator::create(io::NamedSerializable* serializable) const {
+MonoObject* LibClassLocator::create(io::SerializableAsset* serializable) const {
     switch (static_cast<reflection::RuntimeTypes>(serializable->getType())) {
     case reflection::RuntimeTypes::MESH: {
         return this->create(static_cast<asset::MeshAsset*>(serializable));

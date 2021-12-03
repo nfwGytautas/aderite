@@ -65,9 +65,9 @@ void ScriptManager::update(float delta) {
         return;
     }
 
-    for (scripting::ScriptSystem* system : currentScene->getScriptSystems()) {
+    /*for (scripting::ScriptSystem* system : currentScene->get()) {
         system->update(delta);
-    }
+    }*/
 }
 
 void ScriptManager::loadAssemblies() {
@@ -115,7 +115,7 @@ MonoImage* ScriptManager::getCodeImage() const {
     return m_codeImage;
 }
 
-MonoObject* ScriptManager::createInstance(io::NamedSerializable* serializable) {
+MonoObject* ScriptManager::createInstance(io::SerializableAsset* serializable) {
     ADERITE_DYNAMIC_ASSERT(serializable != nullptr, "Nullptr serializable passed to createInstance");
 
     // Check if an object already exists

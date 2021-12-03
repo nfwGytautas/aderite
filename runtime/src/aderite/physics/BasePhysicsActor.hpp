@@ -15,7 +15,7 @@ namespace physics {
 /**
  * @brief BasePhysicsActor class is a base class for dynamic and static physics actors
  */
-class BasePhysicsActor : public scene::ITransformProvider, public io::IReflectableSerializable {
+class BasePhysicsActor : public scene::ITransformProvider, public io::ISerializable {
 public:
     virtual ~BasePhysicsActor();
 
@@ -44,7 +44,7 @@ public:
     void setRotation(const glm::quat& rotation) override;
     void setScale(const glm::vec3& scale) override;
 
-    // Inherited via IReflectableSerializable
+    // Inherited via ISerializable
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 

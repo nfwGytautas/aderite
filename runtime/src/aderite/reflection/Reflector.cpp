@@ -21,8 +21,11 @@
 #include "aderite/rendering/operation/OutputToScreenOperation.hpp"
 #include "aderite/rendering/operation/RenderOperation.hpp"
 #include "aderite/rendering/operation/TargetProvideOperation.hpp"
+#include "aderite/scene/DynamicPhysicsRegion.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/Scenery.hpp"
+#include "aderite/scene/StaticPhysicsRegion.hpp"
 #include "aderite/scene/Visual.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 
@@ -47,9 +50,14 @@ bool Reflector::init() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, audio::AudioSource, RuntimeTypes::AUDIO_SOURCE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, audio::AudioListener, RuntimeTypes::AUDIO_LISTENER);
 
-    // Entity
+    // Object
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Visual, RuntimeTypes::VISUAL);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Scenery, RuntimeTypes::SCENERY);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Entity, RuntimeTypes::ENTITY);
+
+    // Physics
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::StaticPhysicsRegion, RuntimeTypes::STATIC_PHYSICS_REGION);
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::DynamicPhysicsRegion, RuntimeTypes::DYNAMIC_PHYSICS_REGION);
 
     // Geometry
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::BoxGeometry, RuntimeTypes::BOX_GEOMETRY);

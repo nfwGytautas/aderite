@@ -11,10 +11,15 @@ namespace scene {
 
 class SceneManager;
 class Scene;
-class SceneSerializer;
 
+// Objects
 class Visual;
 class Scenery;
+class Entity;
+
+// Physics
+class StaticPhysicsRegion;
+class DynamicPhysicsRegion;
 
 } // namespace scene
 } // namespace aderite

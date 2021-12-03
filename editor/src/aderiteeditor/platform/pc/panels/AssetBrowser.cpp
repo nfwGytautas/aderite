@@ -4,10 +4,10 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
-#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/Serializer.hpp"
@@ -103,7 +103,7 @@ void AssetBrowser::renderItems() {
 
         // Files
         for (vfs::File* file : m_currentDir->getFiles()) {
-            io::SerializableAsset* object = ::aderite::Engine::getSerializer()->getOrRead(file->getHandle());
+            io::SerializableAsset* object = ::aderite::Engine::getAssetManager()->get(file->getHandle());
             bgfx::TextureHandle icon = BGFX_INVALID_HANDLE;
 
             ImGui::TableNextColumn();
@@ -137,10 +137,10 @@ void AssetBrowser::renderItems() {
                 icon = editor::EditorIcons::getInstance().getIcon("audio_clip");
                 break;
             }
-            case reflection::RuntimeTypes::PREFAB: {
-                icon = editor::EditorIcons::getInstance().getIcon("prefab");
-                break;
-            }
+                /*case reflection::RuntimeTypes::PREFAB: {
+                    icon = editor::EditorIcons::getInstance().getIcon("prefab");
+                    break;
+                }*/
             }
 
             if (this->renderImageButton(icon, cellSize, cellSize)) {
@@ -159,7 +159,7 @@ void AssetBrowser::renderItems() {
 
             // Source
             DragDrop::renderSource(object);
-            //DragDrop::renderFileSource(file);
+            // DragDrop::renderFileSource(file);
 
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                 if (static_cast<reflection::RuntimeTypes>(object->getType()) == reflection::RuntimeTypes::SCENE) {
@@ -230,8 +230,8 @@ void AssetBrowser::renderAddItemPopup() {
     }
 
     if (object != nullptr && !newName.empty()) {
-        ::aderite::Engine::getSerializer()->add(object);
-        ::aderite::Engine::getSerializer()->save(object);
+        ::aderite::Engine::getAssetManager()->track(object);
+        ::aderite::Engine::getAssetManager()->save(object);
         vfs::File* file = new vfs::File(newName, object->getHandle(), m_currentDir);
     }
 }
@@ -317,17 +317,17 @@ void AssetBrowser::render() {
 
     // Navigator
     if (ImGui::BeginTable("AssetBrowserTable", 2, 0)) {
-        scene::Entity* entity = static_cast<scene::Entity*>(
-            DragDrop::renderTarget(static_cast<aderite::reflection::Type>(aderite::reflection::RuntimeTypes::ENTITY)));
-        if (entity != nullptr) {
-            // Create prefab
-            asset::PrefabAsset* prefab = new asset::PrefabAsset();
-            prefab->setPrototype(entity);
+        //scene::Entity* entity = static_cast<scene::Entity*>(
+        //    DragDrop::renderTarget(static_cast<aderite::reflection::Type>(aderite::reflection::RuntimeTypes::ENTITY)));
+        //if (entity != nullptr) {
+        //    // Create prefab
+        //    asset::PrefabAsset* prefab = new asset::PrefabAsset();
+        //    prefab->setPrototype(entity);
 
-            ::aderite::Engine::getSerializer()->add(prefab);
-            ::aderite::Engine::getSerializer()->save(prefab);
-            vfs::File* file = new vfs::File(entity->getName() + "_prefab", prefab->getHandle(), m_currentDir);
-        }
+        //    ::aderite::Engine::getSerializer()->add(prefab);
+        //    ::aderite::Engine::getSerializer()->save(prefab);
+        //    vfs::File* file = new vfs::File(entity->getName() + "_prefab", prefab->getHandle(), m_currentDir);
+        //}
 
         ImGui::TableSetupColumn("Navigator", ImGuiTableColumnFlags_WidthFixed, 200.0f);
         ImGui::TableSetupColumn("Items", ImGuiTableColumnFlags_None);

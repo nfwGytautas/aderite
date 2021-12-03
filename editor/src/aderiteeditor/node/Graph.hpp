@@ -21,7 +21,7 @@ enum class GraphType { RENDER_PIPELINE, MATERIAL };
 /**
  * @brief Main node editor object which represent the current graph state
  */
-class Graph : public io::NamedSerializable {
+class Graph : public io::SerializableObject {
 public:
     Graph();
     virtual ~Graph();
@@ -90,7 +90,7 @@ public:
      */
     void closingDisplay();
 
-    // Inherited via ISerializable
+    // Inherited via SerializableObject
     virtual reflection::Type getType() const override;
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;

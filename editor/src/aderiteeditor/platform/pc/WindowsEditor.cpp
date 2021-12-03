@@ -5,6 +5,7 @@
 #include <pfd/portable-file-dialogs.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/input/InputManager.hpp"
 #include "aderite/io/FileHandler.hpp"
@@ -132,6 +133,9 @@ void WindowsEditor::onNewProject(const std::string& dir, const std::string& name
     // Create new scene
     onNewScene("Untitled scene");
 
+    // Registry
+    ::aderite::Engine::getAssetManager()->saveRegistry();
+
     // Save
     editor::State::Project->save();
 }
@@ -143,7 +147,8 @@ void WindowsEditor::onSaveProject() {
     }
 
     // Save all assets
-    ::aderite::Engine::getSerializer()->saveAll();
+    ::aderite::Engine::getAssetManager()->saveAllTrackedObjects();
+    ::aderite::Engine::getAssetManager()->saveRegistry();
     editor::State::Project->save();
 }
 
@@ -169,6 +174,7 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 
     // Setup asset manager
     ::aderite::Engine::getFileHandler()->setRoot(editor::State::Project->getRootDir());
+    ::aderite::Engine::getAssetManager()->loadRegistry();
 
     // Setup audio controller
     ::aderite::Engine::getAudioController()->loadMasterBank();
@@ -180,8 +186,7 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 
     if (editor::State::Project->getActiveScene() != c_InvalidHandle) {
         // Read scene
-        scene::Scene* s =
-            static_cast<scene::Scene*>(::aderite::Engine::getSerializer()->getOrRead(editor::State::Project->getActiveScene()));
+        scene::Scene* s = static_cast<scene::Scene*>(::aderite::Engine::getAssetManager()->get(editor::State::Project->getActiveScene()));
         ::aderite::Engine::getSceneManager()->setActive(s);
     }
 }
@@ -199,8 +204,8 @@ void WindowsEditor::onNewScene(const std::string& name) {
 
     // TODO: Error screen or special naming
     scene::Scene* s = new scene::Scene();
-    ::aderite::Engine::getSerializer()->add(s);
-    ::aderite::Engine::getSerializer()->save(s);
+    ::aderite::Engine::getAssetManager()->track(s);
+    ::aderite::Engine::getAssetManager()->save(s);
     vfs::File* file = new vfs::File(name, s->getHandle(), editor::State::Project->getVfs()->getRoot());
 
     ::aderite::Engine::getSceneManager()->setActive(s);

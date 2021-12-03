@@ -14,10 +14,10 @@ namespace physics {
 /**
  * @brief Physics scene for aderite
  */
-class PhysicsScene final : public physx::PxSimulationEventCallback, public io::NamedSerializable {
+class PhysicsScene : public physx::PxSimulationEventCallback, public io::ISerializable {
 public:
     PhysicsScene();
-    ~PhysicsScene();
+    virtual ~PhysicsScene();
 
     /**
      * @brief Physics update
@@ -28,12 +28,12 @@ public:
     /**
      * @brief Add actor to the scene
      * @param actor Actor to add
-    */
+     */
     void addActor(BasePhysicsActor* actor);
 
     /**
      * @brief Sends queued physics events to specified user callbacks
-    */
+     */
     void sendEvents();
 
     /**
@@ -45,6 +45,11 @@ public:
      * @return True if there was a hit, false otherwise
      */
     bool raycastSingle(RaycastHit& result, const glm::vec3& from, const glm::vec3& direction, float maxDistance);
+
+protected:
+    // Inherited via ISerializable
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
     // Inherited via PxSimulationEventCallback
@@ -58,11 +63,6 @@ private:
 private:
     physx::PxScene* m_scene = nullptr;
     PhysicsEventList* m_events = nullptr;
-
-    // Inherited via ISerializable
-    reflection::Type getType() const override;
-    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 };
 
 } // namespace physics

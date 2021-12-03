@@ -154,6 +154,7 @@ private:
     ADERITE_SYSTEM_PTR(getPhysicsController, physics::PhysicsController, m_physicsController)
     ADERITE_SYSTEM_PTR(getAudioController, audio::AudioController, m_audioController)
     ADERITE_SYSTEM_PTR(getScriptManager, scripting::ScriptManager, m_scriptManager)
+    ADERITE_SYSTEM_PTR(getAssetManager, asset::AssetManager, m_assetManager)
 
 #if MIDDLEWARE_ENABLED == 1
     ADERITE_SYSTEM_PTR(getMiddleware, interfaces::IEngineMiddleware, m_middleware)

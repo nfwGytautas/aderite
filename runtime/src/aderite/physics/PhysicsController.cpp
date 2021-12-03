@@ -165,11 +165,6 @@ void PhysicsController::update(float delta) {
         return;
     }
 
-    physics::PhysicsScene* physicsScene = currentScene->getPhysicsScene();
-    if (physicsScene == nullptr) {
-        return;
-    }
-
     m_accumulator += delta;
 
     if (m_accumulator < c_FixedUpdateWindow) {
@@ -177,8 +172,8 @@ void PhysicsController::update(float delta) {
     }
 
     m_accumulator -= c_FixedUpdateWindow;
-    physicsScene->simulate(c_FixedUpdateWindow);
-    physicsScene->sendEvents();
+    currentScene->simulate(c_FixedUpdateWindow);
+    currentScene->sendEvents();
 }
 
 physx::PxPhysics* PhysicsController::getPhysics() const {

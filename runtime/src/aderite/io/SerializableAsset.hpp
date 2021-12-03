@@ -1,5 +1,6 @@
 #pragma once
 
+#include "aderite/asset/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 
 namespace aderite {
@@ -38,7 +39,7 @@ public:
     void acquire();
 
 public:
-    friend class Serializer; // Used to set the handle
+    friend asset::AssetManager; // Used to set the handle and manage ref count
 private:
     SerializableHandle m_handle = c_InvalidHandle;
     size_t m_refCount = 0;

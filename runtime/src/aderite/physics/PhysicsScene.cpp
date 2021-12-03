@@ -143,18 +143,18 @@ void PhysicsScene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 nbPairs) 
     }
 }
 
-reflection::Type PhysicsScene::getType() const {
-    return static_cast<reflection::Type>(reflection::RuntimeTypes::PHYSICS_SCENE);
-}
-
 bool PhysicsScene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    // Actors are filled from entities not from physics scene itself
+    emitter << YAML::Key << "PhysicsScene" << YAML::BeginMap;
+    emitter << YAML::EndMap;
 
     return true;
 }
 
 bool PhysicsScene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    // Actors are filled from entities not from physics scene itself
+    const YAML::Node& physicsNode = data["PhysicsScene"];
+    if (!physicsNode || physicsNode.IsNull()) {
+        return false;
+    }
 
     return true;
 }
