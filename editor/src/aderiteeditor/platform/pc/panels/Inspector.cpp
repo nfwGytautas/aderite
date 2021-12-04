@@ -44,8 +44,6 @@
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/utility/ImGui.hpp"
 #include "aderiteeditor/utility/Utility.hpp"
-#include "aderiteeditor/vfs/File.hpp"
-#include "aderiteeditor/vfs/VFS.hpp"
 
 namespace aderite {
 namespace editor {
@@ -80,7 +78,7 @@ void render_component_shared(const std::string& id, const std::string& label, bo
     }
 }
 
-//void Inspector::renderEntity() {
+// void Inspector::renderEntity() {
 //    static utility::InlineRename renamer;
 //    scene::Entity* entity = editor::State::LastSelectedObject.getEntity();
 //
@@ -293,7 +291,7 @@ void render_component_shared(const std::string& id, const std::string& label, bo
 //    }
 //}
 
-//void Inspector::renderActor(physics::PhysicsActor* actor) {
+// void Inspector::renderActor(physics::PhysicsActor* actor) {
 //    // Colliders
 //    ImGui::Separator();
 //    ImGui::Text("Colliders");
@@ -324,7 +322,7 @@ void render_component_shared(const std::string& id, const std::string& label, bo
 //    }
 //}
 //
-//void Inspector::renderDynamicActor(physics::DynamicActor* actor) {
+// void Inspector::renderDynamicActor(physics::DynamicActor* actor) {
 //    // Properties
 //    bool hasGravity = actor->getGravity();
 //    if (ImGui::Checkbox("Has gravity", &hasGravity)) {
@@ -347,7 +345,7 @@ void render_component_shared(const std::string& id, const std::string& label, bo
 //    this->renderActor(actor);
 //}
 //
-//void Inspector::renderStaticActor(physics::StaticActor* actor) {
+// void Inspector::renderStaticActor(physics::StaticActor* actor) {
 //    // Properties
 //    ImGui::Text("Static actors don't have properties yet");
 //
@@ -356,72 +354,72 @@ void render_component_shared(const std::string& id, const std::string& label, bo
 //}
 
 void Inspector::renderAsset() {
-    //static vfs::File* cacheFile = nullptr;
-    //static utility::InlineRename renamer;
-    //io::SerializableAsset* object = editor::State::LastSelectedObject.getAsset();
+    // static vfs::File* cacheFile = nullptr;
+    // static utility::InlineRename renamer;
+    // io::SerializableAsset* object = editor::State::LastSelectedObject.getAsset();
 
-    //if (cacheFile == nullptr || cacheFile->getHandle() != object->getHandle()) {
+    // if (cacheFile == nullptr || cacheFile->getHandle() != object->getHandle()) {
     //    // Refind
     //    cacheFile = editor::State::Project->getVfs()->getFile(object->getHandle());
     //    ADERITE_DYNAMIC_ASSERT(cacheFile != nullptr, "Failed to find associated file");
     //    renamer.setValue(cacheFile->getName());
     //}
 
-    //if (renamer.renderUI()) {
+    // if (renamer.renderUI()) {
     //    editor::State::Project->getVfs()->rename(cacheFile, renamer.getValue());
     //    renamer.setValue(renamer.getValue());
     //}
 
-    //ImGui::Separator();
+    // ImGui::Separator();
 
-    //switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
-    //case reflection::RuntimeTypes::MESH: {
+    // switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
+    // case reflection::RuntimeTypes::MESH: {
     //    this->renderMesh(object);
     //    break;
     //}
-    //case reflection::RuntimeTypes::TEXTURE: {
+    // case reflection::RuntimeTypes::TEXTURE: {
     //    this->renderTexture(object);
     //    break;
     //}
-    //case reflection::RuntimeTypes::MATERIAL: {
+    // case reflection::RuntimeTypes::MATERIAL: {
     //    this->renderMaterial(object);
     //    break;
     //}
-    //case reflection::RuntimeTypes::MAT_TYPE: {
+    // case reflection::RuntimeTypes::MAT_TYPE: {
     //    this->renderMaterialType(object);
     //    break;
     //}
-    //case reflection::RuntimeTypes::SCENE: {
+    // case reflection::RuntimeTypes::SCENE: {
     //    this->renderScene(object);
     //    break;
     //}
-    //case reflection::RuntimeTypes::PIPELINE: {
+    // case reflection::RuntimeTypes::PIPELINE: {
     //    this->renderPipeline(object);
     //    break;
     //}
-    //case reflection::RuntimeTypes::AUDIO: {
+    // case reflection::RuntimeTypes::AUDIO: {
     //    this->renderAudio(object);
     //    break;
     //}
-    //default: {
+    // default: {
     //}
     //}
 }
 
 void Inspector::renderMesh(io::SerializableAsset* asset) {
-    //asset::MeshAsset* mesh = static_cast<asset::MeshAsset*>(asset);
-    //asset::MeshAsset::fields& finfo = mesh->getFieldsMutable();
+    // asset::MeshAsset* mesh = static_cast<asset::MeshAsset*>(asset);
+    // asset::MeshAsset::fields& finfo = mesh->getFieldsMutable();
 
     //// Replace source button
-    //ImGui::PushItemWidth(-FLT_MIN);
-    //if (ImGui::Button("Replace source", ImVec2(-1.0f, 0.0f))) {
+    // ImGui::PushItemWidth(-FLT_MIN);
+    // if (ImGui::Button("Replace source", ImVec2(-1.0f, 0.0f))) {
     //    std::string file = FileDialog::selectFile("Select mesh file");
 
     //    if (!file.empty()) {
     //        ::aderite::Engine::getFileHandler()->writePhysicalFile(mesh->getHandle(), file);
     //    }
     //}
-    //ImGui::PopItemWidth();
+    // ImGui::PopItemWidth();
 
     // Properties
 
@@ -479,8 +477,6 @@ void Inspector::renderMaterial(io::SerializableAsset* asset) {
     asset::MaterialAsset* material = static_cast<asset::MaterialAsset*>(asset);
     asset::MaterialAsset::fields& finfo = material->getFieldsMutable();
 
-    static vfs::File* typeFile = finfo.Type != nullptr ? editor::State::Project->getVfs()->getFile(finfo.Type->getHandle()) : nullptr;
-
     if (ImGui::BeginTable("MaterialTypeSelectTable", 2)) {
         ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
         ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
@@ -493,8 +489,8 @@ void Inspector::renderMaterial(io::SerializableAsset* asset) {
         ImGui::TableSetColumnIndex(1);
         ImGui::PushItemWidth(-FLT_MIN);
 
-        if (typeFile != nullptr) {
-            ImGui::Button(typeFile->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        if (finfo.Type != nullptr) {
+            ImGui::Button(finfo.Type->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
         } else {
             ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
         }
@@ -573,8 +569,7 @@ void Inspector::renderMaterial(io::SerializableAsset* asset) {
                 // TODO: Verify type
                 asset::TextureAsset*& sampler = finfo.Samplers[i];
                 if (sampler != nullptr) {
-                    vfs::File* file = editor::State::Project->getVfs()->getFile(sampler->getHandle());
-                    ImGui::Button(file->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    ImGui::Button(sampler->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 } else {
                     ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 }
@@ -704,7 +699,6 @@ void Inspector::renderMaterialType(io::SerializableAsset* asset) {
 }
 
 void Inspector::renderScene(io::SerializableAsset* asset) {
-    static vfs::File* cacheFile = nullptr;
     scene::Scene* type = static_cast<scene::Scene*>(asset);
 
     if (ImGui::BeginTable("SceneEditTable", 2)) {
@@ -719,8 +713,7 @@ void Inspector::renderScene(io::SerializableAsset* asset) {
         if (type->getPipeline() == nullptr) {
             ImGui::Selectable("None");
         } else {
-            vfs::File* file = editor::State::Project->getVfs()->getFile(type->getPipeline()->getHandle());
-            ImGui::Selectable(file->getName().c_str());
+            ImGui::Selectable(type->getPipeline()->getName().c_str());
         }
 
         rendering::Pipeline* object = DragDrop::renderTarget<rendering::Pipeline>(reflection::RuntimeTypes::PIPELINE);
@@ -748,10 +741,7 @@ void Inspector::renderPipeline(io::SerializableAsset* asset) {
 
 void Inspector::renderAudio(io::SerializableAsset* asset) {
     static SelectAudioModal sam;
-
     asset::AudioAsset* audio = static_cast<asset::AudioAsset*>(asset);
-
-    static vfs::File* audioFile = editor::State::Project->getVfs()->getFile(audio->getHandle());
 
     if (ImGui::BeginTable("AudioClipEditTable", 2)) {
         ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
@@ -888,8 +878,7 @@ void Inspector::renderScriptSystem(io::SerializableObject* serializable) {
                 asset::MeshAsset* handle = static_cast<asset::MeshAsset*>(fw.getSerializable());
 
                 if (handle) {
-                    vfs::File* file = editor::State::Project->getVfs()->getFile(handle->getHandle());
-                    ImGui::Button(file->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    ImGui::Button(handle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 } else {
                     ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 }
@@ -905,8 +894,7 @@ void Inspector::renderScriptSystem(io::SerializableObject* serializable) {
                 asset::MaterialAsset* handle = static_cast<asset::MaterialAsset*>(fw.getSerializable());
 
                 if (handle) {
-                    vfs::File* file = editor::State::Project->getVfs()->getFile(handle->getHandle());
-                    ImGui::Button(file->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    ImGui::Button(handle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 } else {
                     ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 }
@@ -922,8 +910,7 @@ void Inspector::renderScriptSystem(io::SerializableObject* serializable) {
                 asset::AudioAsset* handle = static_cast<asset::AudioAsset*>(fw.getSerializable());
 
                 if (handle) {
-                    vfs::File* file = editor::State::Project->getVfs()->getFile(handle->getHandle());
-                    ImGui::Button(file->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    ImGui::Button(handle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 } else {
                     ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
                 }

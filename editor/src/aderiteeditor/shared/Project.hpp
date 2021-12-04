@@ -7,7 +7,6 @@
 
 #include "aderiteeditor/shared/Forward.hpp"
 #include "aderiteeditor/utility/Macros.hpp"
-#include "aderiteeditor/vfs/Forward.hpp"
 
 namespace aderite {
 namespace editor {
@@ -68,18 +67,11 @@ public:
      */
     void validate();
 
-    /**
-     * @brief Returns the virtual file system of the project
-     */
-    vfs::VFS* getVfs() const;
-
 private:
     std::filesystem::path m_directory;
     std::filesystem::path m_fmodProjectDirectory;
     std::string m_name;
     io::SerializableHandle m_activeScene;
-
-    vfs::VFS* m_vfs = nullptr;
 };
 
 } // namespace editor

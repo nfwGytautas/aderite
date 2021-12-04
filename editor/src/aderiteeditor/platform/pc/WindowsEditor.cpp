@@ -28,8 +28,6 @@
 #include "aderiteeditor/shared/EditorCamera.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
-#include "aderiteeditor/vfs/File.hpp"
-#include "aderiteeditor/vfs/VFS.hpp"
 
 #define EVENT_ROUTE(e, dst) event_router::e = std::bind(&WindowsEditor::dst, this, std::placeholders::_1)
 
@@ -204,9 +202,9 @@ void WindowsEditor::onNewScene(const std::string& name) {
 
     // TODO: Error screen or special naming
     scene::Scene* s = new scene::Scene();
-    ::aderite::Engine::getAssetManager()->track(s);
-    ::aderite::Engine::getAssetManager()->save(s);
-    vfs::File* file = new vfs::File(name, s->getHandle(), editor::State::Project->getVfs()->getRoot());
+    /*::aderite::Engine::getAssetManager()->track(s);
+    ::aderite::Engine::getAssetManager()->save(s);*/
+    //vfs::File* file = new vfs::File(name, s->getHandle(), editor::State::Project->getVfs()->getRoot());
 
     ::aderite::Engine::getSceneManager()->setActive(s);
 }
@@ -264,6 +262,11 @@ void WindowsEditor::createDirectories() {
 
     if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Scripts/")) {
         std::filesystem::create_directory(editor::State::Project->getRootDir() / "Scripts/");
+    }
+
+    // Virtual file system
+    if (!std::filesystem::exists(editor::State::Project->getRootDir() / "VFS/")) {
+        std::filesystem::create_directory(editor::State::Project->getRootDir() / "VFS/");
     }
 }
 

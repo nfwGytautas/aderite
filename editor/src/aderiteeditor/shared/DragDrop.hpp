@@ -2,8 +2,6 @@
 
 #include "aderite/io/SerializableObject.hpp"
 
-#include "aderiteeditor/vfs/Forward.hpp"
-
 namespace aderite {
 namespace editor {
 
@@ -44,25 +42,25 @@ public:
      */
     static io::SerializableObject* renderGenericTarget();
 
-    /**
-     * @brief Renders a directory drag drop source
-    */
-    static void renderDirectorySource(vfs::Directory* dir);
+    ///**
+    // * @brief Renders a directory drag drop source
+    //*/
+    //static void renderDirectorySource(vfs::Directory* dir);
 
-    /**
-     * @brief Renders a directory drag drop target
-    */
-    static vfs::Directory* renderDirectoryTarget();
+    ///**
+    // * @brief Renders a directory drag drop target
+    //*/
+    //static vfs::Directory* renderDirectoryTarget();
 
-    /**
-     * @brief Renders a file drag drop source
-     */
-    static void renderFileSource(vfs::File* file);
+    ///**
+    // * @brief Renders a file drag drop source
+    // */
+    //static void renderFileSource(vfs::File* file);
 
-    /**
-     * @brief Renders a file drag drop target
-     */
-    static vfs::File* renderFileTarget();
+    ///**
+    // * @brief Renders a file drag drop target
+    // */
+    //static vfs::File* renderFileTarget();
 };
 
 } // namespace editor

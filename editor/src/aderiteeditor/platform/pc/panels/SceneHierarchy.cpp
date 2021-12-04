@@ -23,8 +23,6 @@
 #include "aderiteeditor/shared/DragDrop.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
-#include "aderiteeditor/vfs/File.hpp"
-#include "aderiteeditor/vfs/VFS.hpp"
 
 namespace aderite {
 namespace editor {

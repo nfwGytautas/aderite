@@ -13,8 +13,6 @@
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
-#include "aderiteeditor/vfs/File.hpp"
-#include "aderiteeditor/vfs/VFS.hpp"
 
 namespace aderite {
 namespace node {
@@ -36,8 +34,6 @@ const char* MaterialInputNode::getNodeName() const {
 }
 
 void MaterialInputNode::renderBody() {
-    static vfs::File* file = editor::State::Project->getVfs()->getFile(m_material->getHandle());
-
     auto props = m_material->getProperties();
     auto samplers = m_material->getSamplers();
     if (props.size() + samplers.size() != p_outputs.size()) {
@@ -52,7 +48,7 @@ void MaterialInputNode::renderBody() {
         }
     }
 
-    ImGui::Text(file->getName().c_str());
+    ImGui::Text(this->getName().c_str());
     ImGui::Spacing();
 }
 

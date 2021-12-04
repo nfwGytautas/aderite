@@ -9,8 +9,6 @@
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/utility/Log.hpp"
 
-#include "aderiteeditor/vfs/VFS.hpp"
-
 // Previous versions:
 //	- 2021_07_31r1
 
@@ -19,7 +17,7 @@ constexpr const char* current_version = "2021_07_31r1";
 namespace aderite {
 namespace editor {
 
-Project::Project(const std::string& dir, const std::string& name) : m_directory(dir), m_name(name), m_vfs(new vfs::VFS()) {}
+Project::Project(const std::string& dir, const std::string& name) : m_directory(dir), m_name(name) {}
 
 Project::~Project() {}
 
@@ -50,8 +48,6 @@ bool Project::save() {
     out << YAML::Key << "FMODProject" << YAML::Value << m_fmodProjectDirectory.string();
 
     out << YAML::EndMap; // Root
-
-    m_vfs->save(this->getRootDir());
 
     std::ofstream fout(root.append(m_name + ".aproj"));
     fout << out.c_str();
@@ -92,8 +88,6 @@ Project* Project::load(const std::string& path) {
         p->m_fmodProjectDirectory = data["FMODProject"].as<std::string>();
     }
 
-    p->m_vfs = vfs::VFS::load(p->getRootDir());
-
     return p;
 }
 
@@ -128,10 +122,6 @@ void Project::validate() {
     } else if (::aderite::Engine::getSceneManager()->getCurrentScene()->getHandle() != m_activeScene) {
         save();
     }
-}
-
-vfs::VFS* Project::getVfs() const {
-    return m_vfs;
 }
 
 } // namespace editor

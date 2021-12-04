@@ -74,5 +74,10 @@ private:
     size_t m_idx = -1;
 };
 
+/**
+ * @brief Creates a spinner that is used for loading purposes, code from https://github.com/ocornut/imgui/issues/1901
+ */
+void ImSpinner(const char* label, const float indicator_radius, const int circle_count, const float speed);
+
 } // namespace utility
 } // namespace aderite
