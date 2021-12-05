@@ -77,7 +77,7 @@ private:
 /**
  * @brief Creates a spinner that is used for loading purposes, code from https://github.com/ocornut/imgui/issues/1901
  */
-void ImSpinner(const char* label, const float indicator_radius, const int circle_count, const float speed);
+void ImSpinner(const char* label, const float indicator_radius, const int circle_count, const float speed, glm::vec2 size);
 
 } // namespace utility
 } // namespace aderite

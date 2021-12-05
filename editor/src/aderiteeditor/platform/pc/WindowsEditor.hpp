@@ -38,6 +38,11 @@ public:
     virtual void onStartGame() override;
     virtual void onResetGameState() override;
 
+    /**
+     * @brief Returns the UI of the editor
+     */
+    editor::EditorUI& getUI();
+
     static WindowsEditor* getInstance();
 
 private:

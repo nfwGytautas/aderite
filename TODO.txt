@@ -56,8 +56,8 @@ Runtime:
 		default/delete modifiers
 
 Editor:
-	TODO:
-		Double click scene open in inspector not change scene (in inspector have button to load scene)
+	Asset browser:
+		Verify that the imported file can actually be used for the specified type
 	VFS:
 		Load textures for preview on directory change
 		Unload texture previews on directory change

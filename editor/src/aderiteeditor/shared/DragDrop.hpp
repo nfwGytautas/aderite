@@ -1,5 +1,7 @@
 #pragma once
 
+#include <filesystem>
+
 #include "aderite/io/SerializableObject.hpp"
 
 namespace aderite {
@@ -42,25 +44,16 @@ public:
      */
     static io::SerializableObject* renderGenericTarget();
 
-    ///**
-    // * @brief Renders a directory drag drop source
-    //*/
-    //static void renderDirectorySource(vfs::Directory* dir);
+    /**
+     * @brief Renders a file drag drop source
+     * @param file File to drag drop
+     */
+    static void renderFileSource(const std::filesystem::path& file);
 
-    ///**
-    // * @brief Renders a directory drag drop target
-    //*/
-    //static vfs::Directory* renderDirectoryTarget();
-
-    ///**
-    // * @brief Renders a file drag drop source
-    // */
-    //static void renderFileSource(vfs::File* file);
-
-    ///**
-    // * @brief Renders a file drag drop target
-    // */
-    //static vfs::File* renderFileTarget();
+    /**
+     * @brief Renders a file drag drop target
+     */
+    static std::filesystem::path renderFileTarget();
 };
 
 } // namespace editor

@@ -204,7 +204,7 @@ void WindowsEditor::onNewScene(const std::string& name) {
     scene::Scene* s = new scene::Scene();
     /*::aderite::Engine::getAssetManager()->track(s);
     ::aderite::Engine::getAssetManager()->save(s);*/
-    //vfs::File* file = new vfs::File(name, s->getHandle(), editor::State::Project->getVfs()->getRoot());
+    // vfs::File* file = new vfs::File(name, s->getHandle(), editor::State::Project->getVfs()->getRoot());
 
     ::aderite::Engine::getSceneManager()->setActive(s);
 }
@@ -231,6 +231,10 @@ void WindowsEditor::onStartGame() {
 
 void WindowsEditor::onResetGameState() {
     // TODO: Reset game state, by reloading all scripts or resetting their default parameters
+}
+
+editor::EditorUI& WindowsEditor::getUI() {
+    return m_ui;
 }
 
 WindowsEditor* WindowsEditor::getInstance() {

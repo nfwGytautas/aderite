@@ -108,6 +108,21 @@ void EditorUI::render() {
 
     // Dockspace components end here
 
+    // Modal
+    if (m_modalStack.size() > 0) {
+        IModal* modal = m_modalStack.top();
+        modal->show();
+        if (modal->stillValid()) {
+            modal->render();
+        } else {
+            // Delete the top one and pop it
+            delete modal;
+            modal = nullptr;
+
+            m_modalStack.pop();
+        }
+    }
+
     // Rendering ImGui
     ImGui::End();
     ImGui::Render();
@@ -128,6 +143,10 @@ void EditorUI::shutdown() {
     this->shutdownImGui();
 
     LOG_INFO("[Editor] UI shutdown");
+}
+
+void EditorUI::pushModal(IModal* modal) {
+    m_modalStack.push(modal);
 }
 
 bool EditorUI::initializeImGui() {

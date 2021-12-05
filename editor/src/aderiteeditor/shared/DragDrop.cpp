@@ -6,9 +6,21 @@ namespace aderite {
 namespace editor {
 
 struct DragDropInfo {
-    io::SerializableObject* Data = nullptr;
-};
+    DragDropInfo(io::SerializableObject* object) : Object(nullptr) {
+        Object = object;
+    }
 
+    DragDropInfo(std::filesystem::path path) : File("") {
+        File = path.string();
+    }
+
+    ~DragDropInfo() {}
+
+    union {
+        io::SerializableObject* Object;
+        std::string File;
+    };
+};
 
 void DragDrop::renderSource(io::SerializableObject* serializable) {
     if (serializable == nullptr) {
@@ -16,7 +28,7 @@ void DragDrop::renderSource(io::SerializableObject* serializable) {
     }
 
     if (ImGui::BeginDragDropSource()) {
-        DragDropInfo ddi {serializable};
+        DragDropInfo ddi(serializable);
         ImGui::SetDragDropPayload(std::to_string(serializable->getType()).c_str(), &ddi, sizeof(DragDropInfo));
         ImGui::EndDragDropSource();
     }
@@ -38,7 +50,7 @@ io::SerializableObject* DragDrop::renderTarget(reflection::Type type) {
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::to_string(type).c_str())) {
-            result = static_cast<DragDropInfo*>(payload->Data)->Data;
+            result = static_cast<DragDropInfo*>(payload->Data)->Object;
         }
 
         ImGui::EndDragDropTarget();
@@ -72,7 +84,29 @@ io::SerializableObject* DragDrop::renderGenericTarget() {
     return result;
 }
 
-//void DragDrop::renderDirectorySource(vfs::Directory* dir) {
+void DragDrop::renderFileSource(const std::filesystem::path& file) {
+    if (ImGui::BeginDragDropSource()) {
+        DragDropInfo ddi(file);
+        ImGui::SetDragDropPayload("FileDD", &ddi, sizeof(DragDropInfo));
+        ImGui::EndDragDropSource();
+    }
+}
+
+std::filesystem::path DragDrop::renderFileTarget() {
+    std::filesystem::path result;
+
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FileDD")) {
+            result = static_cast<DragDropInfo*>(payload->Data)->File;
+        }
+
+        ImGui::EndDragDropTarget();
+    }
+
+    return result;
+}
+
+// void DragDrop::renderDirectorySource(vfs::Directory* dir) {
 //    if (dir == nullptr) {
 //        return;
 //    }
@@ -83,7 +117,7 @@ io::SerializableObject* DragDrop::renderGenericTarget() {
 //    }
 //}
 //
-//vfs::Directory* DragDrop::renderDirectoryTarget() {
+// vfs::Directory* DragDrop::renderDirectoryTarget() {
 //    vfs::Directory* result = nullptr;
 //
 //    if (ImGui::BeginDragDropTarget()) {
@@ -97,7 +131,7 @@ io::SerializableObject* DragDrop::renderGenericTarget() {
 //    return result;
 //}
 //
-//void DragDrop::renderFileSource(vfs::File* file) {
+// void DragDrop::renderFileSource(vfs::File* file) {
 //    if (file == nullptr) {
 //        return;
 //    }
@@ -108,7 +142,7 @@ io::SerializableObject* DragDrop::renderGenericTarget() {
 //    }
 //}
 //
-//vfs::File* DragDrop::renderFileTarget() {
+// vfs::File* DragDrop::renderFileTarget() {
 //    vfs::File* result = nullptr;
 //
 //    if (ImGui::BeginDragDropTarget()) {

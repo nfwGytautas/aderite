@@ -1,4 +1,6 @@
 Registry:
-  NextHandle: 1
+  NextHandle: 3
   Entries:
     - Handle: 0
+    - Handle: 1
+    - Handle: 2

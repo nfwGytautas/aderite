@@ -105,7 +105,7 @@ bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetVal
     return altered;
 }
 
-void ImSpinner(const char* label, const float indicator_radius, const int circle_count, const float speed) {
+void ImSpinner(const char* label, const float indicator_radius, const int circle_count, const float speed, glm::vec2 size) {
     const auto style = ImGui::GetStyle();
 
     const ImVec4& main_color = ImVec4(15.0f / 255.0f, 135.0f / 255.0f, 250.0f / 255.0f, 1.0f);
@@ -122,7 +122,8 @@ void ImSpinner(const char* label, const float indicator_radius, const int circle
     const ImVec2 region = ImGui::GetContentRegionAvail();
     const ImVec2 pos = ImVec2(window->DC.CursorPos.x + ((region.x - indicator_radius) / 2.0f), window->DC.CursorPos.y + ((region.x - indicator_radius) / 3.0f));
     const float circle_radius = indicator_radius / 10.0f;
-    const ImRect bb(pos, ImVec2(pos.x + indicator_radius * 2.0f, pos.y + indicator_radius * 2.0f));
+    //const ImRect bb(pos, ImVec2(pos.x + indicator_radius * 2.0f, pos.y + indicator_radius * 2.0f));
+    const ImRect bb(pos, ImVec2(pos.x + size.x, pos.y + size.y));
     ImGui::ItemSize(bb, style.FramePadding.y);
     if (!ImGui::ItemAdd(bb, id)) {
         return;
@@ -139,7 +140,7 @@ void ImSpinner(const char* label, const float indicator_radius, const int circle
         color.y = main_color.y * growth + backdrop_color.y * (1.0f - growth);
         color.z = main_color.z * growth + backdrop_color.z * (1.0f - growth);
         color.w = 1.0f;
-        window->DrawList->AddCircleFilled(ImVec2(pos.x + indicator_radius + x, pos.y + indicator_radius - y),
+        window->DrawList->AddCircleFilled(ImVec2(pos.x + indicator_radius + x - 5, pos.y + indicator_radius - y),
                                           circle_radius + growth * circle_radius, ImGui::GetColorU32(color));
     }
 }
@@ -184,6 +185,10 @@ bool InlineRename::renderUI() {
 bool InlineRename::renderUI(size_t index, std::string value) {
     static ImGuiInputTextFlags edit_flags = ImGuiInputTextFlags_CallbackResize | ImGuiInputTextFlags_CharsNoBlank |
                                             ImGuiInputTextFlags_EnterReturnsTrue;
+
+    const float availWidth = ImGui::GetContentRegionAvailWidth();
+    ImGui::SetNextItemWidth(availWidth);
+
     bool renamed = false;
 
     if (m_idx != index) {
@@ -213,6 +218,7 @@ bool InlineRename::renderUI(size_t index, std::string value) {
         }
 
         if (m_appearing) {
+            m_value = value;
             ImGui::SetKeyboardFocusHere();
             m_appearing = false;
         }

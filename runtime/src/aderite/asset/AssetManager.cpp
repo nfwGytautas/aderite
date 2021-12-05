@@ -132,6 +132,9 @@ void AssetManager::save(io::SerializableAsset* object) const {
 void AssetManager::track(io::SerializableAsset* object) {
     m_registry.push_back({object, m_nextFreeHandle++});
     object->m_handle = m_nextFreeHandle - 1;
+
+    // Save registry
+    this->saveRegistry();
 }
 
 void AssetManager::untrack(io::SerializableAsset* asset) {}
