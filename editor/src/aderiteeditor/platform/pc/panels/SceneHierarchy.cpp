@@ -35,8 +35,8 @@ void genericNodeList(const std::vector<T*>& list, DelFn onDelete) {
     for (T* item : list) {
         ImGuiTreeNodeFlags leafFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
-        if (editor::State::LastSelectedObject.getType() == editor::SelectableObjectType::Object &&
-            editor::State::LastSelectedObject.getSerializable() == item) {
+        io::SerializableObject* selectedObject = editor::State::getInstance().getSelectedObject();
+        if (selectedObject == item) {
             leafFlags |= ImGuiTreeNodeFlags_Selected;
         }
 
@@ -60,7 +60,7 @@ void genericNodeList(const std::vector<T*>& list, DelFn onDelete) {
 
         // Selection
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            editor::State::LastSelectedObject = editor::SelectableObject(item);
+            editor::State::getInstance().setSelectedObject(item);
         }
     }
 }
@@ -124,7 +124,7 @@ void SceneHierarchy::contextMenu() {
         ImGui::MenuItem("(Scene)", NULL, false, false);
 
         if (ImGui::Selectable("Edit")) {
-            editor::State::LastSelectedObject = editor::SelectableObject(currentScene);
+            editor::State::getInstance().setSelectedObject(currentScene);
         }
 
         ImGui::EndPopup();

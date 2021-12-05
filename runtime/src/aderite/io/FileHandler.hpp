@@ -91,6 +91,11 @@ public:
      */
     void writePhysicalFile(LoadableHandle handle, const std::filesystem::path& file) const;
 
+    /**
+     * @brief Returns true if a loadable with the specified handle has a data file
+    */
+    bool exists(LoadableHandle handle) const;
+
 private:
     struct ChunkLocator {
         size_t Offset;

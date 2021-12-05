@@ -57,6 +57,7 @@ Editor:
 		Verify that the drag drop imported file can actually be used for the specified type
 	VFS:
 		Remove files that don't physically exist anymore
+		Add to root VFS files that don't have an actual file
 	Node editor:
 		Clear graph on new select
 		Constraints for number of nodes and deletion

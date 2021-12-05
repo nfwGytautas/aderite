@@ -1,0 +1,37 @@
+Type: 4
+Name: TextureMaterial
+Data:
+  DataSize: 0
+  SamplerCount: 0
+  Properties:
+    []
+  Samplers:
+    []
+  Graph:
+    Type: 1501
+    Name: vPud30y9hecH
+    Data:
+      NextId: 2
+      LastNode: 0
+      Nodes:
+        - Type: 502
+          Name: 54o3s2n3OrHd
+          Data:
+            InputPins: [-1]
+            OutputPins: []
+            Position:
+              X: 400
+              Y: 200
+            ID: 0
+        - Type: 501
+          Name: 8x25kl7KxWGb
+          Data:
+            Material: 3
+            InputPins: []
+            OutputPins: []
+            Position:
+              X: 200
+              Y: 200
+            ID: 1
+      Links:
+        []

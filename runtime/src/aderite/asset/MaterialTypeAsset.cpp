@@ -1,5 +1,7 @@
 #include "MaterialTypeAsset.hpp"
 
+#include "aderite/Aderite.hpp"
+#include "aderite/io/FileHandler.hpp"
 #include "aderite/io/Loader.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
@@ -84,6 +86,11 @@ void MaterialTypeAsset::unload() {
 }
 
 bool MaterialTypeAsset::needsLoading() const {
+    // Check if sources exist
+    if (!::aderite::Engine::getFileHandler()->exists(this->getHandle())) {
+        return false;
+    }
+
     return !this->isValid();
 }
 

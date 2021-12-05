@@ -216,14 +216,20 @@ void AssetBrowser::renderItems() {
                 DragDrop::renderFileSource(entry);
 
                 if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                    editor::State::LastSelectedObject = editor::SelectableObject(object);
+                    editor::State::getInstance().setSelectedObject(object);
                 }
 
-                ImGui::SetWindowFontScale(0.75f);
-                if (renamer.renderUI(std::hash<std::string>()(id), name)) {
-                    this->handleFileRename(entry, renamer.getValue(), object);
+                // Check for outside name rename
+                if (name != object->getName()) {
+                    // Update the name
+                    this->handleFileRename(entry, object->getName(), object);
+                } else {
+                    ImGui::SetWindowFontScale(0.75f);
+                    if (renamer.renderUI(std::hash<std::string>()(id), name)) {
+                        this->handleFileRename(entry, renamer.getValue(), object);
+                    }
+                    ImGui::SetWindowFontScale(1.0f);
                 }
-                ImGui::SetWindowFontScale(1.0f);
             } else {
                 // Unknown
             }
@@ -488,9 +494,6 @@ void AssetBrowser::importAsset(const std::filesystem::path& path, reflection::Ru
 
         // Now copy the source as a loadable id
         ::aderite::Engine::getFileHandler()->writePhysicalFile(asset->getHandle(), path);
-
-        // Create VFS file
-        std::ofstream ofs(m_currentDirectory / (asset->getName() + "." + std::to_string(asset->getHandle())));
     }
 }
 
@@ -498,6 +501,10 @@ void AssetBrowser::addAsset(io::SerializableAsset* asset) {
     if (asset != nullptr) {
         ::aderite::Engine::getAssetManager()->track(asset);
         ::aderite::Engine::getAssetManager()->save(asset);
+        asset->acquire();
+
+        // Create VFS file
+        std::ofstream ofs(m_currentDirectory / (asset->getName() + "." + std::to_string(asset->getHandle())));
     }
 }
 
