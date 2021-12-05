@@ -47,10 +47,10 @@ void DragDropImportModal::render() {
         if (ImGui::Button("Import", ImVec2(buttonWidth, 0.0f))) {
             // Check type
             if (m_type != -1) {
+                // Try to import the asset
                 this->m_callback(m_path, static_cast<reflection::RuntimeTypes>(m_type));
             }
 
-            // Try to import the asset
             this->close();
             ImGui::CloseCurrentPopup();
         }

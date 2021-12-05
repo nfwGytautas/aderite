@@ -24,14 +24,22 @@ size_t SerializableAsset::getRefCount() const {
 }
 
 void SerializableAsset::release() {
-    LOG_TRACE("[Asset] Releasing {0} reference, there are currently {1} references", m_handle, m_refCount);
+    LOG_TRACE("[Asset] Releasing {0}(handle: {2}) reference, there are currently {1} references", this->getName(), m_refCount, m_handle);
     ADERITE_DYNAMIC_ASSERT(m_refCount > 0, "Never acquired object was released");
     m_refCount--;
 }
 
 void SerializableAsset::acquire() {
-    LOG_TRACE("[Asset] Acquiring {0} reference, there are currently {1} references", m_handle, m_refCount);
+    LOG_TRACE("[Asset] Acquiring {0}(handle: {2}) reference, there are currently {1} references", this->getName(), m_refCount, m_handle);
     m_refCount++;
+}
+
+void SerializableAsset::load(const io::Loader* loader) {}
+
+void SerializableAsset::unload() {}
+
+bool SerializableAsset::needsLoading() const {
+    return false;
 }
 
 } // namespace io

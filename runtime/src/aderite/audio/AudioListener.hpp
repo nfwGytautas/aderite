@@ -14,7 +14,7 @@ namespace audio {
 /**
  * @brief Audio listener object used to denote a point in the world where audio is heard from
  */
-class AudioListener final : public io::SerializableAsset {
+class AudioListener final : public io::SerializableObject {
 public:
     AudioListener();
     virtual ~AudioListener();

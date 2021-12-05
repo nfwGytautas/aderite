@@ -17,7 +17,7 @@ namespace audio {
 /**
  * @brief Audio source object used to denote a point in the world where audio is emitted from
  */
-class AudioSource final : public io::SerializableAsset {
+class AudioSource final : public io::SerializableObject {
 public:
     AudioSource();
     virtual ~AudioSource();

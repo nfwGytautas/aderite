@@ -922,7 +922,7 @@ void Inspector::renderScriptSystem(io::SerializableObject* serializable) {
 
                 break;
             }
-            case scripting::FieldType::AudioSource: {
+            /*case scripting::FieldType::AudioSource: {
                 audio::AudioSource* handle = static_cast<audio::AudioSource*>(fw.getSerializable());
 
                 if (handle) {
@@ -937,7 +937,7 @@ void Inspector::renderScriptSystem(io::SerializableObject* serializable) {
                 }
 
                 break;
-            }
+            }*/
             /*case scripting::FieldType::Prefab: {
                 asset::PrefabAsset* handle = static_cast<asset::PrefabAsset*>(fw.getSerializable());
 

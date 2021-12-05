@@ -1,6 +1,7 @@
 #pragma once
 
 #include "aderite/asset/Forward.hpp"
+#include "aderite/io/ILoadable.hpp"
 #include "aderite/io/SerializableObject.hpp"
 
 namespace aderite {
@@ -11,7 +12,7 @@ using SerializableHandle = size_t;
 /**
  * @brief Base class for serializable objects that require reference counting
  */
-class SerializableAsset : public SerializableObject {
+class SerializableAsset : public SerializableObject, public io::ILoadable {
 public:
     static constexpr size_t c_InvalidHandle = 0xffffffffffffffff; // std::numeric_limits<size_t>::max() or ULLONG_MAX
 
@@ -37,6 +38,11 @@ public:
      * @brief Acquires a reference
      */
     void acquire();
+
+    // Inherited via ILoadable
+    virtual void load(const io::Loader* loader) override;
+    virtual void unload() override;
+    virtual bool needsLoading() const override;
 
 public:
     friend asset::AssetManager; // Used to set the handle and manage ref count

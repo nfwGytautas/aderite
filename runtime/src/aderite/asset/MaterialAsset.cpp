@@ -14,7 +14,7 @@ namespace aderite {
 namespace asset {
 
 MaterialAsset::~MaterialAsset() {
-    LOG_TRACE("[Asset] Destroying {0}", this->getHandle());
+    LOG_TRACE("[Asset] Destroying {0}", this->getName());
     std::free(m_udata);
 }
 
@@ -33,7 +33,7 @@ bool MaterialAsset::isValid() const {
 }
 
 void MaterialAsset::load(const io::Loader* loader) {
-    LOG_TRACE("[Asset] Loading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Loading {0}", this->getName());
 
     // TODO: Reference
 
@@ -45,15 +45,15 @@ void MaterialAsset::load(const io::Loader* loader) {
         }
     }
 
-    LOG_INFO("[Asset] Loaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Loaded {0}", this->getName());
 }
 
 void MaterialAsset::unload() {
-    LOG_TRACE("[Asset] Unloading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Unloading {0}", this->getName());
 
     // TODO: Rework cause this should be reference counted
 
-    LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Unloaded {0}", this->getName());
 }
 
 bool MaterialAsset::needsLoading() const {
@@ -105,7 +105,7 @@ bool MaterialAsset::deserialize(io::Serializer* serializer, const YAML::Node& da
     m_udata = static_cast<float*>(std::malloc(dataSize));
 
     if (m_udata == nullptr) {
-        LOG_ERROR("[Asset] Failed to allocate space for material property data {0}", getHandle());
+        LOG_ERROR("[Asset] Failed to allocate space for material property data {0}", this->getName());
         return false;
     }
 
@@ -114,7 +114,7 @@ bool MaterialAsset::deserialize(io::Serializer* serializer, const YAML::Node& da
     const YAML::Node& d = data["Properties"]["Data"];
 
     if (d.size() != (m_info.Type->getFields().Size * 4)) {
-        LOG_ERROR("[Asset] Incorrect size for stored material data and type {0}", getHandle());
+        LOG_ERROR("[Asset] Incorrect size for stored material data and type {0}", this->getName());
         return false;
     }
 
@@ -148,7 +148,7 @@ void MaterialAsset::setType(MaterialTypeAsset* type) {
     if (realloced != nullptr) {
         m_udata = realloced;
     } else {
-        LOG_ERROR("[Asset] Failed to realloc material {0} data array", this->getHandle());
+        LOG_ERROR("[Asset] Failed to realloc material {0} data array", this->getName());
         return;
     }
 

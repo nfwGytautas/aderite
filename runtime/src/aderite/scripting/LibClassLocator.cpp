@@ -126,9 +126,9 @@ MonoObject* LibClassLocator::create(io::SerializableAsset* serializable) const {
     case reflection::RuntimeTypes::AUDIO: {
         return this->create(static_cast<asset::AudioAsset*>(serializable));
     }
-    case reflection::RuntimeTypes::AUDIO_SOURCE: {
+    /*case reflection::RuntimeTypes::AUDIO_SOURCE: {
         return this->create(static_cast<audio::AudioSource*>(serializable));
-    }
+    }*/
     default: {
         LOG_ERROR("[Scripting] Unknown implementation for creating a {0} serializable", serializable->getType());
         return nullptr;

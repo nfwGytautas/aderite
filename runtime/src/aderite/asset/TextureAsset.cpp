@@ -8,7 +8,7 @@ namespace aderite {
 namespace asset {
 
 TextureAsset::~TextureAsset() {
-    LOG_TRACE("[Asset] Destroying {0}", this->getHandle());
+    LOG_TRACE("[Asset] Destroying {0}", this->getName());
 
     if (bgfx::isValid(m_handle)) {
         this->unload();
@@ -20,7 +20,7 @@ bool TextureAsset::isValid() const {
 }
 
 void TextureAsset::load(const io::Loader* loader) {
-    LOG_TRACE("[Asset] Loading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Loading {0}", this->getName());
     ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_handle), "Tried to load already loaded texture");
 
     if (m_info.IsCubemap) {
@@ -38,18 +38,18 @@ void TextureAsset::load(const io::Loader* loader) {
                                          bgfx::copy(result.Data.get(), result.Width * result.Height * result.BPP));
     }
 
-    LOG_INFO("[Asset] Loaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Loaded {0}", this->getName());
 }
 
 void TextureAsset::unload() {
-    LOG_TRACE("[Asset] Unloading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Unloading {0}", this->getName());
 
     if (bgfx::isValid(m_handle)) {
         bgfx::destroy(m_handle);
         m_handle = BGFX_INVALID_HANDLE;
     }
 
-    LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Unloaded {0}", this->getName());
 }
 
 bool TextureAsset::needsLoading() const {

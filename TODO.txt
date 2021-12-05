@@ -17,9 +17,8 @@ Licensing:
 Runtime:
 	Serialization:
 		Name resolve
-		Return true/false on writeUntrackedType, fillData
 	Asset manager:
-		Asset ref counting
+		Loaded asset leeway, so not to instantly unload
 	FPRP:
 		Array operation
 		Operation resize events
@@ -40,8 +39,6 @@ Runtime:
 		Disable/enable colliders at runtime
 		Broad-Phase callbacks
 		Collision layers
-	Selectors:
-		Any/All for TagSelector
 	Scripting:
 		Dont kill entire editor on script run error
 		Load on project open
@@ -57,11 +54,8 @@ Runtime:
 
 Editor:
 	Asset browser:
-		Verify that the imported file can actually be used for the specified type
+		Verify that the drag drop imported file can actually be used for the specified type
 	VFS:
-		Load textures for preview on directory change
-		Unload texture previews on directory change
-		Refactor to be more intuitive
 		Remove files that don't physically exist anymore
 	Node editor:
 		Clear graph on new select

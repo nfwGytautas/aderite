@@ -229,11 +229,11 @@ bool ScriptSystem::deserialize(io::Serializer* serializer, const YAML::Node& dat
                     fw.setSerializable(object);*/
                     break;
                 }
-                case scripting::FieldType::AudioSource: {
+                /*case scripting::FieldType::AudioSource: {
                     audio::AudioSource* source = m_scene->getSource(fieldData.second.as<std::string>());
                     fw.setSerializable(source);
                     break;
-                }
+                }*/
                 default: {
                     LOG_ERROR("[Scripting] Unknown implementation for deserializing field of type {0}", fw.getType());
                 }

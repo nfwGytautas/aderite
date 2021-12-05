@@ -270,6 +270,9 @@ void Engine::updateSystem(float delta) const {
     // Update audio and flush queued audio commands to controller (FMOD should always update)
     m_audioController->update();
 
+    // Asset manager
+    m_assetManager->update();
+
     MIDDLEWARE_ACTION(onSystemUpdate, delta);
 }
 

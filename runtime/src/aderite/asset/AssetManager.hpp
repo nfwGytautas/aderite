@@ -33,6 +33,11 @@ public:
     void shutdown();
 
     /**
+     * @brief Updates the asset manager, queueing necessary assets, freeing unneeded, etc.
+     */
+    void update();
+
+    /**
      * @brief Loads the asset manager registry using the FileHandler
      * @return True if loaded and valid, false otherwise
      */

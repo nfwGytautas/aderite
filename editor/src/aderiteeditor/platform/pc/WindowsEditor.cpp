@@ -102,6 +102,9 @@ void WindowsEditor::onRuntimeShutdown() {
         // onSaveProject();
     }
 
+    // Icons
+    editor::EditorIcons::getInstance().unload();
+
     // UI
     m_ui.shutdown();
 

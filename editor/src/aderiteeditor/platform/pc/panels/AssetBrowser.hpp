@@ -96,8 +96,13 @@ private:
     /**
      * @brief Add asset to the current selected directory
      * @param asset Asset to add
-    */
+     */
     void addAsset(io::SerializableAsset* asset);
+
+    /**
+     * @brief Releases all current directory references
+     */
+    void releaseCurrentDirectoryReferences();
 
 private:
     // Current selected directory

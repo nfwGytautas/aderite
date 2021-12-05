@@ -2,6 +2,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/io/FileHandler.hpp"
+#include "aderite/io/LoaderPool.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/utility/Log.hpp"
@@ -34,6 +35,28 @@ void AssetManager::shutdown() {
     this->saveRegistry();
 
     LOG_INFO("[Asset] Asset manager shutdown");
+}
+
+void AssetManager::update() {
+    for (auto& entry : m_registry) {
+        if (entry.Asset != nullptr) {
+            // Check references
+            if (entry.Asset->getRefCount() > 0) {
+                // Check if loaded
+                if (entry.Asset->needsLoading()) {
+                    // Load
+                    ::aderite::Engine::getLoaderPool()->enqueue(entry.Asset);
+                }
+            } else {
+                // No outstanding ref count, can be freed
+                entry.Asset->unload();
+
+                // And delete and flag as no meta
+                delete entry.Asset;
+                entry.Asset = nullptr;
+            }
+        }
+    }
 }
 
 bool AssetManager::loadRegistry() {
@@ -137,7 +160,19 @@ void AssetManager::track(io::SerializableAsset* object) {
     this->saveRegistry();
 }
 
-void AssetManager::untrack(io::SerializableAsset* asset) {}
+void AssetManager::untrack(io::SerializableAsset* asset) {
+    ADERITE_DYNAMIC_ASSERT(asset != nullptr, "Tried to untrack nullptr");
+
+    // Remove from list
+    auto it = std::find_if(m_registry.begin(), m_registry.end(), [asset](auto& entry) {
+        return entry.Asset != nullptr && entry.Asset == asset;
+    });
+
+    if (it != m_registry.end()) {
+        ADERITE_DYNAMIC_ASSERT(it->Asset->getRefCount() == 0, "Tried to untrack asset with outstanding references");
+        m_registry.erase(it);
+    }
+}
 
 void AssetManager::saveAllTrackedObjects() const {
     LOG_TRACE("[Asset] Saving all objects");

@@ -25,6 +25,7 @@
 #include "aderiteeditor/platform/pc/EditorUI.hpp"
 #include "aderiteeditor/platform/pc/WindowsEditor.hpp"
 #include "aderiteeditor/platform/pc/modals/DragDropImportModal.hpp"
+#include "aderiteeditor/platform/pc/modals/NotificationModal.hpp"
 #include "aderiteeditor/platform/pc/modals/PromptModal.hpp"
 #include "aderiteeditor/resources/EditorIcons.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
@@ -338,20 +339,14 @@ std::filesystem::path AssetBrowser::getVFSRootAbsolute() const {
 void AssetBrowser::removeDirectory(const std::filesystem::path& directory) {
     const std::string name = directory.stem().string();
 
-    // Already exist show confirmation window
-    PromptModal* modal =
-        new PromptModal("Are you sure you want to delete?", "Are you sure you want to delete " + name + " this action can not be undone!");
-
-    // Add buttons
-    modal->pushButton({"Cancel"});
-    modal->pushButton({"Delete", [=]() {
-                           // Iterate over the directory and remove everything
-
-                           std::filesystem::remove(directory);
-                       }});
-
-    // Already exists push a notification window
-    WindowsEditor::getInstance()->getUI().pushModal(modal);
+    // Check if empty
+    if (!std::filesystem::is_empty(directory)) {
+        // Non empty directory can't be removed
+        NotificationModal* modal = new NotificationModal("Info", "Can't remove non empty directory, move or delete child items first");
+        WindowsEditor::getInstance()->getUI().pushModal(modal);
+    } else {
+        std::filesystem::remove(directory);
+    }
 }
 
 void AssetBrowser::removeFile(const std::filesystem::path& file) {
@@ -377,6 +372,24 @@ void AssetBrowser::removeFile(const std::filesystem::path& file) {
 }
 
 void AssetBrowser::handleDirectoryChange(const std::filesystem::path& newDirectory) {
+    // Acquire references in new directory
+    for (const auto& entry : std::filesystem::directory_iterator(newDirectory)) {
+        if (entry.is_regular_file()) {
+            // Get handle
+            const std::string handleString = entry.path().extension().string().substr(1);
+            const io::SerializableHandle handle = std::stoull(handleString);
+
+            // Get asset
+            io::SerializableAsset* asset = ::aderite::Engine::getAssetManager()->get(handle);
+
+            // Release held reference
+            asset->acquire();
+        }
+    }
+
+    // Release from previous directory
+    this->releaseCurrentDirectoryReferences();
+
     m_currentDirectory = newDirectory;
 }
 
@@ -445,6 +458,10 @@ void AssetBrowser::directoryDragDropHandler(const std::filesystem::path& directo
 
     if (!entry.empty()) {
         std::filesystem::rename(entry, directory / entry.filename());
+
+        if (entry == m_currentDirectory) {
+            m_currentDirectory = directory / entry.filename();
+        }
     }
 }
 
@@ -484,6 +501,24 @@ void AssetBrowser::addAsset(io::SerializableAsset* asset) {
     }
 }
 
+void AssetBrowser::releaseCurrentDirectoryReferences() {
+    if (!m_currentDirectory.empty()) {
+        for (const auto& entry : std::filesystem::directory_iterator(m_currentDirectory)) {
+            if (entry.is_regular_file()) {
+                // Get handle
+                const std::string handleString = entry.path().extension().string().substr(1);
+                const io::SerializableHandle handle = std::stoull(handleString);
+
+                // Get asset
+                io::SerializableAsset* asset = ::aderite::Engine::getAssetManager()->get(handle);
+
+                // Release held reference
+                asset->release();
+            }
+        }
+    }
+}
+
 bool AssetBrowser::init() {
     ADERITE_DYNAMIC_ASSERT(g_instance == nullptr, "Multiple asset browsers created");
 
@@ -498,7 +533,9 @@ bool AssetBrowser::init() {
     return true;
 }
 
-void AssetBrowser::shutdown() {}
+void AssetBrowser::shutdown() {
+    this->releaseCurrentDirectoryReferences();
+}
 
 void AssetBrowser::render() {
     if (!this->isProjectLoaded()) {

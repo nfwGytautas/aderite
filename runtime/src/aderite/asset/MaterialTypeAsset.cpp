@@ -16,7 +16,7 @@ bgfx::ShaderHandle load_shader(const std::vector<unsigned char>& source, const s
 }
 
 MaterialTypeAsset::~MaterialTypeAsset() {
-    LOG_TRACE("[Asset] Destroying {0}", this->getHandle());
+    LOG_TRACE("[Asset] Destroying {0}", this->getName());
     this->unload();
 }
 
@@ -31,7 +31,7 @@ bool MaterialTypeAsset::isValid() const {
 }
 
 void MaterialTypeAsset::load(const io::Loader* loader) {
-    LOG_TRACE("[Asset] Loading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Loading {0}", this->getName());
     ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_shaderHandle), "Tried to load already loaded material type");
 
     io::Loader::ShaderLoadResult slr = loader->loadShader(this->getHandle());
@@ -56,11 +56,11 @@ void MaterialTypeAsset::load(const io::Loader* loader) {
         m_samplers[i] = bgfx::createUniform(("u_" + typeName + "_" + std::to_string(i)).c_str(), bgfx::UniformType::Sampler, 1);
     }
 
-    LOG_INFO("[Asset] Loaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Loaded {0}", this->getName());
 }
 
 void MaterialTypeAsset::unload() {
-    LOG_TRACE("[Asset] Unloading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Unloading {0}", this->getName());
 
     if (bgfx::isValid(m_shaderHandle)) {
         bgfx::destroy(m_shaderHandle);
@@ -80,7 +80,7 @@ void MaterialTypeAsset::unload() {
 
     m_samplers.clear();
 
-    LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Unloaded {0}", this->getName());
 }
 
 bool MaterialTypeAsset::needsLoading() const {
