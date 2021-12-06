@@ -16,7 +16,7 @@ size_t OperationArray::size() const {
 }
 
 reflection::Type OperationArray::getType() const {
-    return static_cast<reflection::Type>(reflection::EditorTypes::ArrayOp);
+    return 0;
 }
 
 bool OperationArray::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

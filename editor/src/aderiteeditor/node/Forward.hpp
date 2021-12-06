@@ -16,25 +16,10 @@ class OutputPin;
 class Link;
 
 // Node types
-
-// Material
 class MaterialInputNode;
 class MaterialOutputNode;
 class AddNode;
 class Sampler2DNode;
-
-// Rendering pipeline
-class ScreenNode;
-class EntitiesNode;
-class RenderNode;
-class TargetProviderNode;
-class CameraProviderNode;
-class EditorRenderNode;
-class EditorTargetNode;
-class EditorCameraNode;
-class RequireLockNode;
-class ConcatObjectsNode;
-class SelectObjectNode;
 
 } // namespace node
 } // namespace aderite

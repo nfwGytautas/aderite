@@ -10,22 +10,17 @@
 #include "aderiteeditor/asset/property/Property.hpp"
 #include "aderiteeditor/compiler/ShaderCompiler.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
-#include "aderiteeditor/node/Graph.hpp"
-#include "aderiteeditor/node/material/MaterialInputNode.hpp"
-#include "aderiteeditor/node/material/MaterialOutputNode.hpp"
+//#include "aderiteeditor/node/Graph.hpp"
+//#include "aderiteeditor/node/material/MaterialInputNode.hpp"
+//#include "aderiteeditor/node/material/MaterialOutputNode.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
 
 namespace aderite {
 namespace asset {
 
-EditorMaterialType::EditorMaterialType() : m_graph(new node::Graph()) {
-    node::MaterialOutputNode* mon = m_graph->addNode<node::MaterialOutputNode>();
-    node::MaterialInputNode* min = m_graph->addNode<node::MaterialInputNode>();
-    min->setType(this);
-    m_graph->setLastNode(mon);
-    mon->setPosition({400, 200});
-    min->setPosition({200, 200});
+EditorMaterialType::EditorMaterialType() {
+    this->addIONodes();
 }
 
 EditorMaterialType::~EditorMaterialType() {
@@ -61,7 +56,7 @@ bool EditorMaterialType::serialize(const io::Serializer* serializer, YAML::Emitt
     emitter << YAML::EndSeq;
 
     emitter << YAML::Key << "Graph";
-    serializer->writeObject(emitter, m_graph);
+    //serializer->writeObject(emitter, this);
 
     return true;
 }
@@ -96,14 +91,10 @@ bool EditorMaterialType::deserialize(io::Serializer* serializer, const YAML::Nod
         }
     }
 
-    delete m_graph;
-    m_graph = static_cast<node::Graph*>(serializer->parseObject(data["Graph"]));
+    /*delete m_graph;
+    m_graph = static_cast<node::Graph*>(serializer->parseObject(data["Graph"]));*/
 
     return true;
-}
-
-node::Graph* EditorMaterialType::getGraph() const {
-    return m_graph;
 }
 
 void EditorMaterialType::recalculate() {
@@ -421,8 +412,8 @@ void EditorMaterialType::generateVarying(std::ostream& os) {
 void EditorMaterialType::generateFragment(std::ostream& os) {
     LOG_TRACE("Generating fragment shader");
     compiler::ShaderEvaluator fragmentWriter(compiler::ShaderEvaluator::ShaderType::FRAGMENT, this);
-    m_graph->resetEvaluateFlag();
-    m_graph->getLastNode()->evaluate(&fragmentWriter);
+    /*this->resetEvaluateFlag();
+    this->getLastNode()->evaluate(&fragmentWriter);*/
     fragmentWriter.write(os);
 }
 
@@ -467,6 +458,18 @@ void EditorMaterialType::generateVertex(std::ostream& os) {
 
     // Close main
     os << "}\n";
+}
+
+void EditorMaterialType::addIONodes() {
+    //// Don't have multiple IO nodes
+    //this->clear();
+
+    //node::MaterialOutputNode* mon = this->addNode<node::MaterialOutputNode>();
+    //node::MaterialInputNode* min = this->addNode<node::MaterialInputNode>();
+    //min->setType(this);
+    //this->setLastNode(mon);
+    //mon->setPosition({400, 200});
+    //min->setPosition({200, 200});
 }
 
 } // namespace asset

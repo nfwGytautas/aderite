@@ -33,7 +33,7 @@ void Sampler2DNode::evaluate(compiler::GraphEvaluator* evaluator) {
 }
 
 reflection::Type Sampler2DNode::getType() const {
-    return static_cast<reflection::Type>(reflection::EditorTypes::Sampler2DNode);
+    return 0;
 }
 
 bool Sampler2DNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

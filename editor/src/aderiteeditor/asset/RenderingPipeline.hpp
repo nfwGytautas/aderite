@@ -36,7 +36,7 @@ public:
 
 private:
     std::string m_name;
-    node::Graph* m_graph = nullptr;
+    //node::Graph* m_graph = nullptr;
 };
 
 } // namespace asset

@@ -6,58 +6,64 @@
 #include "aderite/utility/Log.hpp"
 
 #include "aderiteeditor/platform/pc/backend/node/imnodes.h"
+#include "aderiteeditor/platform/pc/backend/node/imnodes_aderite.hpp"
 #include "aderiteeditor/shared/State.hpp"
 
-// Nodes
-// Material
-#include "aderiteeditor/node/material/AddNode.hpp"
-#include "aderiteeditor/node/material/MaterialInputNode.hpp"
-#include "aderiteeditor/node/material/MaterialOutputNode.hpp"
-#include "aderiteeditor/node/material/Sampler2DNode.hpp"
-
-// Pipeline
-#include "aderiteeditor/node/pipeline/CameraProviderNode.hpp"
-#include "aderiteeditor/node/pipeline/ConcatObjectsNode.hpp"
-#include "aderiteeditor/node/pipeline/EditorCameraNode.hpp"
-#include "aderiteeditor/node/pipeline/EditorRenderNode.hpp"
-#include "aderiteeditor/node/pipeline/EditorTargetNode.hpp"
-#include "aderiteeditor/node/pipeline/EntitiesNode.hpp"
-#include "aderiteeditor/node/pipeline/RenderNode.hpp"
-#include "aderiteeditor/node/pipeline/RequireLockNode.hpp"
-#include "aderiteeditor/node/pipeline/ScreenNode.hpp"
-#include "aderiteeditor/node/pipeline/SelectObjectNode.hpp"
-#include "aderiteeditor/node/pipeline/TargetProviderNode.hpp"
-
-// Shared
-#include "aderiteeditor/node/shared/ConvertNode.hpp"
-#include "aderiteeditor/node/shared/Properties.hpp"
+//// Nodes
+//#include "aderiteeditor/node/material/AddNode.hpp"
+//#include "aderiteeditor/node/material/MaterialInputNode.hpp"
+//#include "aderiteeditor/node/material/MaterialOutputNode.hpp"
+//#include "aderiteeditor/node/material/Sampler2DNode.hpp"
+//
+//// Shared
+//#include "aderiteeditor/node/shared/ConvertNode.hpp"
+//#include "aderiteeditor/node/shared/Properties.hpp"
 
 namespace aderite {
 namespace editor {
 
+class TestNode : public node::Node {
+public:
+    TestNode() {
+        p_inPins.push_back(node::InNodePin(this, node::PinType::Float));
+        p_outPins.push_back(node::OutNodePin(this, node::PinType::Float));
+    }
+
+    // Inherited via Node
+    virtual const char* getTypeName() const override {
+        return "TestNode";
+    }
+};
+
 constexpr int c_RootMaterialNodeId = 0;
 
-NodeEditor::NodeEditor() {}
+NodeEditor::NodeEditor() {
+    m_graph = new node::Graph();
+}
 
 NodeEditor::~NodeEditor() {}
 
-void NodeEditor::setGraph(node::Graph* graph, NodeEditorType type) {
-    if (m_graph != nullptr) {
+void NodeEditor::setGraph(node::Graph* graph) {
+    /*if (m_graph != nullptr) {
         m_graph->closingDisplay();
     }
 
     if (graph != nullptr) {
         graph->prepareToDisplay();
-    }
+    }*/
 
     m_graph = graph;
-    m_type = type;
 }
 
 void NodeEditor::renderMaterialEditorContextMenu() {
     const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
 
     if (ImGui::MenuItem("Add")) {
+        m_graph->addNode(new TestNode());
+        //ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
+    }
+
+    /*if (ImGui::MenuItem("Add")) {
         node::Node* n = m_graph->addNode<node::AddNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
     }
@@ -65,84 +71,7 @@ void NodeEditor::renderMaterialEditorContextMenu() {
     if (ImGui::MenuItem("Sampler 2D")) {
         node::Node* n = m_graph->addNode<node::Sampler2DNode>();
         ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-    }
-}
-
-void NodeEditor::renderRenderPipelineEditorContextMenu() {
-    const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
-
-    if (ImGui::MenuItem("Entities")) {
-        node::Node* n = m_graph->addNode<node::EntitiesNode>();
-        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-    }
-
-    if (ImGui::MenuItem("Camera provider")) {
-        node::Node* n = m_graph->addNode<node::CameraProviderNode>();
-        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-    }
-
-    if (ImGui::MenuItem("Target provider")) {
-        node::Node* n = m_graph->addNode<node::TargetProviderNode>();
-        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-    }
-
-    if (ImGui::BeginMenu("Array")) {
-        if (ImGui::MenuItem("Concat")) {
-            node::Node* n = m_graph->addNode<node::ConcatObjectsNode>();
-            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-        }
-
-        if (ImGui::MenuItem("Select")) {
-            node::Node* n = m_graph->addNode<node::SelectObjectNode>();
-            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-        }
-
-        ImGui::EndMenu();
-    }
-
-    if (ImGui::BeginMenu("Flow control")) {
-        if (ImGui::MenuItem("Require lock")) {
-            node::Node* n = m_graph->addNode<node::RequireLockNode>();
-            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-        }
-
-        ImGui::EndMenu();
-    }
-
-    if (ImGui::MenuItem("Convert")) {
-        node::Node* n = m_graph->addNode<node::ConvertNode>();
-        ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-    }
-
-    if (ImGui::BeginMenu("Rendering")) {
-        if (ImGui::MenuItem("Depth & Color")) {
-            node::Node* n = m_graph->addNode<node::RenderNode>();
-            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-        }
-
-        ImGui::EndMenu();
-    }
-
-    ImGui::Separator();
-
-    if (ImGui::BeginMenu("Editor")) {
-        if (ImGui::MenuItem("Render")) {
-            node::Node* n = m_graph->addNode<node::EditorRenderNode>();
-            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-        }
-
-        if (ImGui::MenuItem("Camera")) {
-            node::Node* n = m_graph->addNode<node::EditorCameraNode>();
-            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-        }
-
-        if (ImGui::MenuItem("Target")) {
-            node::Node* n = m_graph->addNode<node::EditorTargetNode>();
-            ImNodes::SetNodeScreenSpacePos(n->getId(), click_pos);
-        }
-
-        ImGui::EndMenu();
-    }
+    }*/
 }
 
 bool NodeEditor::init() {
@@ -176,23 +105,13 @@ void NodeEditor::render() {
                 }
 
                 if (ImGui::BeginPopup("add node")) {
-                    switch (m_type) {
-                    case NodeEditorType::MATERIAL: {
-                        renderMaterialEditorContextMenu();
-                        break;
-                    }
-                    case NodeEditorType::RENDER_PIPELINE: {
-                        renderRenderPipelineEditorContextMenu();
-                        break;
-                    }
-                    }
-
+                    renderMaterialEditorContextMenu();
                     ImGui::EndPopup();
                 }
                 ImGui::PopStyleVar();
             }
 
-            m_graph->renderUI();
+            m_graph->render();
 
             ImNodes::MiniMap();
             ImNodes::EndNodeEditor();
@@ -205,7 +124,9 @@ void NodeEditor::render() {
                 int start;
                 int end;
                 if (ImNodes::IsLinkCreated(&start, &end)) {
-                    m_graph->connect(start, end);
+                    node::OutNodePin* outPin = static_cast<node::OutNodePin*>(ImNodes::GetPinUserData(start));
+                    node::InNodePin* inPin = static_cast<node::InNodePin*>(ImNodes::GetPinUserData(end));
+                    inPin->setConnectedOutPin(outPin);
                 }
             }
 
@@ -217,8 +138,9 @@ void NodeEditor::render() {
                     if (nodes.size() > 0) {
                         ImNodes::GetSelectedNodes(nodes.data());
 
-                        for (int node : nodes) {
-                            m_graph->deleteNode(node);
+                        for (int nodeId : nodes) {
+                            node::Node* node = static_cast<node::Node*>(ImNodes::GetNodeUserData(nodeId));
+                            m_graph->removeNode(node);
                         }
                     }
 
@@ -229,7 +151,8 @@ void NodeEditor::render() {
             {
                 int link_id;
                 if (ImNodes::IsLinkDestroyed(&link_id)) {
-                    m_graph->disconnectLink(link_id);
+                    node::InNodePin* inPin = static_cast<node::InNodePin*>(ImNodes::GetLinkUserData(link_id));
+                    inPin->setConnectedOutPin(nullptr);
                 }
             }
         }

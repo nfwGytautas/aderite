@@ -13,6 +13,7 @@
 
 #include "aderiteeditor/asset/property/Forward.hpp"
 #include "aderiteeditor/node/Forward.hpp"
+#include "aderiteeditor/node/new/GraphX.hpp"
 
 namespace aderite {
 namespace asset {
@@ -20,7 +21,7 @@ namespace asset {
 /**
  * @brief Material type asset implementation
  */
-class EditorMaterialType : public asset::MaterialTypeAsset {
+class EditorMaterialType : public asset::MaterialTypeAsset, public node::Graph {
 public:
     using Properties = std::vector<Property*>;
     using Samplers = std::vector<Sampler*>;
@@ -31,12 +32,6 @@ public:
 
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
-
-    /**
-     * @brief Returns this pipeline graph representation
-     * @return node::Graph instance
-     */
-    node::Graph* getGraph() const;
 
     /**
      * @brief Recalculates property offsets
@@ -107,10 +102,14 @@ private:
      */
     void generateVertex(std::ostream& os);
 
+    /**
+     * @brief Adds material input, output nodes to the graph
+     */
+    void addIONodes();
+
 private:
     Properties m_properties;
     Samplers m_samplers;
-    node::Graph* m_graph = nullptr;
 };
 
 } // namespace asset

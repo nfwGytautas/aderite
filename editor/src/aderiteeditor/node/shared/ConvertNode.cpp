@@ -79,7 +79,7 @@ bool ConvertNode::onConnectToOutput(OutputPin* target, InputPin* source) {
 }
 
 reflection::Type ConvertNode::getType() const {
-    return static_cast<reflection::Type>(reflection::EditorTypes::ConvertNode);
+    return 0;
 }
 
 bool ConvertNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

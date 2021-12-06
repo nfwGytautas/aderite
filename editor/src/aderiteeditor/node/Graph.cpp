@@ -11,6 +11,7 @@
 #include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/node/OutputPin.hpp"
 #include "aderiteeditor/platform/pc/backend/node/imnodes.h"
+#include "aderiteeditor/platform/pc/backend/node/imnodes_aderite.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 
 namespace aderite {
@@ -19,13 +20,7 @@ namespace node {
 Graph::Graph() {}
 
 Graph::~Graph() {
-    for (Node* n : m_nodes) {
-        delete n;
-    }
-
-    for (auto pair : m_links) {
-        delete pair.second;
-    }
+    this->clear();
 }
 
 void Graph::connect(int outputPinId, int inputPinId) {
@@ -93,6 +88,21 @@ void Graph::disconnectLink(int linkId) {
     }
 }
 
+void Graph::clear() {
+    for (Node* n : m_nodes) {
+        delete n;
+    }
+
+    for (auto pair : m_links) {
+        delete pair.second;
+    }
+
+    m_nodes.clear();
+    m_links.clear();
+    m_freeLinks = std::stack<int>();
+    m_nextId = 0;
+}
+
 void Graph::deleteNode(int id) {
     Node* n = findNode(id);
 
@@ -140,6 +150,7 @@ void Graph::renderUI() {
         }
 
         ImNodes::BeginNode(node->getId());
+        ImNodes::SetNodeUserData(node->getId(), node);
 
         ImNodes::BeginNodeTitleBar();
         ImGui::TextUnformatted(node->getNodeName());
@@ -226,10 +237,6 @@ Node* Graph::findNode(int id) const {
     }
 
     return *it;
-}
-
-reflection::Type Graph::getType() const {
-    return static_cast<reflection::Type>(reflection::EditorTypes::GraphAsset);
 }
 
 bool Graph::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

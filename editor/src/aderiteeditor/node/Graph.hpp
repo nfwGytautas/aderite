@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stack>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -16,14 +17,13 @@ namespace node {
 /**
  * @brief Type of the graph
  */
-enum class GraphType { RENDER_PIPELINE, MATERIAL };
+enum class GraphType { MATERIAL };
 
 /**
  * @brief Main node editor object which represent the current graph state
  */
-class Graph : public io::SerializableObject {
+class Graph : public io::ISerializable {
 public:
-    Graph();
     virtual ~Graph();
 
     /**
@@ -51,6 +51,11 @@ public:
         node->setId(m_nextId++);
         return node;
     }
+
+    /**
+     * @brief Removes all links and nodes from graph
+     */
+    void clear();
 
     /**
      * @brief Delete node from graph
@@ -91,9 +96,11 @@ public:
     void closingDisplay();
 
     // Inherited via SerializableObject
-    virtual reflection::Type getType() const override;
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+
+protected:
+    Graph();
 
 private:
     OutputPin* findOutputPin(int id) const;
@@ -110,6 +117,9 @@ private:
     // Links
     std::unordered_map<int, Link*> m_links;
     std::stack<int> m_freeLinks;
+
+    // Map that is used to associate a name with it's id
+    std::unordered_map<std::string, int> m_idMap;
 };
 
 } // namespace node

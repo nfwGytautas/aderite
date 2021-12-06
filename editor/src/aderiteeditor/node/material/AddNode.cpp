@@ -39,7 +39,7 @@ void AddNode::evaluate(compiler::GraphEvaluator* evaluator) {
 }
 
 reflection::Type AddNode::getType() const {
-    return static_cast<reflection::Type>(reflection::EditorTypes::AddNode);
+    return 0;
 }
 
 bool AddNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

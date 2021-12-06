@@ -136,6 +136,8 @@ struct ImNodeData
     ImRect TitleBarContentRect;
     ImRect Rect;
 
+    void* UserData;
+
     struct
     {
         ImU32 Background, BackgroundHovered, BackgroundSelected, Outline, Titlebar, TitlebarHovered,
@@ -155,7 +157,7 @@ struct ImNodeData
     ImNodeData(const int node_id)
         : Id(node_id), Origin(100.0f, 100.0f), TitleBarContentRect(),
           Rect(ImVec2(0.0f, 0.0f), ImVec2(0.0f, 0.0f)), ColorStyle(), LayoutStyle(), PinIndices(),
-          Draggable(true)
+          Draggable(true), UserData(nullptr)
     {
     }
 
@@ -172,6 +174,8 @@ struct ImPinData
     ImVec2               Pos; // screen-space coordinates
     int                  Flags;
 
+    void* UserData = nullptr;
+
     struct
     {
         ImU32 Background, Hovered;
@@ -180,7 +184,7 @@ struct ImPinData
     ImPinData(const int pin_id)
         : Id(pin_id), ParentNodeIdx(), AttributeRect(), Type(ImNodesAttributeType_None),
           Shape(ImNodesPinShape_CircleFilled), Pos(), Flags(ImNodesAttributeFlags_None),
-          ColorStyle()
+        ColorStyle(), UserData(nullptr)
     {
     }
 };
@@ -190,12 +194,14 @@ struct ImLinkData
     int Id;
     int StartPinIdx, EndPinIdx;
 
+    void* UserData;
+
     struct
     {
         ImU32 Base, Hovered, Selected;
     } ColorStyle;
 
-    ImLinkData(const int link_id) : Id(link_id), StartPinIdx(), EndPinIdx(), ColorStyle() {}
+    ImLinkData(const int link_id) : Id(link_id), StartPinIdx(), EndPinIdx(), ColorStyle(), UserData(nullptr) {}
 };
 
 struct ImClickInteractionState

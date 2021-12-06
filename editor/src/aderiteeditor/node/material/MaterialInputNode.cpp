@@ -70,7 +70,7 @@ void MaterialInputNode::evaluate(compiler::GraphEvaluator* evaluator) {
 }
 
 reflection::Type MaterialInputNode::getType() const {
-    return static_cast<reflection::Type>(reflection::EditorTypes::MaterialInputNode);
+    return 0;
 }
 
 bool MaterialInputNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

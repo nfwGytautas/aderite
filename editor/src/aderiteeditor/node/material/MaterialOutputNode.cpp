@@ -24,7 +24,7 @@ void MaterialOutputNode::evaluate(compiler::GraphEvaluator* evaluator) {
 }
 
 reflection::Type MaterialOutputNode::getType() const {
-    return static_cast<reflection::Type>(reflection::EditorTypes::MaterialOutputNode);
+    return 0;
 }
 
 bool MaterialOutputNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

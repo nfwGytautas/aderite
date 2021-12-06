@@ -33,7 +33,7 @@
 #include "aderiteeditor/asset/property/Property.hpp"
 #include "aderiteeditor/compiler/PipelineEvaluator.hpp"
 #include "aderiteeditor/compiler/ShaderEvaluator.hpp"
-#include "aderiteeditor/node/Node.hpp"
+//#include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/platform/pc/modals/FileDialog.hpp"
 #include "aderiteeditor/platform/pc/modals/SelectAudioModal.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
