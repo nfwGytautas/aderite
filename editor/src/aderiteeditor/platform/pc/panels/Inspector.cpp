@@ -31,8 +31,6 @@
 #include "aderiteeditor/asset/EditorMaterialType.hpp"
 #include "aderiteeditor/asset/RenderingPipeline.hpp"
 #include "aderiteeditor/asset/property/Property.hpp"
-#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
-#include "aderiteeditor/compiler/ShaderEvaluator.hpp"
 //#include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/platform/pc/modals/FileDialog.hpp"
 #include "aderiteeditor/platform/pc/modals/SelectAudioModal.hpp"
@@ -352,7 +350,7 @@ void render_component_shared(const std::string& id, const std::string& label, bo
 //    this->renderActor(actor);
 //}
 
-//void Inspector::renderAsset() {
+// void Inspector::renderAsset() {
 //    // static vfs::File* cacheFile = nullptr;
 //    // static utility::InlineRename renamer;
 //    // io::SerializableAsset* object = editor::State::LastSelectedObject.getAsset();
@@ -405,7 +403,7 @@ void render_component_shared(const std::string& id, const std::string& label, bo
 //    //}
 //}
 //
-//void Inspector::renderMesh(io::SerializableAsset* asset) {
+// void Inspector::renderMesh(io::SerializableAsset* asset) {
 //    // asset::MeshAsset* mesh = static_cast<asset::MeshAsset*>(asset);
 //    // asset::MeshAsset::fields& finfo = mesh->getFieldsMutable();
 //
@@ -426,7 +424,7 @@ void render_component_shared(const std::string& id, const std::string& label, bo
 //    // TODO: Preview
 //}
 //
-//void Inspector::renderTexture(io::SerializableAsset* asset) {
+// void Inspector::renderTexture(io::SerializableAsset* asset) {
 //    asset::TextureAsset* texture = static_cast<asset::TextureAsset*>(asset);
 //    asset::TextureAsset::fields& finfo = texture->getFieldsMutable();
 //
@@ -464,7 +462,8 @@ void render_component_shared(const std::string& id, const std::string& label, bo
 //        ImGui::TableNextRow();
 //
 //        ImGui::TableSetColumnIndex(1);
-//        ImGui::Image((void*)(intptr_t)texture->getTextureHandle().idx, ImVec2(96.0f, 96.0f), ImVec2(1, 0), ImVec2(0, 1), ImVec4(1, 1, 1, 1),
+//        ImGui::Image((void*)(intptr_t)texture->getTextureHandle().idx, ImVec2(96.0f, 96.0f), ImVec2(1, 0), ImVec2(0, 1), ImVec4(1, 1, 1,
+//        1),
 //                     ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
 //        ImGui::Text("Preview");
 //
@@ -472,7 +471,7 @@ void render_component_shared(const std::string& id, const std::string& label, bo
 //    }
 //}
 //
-//void Inspector::renderMaterial(io::SerializableAsset* asset) {
+// void Inspector::renderMaterial(io::SerializableAsset* asset) {
 //    asset::MaterialAsset* material = static_cast<asset::MaterialAsset*>(asset);
 //    asset::MaterialAsset::fields& finfo = material->getFieldsMutable();
 //
@@ -600,6 +599,20 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
 
     ImGui::Text("Properties and samplers:");
 
+    ImGui::PushItemWidth(-FLT_MIN);
+
+    if (ImGui::Button("Add property", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
+        ImGui::OpenPopup("SelectMaterialTypeProperty");
+    }
+
+    if (ImGui::Button("Add sampler", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
+        ImGui::OpenPopup("SelectMaterialTypeSampler");
+    }
+
+    ImGui::PopItemWidth();
+
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
     if (ImGui::BeginTable("MaterialTypeEditTable", 4)) {
         ImGui::TableSetupColumn("Remove", ImGuiTableColumnFlags_WidthFixed, 20.0f);
         ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 130.0f);
@@ -647,23 +660,9 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
     }
 
     ImGui::PushItemWidth(-FLT_MIN);
-
-    ImGui::Separator();
-    ImGui::Text("Modify:");
-    if (ImGui::Button("Add property", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
-        ImGui::OpenPopup("SelectMaterialTypeProperty");
-    }
-
-    if (ImGui::Button("Add sampler", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
-        ImGui::OpenPopup("SelectMaterialTypeSampler");
-    }
-
+   
     ImGui::Separator();
     ImGui::Text("Compilation:");
-    if (ImGui::Button("Open shader editor", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
-        // WindowsEditor::getInstance()->NodeEditor->setGraph(type->getGraph(), editor_ui::NodeEditor::NodeEditorType::MATERIAL);
-    }
-
     if (ImGui::Button("Compile", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
         type->compile();
     }
@@ -673,11 +672,9 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
     if (ImGui::BeginPopup("SelectMaterialTypeProperty")) {
         ImGui::Text("Type");
         ImGui::Separator();
-        for (int i = 0; i < static_cast<int>(asset::PropertyType::COUNT); i++) {
+        for (int i = static_cast<int>(asset::PropertyType::START); i < static_cast<int>(asset::PropertyType::COUNT); i++) {
             if (ImGui::Selectable(asset::getNameForType(static_cast<asset::PropertyType>(i)))) {
-                type->addProperty(
-                    new asset::Property(static_cast<asset::PropertyType>(i), "NewProperty_" + aderite::utility::generateString(8)));
-                type->recalculate();
+                type->addProperty(new asset::Property(static_cast<asset::PropertyType>(i), "p_" + aderite::utility::generateString(8)));
             }
         }
         ImGui::EndPopup();
@@ -686,18 +683,16 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
     if (ImGui::BeginPopup("SelectMaterialTypeSampler")) {
         ImGui::Text("Type");
         ImGui::Separator();
-        for (int i = 0; i < static_cast<int>(asset::SamplerType::COUNT); i++) {
+        for (int i = static_cast<int>(asset::SamplerType::START); i < static_cast<int>(asset::SamplerType::COUNT); i++) {
             if (ImGui::Selectable(asset::getNameForType(static_cast<asset::SamplerType>(i)))) {
-                type->addSampler(
-                    new asset::Sampler(static_cast<asset::SamplerType>(i), "NewSampler_" + aderite::utility::generateString(8)));
-                type->recalculate();
+                type->addSampler(new asset::Sampler(static_cast<asset::SamplerType>(i), "s_" + aderite::utility::generateString(8)));
             }
         }
         ImGui::EndPopup();
     }
 }
 
-//void Inspector::renderScene(io::SerializableAsset* asset) {
+// void Inspector::renderScene(io::SerializableAsset* asset) {
 //    scene::Scene* type = static_cast<scene::Scene*>(asset);
 //
 //    if (ImGui::BeginTable("SceneEditTable", 2)) {
@@ -724,7 +719,7 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
 //    }
 //}
 //
-//void Inspector::renderPipeline(io::SerializableAsset* asset) {
+// void Inspector::renderPipeline(io::SerializableAsset* asset) {
 //    asset::RenderingPipeline* type = static_cast<asset::RenderingPipeline*>(asset);
 //
 //    ImGui::PushItemWidth(-FLT_MIN);
@@ -738,7 +733,7 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
 //    ImGui::PopItemWidth();
 //}
 //
-//void Inspector::renderAudio(io::SerializableAsset* asset) {
+// void Inspector::renderAudio(io::SerializableAsset* asset) {
 //    static SelectAudioModal sam;
 //    asset::AudioAsset* audio = static_cast<asset::AudioAsset*>(asset);
 //
@@ -773,7 +768,7 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
 //    }
 //}
 //
-//void Inspector::renderSerializable() {
+// void Inspector::renderSerializable() {
 //    io::SerializableObject* object = editor::State::LastSelectedObject.getSerializable();
 //
 //    switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
@@ -798,7 +793,7 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
 //    }
 //}
 //
-//void Inspector::renderAudioSource(io::SerializableObject* serializable) {
+// void Inspector::renderAudioSource(io::SerializableObject* serializable) {
 //    static utility::InlineRename renamer;
 //    audio::AudioSource* source = static_cast<audio::AudioSource*>(serializable);
 //
@@ -812,7 +807,7 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
 //    ImGui::Separator();
 //}
 //
-//void Inspector::renderScriptSystem(io::SerializableObject* serializable) {
+// void Inspector::renderScriptSystem(io::SerializableObject* serializable) {
 //    scripting::ScriptSystem* system = static_cast<scripting::ScriptSystem*>(serializable);
 //
 //    ImGui::Text(system->getName().c_str());
@@ -966,7 +961,7 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
 //    }
 //}
 //
-//void Inspector::renderAudioListener(io::SerializableObject* serializable) {
+// void Inspector::renderAudioListener(io::SerializableObject* serializable) {
 //    static utility::InlineRename renamer;
 //    audio::AudioListener* listener = static_cast<audio::AudioListener*>(serializable);
 //
@@ -1025,7 +1020,7 @@ void Inspector::render() {
 
     switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
     case reflection::RuntimeTypes::MAT_TYPE: {
-
+        this->renderMaterialType(object);
         break;
     }
     default: {

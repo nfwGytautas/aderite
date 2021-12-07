@@ -385,11 +385,16 @@ void AssetBrowser::handleDirectoryChange(const std::filesystem::path& newDirecto
             const std::string handleString = entry.path().extension().string().substr(1);
             const io::SerializableHandle handle = std::stoull(handleString);
 
-            // Get asset
-            io::SerializableAsset* asset = ::aderite::Engine::getAssetManager()->get(handle);
+            if (!::aderite::Engine::getAssetManager()->has(handle)) {
+                // No longer exists
+                std::filesystem::remove(entry);
+            } else {
+                // Get asset
+                io::SerializableAsset* asset = ::aderite::Engine::getAssetManager()->get(handle);
 
-            // Release held reference
-            asset->acquire();
+                // Acquire reference
+                asset->acquire();
+            }
         }
     }
 

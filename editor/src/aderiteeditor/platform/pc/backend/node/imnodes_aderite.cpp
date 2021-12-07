@@ -29,7 +29,7 @@ void SetNodeUserData(int id, void* data) {
 
 void* GetNodeUserData(int id) {
     ImNodesEditorContext& editor = EditorContextGet();
-    int idx = ObjectPoolFind(editor.Links, id);
+    int idx = ObjectPoolFind(editor.Nodes, id);
     ADERITE_DYNAMIC_ASSERT(idx != -1, "Invalid index");
     return editor.Nodes.Pool[idx].UserData;
 }
@@ -46,6 +46,11 @@ void* GetPinUserData(int id) {
     int idx = ObjectPoolFind(editor.Pins, id);
     ADERITE_DYNAMIC_ASSERT(idx != -1, "Invalid index");
     return editor.Pins.Pool[idx].UserData;
+}
+
+ImVec2 ToEditorGridPos(const ImVec2& pos) {
+    ImNodesEditorContext& editor = EditorContextGet();
+    return pos - GImNodes->CanvasOriginScreenSpace - editor.Panning;
 }
 
 } // namespace IMNODES_NAMESPACE

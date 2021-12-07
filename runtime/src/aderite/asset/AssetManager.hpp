@@ -49,6 +49,11 @@ public:
     void saveRegistry();
 
     /**
+     * @brief Returns true if the asset manager has the specified asset tracked, false otherwise
+     */
+    bool has(io::SerializableHandle handle) const;
+
+    /**
      * @brief Returns object associated with the serializable handle
      * @param handle Handle of the object
      * @return Serializable object instance

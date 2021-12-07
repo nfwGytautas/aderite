@@ -111,6 +111,17 @@ void AssetManager::saveRegistry() {
     LOG_INFO("[Asset] Registry saved");
 }
 
+bool AssetManager::has(io::SerializableHandle handle) const {
+    ADERITE_DYNAMIC_ASSERT(handle != io::SerializableAsset::c_InvalidHandle, "Invalid handle passed to asset manager has method");
+
+    // Try to find the entry
+    auto it = std::find_if(m_registry.begin(), m_registry.end(), [handle](const AssetRegistryEntry& entry) {
+        return entry.Handle == handle;
+    });
+
+    return it != m_registry.end();
+}
+
 io::SerializableAsset* AssetManager::get(io::SerializableHandle handle) {
     ADERITE_DYNAMIC_ASSERT(handle != io::SerializableAsset::c_InvalidHandle, "Invalid handle passed to asset manager get method");
 

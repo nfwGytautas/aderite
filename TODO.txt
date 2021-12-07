@@ -56,12 +56,10 @@ Editor:
 	Asset browser:
 		Verify that the drag drop imported file can actually be used for the specified type
 	VFS:
-		Remove files that don't physically exist anymore
+		Clean assets that are not tracked
 		Add to root VFS files that don't have an actual file
 	Node editor:
-		Clear graph on new select
-		Constraints for number of nodes and deletion
-		Property for ALL items
+		Display name for pins and nodes
 	Must have:
 		Reset game state on game mode switch
 		Block edit on when in game mode
@@ -107,6 +105,7 @@ Editor:
 		Node editor middle mouse also moves scene view
 		Window resize for viewport
 		Drag drop files to folders
+		Crash on bad graph compile
 	Maybe:
 		Don't compile when loading project
 		Dont load scripts if they are out of date

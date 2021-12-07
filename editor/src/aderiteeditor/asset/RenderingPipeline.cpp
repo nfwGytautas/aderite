@@ -3,10 +3,6 @@
 #include "aderite/io/Serializer.hpp"
 #include "aderite/rendering/Pipeline.hpp"
 #include "aderite/utility/Log.hpp"
-
-#include "aderiteeditor/compiler/PipelineEvaluator.hpp"
-//#include "aderiteeditor/node/Graph.hpp"
-//#include "aderiteeditor/node/pipeline/ScreenNode.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 
 namespace aderite {
@@ -29,11 +25,11 @@ node::Graph* RenderingPipeline::getGraph() const {
 
 void RenderingPipeline::compile() {
     LOG_TRACE("Compiling rendering pipeline");
-    compiler::PipelineEvaluator evaluator;
+   // compiler::PipelineEvaluator evaluator;
 
-   /* m_graph->resetEvaluateFlag();
-    m_graph->getLastNode()->evaluate(&evaluator);*/
-    evaluator.transferToPipeline(this);
+   ///* m_graph->resetEvaluateFlag();
+   // m_graph->getLastNode()->evaluate(&evaluator);*/
+   // evaluator.transferToPipeline(this);
 }
 
 bool RenderingPipeline::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

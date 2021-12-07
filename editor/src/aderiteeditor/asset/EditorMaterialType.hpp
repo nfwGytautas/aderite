@@ -107,9 +107,24 @@ private:
      */
     void addIONodes();
 
+    /**
+     * @brief Updates the nodes given the material information
+     */
+    void updateIONodes();
+
+    /**
+     * @brief Create a node of the specified type
+     * @param type Type of the node
+     * @return Node instance
+     */
+    node::Node* createNodeInstance(const std::string& type) override;
+
 private:
     Properties m_properties;
     Samplers m_samplers;
+
+    node::MaterialInputNode* m_inputNode = nullptr;
+    node::MaterialOutputNode* m_outputNode = nullptr;
 };
 
 } // namespace asset

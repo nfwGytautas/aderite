@@ -17,4 +17,6 @@ void* GetNodeUserData(int id);
 void SetPinUserData(int id, void* data);
 void* GetPinUserData(int id);
 
+ImVec2 ToEditorGridPos(const ImVec2& pos);
+
 } // namespace IMNODES_NAMESPACE

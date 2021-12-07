@@ -5,6 +5,8 @@
 
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 
+#include "aderiteeditor/asset/EditorMaterialType.hpp"
+
 namespace aderite {
 namespace utility {
 
@@ -14,6 +16,7 @@ namespace utility {
 void linkInstancers() {
     aderite::reflection::Reflector* reflector = aderite::Engine::getReflector();
 
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(reflector, asset::EditorMaterialType, reflection::RuntimeTypes::MAT_TYPE);
 }
 
 } // namespace utility

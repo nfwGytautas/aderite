@@ -1,0 +1,54 @@
+Type: 4
+Name: Textured
+Data:
+  DataSize: 0
+  SamplerCount: 1
+  Properties:
+    []
+  Samplers:
+    - Name: s_Texture
+      Type: 5
+  Graph:
+    Nodes:
+      - Type: Material
+        Name: Textured
+        Position: [-4, 25]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 5
+              Name: s_Texture
+      - Type: Output
+        Name: 4fQ9zCc4HQQa
+        Position: [498, 74]
+        Pins:
+          In:
+            - Type: 4
+              Name: Output
+              Connected: c4QdgRNmZ2Sw_Color
+          Out:
+            []
+      - Type: Sample 2D
+        Name: c4QdgRNmZ2Sw
+        Position: [249, 59]
+        Pins:
+          In:
+            - Type: 5
+              Name: Texture
+              Connected: Textured_s_Texture
+            - Type: 2
+              Name: UV
+              Connected: EM2DxVHLX06z_v_texcoord
+          Out:
+            - Type: 4
+              Name: Color
+      - Type: Vertex UV
+        Name: EM2DxVHLX06z
+        Position: [34, 120]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 2
+              Name: v_texcoord

@@ -18,17 +18,8 @@ public:
     bool init() override;
     void shutdown() override;
     void render() override;
-
-    /**
-     * @brief Sets the current active asset
-     */
-    void setGraph(node::Graph* graph);
-
 private:
     void renderMaterialEditorContextMenu();
-
-private:
-    node::Graph* m_graph = nullptr;
 };
 
 } // namespace editor

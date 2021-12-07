@@ -8,23 +8,12 @@ namespace asset {
 /**
  * @brief Supported types of properties
  */
-enum class PropertyType {
-    NONE = -1,
-    FLOAT = 0,
-    VEC2 = 1,
-    VEC3 = 2,
-    VEC4 = 3,
-    COUNT,
-};
+enum class PropertyType { NONE = -1, FLOAT = 1, VEC2 = 2, VEC3 = 3, VEC4 = 4, COUNT, START = FLOAT };
 
 /**
  * @brief Supported types of samplers
  */
-enum class SamplerType {
-    TEXTURE_2D = 0,
-    TEXTURE_CUBE = 1,
-    COUNT,
-};
+enum class SamplerType { TEXTURE_2D = 5, TEXTURE_CUBE = 6, COUNT, START = TEXTURE_2D };
 
 /**
  * @brief Returns the amount of float elements in property type
