@@ -1,13 +1,18 @@
 #pragma once
 
+#include <string>
+
+#include <bgfx/bgfx.h>
 #include <glm/glm.hpp>
 
 #include "aderite/rendering/Forward.hpp"
+#include "aderite/scene/Forward.hpp"
 
 namespace aderite {
 class Engine;
 
 namespace rendering {
+
 /**
  * @brief The Renderer of aderite powered by bgfx
  */
@@ -59,24 +64,47 @@ public:
     void commit() const;
 
     /**
-     * @brief Returns the rendering pipeline instance
-     * @return Pipeline instance
+     * @brief Sets the editor camera instance
+     * @param camera Camera of the editor
      */
-    Pipeline* getPipeline() const;
+    void setEditorCamera(scene::Camera* camera);
+
+private:
+    /**
+     * @brief Creates render targets of the renderer
+     */
+    bool createTargets();
 
     /**
-     * @brief Set the pipeline for the renderer to use
-     * @param pipeline Pipeline to use
+     * @brief Prepares targets for a render pass (clears information)
      */
-    void setPipeline(Pipeline* pipeline);
+    void prepareTargets();
+
+    /**
+     * @brief Sets up the view index
+     * @param idx View index
+     * @param name Name of the view
+     */
+    void setupView(uint8_t idx, const std::string& name);
 
 private:
     Renderer() {}
     friend Engine;
 
 private:
-    Pipeline* m_pipeline = nullptr;
     bool m_isInitialized = false;
+
+    scene::Camera* m_editorCamera = nullptr;
+
+    // BGFX views
+    glm::uvec2 m_resolution = glm::uvec2(1280, 920);
+
+    // Targets
+
+    /**
+     * @brief This will be the target where the result will be stored
+     */
+    bgfx::FrameBufferHandle m_mainFbo = BGFX_INVALID_HANDLE;
 };
 
 } // namespace rendering

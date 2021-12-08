@@ -232,6 +232,7 @@ void EditorUI::configureDockspace() {
         ImGui::DockBuilderDockWindow("Inspector", dockMiddleRight);
         ImGui::DockBuilderDockWindow("Scene view", dockMainId);
         ImGui::DockBuilderDockWindow("Node editor", dockMainId);
+        ImGui::DockBuilderDockWindow("Pipeline editor", dockMainId);
 
         // Make toolbar immutable
         ImGuiDockNode* node = ImGui::DockBuilderGetNode(dockTop);

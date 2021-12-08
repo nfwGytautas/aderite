@@ -36,6 +36,8 @@ void TextureAsset::load(const io::Loader* loader) {
                                          static_cast<bgfx::TextureFormat::Enum>(result.Format),
                                          BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_W_CLAMP,
                                          bgfx::copy(result.Data.get(), result.Width * result.Height * result.BPP));
+
+        bgfx::setName(m_handle, this->getName().c_str());
     }
 
     LOG_INFO("[Asset] Loaded {0}", this->getName());

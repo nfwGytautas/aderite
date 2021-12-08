@@ -7,6 +7,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/input/InputManager.hpp"
+#include "aderite/scene/Camera.hpp"
 #include "aderite/utility/Log.hpp"
 
 #include "aderiteeditor/shared/Settings.hpp"
@@ -16,10 +17,17 @@ namespace aderite {
 namespace editor {
 
 EditorCamera::EditorCamera() {
-    updateViewMatrix();
+    m_camera = new scene::Camera();
+    m_camera->setName("Editor");
 }
 
-EditorCamera::~EditorCamera() {}
+EditorCamera::~EditorCamera() {
+    delete m_camera;
+}
+
+scene::Camera* EditorCamera::getCamera() const {
+    return m_camera;
+}
 
 void EditorCamera::onViewportResize(const glm::uvec2& size) {
     if (size.x == 0 || size.y == 0) {
@@ -27,21 +35,9 @@ void EditorCamera::onViewportResize(const glm::uvec2& size) {
     }
 
     m_viewportSize = size;
-    m_projectionMatrix =
-        glm::perspective(glm::radians(Settings::EditorCameraFov), (float)m_viewportSize.x / (float)m_viewportSize.y, 0.1f, 1000.0f);
-}
-
-const glm::mat4& EditorCamera::getViewMatrix() const {
-    return m_viewMatrix;
-}
-
-const glm::mat4& EditorCamera::getProjectionMatrix() const {
-    return m_projectionMatrix;
 }
 
 void EditorCamera::update(float delta) {
-    bool wasUpdated = false;
-
     auto inputManager = ::aderite::Engine::getInputManager();
 
     if (inputManager->isKeyPressed(input::Key::LEFT_ALT)) {
@@ -54,8 +50,7 @@ void EditorCamera::update(float delta) {
                 m_focalpoint += getForwardDirection();
                 m_distance = 1.0f;
             }
-
-            wasUpdated = true;
+            m_camera->setPosition(this->calculatePosition());
         }
 
         // Pan
@@ -65,8 +60,7 @@ void EditorCamera::update(float delta) {
             glm::vec2 speed = panSpeed();
             m_focalpoint += -getRightDirection() * mouseDelta.x * speed.x * m_distance * delta;
             m_focalpoint += getUpDirection() * mouseDelta.y * speed.y * m_distance * delta;
-
-            wasUpdated = true;
+            m_camera->setPosition(this->calculatePosition());
         }
     } else {
         // Rotate
@@ -74,21 +68,13 @@ void EditorCamera::update(float delta) {
             glm::vec2 mouseDelta = inputManager->getMouseDelta();
 
             float yawSign = getUpDirection().y < 0 ? -1.0f : 1.0f;
-            m_yaw -= delta * yawSign * mouseDelta.x * Settings::EditorCameraRotationSpeed;
-            m_pitch += delta * mouseDelta.y * Settings::EditorCameraRotationSpeed;
-
-            wasUpdated = true;
+            glm::vec3 rotation = m_camera->getRotation();
+            rotation.x += delta * mouseDelta.y * Settings::EditorCameraRotationSpeed;
+            rotation.y -= delta * yawSign * mouseDelta.x * Settings::EditorCameraRotationSpeed;
+            m_camera->setRotation(rotation);
+            m_camera->setPosition(this->calculatePosition());
         }
     }
-
-    if (wasUpdated) {
-        updateViewMatrix();
-    }
-}
-
-bool EditorCamera::isEnabled() const {
-    // return !State::IsGameMode;
-    return true;
 }
 
 glm::vec3 EditorCamera::getUpDirection() const {
@@ -108,13 +94,7 @@ glm::vec3 EditorCamera::calculatePosition() const {
 }
 
 glm::quat EditorCamera::getOrientation() const {
-    return glm::quat(glm::vec3(m_pitch, m_yaw, 0.0f));
-}
-
-void EditorCamera::updateViewMatrix() {
-    glm::quat orientation = getOrientation();
-    m_viewMatrix = glm::translate(glm::mat4(1.0f), calculatePosition()) * glm::toMat4(orientation);
-    m_viewMatrix = glm::inverse(m_viewMatrix);
+    return glm::quat(m_camera->getRotation());
 }
 
 float EditorCamera::zoomSpeed() const {

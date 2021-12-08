@@ -6,16 +6,46 @@
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/utility/Macros.hpp"
+#include "aderite/utility/Utility.hpp"
 
 namespace aderite {
 namespace rendering {
 
+Renderable::~Renderable() {
+    if (m_mesh != nullptr) {
+        m_mesh->release();
+    }
+
+    if (m_material != nullptr) {
+        m_material->release();
+    }
+}
+
+bool Renderable::isValid() const {
+    return m_mesh != nullptr && m_material != nullptr && m_mesh->isValid() && m_material->isValid();
+}
+
+size_t Renderable::hash() const {
+    ADERITE_DYNAMIC_ASSERT(this->isValid(), "Tried to get hash of invalid renderable");
+    return utility::combineHash(m_mesh->getHandle(), m_material->getHandle());
+}
+
 void Renderable::setMesh(asset::MeshAsset* mesh) {
+    if (m_mesh != nullptr) {
+        m_mesh->release();
+    }
+
     m_mesh = mesh;
+    m_mesh->acquire();
 }
 
 void Renderable::setMaterial(asset::MaterialAsset* material) {
+    if (m_material != nullptr) {
+        m_material->release();
+    }
+
     m_material = material;
+    m_material->acquire();
 }
 
 asset::MeshAsset* Renderable::getMesh() const {
@@ -47,15 +77,13 @@ bool Renderable::deserialize(io::Serializer* serializer, const YAML::Node& data)
     }
 
     if (renderNode["Mesh"]) {
-        const io::SerializableHandle handle = data["Mesh"].as<io::SerializableHandle>();
-        m_mesh = static_cast<asset::MeshAsset*>(::aderite::Engine::getAssetManager()->get(handle));
-        ADERITE_DYNAMIC_ASSERT(m_mesh != nullptr, "Tried to use a deleted asset");
+        const io::SerializableHandle handle = renderNode["Mesh"].as<io::SerializableHandle>();
+        this->setMesh(static_cast<asset::MeshAsset*>(::aderite::Engine::getAssetManager()->get(handle)));
     }
 
     if (renderNode["Material"]) {
-        const io::SerializableHandle handle = data["Material"].as<io::SerializableHandle>();
-        m_material = static_cast<asset::MaterialAsset*>(::aderite::Engine::getAssetManager()->get(handle));
-        ADERITE_DYNAMIC_ASSERT(m_material != nullptr, "Tried to use a deleted asset");
+        const io::SerializableHandle handle = renderNode["Material"].as<io::SerializableHandle>();
+        this->setMaterial(static_cast<asset::MaterialAsset*>(::aderite::Engine::getAssetManager()->get(handle)));
     }
 
     return true;

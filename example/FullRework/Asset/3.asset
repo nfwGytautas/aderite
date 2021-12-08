@@ -3,6 +3,7 @@ Name: Textured
 Data:
   DataSize: 0
   SamplerCount: 1
+  SamplerNames: [s_Texture]
   Properties:
     []
   Samplers:

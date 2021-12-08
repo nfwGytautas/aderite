@@ -3,6 +3,8 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
 
+#include "aderite/utility/Log.hpp"
+
 namespace aderite {
 namespace utility {
 
@@ -120,9 +122,10 @@ void ImSpinner(const char* label, const float indicator_radius, const int circle
     const ImGuiID id = window->GetID(label);
 
     const ImVec2 region = ImGui::GetContentRegionAvail();
-    const ImVec2 pos = ImVec2(window->DC.CursorPos.x + ((region.x - indicator_radius) / 2.0f), window->DC.CursorPos.y + ((region.x - indicator_radius) / 3.0f));
+    const ImVec2 pos = ImVec2(window->DC.CursorPos.x + ((region.x - indicator_radius) / 2.0f),
+                              window->DC.CursorPos.y + ((region.x - indicator_radius) / 3.0f));
     const float circle_radius = indicator_radius / 10.0f;
-    //const ImRect bb(pos, ImVec2(pos.x + indicator_radius * 2.0f, pos.y + indicator_radius * 2.0f));
+    // const ImRect bb(pos, ImVec2(pos.x + indicator_radius * 2.0f, pos.y + indicator_radius * 2.0f));
     const ImRect bb(pos, ImVec2(pos.x + size.x, pos.y + size.y));
     ImGui::ItemSize(bb, style.FramePadding.y);
     if (!ImGui::ItemAdd(bb, id)) {
@@ -143,43 +146,6 @@ void ImSpinner(const char* label, const float indicator_radius, const int circle
         window->DrawList->AddCircleFilled(ImVec2(pos.x + indicator_radius + x - 5, pos.y + indicator_radius - y),
                                           circle_radius + growth * circle_radius, ImGui::GetColorU32(color));
     }
-}
-
-bool InlineRename::renderUI() {
-    static ImGuiInputTextFlags edit_flags = ImGuiInputTextFlags_CallbackResize | ImGuiInputTextFlags_CharsNoBlank |
-                                            ImGuiInputTextFlags_EnterReturnsTrue;
-    bool renamed = false;
-
-    if (!m_renaming) {
-        if (ImGui::Selectable(m_initial.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
-            if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                m_initial = "";
-                m_renaming = true;
-                m_appearing = true;
-            }
-        }
-    } else {
-        if (DynamicInputText("##rename", &m_value, edit_flags)) {
-            m_renaming = false;
-
-            if (m_value.empty()) {
-                m_value = m_initial;
-            }
-
-            renamed = true;
-        }
-
-        if (!ImGui::IsItemActive() && !m_appearing) {
-            m_renaming = false;
-        }
-
-        if (m_appearing) {
-            ImGui::SetKeyboardFocusHere();
-            m_appearing = false;
-        }
-    }
-
-    return renamed;
 }
 
 bool InlineRename::renderUI(size_t index, std::string value) {
@@ -219,7 +185,7 @@ bool InlineRename::renderUI(size_t index, std::string value) {
 
         if (m_appearing) {
             m_value = value;
-            ImGui::SetKeyboardFocusHere();
+            ImGui::SetKeyboardFocusHere(-1);
             m_appearing = false;
         }
     }

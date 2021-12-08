@@ -1,0 +1,7 @@
+Type: 1
+Name: ContainerMat
+Data:
+  MaterialType: 3
+  Properties:
+    Data: []
+  Samplers: [2]

@@ -1,7 +1,10 @@
 Registry:
-  NextHandle: 4
+  NextHandle: 7
   Entries:
     - Handle: 0
     - Handle: 1
     - Handle: 2
     - Handle: 3
+    - Handle: 4
+    - Handle: 5
+    - Handle: 6

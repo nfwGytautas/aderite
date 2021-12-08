@@ -14,13 +14,7 @@
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/geometry/BoxGeometry.hpp"
-#include "aderite/rendering/Pipeline.hpp"
 #include "aderite/rendering/Renderable.hpp"
-#include "aderite/rendering/operation/CameraProvideOperation.hpp"
-#include "aderite/rendering/operation/EntityProvideOperation.hpp"
-#include "aderite/rendering/operation/OutputToScreenOperation.hpp"
-#include "aderite/rendering/operation/RenderOperation.hpp"
-#include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/scene/DynamicPhysicsRegion.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
@@ -43,7 +37,6 @@ bool Reflector::init() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::TextureAsset, RuntimeTypes::TEXTURE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Scene, RuntimeTypes::SCENE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::MaterialTypeAsset, RuntimeTypes::MAT_TYPE);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::Pipeline, RuntimeTypes::PIPELINE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::AudioAsset, RuntimeTypes::AUDIO);
 
     // Audio
@@ -61,13 +54,6 @@ bool Reflector::init() {
 
     // Geometry
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::BoxGeometry, RuntimeTypes::BOX_GEOMETRY);
-
-    // Operations
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::CameraProvideOperation, RuntimeTypes::OP_CAMERA);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::EntityProvideOperation, RuntimeTypes::OP_ENTITY);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::OutputToScreenOperation, RuntimeTypes::OP_SCREEN);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::RenderOperation, RuntimeTypes::OP_RENDER);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::TargetProvideOperation, RuntimeTypes::OP_TARGET);
 
     LOG_DEBUG("[Reflection] Registered {0} runtime instancers", m_instancers.size());
     ADERITE_DEBUG_SECTION(this->printInstancers(););

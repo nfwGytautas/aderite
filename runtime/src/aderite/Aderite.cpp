@@ -211,10 +211,6 @@ void Engine::onRendererInitialized() const {
     MIDDLEWARE_ACTION(onRendererInitialized);
 }
 
-void Engine::onPipelineChanged(rendering::Pipeline* pipeline) const {
-    MIDDLEWARE_ACTION(onPipelineChanged, pipeline);
-}
-
 void Engine::onSceneChanged(scene::Scene* scene) const {
     MIDDLEWARE_ACTION(onSceneChanged, scene);
 }

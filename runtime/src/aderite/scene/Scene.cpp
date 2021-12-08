@@ -3,7 +3,7 @@
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/Serializer.hpp"
-#include "aderite/rendering/Pipeline.hpp"
+#include "aderite/scene/Camera.hpp"
 #include "aderite/scene/DynamicPhysicsRegion.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scenery.hpp"
@@ -183,8 +183,16 @@ const std::vector<audio::AudioSource*>& Scene::getAudioSources() const {
     return m_audioSources;
 }
 
-rendering::Pipeline* Scene::getPipeline() const {
-    return m_pipeline;
+void Scene::add(Camera* camera) {
+    addObject(m_cameras, camera);
+}
+
+void Scene::remove(Camera* camera) {
+    removeObject(m_cameras, camera);
+}
+
+const std::vector<Camera*>& Scene::getCameras() const {
+    return m_cameras;
 }
 
 audio::AudioSource* Scene::getSource(const std::string& name) const {
@@ -198,11 +206,6 @@ audio::AudioSource* Scene::getSource(const std::string& name) const {
     }
 
     return *it;
-}
-
-void Scene::setPipeline(rendering::Pipeline* pipeline) {
-    LOG_WARN("[Scene] Setting scene {0} pipeline to {1}", this->getName(), pipeline->getHandle());
-    m_pipeline = pipeline;
 }
 
 reflection::Type Scene::getType() const {
@@ -230,6 +233,9 @@ bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
     // Audio
     SERIALIZE_LIST("AudioListeners", m_audioListeners);
     SERIALIZE_LIST("AudioSources", m_audioSources);
+
+    // Other
+    SERIALIZE_LIST("Cameras", m_cameras);
 }
 
 bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
@@ -253,6 +259,9 @@ bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     // Audio
     DESERIALIZE_LIST("AudioListeners", audio::AudioListener);
     DESERIALIZE_LIST("AudioSources", audio::AudioSource);
+
+    // Other
+    DESERIALIZE_LIST("Cameras", Camera);
 }
 
 Scene::Scene() {}

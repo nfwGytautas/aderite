@@ -21,6 +21,7 @@ public:
     struct fields {
         size_t Size; // Number of vec4 components
         size_t NumSamplers;
+        std::vector<std::string> SamplerNames;
     };
 
 public:

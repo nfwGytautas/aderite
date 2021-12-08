@@ -54,6 +54,13 @@ public:
      * @brief Renders a file drag drop target
      */
     static std::filesystem::path renderFileTarget();
+
+    /**
+     * @brief Renders a file and object instance source, allowing multiple values, using the same renderTarget calls
+     * @param file File for source
+     * @param object Object for source
+    */
+    static void renderAssetFileSource(const std::filesystem::path& file, io::SerializableObject* object);
 };
 
 } // namespace editor

@@ -43,6 +43,9 @@ void MeshAsset::load(const io::Loader* loader) {
         auto& indicesData = result.Indices;
         m_vbh = bgfx::createVertexBuffer(bgfx::copy(positionData.data(), sizeof(float) * positionData.size()), layout);
         m_ibh = bgfx::createIndexBuffer(bgfx::copy(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
+
+        bgfx::setName(m_vbh, this->getName().c_str());
+        bgfx::setName(m_ibh, this->getName().c_str());
     } else {
         LOG_ERROR("[Asset] Unimplemented dynamic mesh");
         return;

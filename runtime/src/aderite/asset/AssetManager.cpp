@@ -24,11 +24,16 @@ void AssetManager::shutdown() {
     LOG_TRACE("[Asset] Shutting down asset manager");
 
     // Free memory
+    // 2 Update cycles should free any data during shutdown
+    
+    // 1 update will delete 0 outstanding reference
+    // 2 update will delete any left over dependencies
+    this->update();
+    this->update();
+
+    // Verify
     for (auto& obj : m_registry) {
-        if (obj.Asset != nullptr) {
-            delete obj.Asset;
-            obj.Asset = nullptr;
-        }
+        ADERITE_DYNAMIC_ASSERT(obj.Asset == nullptr, "Failed to free asset");
     }
 
     // Save registry

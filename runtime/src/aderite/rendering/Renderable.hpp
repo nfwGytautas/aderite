@@ -11,7 +11,17 @@ namespace rendering {
  */
 class Renderable : public io::ISerializable {
 public:
-    virtual ~Renderable() = default;
+    virtual ~Renderable();
+
+    /**
+     * @brief Returns true if the renderable parameters are valid and it can be used for rendering
+     */
+    bool isValid() const;
+
+    /**
+     * @brief Computes a hash value of this renderable
+     */
+    size_t hash() const;
 
     /**
      * @brief Set the mesh of the renderable
@@ -42,7 +52,6 @@ public:
 private:
     asset::MeshAsset* m_mesh = nullptr;
     asset::MaterialAsset* m_material = nullptr;
-
 };
 
 } // namespace rendering

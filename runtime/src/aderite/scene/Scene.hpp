@@ -150,15 +150,21 @@ public:
     const std::vector<audio::AudioSource*>& getAudioSources() const;
 
     /**
-     * @brief Sets the pipeline of the scene
-     * @param pipeline New pipeline
+     * @brief Add a camera to the scene (takes ownership)
+     * @param camera Camera instance
      */
-    void setPipeline(rendering::Pipeline* pipeline);
+    void add(Camera* camera);
 
     /**
-     * @brief Returns the pipeline of this scene
+     * @brief Remove camera from the scene
+     * @param camera Camera to remove
      */
-    rendering::Pipeline* getPipeline() const;
+    void remove(Camera* camera);
+
+    /**
+     * @brief Returns cameras of this scene
+     */
+    const std::vector<Camera*>& getCameras() const;
 
     /**
      * @brief Returns the audio source with the specified name
@@ -177,8 +183,6 @@ private:
     friend class SceneSerializer;
 
 private:
-    rendering::Pipeline* m_pipeline = nullptr;
-
     // Objects
     std::vector<Visual*> m_visuals;
     std::vector<Scenery*> m_scenery;
@@ -191,6 +195,9 @@ private:
     // Audio
     std::vector<audio::AudioSource*> m_audioSources;
     std::vector<audio::AudioListener*> m_audioListeners;
+
+    // Other
+    std::vector<Camera*> m_cameras;
 };
 
 } // namespace scene

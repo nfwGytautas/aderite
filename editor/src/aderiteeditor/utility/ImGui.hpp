@@ -37,11 +37,6 @@ bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetVal
 class InlineRename {
 public:
     /**
-     * @brief Renders ImGui ui, returns true if value was altered
-     */
-    bool renderUI();
-
-    /**
      * @brief Renders ImGui ui, returns true if value was altered, method used for array operations,
      * for example having an array of renameable objects pass object index.
      * @param index Index of the current render

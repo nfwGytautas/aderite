@@ -5,6 +5,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/rendering/Renderer.hpp"
+#include "aderite/scene/Camera.hpp"
 #include "aderite/utility/Log.hpp"
 
 #include "aderiteeditor/shared/EditorCamera.hpp"
@@ -33,14 +34,9 @@ void SceneView::render() {
         return;
     }
 
-    if (!bgfx::isValid(editor::State::DebugRenderHandle)) {
-        ImGui::End();
-        ImGui::PopStyleVar();
-        return;
-    }
+    bgfx::TextureHandle outHandle = editor::State::getInstance().getEditorCamera()->getCamera()->getOutputHandle();
 
-    m_fbth = bgfx::getTexture(editor::State::DebugRenderHandle, 0);
-    if (!bgfx::isValid(m_fbth)) {
+    if (!bgfx::isValid(outHandle)) {
         ImGui::End();
         ImGui::PopStyleVar();
         return;
@@ -50,19 +46,13 @@ void SceneView::render() {
     ImVec2 viewportSize = {viewportPanelSize.x, viewportPanelSize.y};
     m_size.x = viewportPanelSize.x;
     m_size.y = viewportPanelSize.y;
-    editor::State::EditorCamera->onViewportResize(m_size);
+    editor::State::getInstance().getEditorCamera()->onViewportResize(m_size);
 
-    ImGui::Image((void*)(intptr_t)m_fbth.idx, viewportSize, ImVec2(0, 0), ImVec2(1, 1));
+    ImGui::Image((void*)(intptr_t)outHandle.idx, viewportSize, ImVec2(0, 0), ImVec2(1, 1));
 
     ImGui::End();
     ImGui::PopStyleVar();
 }
 
-void SceneView::onSceneChanged(scene::Scene* scene) {
-    // TODO: Error check
-    m_fbth = bgfx::getTexture(editor::State::DebugRenderHandle, 0);
-    editor::State::EditorCamera->onViewportResize(m_size);
-}
-
-} // namespace editor_ui
+} // namespace editor
 } // namespace aderite

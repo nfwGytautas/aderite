@@ -296,7 +296,7 @@ void EditorMaterialType::generateMaterialHeader(std::ostream& os) {
 
     unsigned int arraySize = this->getFields().Size;
     if (arraySize > 0) {
-        properties << "uniform vec4 u_mat_buffer_" << this->getName() << "[" << arraySize << "];\n\n";
+        properties << "uniform vec4 mf_mat_buffer_" << this->getName() << "[" << arraySize << "];\n\n";
     }
 
     // Properties
@@ -374,7 +374,7 @@ void EditorMaterialType::generateMaterialHeader(std::ostream& os) {
         case asset::PropertyType::VEC2:
         case asset::PropertyType::VEC3:
         case asset::PropertyType::VEC4: {
-            properties << "#define mf_" << this->getName() << "_" << prop->getName() << " u_mat_buffer_" << this->getName() << "["
+            properties << "#define mf_" << this->getName() << "_" << prop->getName() << " mf_mat_buffer_" << this->getName() << "["
                        << arrayIdx << "]." << access << "\n";
             break;
         }

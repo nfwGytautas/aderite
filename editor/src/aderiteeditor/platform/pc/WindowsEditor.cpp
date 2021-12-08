@@ -11,10 +11,7 @@
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/io/LoaderPool.hpp"
 #include "aderite/io/Serializer.hpp"
-#include "aderite/rendering/Pipeline.hpp"
 #include "aderite/rendering/Renderer.hpp"
-#include "aderite/rendering/operation/CameraProvideOperation.hpp"
-#include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
@@ -36,8 +33,6 @@ namespace aderite {
 WindowsEditor* WindowsEditor::m_instance = nullptr;
 
 WindowsEditor::WindowsEditor(int argc, char** argv) {
-    editor::State::EditorCamera = new editor::EditorCamera();
-
     // Setup event router
     editor::State::Sink = this;
     editor::State::Project = nullptr;
@@ -65,6 +60,8 @@ void WindowsEditor::onRuntimeInitialized() {
 
 void WindowsEditor::onRendererInitialized() {
     ADERITE_LOG_BLOCK;
+
+    editor::State::getInstance().init();
 
     // Load editor icons
     LOG_TRACE("[Editor] Enqueueing editor icon loading");
@@ -107,6 +104,8 @@ void WindowsEditor::onRuntimeShutdown() {
 
     // UI
     m_ui.shutdown();
+
+    editor::State::getInstance().shutdown();
 
     delete editor::State::Project;
     editor::State::Project = nullptr;
@@ -195,10 +194,8 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 void WindowsEditor::onSceneChanged(scene::Scene* scene) {}
 
 void WindowsEditor::onSystemUpdate(float delta) {
-    editor::State::EditorCamera->update(delta);
+    editor::State::getInstance().getEditorCamera()->update(delta);
 }
-
-void WindowsEditor::onPipelineChanged(rendering::Pipeline* pipeline) {}
 
 void WindowsEditor::onNewScene(const std::string& name) {
     LOG_TRACE("New scene with name: {0}", name);

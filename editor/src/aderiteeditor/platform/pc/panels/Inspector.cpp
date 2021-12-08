@@ -18,9 +18,9 @@
 #include "aderite/io/Serializer.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
-#include "aderite/rendering/Pipeline.hpp"
 #include "aderite/rendering/Renderable.hpp"
 #include "aderite/scene/Scene.hpp"
+#include "aderite/scene/Visual.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
@@ -29,7 +29,6 @@
 #include "aderite/utility/Random.hpp"
 
 #include "aderiteeditor/asset/EditorMaterialType.hpp"
-#include "aderiteeditor/asset/RenderingPipeline.hpp"
 #include "aderiteeditor/asset/property/Property.hpp"
 //#include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/platform/pc/modals/FileDialog.hpp"
@@ -470,227 +469,6 @@ void render_component_shared(const std::string& id, const std::string& label, bo
 //        ImGui::EndTable();
 //    }
 //}
-//
-// void Inspector::renderMaterial(io::SerializableAsset* asset) {
-//    asset::MaterialAsset* material = static_cast<asset::MaterialAsset*>(asset);
-//    asset::MaterialAsset::fields& finfo = material->getFieldsMutable();
-//
-//    if (ImGui::BeginTable("MaterialTypeSelectTable", 2)) {
-//        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
-//        ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
-//
-//        ImGui::TableNextRow();
-//
-//        ImGui::TableSetColumnIndex(0);
-//        ImGui::Text("Material type");
-//
-//        ImGui::TableSetColumnIndex(1);
-//        ImGui::PushItemWidth(-FLT_MIN);
-//
-//        if (finfo.Type != nullptr) {
-//            ImGui::Button(finfo.Type->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//        } else {
-//            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//        }
-//
-//        asset::MaterialTypeAsset* type = DragDrop::renderTarget<asset::MaterialTypeAsset>(reflection::RuntimeTypes::MAT_TYPE);
-//        if (type != nullptr) {
-//            material->setType(type);
-//        }
-//
-//        ImGui::EndTable();
-//    }
-//
-//    ImGui::Separator();
-//    ImGui::Text("Properties and samplers:");
-//
-//    asset::EditorMaterialType* type = static_cast<asset::EditorMaterialType*>(material->getFields().Type);
-//
-//    if (type == nullptr) {
-//        ImGui::Text("Select material type...");
-//        return;
-//    }
-//
-//    if (ImGui::BeginTable("MaterialEditTable", 2)) {
-//        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
-//        ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
-//
-//        for (asset::Property* p : type->getProperties()) {
-//            ImGui::TableNextRow();
-//
-//            ImGui::TableSetColumnIndex(0);
-//            ImGui::Text(p->getName().c_str());
-//
-//            ImGui::TableSetColumnIndex(1);
-//            ImGui::PushItemWidth(-FLT_MIN);
-//
-//            switch (p->getType()) {
-//            case asset::PropertyType::FLOAT: {
-//                float* val = p->getValue(material->getPropertyData());
-//                ImGui::InputFloat(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
-//                break;
-//            }
-//            case asset::PropertyType::VEC2: {
-//                float* val = p->getValue(material->getPropertyData());
-//                ImGui::InputFloat2(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
-//                break;
-//            }
-//            case asset::PropertyType::VEC3: {
-//                float* val = p->getValue(material->getPropertyData());
-//                ImGui::InputFloat3(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
-//                break;
-//            }
-//            case asset::PropertyType::VEC4: {
-//                float* val = p->getValue(material->getPropertyData());
-//                ImGui::InputFloat4(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
-//                break;
-//            }
-//            default:
-//                ImGui::Text("Unknown property type");
-//            }
-//            ImGui::PopItemWidth();
-//        }
-//
-//        auto samplers = type->getSamplers();
-//        for (size_t i = 0; i < samplers.size(); i++) {
-//            ImGui::TableNextRow();
-//
-//            ImGui::TableSetColumnIndex(0);
-//            ImGui::Text(samplers[i]->getName().c_str());
-//
-//            ImGui::TableSetColumnIndex(1);
-//            ImGui::PushItemWidth(-FLT_MIN);
-//
-//            switch (samplers[i]->getType()) {
-//            case asset::SamplerType::TEXTURE_2D:
-//            case asset::SamplerType::TEXTURE_CUBE: {
-//                // TODO: Verify type
-//                asset::TextureAsset*& sampler = finfo.Samplers[i];
-//                if (sampler != nullptr) {
-//                    ImGui::Button(sampler->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//                } else {
-//                    ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
-//                }
-//
-//                asset::TextureAsset* object = DragDrop::renderTarget<asset::TextureAsset>(reflection::RuntimeTypes::TEXTURE);
-//                if (object != nullptr) {
-//                    sampler = object;
-//                }
-//
-//                break;
-//            }
-//            default: {
-//                ImGui::Text("Unknown sampler type");
-//            }
-//            }
-//
-//            ImGui::PopItemWidth();
-//        }
-//
-//        ImGui::EndTable();
-//    }
-//}
-
-void Inspector::renderMaterialType(io::SerializableObject* object) {
-    static utility::InlineRename renamer;
-
-    asset::EditorMaterialType* type = static_cast<asset::EditorMaterialType*>(object);
-    asset::MaterialTypeAsset::fields& finfo = type->getFieldsMutable();
-
-    ImGui::Text("Properties and samplers:");
-
-    ImGui::PushItemWidth(-FLT_MIN);
-
-    if (ImGui::Button("Add property", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
-        ImGui::OpenPopup("SelectMaterialTypeProperty");
-    }
-
-    if (ImGui::Button("Add sampler", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
-        ImGui::OpenPopup("SelectMaterialTypeSampler");
-    }
-
-    ImGui::PopItemWidth();
-
-    ImGui::Dummy(ImVec2(0.0f, 5.0f));
-
-    if (ImGui::BeginTable("MaterialTypeEditTable", 4)) {
-        ImGui::TableSetupColumn("Remove", ImGuiTableColumnFlags_WidthFixed, 20.0f);
-        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 130.0f);
-        ImGui::TableSetupColumn("Spacing", ImGuiTableColumnFlags_WidthFixed, 10.0f);
-        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_None);
-
-        for (asset::Property* prop : type->getProperties()) {
-            ImGui::TableNextRow();
-
-            ImGui::TableSetColumnIndex(0);
-            if (ImGui::SmallButton("X")) {
-                type->removeProperty(prop);
-                break;
-            }
-
-            ImGui::TableSetColumnIndex(1);
-            renamer.setValue(prop->getName());
-            if (renamer.renderUI(std::hash<std::string>()(prop->getName()), prop->getName())) {
-                prop->setName(renamer.getValue());
-            }
-
-            ImGui::TableSetColumnIndex(3);
-            ImGui::Text(asset::getNameForType(prop->getType()));
-        }
-
-        for (asset::Sampler* samp : type->getSamplers()) {
-            ImGui::TableNextRow();
-
-            ImGui::TableSetColumnIndex(0);
-            if (ImGui::SmallButton("X")) {
-                type->removeSampler(samp);
-                break;
-            }
-
-            ImGui::TableSetColumnIndex(1);
-            renamer.setValue(samp->getName());
-            if (renamer.renderUI(std::hash<std::string>()(samp->getName()), samp->getName())) {
-                samp->setName(renamer.getValue());
-            }
-
-            ImGui::TableSetColumnIndex(3);
-            ImGui::Text(asset::getNameForType(samp->getType()));
-        }
-        ImGui::EndTable();
-    }
-
-    ImGui::PushItemWidth(-FLT_MIN);
-   
-    ImGui::Separator();
-    ImGui::Text("Compilation:");
-    if (ImGui::Button("Compile", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
-        type->compile();
-    }
-
-    ImGui::PopItemWidth();
-
-    if (ImGui::BeginPopup("SelectMaterialTypeProperty")) {
-        ImGui::Text("Type");
-        ImGui::Separator();
-        for (int i = static_cast<int>(asset::PropertyType::START); i < static_cast<int>(asset::PropertyType::COUNT); i++) {
-            if (ImGui::Selectable(asset::getNameForType(static_cast<asset::PropertyType>(i)))) {
-                type->addProperty(new asset::Property(static_cast<asset::PropertyType>(i), "p_" + aderite::utility::generateString(8)));
-            }
-        }
-        ImGui::EndPopup();
-    }
-
-    if (ImGui::BeginPopup("SelectMaterialTypeSampler")) {
-        ImGui::Text("Type");
-        ImGui::Separator();
-        for (int i = static_cast<int>(asset::SamplerType::START); i < static_cast<int>(asset::SamplerType::COUNT); i++) {
-            if (ImGui::Selectable(asset::getNameForType(static_cast<asset::SamplerType>(i)))) {
-                type->addSampler(new asset::Sampler(static_cast<asset::SamplerType>(i), "s_" + aderite::utility::generateString(8)));
-            }
-        }
-        ImGui::EndPopup();
-    }
-}
 
 // void Inspector::renderScene(io::SerializableAsset* asset) {
 //    scene::Scene* type = static_cast<scene::Scene*>(asset);
@@ -1023,12 +801,321 @@ void Inspector::render() {
         this->renderMaterialType(object);
         break;
     }
+    case reflection::RuntimeTypes::MATERIAL: {
+        this->renderMaterial(object);
+        break;
+    }
+    case reflection::RuntimeTypes::VISUAL: {
+        this->renderVisual(object);
+        break;
+    }
     default: {
         ImGui::TextWrapped("No properties can be edited for this type");
     }
     }
 
     ImGui::End();
+}
+
+void Inspector::renderTransformProvider(scene::ITransformProvider* provider) {
+    ImGui::Text("Transform");
+
+    // Position
+    glm::vec3 position = provider->getPosition();
+    if (utility::DrawVec3Control("Position", position)) {
+        provider->setPosition(position);
+    }
+
+    // Rotation
+    glm::vec3 euler = glm::eulerAngles(provider->getRotation());
+    glm::vec3 rotation = glm::degrees(euler);
+    if (utility::DrawVec3Control("Rotation", rotation)) {
+        provider->setRotation(glm::quat(rotation));
+    }
+
+    // Scale
+    glm::vec3 scale = provider->getScale();
+    if (utility::DrawVec3Control("Scale", scale, 1.0f)) {
+        provider->setScale(scale);
+    }
+}
+
+void Inspector::renderRenderable(rendering::Renderable* renderable) {
+    ImGui::Text("Renderable");
+
+    if (ImGui::BeginTable("RenderableTable", 2)) {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 70.0f);
+        ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+        ImGui::TableNextRow();
+
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Mesh");
+
+        ImGui::TableSetColumnIndex(1);
+        ImGui::PushItemWidth(-FLT_MIN);
+
+        if (renderable->getMesh() != nullptr) {
+            ImGui::Button(renderable->getMesh()->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        } else {
+            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        }
+
+        asset::MeshAsset* mesh = DragDrop::renderTarget<asset::MeshAsset>(reflection::RuntimeTypes::MESH);
+        if (mesh != nullptr) {
+            renderable->setMesh(mesh);
+        }
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Material");
+
+        ImGui::TableSetColumnIndex(1);
+        ImGui::PushItemWidth(-FLT_MIN);
+
+        if (renderable->getMaterial() != nullptr) {
+            ImGui::Button(renderable->getMaterial()->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        } else {
+            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        }
+
+        asset::MaterialAsset* material = DragDrop::renderTarget<asset::MaterialAsset>(reflection::RuntimeTypes::MATERIAL);
+        if (material != nullptr) {
+            renderable->setMaterial(material);
+        }
+
+        ImGui::EndTable();
+    }
+}
+
+void Inspector::renderVisual(io::SerializableObject* object) {
+    scene::Visual* visual = static_cast<scene::Visual*>(object);
+
+    ImGui::Dummy(ImVec2(0, 5));
+    this->renderTransformProvider(visual);
+
+    ImGui::Dummy(ImVec2(0, 5));
+    this->renderRenderable(visual);
+}
+
+void Inspector::renderMaterial(io::SerializableObject* asset) {
+    asset::MaterialAsset* material = static_cast<asset::MaterialAsset*>(asset);
+
+    if (ImGui::BeginTable("MaterialTypeSelectTable", 2)) {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+        ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+        ImGui::TableNextRow();
+
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Material type");
+
+        ImGui::TableSetColumnIndex(1);
+        ImGui::PushItemWidth(-FLT_MIN);
+
+        if (material->getMaterialType() != nullptr) {
+            ImGui::Button(material->getMaterialType()->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        } else {
+            ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        }
+
+        asset::MaterialTypeAsset* type = DragDrop::renderTarget<asset::MaterialTypeAsset>(reflection::RuntimeTypes::MAT_TYPE);
+        if (type != nullptr) {
+            material->setMaterialType(type);
+        }
+
+        ImGui::EndTable();
+    }
+
+    ImGui::Separator();
+    ImGui::Text("Properties and samplers:");
+
+    asset::EditorMaterialType* type = static_cast<asset::EditorMaterialType*>(material->getMaterialType());
+
+    if (type == nullptr) {
+        ImGui::Text("Select material type...");
+        return;
+    }
+
+    if (ImGui::BeginTable("MaterialEditTable", 2)) {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+        ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+        for (asset::Property* p : type->getProperties()) {
+            ImGui::TableNextRow();
+
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text(p->getName().c_str());
+
+            ImGui::TableSetColumnIndex(1);
+            ImGui::PushItemWidth(-FLT_MIN);
+
+            switch (p->getType()) {
+            case asset::PropertyType::FLOAT: {
+                float* val = p->getValue(material->getPropertyData());
+                ImGui::InputFloat(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+                break;
+            }
+            case asset::PropertyType::VEC2: {
+                float* val = p->getValue(material->getPropertyData());
+                ImGui::InputFloat2(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+                break;
+            }
+            case asset::PropertyType::VEC3: {
+                float* val = p->getValue(material->getPropertyData());
+                ImGui::InputFloat3(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+                break;
+            }
+            case asset::PropertyType::VEC4: {
+                float* val = p->getValue(material->getPropertyData());
+                ImGui::InputFloat4(std::string("#" + p->getName()).c_str(), p->getValue(material->getPropertyData()), NULL);
+                break;
+            }
+            default:
+                ImGui::Text("Unknown property type");
+            }
+            ImGui::PopItemWidth();
+        }
+
+        auto samplers = type->getSamplers();
+        for (size_t i = 0; i < samplers.size(); i++) {
+            ImGui::TableNextRow();
+
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text(samplers[i]->getName().c_str());
+
+            ImGui::TableSetColumnIndex(1);
+            ImGui::PushItemWidth(-FLT_MIN);
+
+            switch (samplers[i]->getType()) {
+            case asset::SamplerType::TEXTURE_2D:
+            case asset::SamplerType::TEXTURE_CUBE: {
+                // TODO: Verify type
+                asset::TextureAsset* sampler = material->getSampler(i);
+                if (sampler != nullptr) {
+                    ImGui::Button(sampler->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                } else {
+                    ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                }
+
+                asset::TextureAsset* object = DragDrop::renderTarget<asset::TextureAsset>(reflection::RuntimeTypes::TEXTURE);
+                if (object != nullptr) {
+                    material->setSampler(i, object);
+                }
+
+                break;
+            }
+            default: {
+                ImGui::Text("Unknown sampler type");
+            }
+            }
+
+            ImGui::PopItemWidth();
+        }
+
+        ImGui::EndTable();
+    }
+}
+
+void Inspector::renderMaterialType(io::SerializableObject* object) {
+    static utility::InlineRename renamer;
+
+    asset::EditorMaterialType* type = static_cast<asset::EditorMaterialType*>(object);
+    asset::MaterialTypeAsset::fields& finfo = type->getFieldsMutable();
+
+    ImGui::Text("Properties and samplers:");
+
+    ImGui::PushItemWidth(-FLT_MIN);
+
+    if (ImGui::Button("Add property", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
+        ImGui::OpenPopup("SelectMaterialTypeProperty");
+    }
+
+    if (ImGui::Button("Add sampler", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
+        ImGui::OpenPopup("SelectMaterialTypeSampler");
+    }
+
+    ImGui::PopItemWidth();
+
+    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
+    if (ImGui::BeginTable("MaterialTypeEditTable", 4)) {
+        ImGui::TableSetupColumn("Remove", ImGuiTableColumnFlags_WidthFixed, 20.0f);
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+        ImGui::TableSetupColumn("Spacing", ImGuiTableColumnFlags_WidthFixed, 10.0f);
+        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_None);
+
+        for (asset::Property* prop : type->getProperties()) {
+            ImGui::TableNextRow();
+
+            ImGui::TableSetColumnIndex(0);
+            if (ImGui::SmallButton("X")) {
+                type->removeProperty(prop);
+                break;
+            }
+
+            ImGui::TableSetColumnIndex(1);
+            renamer.setValue(prop->getName());
+            if (renamer.renderUI(std::hash<std::string>()(prop->getName()), prop->getName())) {
+                prop->setName(renamer.getValue());
+            }
+
+            ImGui::TableSetColumnIndex(3);
+            ImGui::Text(asset::getNameForType(prop->getType()));
+        }
+
+        for (asset::Sampler* samp : type->getSamplers()) {
+            ImGui::TableNextRow();
+
+            ImGui::TableSetColumnIndex(0);
+            if (ImGui::SmallButton("X")) {
+                type->removeSampler(samp);
+                break;
+            }
+
+            ImGui::TableSetColumnIndex(1);
+            renamer.setValue(samp->getName());
+            if (renamer.renderUI(std::hash<std::string>()(samp->getName()), samp->getName())) {
+                samp->setName(renamer.getValue());
+            }
+
+            ImGui::TableSetColumnIndex(3);
+            ImGui::Text(asset::getNameForType(samp->getType()));
+        }
+        ImGui::EndTable();
+    }
+
+    ImGui::PushItemWidth(-FLT_MIN);
+
+    ImGui::Separator();
+    ImGui::Text("Compilation:");
+    if (ImGui::Button("Compile", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
+        type->compile();
+    }
+
+    ImGui::PopItemWidth();
+
+    if (ImGui::BeginPopup("SelectMaterialTypeProperty")) {
+        ImGui::Text("Type");
+        ImGui::Separator();
+        for (int i = static_cast<int>(asset::PropertyType::START); i < static_cast<int>(asset::PropertyType::COUNT); i++) {
+            if (ImGui::Selectable(asset::getNameForType(static_cast<asset::PropertyType>(i)))) {
+                type->addProperty(new asset::Property(static_cast<asset::PropertyType>(i), "p_" + aderite::utility::generateString(8)));
+            }
+        }
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopup("SelectMaterialTypeSampler")) {
+        ImGui::Text("Type");
+        ImGui::Separator();
+        for (int i = static_cast<int>(asset::SamplerType::START); i < static_cast<int>(asset::SamplerType::COUNT); i++) {
+            if (ImGui::Selectable(asset::getNameForType(static_cast<asset::SamplerType>(i)))) {
+                type->addSampler(new asset::Sampler(static_cast<asset::SamplerType>(i), "s_" + aderite::utility::generateString(8)));
+            }
+        }
+        ImGui::EndPopup();
+    }
 }
 
 } // namespace editor

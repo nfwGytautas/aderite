@@ -21,7 +21,6 @@
 #include "aderite/window/WindowManager.hpp"
 
 #include "aderiteeditor/asset/EditorMaterialType.hpp"
-#include "aderiteeditor/asset/RenderingPipeline.hpp"
 #include "aderiteeditor/platform/pc/EditorUI.hpp"
 #include "aderiteeditor/platform/pc/WindowsEditor.hpp"
 #include "aderiteeditor/platform/pc/modals/DragDropImportModal.hpp"
@@ -196,12 +195,14 @@ void AssetBrowser::renderItems() {
                 }
 
                 // Render element
+                ImGui::PushID(object->getHandle());
                 if (!loadSpinner) {
                     if (this->renderImageButton(icon, cellSize, cellSize)) {
                     }
                 } else {
                     utility::ImSpinner("loading_spinner", (thumbnailSize / 4), 12, 2.0, glm::vec2(cellSize, cellSize));
                 }
+                ImGui::PopID();
 
                 // Context menu
                 if (ImGui::BeginPopupContextItem()) {
@@ -213,7 +214,7 @@ void AssetBrowser::renderItems() {
                 }
 
                 // Source
-                DragDrop::renderFileSource(entry);
+                DragDrop::renderAssetFileSource(entry, object);
 
                 if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                     editor::State::getInstance().setSelectedObject(object);
@@ -249,10 +250,6 @@ void AssetBrowser::renderAddItemPopup() {
     }
 
     ImGui::Separator();
-
-    if (ImGui::MenuItem("Rendering pipeline")) {
-        object = new asset::RenderingPipeline();
-    }
 
     if (ImGui::BeginMenu("New asset")) {
         if (ImGui::MenuItem("Scene")) {

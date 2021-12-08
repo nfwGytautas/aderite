@@ -19,13 +19,6 @@ Runtime:
 		Name resolve
 	Asset manager:
 		Loaded asset leeway, so not to instantly unload
-	FPRP:
-		Array operation
-		Operation resize events
-		Base vertex shader compiling
-		Varying generation
-		Compiling shaders from C++ code
-		Pipeline verification
 	Rendering:
 		BGFX multithread encoder
 	Audio:
@@ -43,7 +36,6 @@ Runtime:
 		Dont kill entire editor on script run error
 		Load on project open
 	Code:
-		Get/Set checks
 		DLLs instead of static libs
 		Middleware sections
 		Utility operators for types

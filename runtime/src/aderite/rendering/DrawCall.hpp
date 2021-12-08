@@ -5,8 +5,7 @@
 #include <bgfx/bgfx.h>
 #include <glm/glm.hpp>
 
-#include "aderite/asset/Forward.hpp"
-#include "aderite/utility/Macros.hpp"
+#include "aderite/rendering/Renderable.hpp"
 
 namespace aderite {
 namespace rendering {
@@ -16,35 +15,11 @@ namespace rendering {
  */
 class DrawCall final {
 public:
-    // Vertex buffer that contains data to be rendered
-    bgfx::VertexBufferHandle VBO = BGFX_INVALID_HANDLE;
-
-    // Index buffer
-    bgfx::IndexBufferHandle IBO = BGFX_INVALID_HANDLE;
-
-    // Shader with which to render
-    bgfx::ProgramHandle Shader = BGFX_INVALID_HANDLE;
-
-    // Uniform from material type
-    bgfx::UniformHandle MaterialUniform = BGFX_INVALID_HANDLE;
-
-    // Samplers
-    std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> Samplers;
-
-    // Uniform data
-    float* UniformData = nullptr;
+    // Any instance of a renderable to be used
+    Renderable* Renderable = nullptr;
 
     // Vector containing transformations, for instanced rendering
     std::vector<glm::mat4> Transformations;
-
-    // Occlusion culled
-    bool FullyCulled = false;
-
-    // If true this draw call will be skipped
-    bool Skip = false;
-
-    // If true then the draw call changed since last frame, so it should be recalculated
-    bool Altered = true;
 };
 
 } // namespace rendering

@@ -8,7 +8,7 @@ namespace io {
 
 SerializableAsset::~SerializableAsset() {
     if (m_refCount > 0) {
-        LOG_ERROR("[Asset] Destroying {0}, but it still has {1} outstanding references", m_refCount);
+        LOG_ERROR("[Asset] Destroying {0}, but it still has {1} outstanding references", this->getName(), m_refCount);
         ADERITE_DYNAMIC_ASSERT(m_refCount == 0, "Asset being destroyed with outstanding references");
     } else {
         LOG_TRACE("[Asset] Destroying {0}, it has no outstanding references", m_handle);
