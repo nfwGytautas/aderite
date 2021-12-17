@@ -556,5 +556,305 @@ void VertexUVProviderNode::evaluate(compiler::ShaderEvaluator* evaluator) {
     evaluator->getAttribute("v_texcoord", p_outPins[0].getFullName(), "vec2");
 }
 
+ConstantValueProviderNode::ConstantValueProviderNode() {
+    p_outPins.push_back(OutNodePin(this, PinType::Float, "Value"));
+}
+
+void ConstantValueProviderNode::setType(PinType type) {
+    for (OutNodePin& opin : p_outPins) {
+        opin.setType(type);
+    }
+
+    m_type = type;
+}
+
+PinType ConstantValueProviderNode::getType() const {
+    return m_type;
+}
+
+void ConstantValueProviderNode::renderBody() {
+    static const PinType types[] = {PinType::Float, PinType::Vec2, PinType::Vec3, PinType::Vec4};
+
+    // Dropdown for type
+    ImGui::SetNextItemWidth(125.0f);
+    if (ImGui::BeginCombo(("##" + this->getName()).c_str(), c_PinTypeMap[static_cast<size_t>(m_type)])) {
+        for (size_t i = 0; i < sizeof(types) / sizeof(types[0]); i++) {
+            if (ImGui::Selectable(c_PinTypeMap[static_cast<size_t>(types[i])], m_type == types[i])) {
+                this->setType(types[i]);
+            }
+
+            if (m_type == types[i]) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+
+        ImGui::EndCombo();
+    }
+
+    // Input for value
+    ImGui::SetNextItemWidth(225.0f);
+    switch (m_type) {
+    case PinType::Float: {
+        ImGui::InputFloat("Value", &m_value.Fval);
+        break;
+    }
+    case PinType::Vec2: {
+        ImGui::InputFloat2("Value", &m_value.v2Val[0]);
+        break;
+    }
+    case PinType::Vec3: {
+        ImGui::InputFloat3("Value", &m_value.v3Val[0]);
+        break;
+    }
+    case PinType::Vec4: {
+        ImGui::InputFloat4("Value", &m_value.v4Val[0]);
+        break;
+    }
+    default: {
+        ADERITE_ABORT("Unknown value provider type");
+    }
+    }
+
+    ImGui::Dummy(ImVec2(0, 5));
+}
+
+const char* ConstantValueProviderNode::getTypeName() const {
+    return "Value";
+}
+
+bool ConstantValueProviderNode::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
+    if (!Node::serialize(serializer, emitter)) {
+        return false;
+    }
+
+    emitter << YAML::Key << "ValueType" << YAML::Value << static_cast<size_t>(m_type);
+    emitter << YAML::Key << "Value" << YAML::Value;
+
+    switch (m_type) {
+    case PinType::Float: {
+        emitter << m_value.Fval;
+        break;
+    }
+    case PinType::Vec2: {
+        emitter << m_value.v2Val;
+        break;
+    }
+    case PinType::Vec3: {
+        emitter << m_value.v3Val;
+        break;
+    }
+    case PinType::Vec4: {
+        emitter << m_value.v4Val;
+        break;
+    }
+    default: {
+        ADERITE_ABORT("Unknown value provider type");
+    }
+    }
+
+    return true;
+}
+
+bool ConstantValueProviderNode::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+    if (!Node::deserialize(serializer, data)) {
+        return false;
+    }
+
+    this->setType(static_cast<PinType>(data["ValueType"].as<size_t>()));
+
+    switch (m_type) {
+    case PinType::Float: {
+        m_value.Fval = data["Value"].as<float>();
+        break;
+    }
+    case PinType::Vec2: {
+        m_value.v2Val = data["Value"].as<glm::vec2>();
+        break;
+    }
+    case PinType::Vec3: {
+        m_value.v3Val = data["Value"].as<glm::vec3>();
+        break;
+    }
+    case PinType::Vec4: {
+        m_value.v4Val = data["Value"].as<glm::vec4>();
+        break;
+    }
+    default: {
+        ADERITE_ABORT("Unknown value provider type");
+    }
+    }
+
+    return true;
+}
+
+void ConstantValueProviderNode::evaluate(compiler::ShaderEvaluator* evaluator) {
+    evaluator->addComment(this->getName());
+
+    std::string value;
+    switch (m_type) {
+    case PinType::Float: {
+        value = std::to_string(m_value.Fval);
+        break;
+    }
+    case PinType::Vec2: {
+        value = "vec2(" + std::to_string(m_value.v2Val.x) + ", " + std::to_string(m_value.v2Val.y) + ")";
+        break;
+    }
+    case PinType::Vec3: {
+        value = "vec3(" + std::to_string(m_value.v3Val.x) + ", " + std::to_string(m_value.v3Val.y) + ", " +
+                std::to_string(m_value.v3Val.z) + ")";
+        break;
+    }
+    case PinType::Vec4: {
+        value = "vec4(" + std::to_string(m_value.v4Val.x) + ", " + std::to_string(m_value.v4Val.y) + ", " +
+                std::to_string(m_value.v4Val.z) + ", " + std::to_string(m_value.v4Val.w) + ")";
+        break;
+    }
+    default: {
+        ADERITE_ABORT("Unknown value provider type");
+    }
+    }
+
+    evaluator->defineVariable(this->p_outPins[0].getFullName(), value, c_PinTypeToShader[static_cast<size_t>(m_type)]);
+}
+
+Vec4Node::Vec4Node() {
+    this->setConstructor(Constructor::FourFloats);
+    p_outPins.push_back(OutNodePin(this, PinType::Vec4, "Out"));
+}
+
+void Vec4Node::setConstructor(Constructor ctor) {
+    p_inPins.clear();
+
+    switch (ctor) {
+    case Constructor::FourFloats: {
+        p_inPins.push_back(InNodePin(this, PinType::Float, "x"));
+        p_inPins.push_back(InNodePin(this, PinType::Float, "y"));
+        p_inPins.push_back(InNodePin(this, PinType::Float, "z"));
+        p_inPins.push_back(InNodePin(this, PinType::Float, "w"));
+        break;
+    }
+    case Constructor::TwoVec2: {
+        p_inPins.push_back(InNodePin(this, PinType::Vec2, "xy"));
+        p_inPins.push_back(InNodePin(this, PinType::Vec2, "zw"));
+        break;
+    }
+    case Constructor::TwoFloatVec2: {
+        p_inPins.push_back(InNodePin(this, PinType::Vec2, "xy"));
+        p_inPins.push_back(InNodePin(this, PinType::Float, "z"));
+        p_inPins.push_back(InNodePin(this, PinType::Float, "w"));
+        break;
+    }
+    case Constructor::Vec3Float: {
+        p_inPins.push_back(InNodePin(this, PinType::Vec3, "xyz"));
+        p_inPins.push_back(InNodePin(this, PinType::Float, "w"));
+    }
+    }
+
+    m_ctor = ctor;
+}
+
+Vec4Node::Constructor Vec4Node::getConstructor() const {
+    return m_ctor;
+}
+
+void Vec4Node::renderBody() {
+    static const char* ConstructorNames[] = {"4 float", "2 vec2", "vec3, float", "2 float, vec2"};
+
+    // Dropdown for type
+    ImGui::SetNextItemWidth(125.0f);
+    if (ImGui::BeginCombo(("##" + this->getName()).c_str(), ConstructorNames[static_cast<size_t>(m_ctor)])) {
+        for (size_t i = 0; i < static_cast<size_t>(Constructor::Count); i++) {
+            if (ImGui::Selectable(ConstructorNames[i], static_cast<size_t>(m_ctor) == i)) {
+                this->setConstructor(static_cast<Constructor>(i));
+            }
+
+            if (static_cast<size_t>(m_ctor) == i) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+
+        ImGui::EndCombo();
+    }
+
+    ImGui::Dummy(ImVec2(0, 5));
+}
+
+const char* Vec4Node::getTypeName() const {
+    return "Vec4";
+}
+
+void Vec4Node::evaluate(compiler::ShaderEvaluator* evaluator) {
+    evaluator->addComment(this->getName());
+
+    std::string value = "vec4(";
+
+    switch (m_ctor) {
+    case Constructor::FourFloats: {
+        value += p_inPins[0].getConnectedOutPinName();
+        value += ", ";
+
+        value += p_inPins[1].getConnectedOutPinName();
+        value += ", ";
+
+        value += p_inPins[2].getConnectedOutPinName();
+        value += ", ";
+
+        value += p_inPins[3].getConnectedOutPinName();
+
+        break;
+    }
+    case Constructor::TwoFloatVec2: {
+        value += p_inPins[0].getConnectedOutPinName();
+        value += ", ";
+
+        value += p_inPins[1].getConnectedOutPinName();
+        value += ", ";
+
+        value += p_inPins[2].getConnectedOutPinName();
+
+        break;
+    }
+    case Constructor::TwoVec2: {
+        value += p_inPins[0].getConnectedOutPinName();
+        value += ", ";
+
+        value += p_inPins[1].getConnectedOutPinName();
+
+        break;
+    }
+    case Constructor::Vec3Float: {
+        value += p_inPins[0].getConnectedOutPinName();
+        value += ", ";
+
+        value += p_inPins[1].getConnectedOutPinName();
+        break;
+    }
+    }
+
+    value += ")";
+    evaluator->defineVariable(p_outPins[0].getFullName(), value, c_PinTypeToShader[static_cast<size_t>(PinType::Vec4)]);
+}
+
+bool Vec4Node::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
+    if (!Node::serialize(serializer, emitter)) {
+        return false;
+    }
+
+    emitter << YAML::Key << "CtorType" << YAML::Value << static_cast<size_t>(m_ctor);
+
+    return true;
+}
+
+bool Vec4Node::deserialize(io::Serializer* serializer, const YAML::Node& data) {
+    if (!Node::deserialize(serializer, data)) {
+        return false;
+    }
+
+    m_ctor = static_cast<Constructor>(data["CtorType"].as<size_t>());
+
+    return true;
+}
+
 } // namespace node
 } // namespace aderite

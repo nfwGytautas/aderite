@@ -1,6 +1,7 @@
 #pragma once
 
 #include "aderite/io/Forward.hpp"
+#include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 
@@ -26,14 +27,14 @@ private:
 
     // Objects
     void renderVisual(io::SerializableObject* object);
+    void renderScenery(io::SerializableObject* object);
+    void renderEntity(io::SerializableObject* object);
 
-    //// Entity
-    // void renderEntity();
-
-    //// Physics
-    // void renderActor(physics::PhysicsActor* actor);
-    // void renderDynamicActor(physics::DynamicActor* actor);
-    // void renderStaticActor(physics::StaticActor* actor);
+    // Physics
+    void renderBaseGeometry(physics::Geometry* geometry);
+    void renderBaseActor(physics::BasePhysicsActor* actor);
+    void renderStaticActor(physics::StaticPhysicsActor* actor);
+    void renderDynamicActor(physics::DynamicPhysicsActor* actor);
 
     // Assets
     // void renderAsset();

@@ -4,6 +4,7 @@
 #include <imgui/imgui_internal.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
@@ -17,9 +18,13 @@
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/physics/PhysicsController.hpp"
+#include "aderite/physics/geometry/BoxGeometry.hpp"
+#include "aderite/physics/geometry/Geometry.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/rendering/Renderable.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
+#include "aderite/scene/Scenery.hpp"
 #include "aderite/scene/Visual.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
@@ -809,6 +814,14 @@ void Inspector::render() {
         this->renderVisual(object);
         break;
     }
+    case reflection::RuntimeTypes::SCENERY: {
+        this->renderScenery(object);
+        break;
+    }
+    case reflection::RuntimeTypes::ENTITY: {
+        this->renderEntity(object);
+        break;
+    }
     default: {
         ImGui::TextWrapped("No properties can be edited for this type");
     }
@@ -827,10 +840,12 @@ void Inspector::renderTransformProvider(scene::ITransformProvider* provider) {
     }
 
     // Rotation
-    glm::vec3 euler = glm::eulerAngles(provider->getRotation());
+    glm::quat rotationValue = provider->getRotation();
+    glm::vec3 euler = glm::eulerAngles(rotationValue);
     glm::vec3 rotation = glm::degrees(euler);
     if (utility::DrawVec3Control("Rotation", rotation)) {
-        provider->setRotation(glm::quat(rotation));
+        glm::quat resultValue = glm::quat(glm::radians(rotation));
+        provider->setRotation(resultValue);
     }
 
     // Scale
@@ -896,6 +911,125 @@ void Inspector::renderVisual(io::SerializableObject* object) {
 
     ImGui::Dummy(ImVec2(0, 5));
     this->renderRenderable(visual);
+}
+
+void Inspector::renderScenery(io::SerializableObject* object) {
+    scene::Scenery* scenery = static_cast<scene::Scenery*>(object);
+
+    ImGui::Dummy(ImVec2(0, 5));
+    this->renderTransformProvider(scenery);
+
+    ImGui::Dummy(ImVec2(0, 5));
+    this->renderRenderable(scenery);
+
+    ImGui::Dummy(ImVec2(0, 5));
+    this->renderStaticActor(scenery);
+}
+
+void Inspector::renderEntity(io::SerializableObject* object) {
+    scene::Entity* entity = static_cast<scene::Entity*>(object);
+
+    ImGui::Dummy(ImVec2(0, 5));
+    this->renderTransformProvider(entity);
+
+    ImGui::Dummy(ImVec2(0, 5));
+    this->renderRenderable(entity);
+
+    ImGui::Dummy(ImVec2(0, 5));
+    this->renderDynamicActor(entity);
+}
+
+void Inspector::renderBaseGeometry(physics::Geometry* geometry) {
+    static utility::InlineRename renamer;
+
+    // Shared
+    if (renamer.renderUI(std::hash<std::string>()(geometry->getName()), geometry->getName())) {
+        geometry->setName(renamer.getValue());
+    }
+
+    ImGui::Separator();
+
+    // Properties
+    switch (static_cast<reflection::RuntimeTypes>(geometry->getType())) {
+    case reflection::RuntimeTypes::BOX_GEOMETRY: {
+        physics::BoxGeometry* boxGeom = static_cast<physics::BoxGeometry*>(geometry);
+
+        glm::vec3 size = boxGeom->getSize();
+        if (utility::DrawVec3Control("Size", size)) {
+            boxGeom->setSize(size);
+        }
+        break;
+    }
+    default: {
+        ADERITE_ABORT("Unknown geometry type");
+    }
+    }
+
+    // Script mappings
+    // TODO: Script mappings
+}
+
+void Inspector::renderBaseActor(physics::BasePhysicsActor* actor) {
+    // Attached geometry
+    ImGui::Dummy(ImVec2(0.0f, 2.5f));
+
+    size_t idx = 1;
+    for (physics::Geometry* geom : actor->getAttachedGeometries()) {
+        ImGui::Text("%ld", idx++);
+        this->renderBaseGeometry(geom);
+    }
+
+    ImGui::Dummy(ImVec2(0.0f, 2.5f));
+
+    if (idx > 1) {
+        ImGui::Separator();
+    }
+
+    float width = ImGui::GetContentRegionAvail().x * 0.4855f;
+    ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
+    if (ImGui::Button("Add geometry", ImVec2(width, 0.0f))) {
+        ImGui::OpenPopup("AddGeometryPopup");
+    }
+
+    if (ImGui::BeginPopup("AddGeometryPopup")) {
+        ImGui::Text("Type");
+        ImGui::Separator();
+
+        if (ImGui::Selectable("Box")) {
+            actor->addGeometry(new physics::BoxGeometry());
+        }
+
+        ImGui::EndPopup();
+    }
+}
+
+void Inspector::renderStaticActor(physics::StaticPhysicsActor* actor) {
+    ImGui::Text("Static physics actor");
+
+    // Properties
+
+    // Base actor
+    this->renderBaseActor(actor);
+}
+
+void Inspector::renderDynamicActor(physics::DynamicPhysicsActor* actor) {
+    ImGui::Text("Dynamic physics actor");
+
+    // Properties
+    bool hasGravity = actor->getGravity();
+    if (ImGui::Checkbox("Has gravity", &hasGravity)) {
+        actor->setGravity(hasGravity);
+    }
+    
+    ImGui::Text("Mass");
+    ImGui::SameLine();
+    float mass = actor->getMass();
+    if (ImGui::DragFloat("##X", &mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+        actor->setMass(mass);
+    }
+
+    // Base actor
+    this->renderBaseActor(actor);
 }
 
 void Inspector::renderMaterial(io::SerializableObject* asset) {
@@ -1058,6 +1192,7 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
             renamer.setValue(prop->getName());
             if (renamer.renderUI(std::hash<std::string>()(prop->getName()), prop->getName())) {
                 prop->setName(renamer.getValue());
+                type->updateIONodes();
             }
 
             ImGui::TableSetColumnIndex(3);
@@ -1077,6 +1212,7 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
             renamer.setValue(samp->getName());
             if (renamer.renderUI(std::hash<std::string>()(samp->getName()), samp->getName())) {
                 samp->setName(renamer.getValue());
+                type->updateIONodes();
             }
 
             ImGui::TableSetColumnIndex(3);

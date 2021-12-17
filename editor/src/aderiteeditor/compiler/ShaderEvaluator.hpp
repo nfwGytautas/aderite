@@ -39,6 +39,7 @@ public:
     void addComment(const std::string& comment);
 
     void getMaterialField(const std::string& field, const std::string& storeIn, const std::string& type);
+    void defineVariable(const std::string& var, const std::string& value, const std::string& type);
 
     /**
      * @brief Returns an access variable for accessing object properties

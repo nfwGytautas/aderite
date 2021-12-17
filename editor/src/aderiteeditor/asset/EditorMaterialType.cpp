@@ -475,6 +475,7 @@ void EditorMaterialType::addIONodes() {
     m_inputNode = new node::MaterialInputNode();
     m_inputNode->setPosition({200, 200});
     m_inputNode->setMaterial(this);
+    m_inputNode->setName(this->getName());
     this->addNode(m_inputNode);
 
     // Output node
@@ -502,7 +503,13 @@ node::Node* EditorMaterialType::createNodeInstance(const std::string& type) {
         return m_inputNode;
     } else if (type == "Vertex UV") {
         return new node::VertexUVProviderNode();
+    } else if (type == "Value") {
+        return new node::ConstantValueProviderNode();
+    } else if (type == "Vec4") {
+        return new node::Vec4Node();
     }
+
+    ADERITE_ABORT("Unknown node type");
 
     return nullptr;
 }

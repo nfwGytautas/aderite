@@ -10,52 +10,71 @@ Data:
       Name: Backdrop
       Data:
         Transform:
-          Position: [0, 5, 0]
-          Rotation: [1, 0, 0, 0]
+          Position: [2.25, 0, 0]
+          Rotation: [0.707106769, 0, 0, 0.707106769]
           Scale: [10, 0.200000003, 10]
         Renderable:
           Mesh: 1
-          Material: 6
+          Material: 4
   Scenery:
     - Type: 41
-      Name: tpaXU2G43otM
+      Name: Slope
       Data:
         StaticPhysicsActor:
           BasePhysicsActor:
+            Transform:
+              Position: [0, 5.5, -2.5]
+              Rotation: [0.965925813, 0.258819044, 0, -1.25151651e-33]
+              Scale: [2, 0.100000001, 2]
             Geometry:
-              []
+              - Type: 75
+                Name: Collider
+                Data:
+                  Size: [1, 1, 1]
         Renderable:
-          {}
+          Mesh: 1
+          Material: 8
+    - Type: 41
+      Name: Ground
+      Data:
+        StaticPhysicsActor:
+          BasePhysicsActor:
+            Transform:
+              Position: [0, 0, 0]
+              Rotation: [1, 0, 0, -1.25151651e-33]
+              Scale: [2, 0.200000003, 10]
+            Geometry:
+              - Type: 75
+                Name: Collider
+                Data:
+                  Size: [1, 1, 1]
+        Renderable:
+          Mesh: 1
+          Material: 8
   Entities:
     - Type: 42
-      Name: EZ8cNZM3Ttld
+      Name: FallingEntity
       Data:
         DynamicPhysicsActor:
           BasePhysicsActor:
+            Transform:
+              Position: [0, 9, -2.0999999]
+              Rotation: [1, 0, 0, -1.25151651e-33]
+              Scale: [0.5, 0.5, 0.5]
             Geometry:
-              []
+              - Type: 75
+                Name: Collider
+                Data:
+                  Size: [1, 1, 1]
           Mass: 1
           HasGravity: true
         Renderable:
-          {}
+          Mesh: 1
+          Material: 9
   StaticPhysicsRegions:
-    - Type: 50
-      Name: 7U8qvA3oFe0y
-      Data:
-        StaticPhysicsActor:
-          BasePhysicsActor:
-            Geometry:
-              []
+    []
   DynamicPhysicsRegions:
-    - Type: 51
-      Name: GDNO4OVraia0
-      Data:
-        DynamicPhysicsActor:
-          BasePhysicsActor:
-            Geometry:
-              []
-          Mass: 1
-          HasGravity: true
+    []
   AudioListeners:
     - Type: 21
       Name: wEO36bXmkhTU

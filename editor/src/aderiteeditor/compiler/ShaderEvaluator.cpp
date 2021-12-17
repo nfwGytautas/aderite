@@ -29,6 +29,10 @@ void ShaderEvaluator::getMaterialField(const std::string& field, const std::stri
                          << "mf_" << field << ";\n";
 }
 
+void ShaderEvaluator::defineVariable(const std::string& var, const std::string& value, const std::string& type) {
+    m_currentScope->Body << "\t" << type << " " << var << " = " << value << ";\n";
+}
+
 void ShaderEvaluator::getProperty(const asset::Property* prop, const std::string& storeIn) {
     m_currentScope->Body << "\t" << c_PropToShader[static_cast<size_t>(prop->getType())] << " " << storeIn << " = "
                          << "u_ " << std::to_string(m_material->getHandle()) << "_" << prop->getName() << ";\n";

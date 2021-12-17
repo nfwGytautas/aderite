@@ -142,7 +142,7 @@ public:
 
     // Inherited via Node
     const char* getTypeName() const override;
-    virtual void evaluate(compiler::ShaderEvaluator* evaluator) override;
+    void evaluate(compiler::ShaderEvaluator* evaluator) override;
 };
 
 class MaterialOutputNode : public Node {
@@ -151,7 +151,7 @@ public:
 
     // Inherited via Node
     const char* getTypeName() const override;
-    virtual void evaluate(compiler::ShaderEvaluator* evaluator) override;
+    void evaluate(compiler::ShaderEvaluator* evaluator) override;
 };
 
 class AddNode : public Node {
@@ -166,7 +166,7 @@ public:
     const char* getTypeName() const override;
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
-    virtual void evaluate(compiler::ShaderEvaluator* evaluator) override;
+    void evaluate(compiler::ShaderEvaluator* evaluator) override;
 
 private:
     PinType m_type = PinType::Float;
@@ -178,7 +178,7 @@ public:
 
     // Inherited via Node
     const char* getTypeName() const override;
-    virtual void evaluate(compiler::ShaderEvaluator* evaluator) override;
+    void evaluate(compiler::ShaderEvaluator* evaluator) override;
 };
 
 class VertexUVProviderNode : public Node {
@@ -187,7 +187,53 @@ public:
 
     // Inherited via Node
     const char* getTypeName() const override;
-    virtual void evaluate(compiler::ShaderEvaluator* evaluator) override;
+    void evaluate(compiler::ShaderEvaluator* evaluator) override;
+};
+
+class ConstantValueProviderNode : public Node {
+public:
+    ConstantValueProviderNode();
+
+    void setType(PinType type);
+    PinType getType() const;
+
+    // Inherited via Node
+    void renderBody() override;
+    const char* getTypeName() const override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    void evaluate(compiler::ShaderEvaluator* evaluator) override;
+
+private:
+    PinType m_type = PinType::Float;
+
+    union {
+        float Fval;
+        glm::vec2 v2Val;
+        glm::vec3 v3Val;
+        glm::vec4 v4Val = glm::vec4(0.0f);
+    } m_value;
+};
+
+class Vec4Node : public Node {
+public:
+    enum class Constructor { FourFloats, TwoVec2, Vec3Float, TwoFloatVec2, Count };
+
+public:
+    Vec4Node();
+
+    void setConstructor(Constructor ctor);
+    Constructor getConstructor() const;
+
+    // Inherited via Node
+    void renderBody() override;
+    const char* getTypeName() const override;
+    void evaluate(compiler::ShaderEvaluator* evaluator) override;
+    bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
+    bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+
+private:
+    Constructor m_ctor = Constructor::FourFloats;
 };
 
 } // namespace node

@@ -82,6 +82,19 @@ void NodeEditor::render() {
                         node = new node::AddNode();
                     }
 
+                    if (ImGui::MenuItem("Value")) {
+                        node = new node::ConstantValueProviderNode();
+                    }
+
+                    if (ImGui::BeginMenu("Vec")) {
+                    if (ImGui::MenuItem("Vec4")) {
+                        node = new node::Vec4Node();
+                    }
+
+                        ImGui::EndMenu();
+                    }
+
+
                     if (ImGui::BeginMenu("Sampler")) {
                         if (ImGui::MenuItem("2D")) {
                             node = new node::Sample2DTextureNode();

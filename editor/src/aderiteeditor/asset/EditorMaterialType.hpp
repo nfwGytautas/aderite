@@ -77,6 +77,11 @@ public:
      */
     void removeSampler(Sampler* sampler);
 
+    /**
+     * @brief Updates the nodes given the material information
+     */
+    void updateIONodes();
+
 private:
     /**
      * @brief Generates a material header for this type and outputs it into the specified stream
@@ -106,11 +111,6 @@ private:
      * @brief Adds material input, output nodes to the graph
      */
     void addIONodes();
-
-    /**
-     * @brief Updates the nodes given the material information
-     */
-    void updateIONodes();
 
     /**
      * @brief Create a node of the specified type

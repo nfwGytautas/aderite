@@ -113,6 +113,7 @@ const std::vector<Visual*> Scene::getVisuals() const {
 
 void Scene::add(Scenery* scenery) {
     addObject(m_scenery, scenery);
+    this->addActor(scenery);
 }
 
 void Scene::remove(Scenery* scenery) {
@@ -125,6 +126,7 @@ const std::vector<Scenery*> Scene::getScenery() const {
 
 void Scene::add(Entity* entity) {
     addObject(m_entities, entity);
+    this->addActor(entity);
 }
 
 void Scene::remove(Entity* entity) {
@@ -137,6 +139,7 @@ const std::vector<Entity*> Scene::getEntities() const {
 
 void Scene::add(StaticPhysicsRegion* region) {
     addObject(m_staticPhysicsRegions, region);
+    this->addActor(region);
 }
 
 void Scene::remove(StaticPhysicsRegion* region) {
@@ -149,6 +152,7 @@ const std::vector<StaticPhysicsRegion*> Scene::getStaticPhysicsRegions() const {
 
 void Scene::add(DynamicPhysicsRegion* region) {
     addObject(m_dynamicPhysicsRegions, region);
+    this->addActor(region);
 }
 
 void Scene::remove(DynamicPhysicsRegion* region) {

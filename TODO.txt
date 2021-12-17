@@ -57,6 +57,9 @@ Editor:
 		Block edit on when in game mode
 		3D gizmo
 		Create build command, to build entire game
+		Comment Graph code
+		Rename graph pins without disconnecting them
+		Add sampler names to material type
 	Icons:
 		Handmade icons
 		Actual mesh instead of an icon in asset browser (cache result)
@@ -75,6 +78,7 @@ Editor:
 		Link FMOD studio Build dir with editor
 		Generate .csproj file for easier coding
 		Physics raycast debug visuals
+		Clean generate shader code after compilation of graph
 	Code:
 		Rework pin type to be enum
 		List item select (merge SelectScriptModal, SelectClipModal)

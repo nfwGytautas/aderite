@@ -116,8 +116,12 @@ bgfx::FrameBufferHandle createFramebuffer(bool blittable = false, bool hdr = fal
 }
 
 inline glm::mat4 calculateTransformationMatrix(scene::ITransformProvider* transform) {
-    glm::mat4 rotation = glm::toMat4(transform->getRotation());
-    return glm::translate(glm::mat4(1.0f), transform->getPosition()) * rotation * glm::scale(glm::mat4(1.0f), transform->getScale());
+    glm::vec3 position = transform->getPosition();
+    glm::quat rotation = transform->getRotation();
+    glm::vec3 scale = transform->getScale();
+
+    glm::mat4 rMat = glm::toMat4(rotation);
+    return glm::translate(glm::mat4(1.0f), position) * rMat * glm::scale(glm::mat4(1.0f), scale);
 }
 
 bool Renderer::init() {
@@ -244,10 +248,11 @@ void Renderer::render() {
         // 3. Setup persistent matrices
         bgfx::setViewTransform(viewIdx, glm::value_ptr(camera->getViewMatrix()), glm::value_ptr(camera->getProjectionMatrix()));
 
+        // Discard previous state
+        bgfx::discard(BGFX_DISCARD_ALL);
+
         // 4. Submit draw calls
         for (auto& kvp : drawCalls) {
-            // Discard previous state
-            bgfx::discard(BGFX_DISCARD_ALL);
 
             // Extract assets
             const Renderable* renderable = kvp.second.Renderable;

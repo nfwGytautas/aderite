@@ -8,6 +8,7 @@
 #include "aderite/io/Serializer.hpp"
 #include "aderite/physics/geometry/Geometry.hpp"
 #include "aderite/utility/Macros.hpp"
+#include "aderite/utility/YAML.hpp"
 
 namespace aderite {
 namespace physics {
@@ -27,6 +28,7 @@ BasePhysicsActor::~BasePhysicsActor() {
 void BasePhysicsActor::addGeometry(Geometry* geometry) {
     ADERITE_DYNAMIC_ASSERT(geometry->p_shape != nullptr, "Nullptr shape of geometry");
     ADERITE_DYNAMIC_ASSERT(geometry->p_shape->getActor() == nullptr, "Already attached geometry being attached again");
+    geometry->applyScale(m_scale);
     p_actor->attachShape(*geometry->p_shape);
 }
 
@@ -98,6 +100,13 @@ BasePhysicsActor::BasePhysicsActor() {}
 bool BasePhysicsActor::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "BasePhysicsActor" << YAML::BeginMap;
 
+    // Transform
+    emitter << YAML::Key << "Transform" << YAML::BeginMap;
+    emitter << YAML::Key << "Position" << YAML::Value << this->getPosition();
+    emitter << YAML::Key << "Rotation" << YAML::Value << this->getRotation();
+    emitter << YAML::Key << "Scale" << YAML::Value << m_scale;
+    emitter << YAML::EndMap;
+
     // Geometry
     emitter << YAML::Key << "Geometry";
     emitter << YAML::BeginSeq;
@@ -116,6 +125,12 @@ bool BasePhysicsActor::deserialize(io::Serializer* serializer, const YAML::Node&
     if (!actorNode || actorNode.IsNull()) {
         return false;
     }
+
+    // Transform
+    const YAML::Node& transformNode = actorNode["Transform"];
+    this->setPosition(transformNode["Position"].as<glm::vec3>());
+    this->setRotation(transformNode["Rotation"].as<glm::quat>());
+    this->setScale(transformNode["Scale"].as<glm::vec3>());
 
     // Geometry
     for (const YAML::Node& geometryNode : actorNode["Geometry"]) {

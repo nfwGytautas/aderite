@@ -1,0 +1,7 @@
+Type: 1
+Name: GreenChecker
+Data:
+  MaterialType: 7
+  Properties:
+    Data: [0, 1, 0, 0]
+  Samplers: [5]
