@@ -21,6 +21,7 @@ Runtime:
 		Loaded asset leeway, so not to instantly unload
 	Rendering:
 		BGFX multithread encoder
+		Change render settings
 	Audio:
 		3D audio
 		Clear finished one shot instances

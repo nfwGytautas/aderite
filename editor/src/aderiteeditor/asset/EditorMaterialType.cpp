@@ -414,6 +414,11 @@ void EditorMaterialType::generateVarying(std::ostream& os) {
     os << "vec3 a_position  : POSITION;\n";
     os << "vec3 a_normal    : NORMAL;\n";
     os << "vec2 a_texcoord0 : TEXCOORD0;\n";
+
+    os << "vec4 i_data0     : TEXCOORD7;\n";
+    os << "vec4 i_data1     : TEXCOORD6;\n";
+    os << "vec4 i_data2     : TEXCOORD5;\n";
+    os << "vec4 i_data3     : TEXCOORD4;\n";
 }
 
 void EditorMaterialType::generateFragment(std::ostream& os) {
@@ -433,7 +438,7 @@ void EditorMaterialType::generateVertex(std::ostream& os) {
     auto tm = *std::localtime(&t);
 
     // Inputs, outputs
-    os << "$input a_position, a_normal, a_texcoord0\n";
+    os << "$input a_position, a_normal, a_texcoord0, i_data0, i_data1, i_data2, i_data3\n";
     os << "$output v_normal, v_texcoord\n\n";
 
     os << "/*\n";
@@ -456,8 +461,12 @@ void EditorMaterialType::generateVertex(std::ostream& os) {
     // Main entry
     os << "void main()\n{\n\t";
 
+    // Model matrix from instance data
+    os << "mat4 model = mtxFromCols(i_data0, i_data1, i_data2, i_data3);\n\t";
+    os << "vec4 worldPos = mul(model, vec4(a_position, 1.0));\n\t";
+
     // gl_Position
-    os << "gl_Position = mul(u_modelViewProj, vec4(a_position, 1.0));\n\t";
+    os << "gl_Position = mul(u_viewProj, worldPos);\n\t";
 
     // Texcoord and normals
     os << "v_texcoord = a_texcoord0;\n\t";

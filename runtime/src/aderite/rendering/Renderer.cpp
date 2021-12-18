@@ -93,10 +93,10 @@ bgfx::FrameBufferHandle createFramebuffer(bool blittable = false, bool hdr = fal
     bgfx::TextureHandle textures[2];
     uint8_t attachments = 0;
 
-    const uint64_t textureFlags = (blittable ? BGFX_TEXTURE_BLIT_DST : 0) | 0;
+    const uint64_t textureFlags = BGFX_TEXTURE_RT_MSAA_X4 | 0;
 
     const uint64_t samplerFlags = BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP |
-                                  BGFX_SAMPLER_V_CLAMP | 0;
+                                  BGFX_SAMPLER_V_CLAMP | (blittable ? BGFX_TEXTURE_BLIT_DST : 0) | 0;
 
     // BGRA is often faster (internal GPU format)
     bgfx::TextureFormat::Enum format = hdr ? bgfx::TextureFormat::RGBA16F : bgfx::TextureFormat::BGRA8;
@@ -260,6 +260,24 @@ void Renderer::render() {
             const asset::MeshAsset* mesh = renderable->getMesh();
             const asset::MaterialTypeAsset* mType = material->getMaterialType();
 
+            // TODO : Check for frame miss and available size
+            const uint16_t instanceStride = sizeof(glm::mat4);
+            uint32_t modelCount = bgfx::getAvailInstanceDataBuffer(kvp.second.Transformations.size(), instanceStride);
+
+            ADERITE_STATIC_ASSERT(instanceStride % 16 == 0, "Instance stride must be divisible by 16");
+
+            // Allocate instance data buffer
+            bgfx::InstanceDataBuffer idb;
+            bgfx::allocInstanceDataBuffer(&idb, modelCount, instanceStride);
+
+            // Fill instance buffer
+            uint8_t* data = idb.data;
+            for (uint32_t i = 0; i < modelCount; i++) {
+                // TODO : Can probably optimized
+                std::memcpy(data, glm::value_ptr(kvp.second.Transformations[i]), instanceStride);
+                data += instanceStride;
+            }
+
             // Uniform
             bgfx::setUniform(mType->getUniformHandle(), material->getPropertyData(), UINT16_MAX);
 
@@ -271,6 +289,7 @@ void Renderer::render() {
             // Bind buffers
             bgfx::setVertexBuffer(0, mesh->getVboHandle());
             bgfx::setIndexBuffer(mesh->getIboHandle());
+            bgfx::setInstanceDataBuffer(&idb);
 
             // Set render state
             uint64_t state = 0 | BGFX_STATE_WRITE_R | BGFX_STATE_WRITE_G | BGFX_STATE_WRITE_B | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z |
@@ -278,16 +297,11 @@ void Renderer::render() {
 
             bgfx::setState(state);
 
-            // TODO: Instancing
-            // Submit rendering
-            for (auto& transform : kvp.second.Transformations) {
-                bgfx::setTransform(glm::value_ptr(transform));
-
-                // Submit draw call
-                uint8_t flags = BGFX_DISCARD_ALL &
-                                ~(BGFX_DISCARD_BINDINGS | BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE);
-                bgfx::submit(viewIdx, mType->getShaderHandle(), 0, flags);
-            }
+            //uint8_t flags = BGFX_DISCARD_ALL &
+            //                ~(BGFX_DISCARD_BINDINGS | BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE);
+            // 
+            // Submit draw call
+            bgfx::submit(viewIdx, mType->getShaderHandle(), 0, BGFX_DISCARD_ALL);
         }
 
         // 5. Copy result

@@ -101,9 +101,12 @@ bool BasePhysicsActor::serialize(const io::Serializer* serializer, YAML::Emitter
     emitter << YAML::Key << "BasePhysicsActor" << YAML::BeginMap;
 
     // Transform
+    glm::vec3 p = this->getPosition();
+    glm::quat q = this->getRotation();
+
     emitter << YAML::Key << "Transform" << YAML::BeginMap;
-    emitter << YAML::Key << "Position" << YAML::Value << this->getPosition();
-    emitter << YAML::Key << "Rotation" << YAML::Value << this->getRotation();
+    emitter << YAML::Key << "Position" << YAML::Value << p;
+    emitter << YAML::Key << "Rotation" << YAML::Value << q;
     emitter << YAML::Key << "Scale" << YAML::Value << m_scale;
     emitter << YAML::EndMap;
 

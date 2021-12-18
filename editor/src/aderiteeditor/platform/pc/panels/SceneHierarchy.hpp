@@ -38,6 +38,12 @@ private:
         void contextMenu() override;
     };
 
+    class ScriptingNode : public ISceneHierarchyNode {
+    public:
+        void render() override;
+        void contextMenu() override;
+    };
+
 public:
     SceneHierarchy();
     virtual ~SceneHierarchy();
