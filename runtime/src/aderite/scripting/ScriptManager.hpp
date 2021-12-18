@@ -42,6 +42,30 @@ public:
     void loadAssemblies();
 
     /**
+     * @brief Returns the list of known scripts
+     */
+    const std::vector<ScriptClass*>& getScripts() const;
+
+    /**
+     * @brief Returns script class with specified name or nullptr if doesn't exist
+     * @param name Name of the script class
+     */
+    ScriptClass* getScript(const std::string& name) const;
+
+    /**
+     * @brief Get script event with the specified name, nullptr if doesn't exist
+     * @param name Name of the script event
+     * @return ScriptEvent instance
+     */
+    ScriptEvent* getEventFromName(const std::string& name) const;
+
+    /**
+     * @brief Invoked when a scene is changed
+     * @param scene New scene
+     */
+    void onSceneChanged(scene::Scene* scene) const;
+
+    /**
      * @brief Returns the current domain
      */
     MonoDomain* getDomain() const;
@@ -58,13 +82,6 @@ public:
      * @return MonoObject instance
      */
     MonoObject* createInstance(io::SerializableAsset* serializable);
-
-    /**
-     * @brief Returns a system MonoClass instance
-     * @param name Name of the system
-     * @return System MonoClass instance or nullptr if a system with the specified name doesn't exist
-     */
-    MonoClass* getSystemClass(const std::string& name) const;
 
     /**
      * @brief Tries to resolve a class with the specified name
@@ -105,11 +122,6 @@ public:
     MonoMethod* getMethod(const std::string& signature) const;
 
     /**
-     * @brief Returns a list of known systems and their names
-     */
-    std::unordered_map<std::string, MonoClass*> getKnownSystems() const;
-
-    /**
      * @brief Returns FieldType from the MonoType
      * @param type MonoType instance
      * @return Corresponding FieldType enum value
@@ -125,7 +137,7 @@ public:
     /**
      * @brief Creates a MonoString from the specified value
      * @return MonoString object
-    */
+     */
     MonoString* string(const char* value) const;
 
 private:
@@ -169,7 +181,7 @@ private:
     MonoImage* m_codeImage = nullptr;
 
     // Vector containing the names of systems that exist in the image
-    std::unordered_map<std::string, MonoClass*> m_knownSystems;
+    std::vector<ScriptClass*> m_scripts;
     std::unordered_map<io::SerializableAsset*, MonoObject*> m_objectCache;
 };
 

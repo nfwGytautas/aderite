@@ -3,7 +3,10 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/scripting/ScriptClass.hpp"
+#include "aderite/scripting/ScriptEvent.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/scripting/events/ScriptUpdateEvent.hpp"
 
 #include "aderiteeditor/shared/IEventSink.hpp"
 #include "aderiteeditor/shared/State.hpp"
@@ -12,63 +15,84 @@
 namespace aderite {
 namespace editor {
 
-void SelectScriptModal::show() {
-    m_visible = true;
-    m_show = true;
-}
-
-bool SelectScriptModal::isOpen() const {
-    return m_visible;
-}
-
-void SelectScriptModal::reset() {
-    m_selected = "";
-}
-
-bool SelectScriptModal::init() {
-    return false;
-}
-
-void SelectScriptModal::shutdown() {}
+SelectScriptModal::SelectScriptModal(FilterType filter, SelectFn fn) : m_filtering(filter), m_callback(fn) {}
 
 void SelectScriptModal::render() {
-    if (m_show) {
-        ImGui::OpenPopup("Select script");
-        m_show = false;
+    if (!m_callback) {
+        this->close();
+    }
+
+    if (!m_open) {
+        return;
     }
 
     // Center on screen
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Select script", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
+    if (ImGui::BeginPopupModal("Select script", NULL,
+                               ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+                                   ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::PushItemWidth(-FLT_MIN);
+
         if (ImGui::Button("Close", ImVec2(-FLT_MIN, 0.0f))) {
-            m_visible = false;
+            this->close();
             ImGui::CloseCurrentPopup();
         }
+
         ImGui::PopItemWidth();
 
         ImGui::Dummy(ImVec2(500.0f, 0.0f));
         ImGui::Separator();
 
-        // TODO: Filtering
-
-        if (ImGui::BeginListBox("##ScriptSelectList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
-            for (auto kvp : ::aderite::Engine::getScriptManager()->getKnownSystems()) {
-                if (ImGui::Selectable(kvp.first.c_str())) {
-                    m_selected = kvp.first;
-                    m_visible = false;
-                    ImGui::CloseCurrentPopup();
-                    break;
+        if (m_class == nullptr) {
+            // Select class
+            if (ImGui::BeginListBox("##ScriptSelectClass", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
+                for (scripting::ScriptClass* sc : ::aderite::Engine::getScriptManager()->getScripts()) {
+                    if (ImGui::Selectable(sc->getName())) {
+                        m_class = sc;
+                    }
                 }
-            }
 
-            ImGui::EndListBox();
+                ImGui::EndListBox();
+            }
+        } else {
+            // Select method
+            if (ImGui::BeginListBox("##ScriptSelectMethod", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
+                switch (m_filtering) {
+                case FilterType::UPDATE: {
+                    for (scripting::ScriptUpdateEvent* sue : m_class->getUpdateEvents()) {
+                        if (ImGui::Selectable(sue->getName())) {
+                            m_event = sue;
+                        }
+                    }
+                }
+                }
+
+                if (m_event != nullptr) {
+                    m_callback(m_event);
+                    this->close();
+                    ImGui::CloseCurrentPopup();
+                }
+
+                ImGui::EndListBox();
+            }
         }
 
         ImGui::EndPopup();
     }
+}
+
+bool SelectScriptModal::stillValid() const {
+    return m_open;
+}
+
+void SelectScriptModal::close() {
+    m_open = false;
+}
+
+void SelectScriptModal::show() {
+    ImGui::OpenPopup("Select script");
 }
 
 } // namespace editor

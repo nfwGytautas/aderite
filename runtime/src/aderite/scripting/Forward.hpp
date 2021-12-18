@@ -15,6 +15,10 @@ class ScriptSystem;
 class FieldWrapper;
 
 class ScriptEventMap;
+class ScriptClass;
+class ScriptEvent;
+
+class ScriptUpdateEvent;
 
 } // namespace scripting
 } // namespace aderite

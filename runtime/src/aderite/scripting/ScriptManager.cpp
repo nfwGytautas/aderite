@@ -11,6 +11,7 @@
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scripting/InternalCalls.hpp"
+#include "aderite/scripting/ScriptClass.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/LogExtensions.hpp"
@@ -65,9 +66,7 @@ void ScriptManager::update(float delta) {
         return;
     }
 
-    /*for (scripting::ScriptSystem* system : currentScene->get()) {
-        system->update(delta);
-    }*/
+    currentScene->callUpdateEvents(delta);
 }
 
 void ScriptManager::loadAssemblies() {
@@ -107,6 +106,42 @@ void ScriptManager::loadAssemblies() {
     LOG_INFO("[Scripting] Assemblies loaded");
 }
 
+const std::vector<ScriptClass*>& ScriptManager::getScripts() const {
+    return m_scripts;
+}
+
+ScriptClass* ScriptManager::getScript(const std::string& name) const {
+    for (ScriptClass* sc : m_scripts) {
+        if (sc->getName() == name) {
+            return sc;
+        }
+    }
+
+    return nullptr;
+}
+
+ScriptEvent* ScriptManager::getEventFromName(const std::string& name) const {
+    const size_t delimIdx = name.find_first_of('.');
+
+    const std::string& scriptName = name.substr(0, delimIdx);
+    const std::string& eventName = name.substr(delimIdx + 1);
+
+    // Find script
+    ScriptClass* script = this->getScript(scriptName);
+
+    if (script == nullptr) {
+        return nullptr;
+    }
+
+    return script->getEvent(eventName);
+}
+
+void ScriptManager::onSceneChanged(scene::Scene* scene) const {
+    for (ScriptClass* sc : m_scripts) {
+        sc->reinstantiate();
+    }
+}
+
 MonoDomain* ScriptManager::getDomain() const {
     return m_currentDomain;
 }
@@ -129,14 +164,6 @@ MonoObject* ScriptManager::createInstance(io::SerializableAsset* serializable) {
     MonoObject* instance = m_locator.create(serializable);
     m_objectCache[serializable] = instance;
     return instance;
-}
-
-MonoClass* ScriptManager::getSystemClass(const std::string& name) const {
-    auto it = m_knownSystems.find(name);
-    if (it == m_knownSystems.end()) {
-        return nullptr;
-    }
-    return it->second;
 }
 
 MonoClass* ScriptManager::resolveClass(const std::string& nSpace, const std::string& name) const {
@@ -185,10 +212,6 @@ MonoMethod* ScriptManager::getMethod(const std::string& signature) const {
     return nullptr;
 }
 
-std::unordered_map<std::string, MonoClass*> ScriptManager::getKnownSystems() const {
-    return m_knownSystems;
-}
-
 FieldType ScriptManager::getType(MonoType* type) const {
     // Check for value types
     switch (mono_type_get_type(type)) {
@@ -214,7 +237,7 @@ MonoString* ScriptManager::string(const char* value) const {
 
 void ScriptManager::resolveSystemNames() {
     LOG_TRACE("[Scripting] Resolving systems");
-    m_knownSystems.clear();
+    this->clean();
 
     // Get the number of rows in the metadata table
     int numRows = mono_image_get_table_rows(m_codeImage, MONO_TABLE_TYPEDEF);
@@ -233,10 +256,8 @@ void ScriptManager::resolveSystemNames() {
                 continue;
             }
 
-            if (m_locator.isSystem(monoClass)) {
-                LOG_TRACE("[Scripting] Found system. Namespace: {1}, name: {0}", name, nSpace);
-                m_knownSystems[nSpace + "." + name] = monoClass;
-            }
+            LOG_TRACE("[Scripting] Found class. Namespace: {1}, name: {0}", name, nSpace);
+            m_scripts.push_back(new ScriptClass(monoClass));
         }
     }
 }
@@ -312,6 +333,11 @@ bool ScriptManager::setupCodeAssemblies() {
 }
 
 void ScriptManager::clean() {
+    for (ScriptClass* klass : m_scripts) {
+        delete klass;
+    }
+
+    m_scripts.clear();
     m_objectCache.clear();
 
     // TODO: Invoke GC

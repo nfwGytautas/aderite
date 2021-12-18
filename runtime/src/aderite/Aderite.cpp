@@ -213,6 +213,7 @@ void Engine::onRendererInitialized() const {
 
 void Engine::onSceneChanged(scene::Scene* scene) const {
     MIDDLEWARE_ACTION(onSceneChanged, scene);
+    m_scriptManager->onSceneChanged(scene);
 }
 
 void Engine::onWindowResized(unsigned int newWidth, unsigned int newHeight) const {

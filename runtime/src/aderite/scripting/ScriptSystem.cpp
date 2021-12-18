@@ -25,7 +25,7 @@ void ScriptSystem::update(float delta) {
 }
 
 void ScriptSystem::init() const {
-    LOG_TRACE("[Scripting] Initialzing {0}", m_name);
+    LOG_TRACE("[Scripting] Initializing {0}", m_name);
     if (m_init) {
         m_init();
     }
@@ -67,11 +67,13 @@ void ScriptSystem::load(const std::string& name) {
     ScriptManager* sm = ::aderite::Engine::getScriptManager();
 
     // Resolve class
-    m_klass = sm->getSystemClass(name);
+    /*m_klass = sm->getSystemClass(name);
     if (m_klass == nullptr) {
         LOG_ERROR("[Scripting] Failed to resolve mono class for {0}", name);
         return;
-    }
+    }*/
+
+    return;
 
     // Create instance
     LOG_TRACE("[Scripting] Create instance");

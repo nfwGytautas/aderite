@@ -6,7 +6,7 @@
 
 #include "aderite/scripting/Forward.hpp"
 
-#include "aderiteeditor/platform/pc/UIComponent.hpp"
+#include "aderiteeditor/platform/pc/modals/IModal.hpp"
 
 namespace aderite {
 namespace editor {
@@ -14,41 +14,32 @@ namespace editor {
 /**
  * @brief This is the modal window showed on aderite editor when a script component is being added
  */
-class SelectScriptModal : public UIComponent {
+class SelectScriptModal : public IModal {
 public:
-    /**
-     * @brief Shows the modal window
-     */
-    void show();
+    using SelectFn = std::function<void(scripting::ScriptEvent*)>;
 
-    // Inherited via UIComponent
-    bool init() override;
-    void shutdown() override;
+    /**
+     * @brief Filtering options for modal
+     */
+    enum class FilterType { UPDATE, NONE };
+
+public:
+    SelectScriptModal(FilterType filter, SelectFn fn);
+
+    // Inherited via IModal
     void render() override;
-
-    /**
-     * @brief Returns true if the modal is currently visible, false otherwise
-     */
-    bool isOpen() const;
-
-    /**
-     * @brief Returns the selected behavior wrapper
-     */
-    const std::string& getSelected() const {
-        return m_selected;
-    }
-
-    /**
-     * @brief Resets the selected behavior
-     */
-    void reset();
+    bool stillValid() const override;
+    void close() override;
+    void show() override;
 
 private:
-    bool m_visible = false;
-    bool m_show = false;
+    bool m_open = true;
+    FilterType m_filtering = FilterType::NONE;
+    SelectFn m_callback;
 
-    std::string m_selected = "";
+    scripting::ScriptClass* m_class = nullptr;
+    scripting::ScriptEvent* m_event = nullptr;
 };
 
-} // namespace editor_ui
+} // namespace editor
 } // namespace aderite

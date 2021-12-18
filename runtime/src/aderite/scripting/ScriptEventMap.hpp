@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "aderite/io/ISerializable.hpp"
+#include "aderite/scripting/Forward.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -16,6 +17,12 @@ class ScriptEventMap : public io::ISerializable {
 public:
     virtual ~ScriptEventMap() = default;
 
+    /**
+     * @brief Invoke all update events
+     * @param delta Delta to pass
+    */
+    void callUpdateEvents(float delta);
+
 protected:
     // Inherited via ISerializable
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
@@ -23,6 +30,27 @@ protected:
 
     // Input events
 public:
+    // Engine events
+public:
+    /**
+     * @brief Adds an update event to be called on engine update
+     * @param e Event to call
+     */
+    void add(scripting::ScriptUpdateEvent* e);
+
+    /**
+     * @brief Returns the update events
+     */
+    const std::vector<scripting::ScriptUpdateEvent*>& getUpdateEvents() const;
+
+    /**
+     * @brief Remove script update event from mapping
+     * @param e Event to remove
+    */
+    void remove(scripting::ScriptUpdateEvent* e);
+
+private:
+    std::vector<scripting::ScriptUpdateEvent*> m_updateEvents;
 };
 
 } // namespace scripting

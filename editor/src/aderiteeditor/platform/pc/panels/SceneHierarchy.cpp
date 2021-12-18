@@ -69,7 +69,6 @@ SceneHierarchy::SceneHierarchy() {
     m_nodes.push_back(new ObjectNode());
     m_nodes.push_back(new PhysicsRegionNode());
     m_nodes.push_back(new AudioNode());
-    m_nodes.push_back(new ScriptingNode());
 }
 
 SceneHierarchy::~SceneHierarchy() {
@@ -260,33 +259,6 @@ void SceneHierarchy::PhysicsRegionNode::contextMenu() {
 
         ImGui::EndMenu();
     }
-}
-
-void SceneHierarchy::ScriptingNode::render() {
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Scripting")) {
-        if (ImGui::TreeNode("Engine functions")) {
-            if (ImGui::TreeNode("Update")) {
-                ImGui::TreePop();
-            }
-
-            if (ImGui::TreeNode("Scene loading")) {
-                ImGui::TreePop();
-            }
-
-            if (ImGui::TreeNode("Scene unloading")) {
-                ImGui::TreePop();
-            }
-
-            ImGui::TreePop();
-        }
-
-        ImGui::TreePop();
-    }
-}
-
-void SceneHierarchy::ScriptingNode::contextMenu() {
-    
 }
 
 } // namespace editor
