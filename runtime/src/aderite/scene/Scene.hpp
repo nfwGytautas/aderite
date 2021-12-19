@@ -167,6 +167,16 @@ public:
     const std::vector<Camera*>& getCameras() const;
 
     /**
+     * @brief Adds/removes new or deleted scripts from this scene
+     */
+    void updateScriptDataEntries();
+
+    /**
+     * @brief Returns script data of this scene
+     */
+    const std::vector<scripting::ScriptData*> getScriptData() const;
+
+    /**
      * @brief Returns the audio source with the specified name
      * @param name Name of the source
      * @return AudioSource instance or nullptr if not found
@@ -198,6 +208,7 @@ private:
 
     // Other
     std::vector<Camera*> m_cameras;
+    std::vector<scripting::ScriptData*> m_scriptData;
 };
 
 } // namespace scene

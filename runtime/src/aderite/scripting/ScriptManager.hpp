@@ -81,7 +81,7 @@ public:
      * @param serializable Serializable to create for
      * @return MonoObject instance
      */
-    MonoObject* createInstance(io::SerializableAsset* serializable);
+    MonoObject* createInstance(io::SerializableObject* serializable);
 
     /**
      * @brief Tries to resolve a class with the specified name
@@ -97,13 +97,6 @@ public:
      * @return MonoObject instance
      */
     MonoObject* instantiate(MonoClass* klass) const;
-
-    /**
-     * @brief Returns public fields of the specified object
-     * @param object Object instance
-     * @return Vector of FieldWrapper objects
-     */
-    std::vector<FieldWrapper> getPublicFields(MonoObject* object) const;
 
     /**
      * @brief Tries to locate a method in the code assembly and returns it
@@ -182,7 +175,7 @@ private:
 
     // Vector containing the names of systems that exist in the image
     std::vector<ScriptClass*> m_scripts;
-    std::unordered_map<io::SerializableAsset*, MonoObject*> m_objectCache;
+    std::unordered_map<io::SerializableObject*, MonoObject*> m_objectCache;
 };
 
 } // namespace scripting

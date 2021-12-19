@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 
+#include "aderite/Aderite.hpp"
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/Serializer.hpp"
@@ -9,6 +10,9 @@
 #include "aderite/scene/Scenery.hpp"
 #include "aderite/scene/StaticPhysicsRegion.hpp"
 #include "aderite/scene/Visual.hpp"
+#include "aderite/scripting/ScriptClass.hpp"
+#include "aderite/scripting/ScriptData.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
@@ -92,6 +96,15 @@ Scene::~Scene() {
     }
     for (audio::AudioListener* listener : m_audioListeners) {
         delete listener;
+    }
+
+    // Other
+    for (Camera* camera : m_cameras) {
+        delete camera;
+    }
+
+    for (scripting::ScriptData* sd : m_scriptData) {
+        delete sd;
     }
 
     LOG_INFO("[Scene] Scene {0} deleted", this->getName());
@@ -199,6 +212,40 @@ const std::vector<Camera*>& Scene::getCameras() const {
     return m_cameras;
 }
 
+void Scene::updateScriptDataEntries() {
+    auto scripts = ::aderite::Engine::getScriptManager()->getScripts();
+
+    // Remove unused ones
+    for (auto it = m_scriptData.begin(); it != m_scriptData.end();) {
+        auto itScripts = std::find_if(scripts.begin(), scripts.end(), [&](scripting::ScriptClass* sc) {
+            return (*it)->getScriptName() == sc->getName();
+        });
+
+        if (itScripts == scripts.end()) {
+            it = m_scriptData.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    // Add new ones
+    for (scripting::ScriptClass* script : scripts) {
+        auto it = std::find_if(m_scriptData.begin(), m_scriptData.end(), [&](scripting::ScriptData* sd) {
+            return sd->getScriptName() == script->getName();
+        });
+
+        if (it == m_scriptData.end()) {
+            scripting::ScriptData* sd = new scripting::ScriptData(this);
+            sd->setScriptName(script->getName());
+            m_scriptData.push_back(sd);
+        }
+    }
+}
+
+const std::vector<scripting::ScriptData*> Scene::getScriptData() const {
+    return m_scriptData;
+}
+
 audio::AudioSource* Scene::getSource(const std::string& name) const {
     auto it = std::find_if(m_audioSources.begin(), m_audioSources.end(), [name](const audio::AudioSource* source) {
         return source->getName() == name;
@@ -240,6 +287,13 @@ bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
 
     // Other
     SERIALIZE_LIST("Cameras", m_cameras);
+
+    // Script data
+    emitter << YAML::Key << "Scripts" << YAML::BeginSeq;
+    for (const scripting::ScriptData* sd : m_scriptData) {
+        sd->serialize(serializer, emitter);
+    }
+    emitter << YAML::EndSeq;
 }
 
 bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
@@ -266,6 +320,16 @@ bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
 
     // Other
     DESERIALIZE_LIST("Cameras", Camera);
+
+    // Script data
+    auto scripts = data["Scripts"];
+    if (scripts) {
+        for (const YAML::Node& node : scripts) {
+            scripting::ScriptData* sd = new scripting::ScriptData(this);
+            sd->deserialize(serializer, node);
+            m_scriptData.push_back(sd);
+        }
+    }
 }
 
 Scene::Scene() {}

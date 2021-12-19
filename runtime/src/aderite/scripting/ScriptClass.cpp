@@ -1,6 +1,9 @@
 #include "ScriptClass.hpp"
 
+#include <mono/metadata/attrdefs.h>
+
 #include "aderite/Aderite.hpp"
+#include "aderite/scripting/ScriptData.hpp"
 #include "aderite/scripting/ScriptEvent.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/events/ScriptUpdateEvent.hpp"
@@ -50,8 +53,14 @@ ScriptClass::~ScriptClass() {
     }
 }
 
-void ScriptClass::reinstantiate() {
-    m_instance = ::aderite::Engine::getScriptManager()->instantiate(m_klass);
+MonoObject* ScriptClass::createInstance() const {
+    return ::aderite::Engine::getScriptManager()->instantiate(m_klass);
+}
+
+void ScriptClass::loadData(ScriptData* data) {
+    ADERITE_DYNAMIC_ASSERT(std::string(this->getName()) == data->getScriptName(), "Incompatible script and data instance");
+
+    m_currentInstance = data->getInstance();
 }
 
 const char* ScriptClass::getName() const {
@@ -59,7 +68,7 @@ const char* ScriptClass::getName() const {
 }
 
 MonoObject* ScriptClass::getInstance() const {
-    return m_instance;
+    return m_currentInstance;
 }
 
 ScriptEvent* ScriptClass::getEvent(const std::string& eventName) const {
@@ -76,9 +85,14 @@ const std::vector<ScriptUpdateEvent*>& ScriptClass::getUpdateEvents() const {
     return m_updateEvents;
 }
 
+const std::vector<FieldWrapper>& ScriptClass::getFields() const {
+    return m_fields;
+}
+
 ScriptClass::ScriptClass(MonoClass* klass) : m_klass(klass) {
     ADERITE_DYNAMIC_ASSERT(klass != nullptr, "Null class passed to ScriptClass constructor");
     this->locateMethods();
+    this->locateFields();
 }
 
 void ScriptClass::locateMethods() {
@@ -90,6 +104,17 @@ void ScriptClass::locateMethods() {
         // Analyze signature
         if (isUpdateSignature(signature)) {
             m_updateEvents.push_back(new ScriptUpdateEvent(this, method));
+        }
+    }
+}
+
+void ScriptClass::locateFields() {
+    // Iterate over public fields and set them, those that don't exist do nothing
+    void* iter = NULL;
+    MonoClassField* field;
+    while (field = mono_class_get_fields(m_klass, &iter)) {
+        if (mono_field_get_flags(field) & MONO_FIELD_ATTR_PUBLIC) {
+            m_fields.push_back(FieldWrapper(field));
         }
     }
 }

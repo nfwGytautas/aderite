@@ -12,6 +12,7 @@
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scripting/InternalCalls.hpp"
 #include "aderite/scripting/ScriptClass.hpp"
+#include "aderite/scripting/ScriptData.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/LogExtensions.hpp"
@@ -137,8 +138,11 @@ ScriptEvent* ScriptManager::getEventFromName(const std::string& name) const {
 }
 
 void ScriptManager::onSceneChanged(scene::Scene* scene) const {
-    for (ScriptClass* sc : m_scripts) {
-        sc->reinstantiate();
+    // Update entries
+    scene->updateScriptDataEntries();
+
+    for (ScriptData* sd : scene->getScriptData()) {
+        sd->load();
     }
 }
 
@@ -150,7 +154,7 @@ MonoImage* ScriptManager::getCodeImage() const {
     return m_codeImage;
 }
 
-MonoObject* ScriptManager::createInstance(io::SerializableAsset* serializable) {
+MonoObject* ScriptManager::createInstance(io::SerializableObject* serializable) {
     ADERITE_DYNAMIC_ASSERT(serializable != nullptr, "Nullptr serializable passed to createInstance");
 
     // Check if an object already exists
@@ -186,18 +190,6 @@ MonoObject* ScriptManager::instantiate(MonoClass* klass) const {
     return object;
 }
 
-std::vector<FieldWrapper> ScriptManager::getPublicFields(MonoObject* object) const {
-    std::vector<FieldWrapper> result;
-    void* iter = NULL;
-    MonoClassField* field;
-    while (field = mono_class_get_fields(mono_object_get_class(object), &iter)) {
-        if (mono_field_get_flags(field) & MONO_FIELD_ATTR_PUBLIC) {
-            result.push_back(FieldWrapper(field, object));
-        }
-    }
-    return result;
-}
-
 MonoMethod* ScriptManager::getMethod(MonoClass* klass, const std::string& name, size_t paramCount) const {
     MonoMethod* method = mono_class_get_method_from_name(klass, name.c_str(), paramCount);
     if (method == nullptr) {
@@ -220,6 +212,9 @@ FieldType ScriptManager::getType(MonoType* type) const {
     }
     case MONO_TYPE_BOOLEAN: {
         return FieldType::Boolean;
+    }
+    case MONO_TYPE_I4: {
+        return FieldType::Integer;
     }
     default: {
         return m_locator.getType(type);

@@ -17,6 +17,7 @@ class FieldWrapper;
 class ScriptEventMap;
 class ScriptClass;
 class ScriptEvent;
+class ScriptData;
 
 class ScriptUpdateEvent;
 

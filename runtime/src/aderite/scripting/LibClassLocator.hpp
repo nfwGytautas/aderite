@@ -18,10 +18,6 @@ namespace scripting {
  */
 class LibClassLocator final {
 public:
-    struct ScriptSystem {
-        MonoClass* Klass = nullptr;
-    };
-
     struct Entity {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
@@ -62,11 +58,6 @@ public:
         MonoMethod* Ctor = nullptr;
     };
 
-    struct Prefab {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
 public:
     /**
      * @brief Locates engine classes from the specified image
@@ -82,23 +73,16 @@ public:
      */
     FieldType getType(MonoType* type) const;
 
-    /**
-     * @brief Checks if the specified class is a system class
-     * @param klass Class to check
-     * @return True if the class is or inherits from system class, false otherwise
-     */
-    bool isSystem(MonoClass* klass) const;
-
     // ====================================================================================
     // Object creators
     // ====================================================================================
 
     /**
      * @brief Create a C# script instance object from generic C++ serializable object
-     * @param serializable Serializable asset
+     * @param serializable Serializable object
      * @return MonoObject instance
      */
-    MonoObject* create(io::SerializableAsset* serializable) const;
+    MonoObject* create(io::SerializableObject* serializable) const;
 
     /**
      * @brief Creates a C# mesh object from C++ asset
@@ -133,37 +117,32 @@ public:
     // * @param triggerEvent TriggerEvent object
     // * @return MonoObject instance
     // */
-    //MonoObject* create(const physics::TriggerEvent& triggerEvent) const;
+    // MonoObject* create(const physics::TriggerEvent& triggerEvent) const;
 
     ///**
     // * @brief Creates a C# collision event object from C++
     // * @param collisionEvent CollisionEvent object
     // * @return MonoObject instance
     // */
-    //MonoObject* create(const physics::CollisionEvent& collisionEvent) const;
+    // MonoObject* create(const physics::CollisionEvent& collisionEvent) const;
 
     ///**
     // * @brief Creates a C# raycast hit object from C++
     // * @param hit RaycastHit object
     // * @return MonoObject instance
     // */
-    //MonoObject* create(const physics::RaycastHit& hit) const;
+    // MonoObject* create(const physics::RaycastHit& hit) const;
 
     ///**
     // * @brief Creates a C# prefab object from C++
     // * @param prefab Prefab object
     // * @return MonoObject instance
     // */
-    //MonoObject* create(asset::PrefabAsset* prefab) const;
+    // MonoObject* create(asset::PrefabAsset* prefab) const;
 
     // ====================================================================================
     // Class getters
     // ====================================================================================
-
-    /**
-     * @brief Returns the script system mono information struct
-     */
-    const ScriptSystem& getScriptSystem() const;
 
     /**
      * @brief Returns the entity mono information struct
@@ -205,11 +184,6 @@ public:
      */
     const RaycastHit& getRaycastHit() const;
 
-    /**
-     * @brief Returns the prefab mono information struct
-     */
-    const Prefab& getPrefab() const;
-
 private:
     /**
      * @brief Handle mono exception object
@@ -227,7 +201,6 @@ private:
     MonoObject* genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args) const;
 
 private:
-    ScriptSystem m_system;
     Entity m_entity;
     Mesh m_mesh;
     Material m_material;
@@ -236,7 +209,6 @@ private:
     TriggerEvent m_triggerEvent;
     CollisionEvent m_collisionEvent;
     RaycastHit m_raycastHit;
-    Prefab m_prefab;
 };
 
 } // namespace scripting

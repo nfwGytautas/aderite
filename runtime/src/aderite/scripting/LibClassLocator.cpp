@@ -41,7 +41,6 @@ bool LibClassLocator::locate(MonoImage* image) {
     bool result = true;
 
     // Classes
-    findClass(image, "Aderite", "ScriptSystem", m_system.Klass, result);
     findClass(image, "Aderite", "Entity", m_entity.Klass, result);
     findClass(image, "Aderite", "Mesh", m_mesh.Klass, result);
     findClass(image, "Aderite", "Material", m_material.Klass, result);
@@ -50,7 +49,6 @@ bool LibClassLocator::locate(MonoImage* image) {
     findClass(image, "Aderite", "TriggerEvent", m_triggerEvent.Klass, result);
     findClass(image, "Aderite", "CollisionEvent", m_collisionEvent.Klass, result);
     findClass(image, "Aderite", "RaycastHit", m_raycastHit.Klass, result);
-    findClass(image, "Aderite", "Prefab", m_prefab.Klass, result);
 
     // Can't proceed if classes are not found
     if (result == false) {
@@ -69,7 +67,6 @@ bool LibClassLocator::locate(MonoImage* image) {
     findMethod(m_triggerEvent.Klass, ".ctor", 2, m_triggerEvent.Ctor, result);
     findMethod(m_collisionEvent.Klass, ".ctor", 2, m_collisionEvent.Ctor, result);
     findMethod(m_raycastHit.Klass, ".ctor", 2, m_raycastHit.Ctor, result);
-    findMethod(m_prefab.Klass, ".ctor", 1, m_prefab.Ctor, result);
 
     if (result) {
         LOG_INFO("[Scripting] Engine classed located");
@@ -90,32 +87,14 @@ FieldType LibClassLocator::getType(MonoType* type) const {
         return FieldType::Material;
     } else if (klass == m_audio.Klass) {
         return FieldType::Audio;
-    } else if (klass == m_system.Klass) {
-        return FieldType::System;
     } else if (klass == m_audioSource.Klass) {
         return FieldType::AudioSource;
-    } else if (klass == m_prefab.Klass) {
-        return FieldType::Prefab;
     }
 
     return FieldType::Null;
 }
 
-bool LibClassLocator::isSystem(MonoClass* klass) const {
-    if (klass == m_system.Klass) {
-        // Class is behavior
-        return true;
-    }
-
-    if (mono_class_get_parent(klass) == m_system.Klass) {
-        // Parent is behavior
-        return true;
-    }
-
-    return false;
-}
-
-MonoObject* LibClassLocator::create(io::SerializableAsset* serializable) const {
+MonoObject* LibClassLocator::create(io::SerializableObject* serializable) const {
     switch (static_cast<reflection::RuntimeTypes>(serializable->getType())) {
     case reflection::RuntimeTypes::MESH: {
         return this->create(static_cast<asset::MeshAsset*>(serializable));
@@ -126,9 +105,9 @@ MonoObject* LibClassLocator::create(io::SerializableAsset* serializable) const {
     case reflection::RuntimeTypes::AUDIO: {
         return this->create(static_cast<asset::AudioAsset*>(serializable));
     }
-    /*case reflection::RuntimeTypes::AUDIO_SOURCE: {
+    case reflection::RuntimeTypes::AUDIO_SOURCE: {
         return this->create(static_cast<audio::AudioSource*>(serializable));
-    }*/
+    }
     default: {
         LOG_ERROR("[Scripting] Unknown implementation for creating a {0} serializable", serializable->getType());
         return nullptr;
@@ -156,29 +135,20 @@ MonoObject* LibClassLocator::create(audio::AudioSource* source) const {
     return this->genericInstanceCreate(m_audioSource.Klass, m_audioSource.Ctor, args);
 }
 
-//MonoObject* LibClassLocator::create(const physics::TriggerEvent& triggerEvent) const {
+// MonoObject* LibClassLocator::create(const physics::TriggerEvent& triggerEvent) const {
 //    void* args[2] = {create(triggerEvent.Actor->getEntity()), create(triggerEvent.Trigger->getEntity())};
 //    return this->genericInstanceCreate(m_triggerEvent.Klass, m_triggerEvent.Ctor, args);
 //}
 //
-//MonoObject* LibClassLocator::create(const physics::CollisionEvent& collisionEvent) const {
+// MonoObject* LibClassLocator::create(const physics::CollisionEvent& collisionEvent) const {
 //    void* args[2] = {create(collisionEvent.Actor1->getEntity()), create(collisionEvent.Actor2->getEntity())};
 //    return this->genericInstanceCreate(m_collisionEvent.Klass, m_collisionEvent.Ctor, args);
 //}
 //
-//MonoObject* LibClassLocator::create(const physics::RaycastHit& hit) const {
+// MonoObject* LibClassLocator::create(const physics::RaycastHit& hit) const {
 //    void* args[2] = {create(hit.Actor->getEntity()), (void*)(&hit.Distance)};
 //    return this->genericInstanceCreate(m_raycastHit.Klass, m_raycastHit.Ctor, args);
 //}
-
-//MonoObject* LibClassLocator::create(asset::PrefabAsset* prefab) const {
-//    void* args[1] = {&prefab};
-//    return this->genericInstanceCreate(m_prefab.Klass, m_prefab.Ctor, args);
-//}
-
-const LibClassLocator::ScriptSystem& LibClassLocator::getScriptSystem() const {
-    return m_system;
-}
 
 const LibClassLocator::Entity& LibClassLocator::getEntity() const {
     return m_entity;
@@ -210,10 +180,6 @@ const LibClassLocator::CollisionEvent& LibClassLocator::getCollisionEvent() cons
 
 const LibClassLocator::RaycastHit& LibClassLocator::getRaycastHit() const {
     return m_raycastHit;
-}
-
-const LibClassLocator::Prefab& LibClassLocator::getPrefab() const {
-    return m_prefab;
 }
 
 void LibClassLocator::handleException(MonoObject* exception) const {

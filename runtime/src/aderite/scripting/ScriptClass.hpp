@@ -5,6 +5,7 @@
 
 #include <mono/jit/jit.h>
 
+#include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/Forward.hpp"
 
 namespace aderite {
@@ -18,9 +19,15 @@ public:
     ~ScriptClass();
 
     /**
-     * @brief Creates or deletes and creates a new instances of this script
+     * @brief Create a new instance of this script
      */
-    void reinstantiate();
+    MonoObject* createInstance() const;
+
+    /**
+     * @brief Load the data of this class (data ownership is not taken, but the relative data is set)
+     * @param data ScriptData instance
+     */
+    void loadData(ScriptData* data);
 
     /**
      * @brief Returns the name of the script
@@ -28,7 +35,7 @@ public:
     const char* getName() const;
 
     /**
-     * @brief Returns the instance of this script
+     * @brief Returns the current instance of this script
      */
     MonoObject* getInstance() const;
 
@@ -43,6 +50,11 @@ public:
      */
     const std::vector<ScriptUpdateEvent*>& getUpdateEvents() const;
 
+    /**
+     * @brief Returns a list of field in this script
+     */
+    const std::vector<FieldWrapper>& getFields() const;
+
 private:
     ScriptClass(MonoClass* klass);
     friend class ScriptManager;
@@ -52,9 +64,17 @@ private:
      */
     void locateMethods();
 
+    /**
+     * @brief Identifies fields of this class that can be set
+     */
+    void locateFields();
+
 private:
     MonoClass* m_klass = nullptr;
-    MonoObject* m_instance = nullptr;
+    MonoObject* m_currentInstance = nullptr;
+
+    // Fields
+    std::vector<FieldWrapper> m_fields;
 
     // Possible mappings
     std::vector<ScriptUpdateEvent*> m_updateEvents;

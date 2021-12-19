@@ -8,15 +8,19 @@ namespace scripting {
  */
 enum class FieldType {
     Null,
+
+    // Value
     Float,
     Boolean,
-    Object,
+    Integer,
+
+    // Asset
     Mesh,
     Material,
-    System,
     Audio,
+
+    // Scene objects
     AudioSource,
-    Prefab,
 };
 
 } // namespace scripting
