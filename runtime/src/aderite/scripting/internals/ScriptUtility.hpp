@@ -4,9 +4,9 @@ namespace aderite {
 namespace scripting {
 
 /**
- * @brief Links entity internal calls
+ * @brief Links Utility namespace internal calls
  */
-void entityInternals();
+void utilityInternals();
 
 } // namespace scripting
 } // namespace aderite

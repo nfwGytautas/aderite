@@ -1,5 +1,7 @@
 #include "Geometry.hpp"
 
+#include <PxRigidActor.h>
+
 #include "aderite/Aderite.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/events/ScriptGeometryEvent.hpp"
@@ -12,7 +14,7 @@ namespace physics {
 Geometry::Geometry() {}
 
 Geometry::~Geometry() {
-    ADERITE_DYNAMIC_ASSERT(p_shape->getActor() == nullptr, "Freed Geometry outside of BasePhysicsActor, because actor is still set");
+    p_shape->userData = nullptr;
     p_shape->release();
 }
 
@@ -42,6 +44,15 @@ void Geometry::setLeaveEvent(scripting::ScriptGeometryEvent* e) {
 
 scripting::ScriptGeometryEvent* Geometry::getLeaveEvent() {
     return m_leave;
+}
+
+BasePhysicsActor* Geometry::getActor() const {
+    physx::PxRigidActor* actor = p_shape->getActor();
+    if (actor != nullptr) {
+        return static_cast<BasePhysicsActor*>(actor->userData);
+    }
+
+    return nullptr;
 }
 
 bool Geometry::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

@@ -4,6 +4,7 @@
 
 #include "aderite/io/ISerializable.hpp"
 #include "aderite/scripting/Forward.hpp"
+#include "aderite/scripting/ScriptEventType.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -20,37 +21,45 @@ public:
     /**
      * @brief Invoke all update events
      * @param delta Delta to pass
-    */
+     */
     void callUpdateEvents(float delta);
+
+    /**
+     * @brief Invoked when the scene has been loaded
+     */
+    void callSceneLoaded();
 
 protected:
     // Inherited via ISerializable
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
-    // Input events
-public:
-    // Engine events
 public:
     /**
-     * @brief Adds an update event to be called on engine update
-     * @param e Event to call
+     * @brief Adds a script event
+     * @param e Event instance
      */
-    void add(scripting::ScriptUpdateEvent* e);
+    void add(scripting::ScriptEvent* e);
 
     /**
-     * @brief Returns the update events
-     */
-    const std::vector<scripting::ScriptUpdateEvent*>& getUpdateEvents() const;
-
-    /**
-     * @brief Remove script update event from mapping
+     * @brief Remove script event from mapping
      * @param e Event to remove
-    */
-    void remove(scripting::ScriptUpdateEvent* e);
+     */
+    void remove(scripting::ScriptEvent* e);
+
+    /**
+     * @brief Returns all events
+     */
+    const std::vector<scripting::ScriptEvent*>& getEvents() const;
+
+    /**
+     * @brief Returns all events of the specified type
+     * @param type Type of events to return
+     */
+    std::vector<scripting::ScriptEvent*> getEvents(ScriptEventType type) const;
 
 private:
-    std::vector<scripting::ScriptUpdateEvent*> m_updateEvents;
+    std::vector<scripting::ScriptEvent*> m_events;
 };
 
 } // namespace scripting

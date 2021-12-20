@@ -116,7 +116,7 @@ void AudioController::update() {
         auto& listeners = currentScene->getAudioListeners();
 
         // If no listeners no need to update anything
-        for (auto listener : listeners) {
+        for (const auto& listener : listeners) {
             if (listener->isEnabled()) {
                 if (enabledListenerCount > 1) {
                     LOG_WARN("[Audio] Multiple enabled listeners, the last one will be used as the listener");
@@ -130,7 +130,7 @@ void AudioController::update() {
         // If no active listeners, mute
         if (enabledListenerCount > 0) {
             // Configure sources
-            for (AudioSource* source : currentScene->getAudioSources()) {
+            for (const std::unique_ptr<AudioSource>& source : currentScene->getAudioSources()) {
                 source->update();
             }
         }
@@ -238,7 +238,7 @@ void AudioController::setMute(bool value) const {
         return;
     }
 
-    for (AudioSource* source : currentScene->getAudioSources()) {
+    for (const auto& source : currentScene->getAudioSources()) {
         if (value) {
             source->mute();
         } else {
@@ -255,7 +255,7 @@ void AudioController::disable(bool value) const {
         return;
     }
 
-    for (AudioSource* source : currentScene->getAudioSources()) {
+    for (const auto& source : currentScene->getAudioSources()) {
         if (value) {
             source->stop();
         } else {

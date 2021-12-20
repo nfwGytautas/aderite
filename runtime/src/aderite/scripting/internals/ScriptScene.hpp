@@ -4,9 +4,9 @@ namespace aderite {
 namespace scripting {
 
 /**
- * @brief Links system internal calls
+ * @brief Links Scene namespace internal calls
  */
-void systemInternals();
+void sceneInternals();
 
 } // namespace scripting
 } // namespace aderite

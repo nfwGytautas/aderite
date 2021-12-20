@@ -32,12 +32,6 @@ private:
         void contextMenu() override;
     };
 
-    class PhysicsRegionNode : public ISceneHierarchyNode {
-    public:
-        void render() override;
-        void contextMenu() override;
-    };
-
 public:
     SceneHierarchy();
     virtual ~SceneHierarchy();

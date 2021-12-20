@@ -7,6 +7,7 @@
 #include "aderite/scripting/ScriptEvent.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/events/ScriptGeometryEvent.hpp"
+#include "aderite/scripting/events/ScriptSceneLoadedEvent.hpp"
 #include "aderite/scripting/events/ScriptUpdateEvent.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
@@ -49,7 +50,7 @@ inline bool isUpdateEventSignature(MonoMethodSignature* signature) {
 }
 
 inline bool isGeometryEventSignature(MonoMethodSignature* signature) {
-    // Update method:
+    // Geometry method:
     //  return void
     //  1 parameter (Aderite.Geometry)
 
@@ -82,9 +83,30 @@ inline bool isGeometryEventSignature(MonoMethodSignature* signature) {
     return true;
 }
 
+bool isSceneLoadEventSignature(MonoMethodSignature* signature) {
+    // Update method:
+    //  return void
+    //  0 parameters
+
+    const uint32_t paramCount = mono_signature_get_param_count(signature);
+    MonoType* retType = mono_signature_get_return_type(signature);
+
+    if (mono_type_get_class(retType) != nullptr) {
+        // Non void return
+        return false;
+    }
+
+    if (paramCount > 0) {
+        // Has parameters
+        return false;
+    }
+
+    return true;
+}
+
 ScriptClass::~ScriptClass() {
-    for (ScriptUpdateEvent* sue : m_updateEvents) {
-        delete sue;
+    for (ScriptEvent* se : m_events) {
+        delete se;
     }
 }
 
@@ -107,27 +129,29 @@ MonoObject* ScriptClass::getInstance() const {
 }
 
 ScriptEvent* ScriptClass::getEvent(const std::string& eventName) const {
-    for (ScriptUpdateEvent* sue : m_updateEvents) {
-        if (sue->getName() == eventName) {
-            return sue;
-        }
-    }
-
-    for (ScriptGeometryEvent* sge : m_geometryEvents) {
-        if (sge->getName() == eventName) {
-            return sge;
+    for (ScriptEvent* se : m_events) {
+        if (se->getName() == eventName) {
+            return se;
         }
     }
 
     return nullptr;
 }
 
-const std::vector<ScriptUpdateEvent*>& ScriptClass::getUpdateEvents() const {
-    return m_updateEvents;
+const std::vector<ScriptEvent*>& ScriptClass::getEvents() const {
+    return m_events;
 }
 
-const std::vector<ScriptGeometryEvent*>& ScriptClass::getGeometryEvents() const {
-    return m_geometryEvents;
+std::vector<ScriptEvent*> ScriptClass::getEvents(ScriptEventType type) const {
+    std::vector<scripting::ScriptEvent*> events;
+
+    for (scripting::ScriptEvent* e : m_events) {
+        if (e->getEventType() == type) {
+            events.push_back(e);
+        }
+    }
+
+    return events;
 }
 
 const std::vector<FieldWrapper>& ScriptClass::getFields() const {
@@ -148,9 +172,11 @@ void ScriptClass::locateMethods() {
 
         // Analyze signature
         if (isUpdateEventSignature(signature)) {
-            m_updateEvents.push_back(new ScriptUpdateEvent(this, method));
+            m_events.push_back(new ScriptUpdateEvent(this, method));
         } else if (isGeometryEventSignature(signature)) {
-            m_geometryEvents.push_back(new ScriptGeometryEvent(this, method));
+            m_events.push_back(new ScriptGeometryEvent(this, method));
+        } else if (isSceneLoadEventSignature(signature)) {
+            m_events.push_back(new ScriptSceneLoadedEvent(this, method));
         }
     }
 }

@@ -38,7 +38,7 @@
 #define ADERITE_DEBUG_SECTION(code)            code
 #define ADERITE_STATIC_ASSERT(check, message)  static_assert(check, message)
 #define ADERITE_DYNAMIC_ASSERT(check, message) assert(((void)message, check))
-#define ADERITE_ABORT(message)                 assert(((void)message, true))
+#define ADERITE_ABORT(message)                 assert(((void)message, false))
 #else
 #define ADERITE_DEBUG_SECTION(code)
 #define ADERITE_STATIC_ASSERT(check, message)

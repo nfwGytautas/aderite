@@ -12,6 +12,10 @@ void ScriptGeometryEvent::call(physics::Geometry* geometry) {
     m_event(p_script->getInstance(), ::aderite::Engine::getScriptManager()->createInstance(geometry));
 }
 
+ScriptEventType ScriptGeometryEvent::getEventType() const {
+    return ScriptEventType::GEOMETRY;
+}
+
 ScriptGeometryEvent::ScriptGeometryEvent(ScriptClass* script, MonoMethod* method) : ScriptEvent(script, method) {
     m_event = ThunkedMethod<void, MonoObject*>(p_method);
 }

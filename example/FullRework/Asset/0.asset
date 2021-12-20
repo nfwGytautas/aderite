@@ -4,8 +4,13 @@ Data:
   PhysicsScene:
     {}
   ScriptEventMap:
-    Update:
-      - BoxSpawner.Update
+    Events:
+      - Type: 1
+        Name: BoxSpawner.Update
+      - Type: 3
+        Name: Despawner.Initialize
+      - Type: 3
+        Name: StateTracker.Initialize
   Visuals:
     - Type: 40
       Name: Backdrop
@@ -73,10 +78,6 @@ Data:
         Renderable:
           Mesh: 1
           Material: 9
-  StaticPhysicsRegions:
-    []
-  DynamicPhysicsRegions:
-    []
   AudioListeners:
     - Type: 21
       Name: wEO36bXmkhTU
@@ -104,3 +105,6 @@ Data:
     - Script: Despawner
       Fields:
         {}
+    - Script: StateTracker
+      Fields:
+        StartingLives: 3

@@ -7,6 +7,14 @@ Entity::Entity() {}
 
 Entity::~Entity() {}
 
+void Entity::markForDeletion() {
+    m_shouldFree = true;
+}
+
+bool Entity::isMarkedForDeletion() const {
+    return m_shouldFree;
+}
+
 bool Entity::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     // Physics
     if (!DynamicPhysicsActor::serialize(serializer, emitter)) {

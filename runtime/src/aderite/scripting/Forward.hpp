@@ -21,6 +21,7 @@ class ScriptData;
 
 class ScriptUpdateEvent;
 class ScriptGeometryEvent;
+class ScriptSceneLoadedEvent;
 
 } // namespace scripting
 } // namespace aderite

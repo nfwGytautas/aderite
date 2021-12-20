@@ -2,53 +2,36 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/scripting/events/ScriptSceneLoadedEvent.hpp"
 #include "aderite/scripting/events/ScriptUpdateEvent.hpp"
 #include "aderite/utility/Macros.hpp"
 
 namespace aderite {
 namespace scripting {
 
-#define SERIALIZE_EVENTS(rootName, objects)             \
-    emitter << YAML::Key << rootName << YAML::BeginSeq; \
-    for (const auto* e : m_updateEvents) {              \
-        emitter << e->getFullName();                    \
-    }                                                   \
-    emitter << YAML::EndSeq;
-
-// TODO: Check for failed parsing
-#define DESERIALIZE_EVENTS(rootName, type)                                                                          \
-    {                                                                                                               \
-        auto objects = mapNode[rootName];                                                                           \
-        if (objects) {                                                                                              \
-            for (auto object : objects) {                                                                           \
-                std::string fullName = object.as<std::string>();                                                    \
-                scripting::ScriptEvent* parsed = ::aderite::Engine::getScriptManager()->getEventFromName(fullName); \
-                if (parsed != nullptr) {                                                                            \
-                    this->add(static_cast<type>(parsed));                                                           \
-                }                                                                                                   \
-            }                                                                                                       \
-        }                                                                                                           \
+void ScriptEventMap::callUpdateEvents(float delta) {
+    for (ScriptEvent* se : this->getEvents(ScriptEventType::UPDATE)) {
+        static_cast<ScriptUpdateEvent*>(se)->call(delta);
     }
-
-template<typename T>
-void removeObject(std::vector<T*>& list, T* object) {
-    ADERITE_DYNAMIC_ASSERT(object != nullptr, "Tried to remove nullptr object");
-    auto it = std::find(list.begin(), list.end(), object);
-    ADERITE_DYNAMIC_ASSERT(it != list.end(), "Tried to remove event that doesn't exist in the mapping");
-    list.erase(it);
-    delete object;
 }
 
-void ScriptEventMap::callUpdateEvents(float delta) {
-    for (ScriptUpdateEvent* sue : m_updateEvents) {
-        sue->call(delta);
+void ScriptEventMap::callSceneLoaded() {
+    for (ScriptEvent* se : this->getEvents(ScriptEventType::SCENE_LOADED)) {
+        static_cast<ScriptSceneLoadedEvent*>(se)->call();
     }
 }
 
 bool ScriptEventMap::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "ScriptEventMap" << YAML::BeginMap;
 
-    SERIALIZE_EVENTS("Update", m_updateEvents);
+    emitter << YAML::Key << "Events" << YAML::BeginSeq;
+    for (const auto* e : m_events) {
+        emitter << YAML::BeginMap;
+        emitter << YAML::Key << "Type" << YAML::Value << static_cast<size_t>(e->getEventType());
+        emitter << YAML::Key << "Name" << YAML::Value << e->getFullName();
+        emitter << YAML::EndMap;
+    }
+    emitter << YAML::EndSeq;
 
     emitter << YAML::EndMap;
 
@@ -61,21 +44,48 @@ bool ScriptEventMap::deserialize(io::Serializer* serializer, const YAML::Node& d
         return false;
     }
 
-    DESERIALIZE_EVENTS("Update", scripting::ScriptUpdateEvent*);
+    auto events = mapNode["Events"];
+    if (events) {
+        for (const YAML::Node& e : events) {
+            const ScriptEventType type = static_cast<ScriptEventType>(e["Type"].as<size_t>());
+            const std::string& name = e["Name"].as<std::string>();
+
+            scripting::ScriptEvent* parsed = ::aderite::Engine::getScriptManager()->getEventFromName(name);
+            if (parsed != nullptr) {
+                this->add(parsed);
+            }
+        }
+    }
 
     return true;
 }
 
-void ScriptEventMap::add(scripting::ScriptUpdateEvent* e) {
-    m_updateEvents.push_back(e);
+void ScriptEventMap::add(scripting::ScriptEvent* e) {
+    m_events.push_back(e);
 }
 
-const std::vector<scripting::ScriptUpdateEvent*>& ScriptEventMap::getUpdateEvents() const {
-    return m_updateEvents;
+void ScriptEventMap::remove(scripting::ScriptEvent* e) {
+    ADERITE_DYNAMIC_ASSERT(e != nullptr, "Tried to remove nullptr event");
+    auto it = std::find(m_events.begin(), m_events.end(), e);
+    ADERITE_DYNAMIC_ASSERT(it != m_events.end(), "Tried to remove event that doesn't exist in the mapping");
+    m_events.erase(it);
+    delete e;
 }
 
-void ScriptEventMap::remove(scripting::ScriptUpdateEvent* e) {
-    removeObject(m_updateEvents, e);
+const std::vector<scripting::ScriptEvent*>& ScriptEventMap::getEvents() const {
+    return m_events;
+}
+
+std::vector<scripting::ScriptEvent*> ScriptEventMap::getEvents(ScriptEventType type) const {
+    std::vector<scripting::ScriptEvent*> events;
+
+    for (scripting::ScriptEvent* e : m_events) {
+        if (e->getEventType() == type) {
+            events.push_back(e);
+        }
+    }
+
+    return events;
 }
 
 } // namespace scripting

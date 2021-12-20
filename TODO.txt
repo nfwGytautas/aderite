@@ -54,6 +54,7 @@ Editor:
 		Add to root VFS files that don't have an actual file
 	Scripting:
 		Don't add the same event twice
+		Remove event mapping
 	Node editor:
 		Display name for pins and nodes
 	Must have:

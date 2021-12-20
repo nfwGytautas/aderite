@@ -4,9 +4,9 @@ namespace aderite {
 namespace scripting {
 
 /**
- * @brief Links input internal calls
+ * @brief Enum describing a script event
  */
-void inputInternals();
+enum class ScriptEventType { NONE, UPDATE, GEOMETRY, SCENE_LOADED };
 
 } // namespace scripting
 } // namespace aderite

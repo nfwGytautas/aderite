@@ -47,7 +47,7 @@ void SceneScriptMapping::render() {
     scripting::ScriptEventMap* eventMap = currentScene;
 
     if (ImGui::CollapsingHeader("Scripts", ImGuiTreeNodeFlags_None)) {
-        for (scripting::ScriptData* sd : currentScene->getScriptData()) {
+        for (const auto& sd : currentScene->getScriptData()) {
             if (ImGui::TreeNode(sd->getScriptName())) {
                 // Fields
                 if (ImGui::BeginTable((std::string(sd->getScriptName()) + "EditTable").c_str(), 2)) {
@@ -168,7 +168,7 @@ void SceneScriptMapping::render() {
 
     if (ImGui::CollapsingHeader("Update", ImGuiTreeNodeFlags_None)) {
         ImGui::PushItemWidth(-FLT_MIN);
-        for (scripting::ScriptUpdateEvent* sue : eventMap->getUpdateEvents()) {
+        for (scripting::ScriptEvent* sue : eventMap->getEvents(scripting::ScriptEventType::UPDATE)) {
             ImGui::Selectable(sue->getFullName().c_str());
         }
         ImGui::PopItemWidth();
@@ -176,18 +176,35 @@ void SceneScriptMapping::render() {
         float width = ImGui::GetContentRegionAvail().x * 0.4855f;
         ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
         if (ImGui::Button("Add", ImVec2(width, 0.0f))) {
-            WindowsEditor::getInstance()->getUI().pushModal(new SelectScriptModal(
-                SelectScriptModal::FilterType::UPDATE, std::bind(&SceneScriptMapping::addUpdateEvent, this, std::placeholders::_1)));
+            WindowsEditor::getInstance()->getUI().pushModal(
+                new SelectScriptModal(scripting::ScriptEventType::UPDATE, [](scripting::ScriptEvent* e) {
+                    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+                    scripting::ScriptEventMap* eventMap = currentScene;
+                    eventMap->add(e);
+                }));
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Scene loaded", ImGuiTreeNodeFlags_None)) {
+        ImGui::PushItemWidth(-FLT_MIN);
+        for (scripting::ScriptEvent* sue : eventMap->getEvents(scripting::ScriptEventType::SCENE_LOADED)) {
+            ImGui::Selectable(sue->getFullName().c_str());
+        }
+        ImGui::PopItemWidth();
+
+        float width = ImGui::GetContentRegionAvail().x * 0.4855f;
+        ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
+        if (ImGui::Button("Add", ImVec2(width, 0.0f))) {
+            WindowsEditor::getInstance()->getUI().pushModal(
+                new SelectScriptModal(scripting::ScriptEventType::SCENE_LOADED, [](scripting::ScriptEvent* e) {
+                    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+                    scripting::ScriptEventMap* eventMap = currentScene;
+                    eventMap->add(e);
+                }));
         }
     }
 
     ImGui::End();
-}
-
-void SceneScriptMapping::addUpdateEvent(scripting::ScriptEvent* e) {
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-    scripting::ScriptEventMap* eventMap = currentScene;
-    eventMap->add(static_cast<scripting::ScriptUpdateEvent*>(e));
 }
 
 } // namespace editor

@@ -5,10 +5,8 @@
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/scene/Camera.hpp"
-#include "aderite/scene/DynamicPhysicsRegion.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scenery.hpp"
-#include "aderite/scene/StaticPhysicsRegion.hpp"
 #include "aderite/scene/Visual.hpp"
 #include "aderite/scripting/ScriptClass.hpp"
 #include "aderite/scripting/ScriptData.hpp"
@@ -22,8 +20,8 @@ namespace scene {
 
 #define SERIALIZE_LIST(rootName, objects)               \
     emitter << YAML::Key << rootName << YAML::BeginSeq; \
-    for (const auto* object : objects) {                \
-        serializer->writeObject(emitter, object);       \
+    for (const auto& object : objects) {                \
+        serializer->writeObject(emitter, object.get()); \
     }                                                   \
     emitter << YAML::EndSeq;
 
@@ -40,11 +38,11 @@ namespace scene {
     }
 
 template<typename T>
-bool addObject(std::vector<T*>& list, T* object) {
+bool addObject(std::vector<std::unique_ptr<T>>& list, T* object) {
     ADERITE_DYNAMIC_ASSERT(object != nullptr, "Passed nullptr to addObject");
 
     // Check if a object with the same name exists
-    auto it = std::find_if(list.begin(), list.end(), [object](const T* obj) {
+    auto it = std::find_if(list.begin(), list.end(), [&object](const std::unique_ptr<T>& obj) {
         return obj->getName() == object->getName();
     });
 
@@ -53,64 +51,47 @@ bool addObject(std::vector<T*>& list, T* object) {
         return false;
     }
 
-    list.push_back(object);
+    list.push_back(std::unique_ptr<T>(object));
     return true;
 }
 
 template<typename T>
-void removeObject(std::vector<T*>& list, T* object) {
+void removeObject(std::vector<std::unique_ptr<T>>& list, T* object) {
     ADERITE_DYNAMIC_ASSERT(object != nullptr, "Tried to remove nullptr object");
-    auto it = std::find_if(list.begin(), list.end(), [object](const T* obj) {
+    auto it = std::find_if(list.begin(), list.end(), [object](const std::unique_ptr<T>& obj) {
         return object->getName() == obj->getName();
     });
     ADERITE_DYNAMIC_ASSERT(it != list.end(), "Tried to remove entity that doesn't exist in the scene");
     list.erase(it);
-    delete object;
 }
 
 Scene::~Scene() {
     LOG_TRACE("[Scene] Deleting scene {0}", this->getName());
 
     // Objects
-    for (Visual* visual : m_visuals) {
-        delete visual;
-    }
-    for (Scenery* scenery : m_scenery) {
-        delete scenery;
-    }
-    for (Entity* entity : m_entities) {
-        delete entity;
-    }
-
-    // Physics
-    for (StaticPhysicsRegion* region : m_staticPhysicsRegions) {
-        delete region;
-    }
-    for (DynamicPhysicsRegion* region : m_dynamicPhysicsRegions) {
-        delete region;
-    }
+    m_visuals.clear();
+    m_scenery.clear();
+    m_entities.clear();
 
     // Audio
-    for (audio::AudioSource* source : m_audioSources) {
-        delete source;
-    }
-    for (audio::AudioListener* listener : m_audioListeners) {
-        delete listener;
-    }
+    m_audioSources.clear();
+    m_audioListeners.clear();
 
     // Other
-    for (Camera* camera : m_cameras) {
-        delete camera;
-    }
-
-    for (scripting::ScriptData* sd : m_scriptData) {
-        delete sd;
-    }
+    m_cameras.clear();
+    m_scriptData.clear();
 
     LOG_INFO("[Scene] Scene {0} deleted", this->getName());
 }
 
-void Scene::update(float delta) {}
+void Scene::update(float delta) {
+    // Free marked entities
+    m_entities.erase(std::remove_if(m_entities.begin(), m_entities.end(),
+                                    [](const std::unique_ptr<Entity>& e) {
+                                        return e->isMarkedForDeletion();
+                                    }),
+                     m_entities.end());
+}
 
 void Scene::add(Visual* visual) {
     addObject(m_visuals, visual);
@@ -120,7 +101,7 @@ void Scene::remove(Visual* visual) {
     removeObject(m_visuals, visual);
 }
 
-const std::vector<Visual*> Scene::getVisuals() const {
+const std::vector<std::unique_ptr<Visual>>& Scene::getVisuals() const {
     return m_visuals;
 }
 
@@ -133,7 +114,7 @@ void Scene::remove(Scenery* scenery) {
     removeObject(m_scenery, scenery);
 }
 
-const std::vector<Scenery*> Scene::getScenery() const {
+const std::vector<std::unique_ptr<Scenery>>& Scene::getScenery() const {
     return m_scenery;
 }
 
@@ -146,34 +127,8 @@ void Scene::remove(Entity* entity) {
     removeObject(m_entities, entity);
 }
 
-const std::vector<Entity*> Scene::getEntities() const {
+const std::vector<std::unique_ptr<Entity>>& Scene::getEntities() const {
     return m_entities;
-}
-
-void Scene::add(StaticPhysicsRegion* region) {
-    addObject(m_staticPhysicsRegions, region);
-    this->addActor(region);
-}
-
-void Scene::remove(StaticPhysicsRegion* region) {
-    removeObject(m_staticPhysicsRegions, region);
-}
-
-const std::vector<StaticPhysicsRegion*> Scene::getStaticPhysicsRegions() const {
-    return m_staticPhysicsRegions;
-}
-
-void Scene::add(DynamicPhysicsRegion* region) {
-    addObject(m_dynamicPhysicsRegions, region);
-    this->addActor(region);
-}
-
-void Scene::remove(DynamicPhysicsRegion* region) {
-    removeObject(m_dynamicPhysicsRegions, region);
-}
-
-const std::vector<DynamicPhysicsRegion*> Scene::getDynamicPhysicsRegions() const {
-    return m_dynamicPhysicsRegions;
 }
 
 void Scene::add(audio::AudioListener* listener) {
@@ -184,7 +139,7 @@ void Scene::remove(audio::AudioListener* listener) {
     removeObject(m_audioListeners, listener);
 }
 
-const std::vector<audio::AudioListener*>& Scene::getAudioListeners() const {
+const std::vector<std::unique_ptr<audio::AudioListener>>& Scene::getAudioListeners() const {
     return m_audioListeners;
 }
 
@@ -196,7 +151,7 @@ void Scene::remove(audio::AudioSource* source) {
     removeObject(m_audioSources, source);
 }
 
-const std::vector<audio::AudioSource*>& Scene::getAudioSources() const {
+const std::vector<std::unique_ptr<audio::AudioSource>>& Scene::getAudioSources() const {
     return m_audioSources;
 }
 
@@ -208,7 +163,7 @@ void Scene::remove(Camera* camera) {
     removeObject(m_cameras, camera);
 }
 
-const std::vector<Camera*>& Scene::getCameras() const {
+const std::vector<std::unique_ptr<Camera>>& Scene::getCameras() const {
     return m_cameras;
 }
 
@@ -217,7 +172,7 @@ void Scene::updateScriptDataEntries() {
 
     // Remove unused ones
     for (auto it = m_scriptData.begin(); it != m_scriptData.end();) {
-        auto itScripts = std::find_if(scripts.begin(), scripts.end(), [&](scripting::ScriptClass* sc) {
+        auto itScripts = std::find_if(scripts.begin(), scripts.end(), [&](const scripting::ScriptClass* sc) {
             return (*it)->getScriptName() == sc->getName();
         });
 
@@ -230,24 +185,24 @@ void Scene::updateScriptDataEntries() {
 
     // Add new ones
     for (scripting::ScriptClass* script : scripts) {
-        auto it = std::find_if(m_scriptData.begin(), m_scriptData.end(), [&](scripting::ScriptData* sd) {
+        auto it = std::find_if(m_scriptData.begin(), m_scriptData.end(), [&](const std::unique_ptr<scripting::ScriptData>& sd) {
             return sd->getScriptName() == script->getName();
         });
 
         if (it == m_scriptData.end()) {
             scripting::ScriptData* sd = new scripting::ScriptData(this);
             sd->setScriptName(script->getName());
-            m_scriptData.push_back(sd);
+            m_scriptData.push_back(std::unique_ptr<scripting::ScriptData>(sd));
         }
     }
 }
 
-const std::vector<scripting::ScriptData*> Scene::getScriptData() const {
+const std::vector<std::unique_ptr<scripting::ScriptData>>& Scene::getScriptData() const {
     return m_scriptData;
 }
 
 audio::AudioSource* Scene::getSource(const std::string& name) const {
-    auto it = std::find_if(m_audioSources.begin(), m_audioSources.end(), [name](const audio::AudioSource* source) {
+    auto it = std::find_if(m_audioSources.begin(), m_audioSources.end(), [name](const std::unique_ptr<audio::AudioSource>& source) {
         return source->getName() == name;
     });
 
@@ -256,7 +211,7 @@ audio::AudioSource* Scene::getSource(const std::string& name) const {
         return nullptr;
     }
 
-    return *it;
+    return it->get();
 }
 
 reflection::Type Scene::getType() const {
@@ -277,10 +232,6 @@ bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
     SERIALIZE_LIST("Scenery", m_scenery);
     SERIALIZE_LIST("Entities", m_entities);
 
-    // Physics
-    SERIALIZE_LIST("StaticPhysicsRegions", m_staticPhysicsRegions);
-    SERIALIZE_LIST("DynamicPhysicsRegions", m_dynamicPhysicsRegions);
-
     // Audio
     SERIALIZE_LIST("AudioListeners", m_audioListeners);
     SERIALIZE_LIST("AudioSources", m_audioSources);
@@ -290,7 +241,7 @@ bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
 
     // Script data
     emitter << YAML::Key << "Scripts" << YAML::BeginSeq;
-    for (const scripting::ScriptData* sd : m_scriptData) {
+    for (const std::unique_ptr<scripting::ScriptData>& sd : m_scriptData) {
         sd->serialize(serializer, emitter);
     }
     emitter << YAML::EndSeq;
@@ -310,10 +261,6 @@ bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     DESERIALIZE_LIST("Scenery", Scenery);
     DESERIALIZE_LIST("Entities", Entity);
 
-    // Physics
-    DESERIALIZE_LIST("StaticPhysicsRegions", StaticPhysicsRegion);
-    DESERIALIZE_LIST("DynamicPhysicsRegions", DynamicPhysicsRegion);
-
     // Audio
     DESERIALIZE_LIST("AudioListeners", audio::AudioListener);
     DESERIALIZE_LIST("AudioSources", audio::AudioSource);
@@ -327,7 +274,7 @@ bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
         for (const YAML::Node& node : scripts) {
             scripting::ScriptData* sd = new scripting::ScriptData(this);
             sd->deserialize(serializer, node);
-            m_scriptData.push_back(sd);
+            m_scriptData.push_back(std::unique_ptr<scripting::ScriptData>(sd));
         }
     }
 }

@@ -43,16 +43,6 @@ public:
         MonoMethod* Ctor = nullptr;
     };
 
-    struct TriggerEvent {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
-    struct CollisionEvent {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
     struct RaycastHit {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
@@ -118,32 +108,11 @@ public:
     MonoObject* create(audio::AudioSource* source) const;
 
     ///**
-    // * @brief Creates a C# trigger event object from C++
-    // * @param triggerEvent TriggerEvent object
-    // * @return MonoObject instance
-    // */
-    // MonoObject* create(const physics::TriggerEvent& triggerEvent) const;
-
-    ///**
-    // * @brief Creates a C# collision event object from C++
-    // * @param collisionEvent CollisionEvent object
-    // * @return MonoObject instance
-    // */
-    // MonoObject* create(const physics::CollisionEvent& collisionEvent) const;
-
-    ///**
     // * @brief Creates a C# raycast hit object from C++
     // * @param hit RaycastHit object
     // * @return MonoObject instance
     // */
     // MonoObject* create(const physics::RaycastHit& hit) const;
-
-    ///**
-    // * @brief Creates a C# prefab object from C++
-    // * @param prefab Prefab object
-    // * @return MonoObject instance
-    // */
-    // MonoObject* create(asset::PrefabAsset* prefab) const;
 
     /**
      * @brief Creates a C# geometry object from C++
@@ -151,6 +120,13 @@ public:
      * @return MonoObject instance
      */
     MonoObject* create(physics::Geometry* geometry) const;
+
+    /**
+     * @brief Creates a C# entity object from C++
+     * @param entity Entity object
+     * @return MonoObject instance
+     */
+    MonoObject* create(scene::Entity* entity) const;
 
     // ====================================================================================
     // Class getters
@@ -180,16 +156,6 @@ public:
      * @brief Returns the audio source mono information struct
      */
     const AudioSource& getAudioSource() const;
-
-    /**
-     * @brief Returns the trigger evnt mono information struct
-     */
-    const TriggerEvent& getTriggerEvent() const;
-
-    /**
-     * @brief Returns the collision event mono information struct
-     */
-    const CollisionEvent& getCollisionEvent() const;
 
     /**
      * @brief Returns the raycast hit mono information struct
@@ -223,8 +189,6 @@ private:
     Material m_material;
     Audio m_audio;
     AudioSource m_audioSource;
-    TriggerEvent m_triggerEvent;
-    CollisionEvent m_collisionEvent;
     RaycastHit m_raycastHit;
     Geometry m_geometry;
 };

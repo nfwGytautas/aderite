@@ -31,10 +31,6 @@ enum class RuntimeTypes : Type {
     SCENERY = 41,
     ENTITY = 42,
 
-    // Physics
-    STATIC_PHYSICS_REGION = 50,
-    DYNAMIC_PHYSICS_REGION = 51,
-
     // Other scene objects
     CAMERA = 60,
 

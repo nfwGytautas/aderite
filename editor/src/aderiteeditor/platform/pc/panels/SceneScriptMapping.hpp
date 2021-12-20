@@ -19,13 +19,6 @@ public:
     bool init() override;
     void shutdown() override;
     void render() override;
-
-private:
-    /**
-     * @brief Add update event to scene
-     * @param e Event to add
-     */
-    void addUpdateEvent(scripting::ScriptEvent* e);
 };
 
 } // namespace editor

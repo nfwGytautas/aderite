@@ -5,6 +5,7 @@
 #include <string>
 
 #include "aderite/scripting/Forward.hpp"
+#include "aderite/scripting/ScriptEventType.hpp"
 
 #include "aderiteeditor/platform/pc/modals/IModal.hpp"
 
@@ -18,13 +19,8 @@ class SelectScriptModal : public IModal {
 public:
     using SelectFn = std::function<void(scripting::ScriptEvent*)>;
 
-    /**
-     * @brief Filtering options for modal
-     */
-    enum class FilterType { UPDATE, GEOMETRY, NONE };
-
 public:
-    SelectScriptModal(FilterType filter, SelectFn fn);
+    SelectScriptModal(scripting::ScriptEventType filter, SelectFn fn);
 
     // Inherited via IModal
     void render() override;
@@ -34,7 +30,7 @@ public:
 
 private:
     bool m_open = true;
-    FilterType m_filtering = FilterType::NONE;
+    scripting::ScriptEventType m_filtering = scripting::ScriptEventType::NONE;
     SelectFn m_callback;
 
     scripting::ScriptClass* m_class = nullptr;

@@ -16,7 +16,7 @@
 namespace aderite {
 namespace editor {
 
-SelectScriptModal::SelectScriptModal(FilterType filter, SelectFn fn) : m_filtering(filter), m_callback(fn) {}
+SelectScriptModal::SelectScriptModal(scripting::ScriptEventType filter, SelectFn fn) : m_filtering(filter), m_callback(fn) {}
 
 void SelectScriptModal::render() {
     if (!m_callback) {
@@ -61,18 +61,18 @@ void SelectScriptModal::render() {
             // Select method
             if (ImGui::BeginListBox("##ScriptSelectMethod", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
                 switch (m_filtering) {
-                case FilterType::UPDATE: {
-                    for (scripting::ScriptUpdateEvent* sue : m_class->getUpdateEvents()) {
-                        if (ImGui::Selectable(sue->getName())) {
-                            m_event = sue;
+                case scripting::ScriptEventType::NONE: {
+                    for (scripting::ScriptEvent* se : m_class->getEvents()) {
+                        if (ImGui::Selectable(se->getName())) {
+                            m_event = se;
                         }
                     }
                     break;
                 }
-                case FilterType::GEOMETRY: {
-                    for (scripting::ScriptGeometryEvent* sge : m_class->getGeometryEvents()) {
-                        if (ImGui::Selectable(sge->getName())) {
-                            m_event = sge;
+                default: {
+                    for (scripting::ScriptEvent* se : m_class->getEvents(m_filtering)) {
+                        if (ImGui::Selectable(se->getName())) {
+                            m_event = se;
                         }
                     }
                     break;

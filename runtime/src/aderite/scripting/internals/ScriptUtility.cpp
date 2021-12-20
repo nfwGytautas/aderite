@@ -1,4 +1,4 @@
-#include "ScriptDebug.hpp"
+#include "ScriptUtility.hpp"
 
 #include <mono/jit/jit.h>
 
@@ -23,7 +23,7 @@ void Error(MonoObject* message) {
     LOG_ERROR("[Game code] {0}", msg);
 }
 
-void logInternals() {
+void utilityInternals() {
     mono_add_internal_call("Aderite.Log::__Trace(string)", reinterpret_cast<void*>(Trace));
     mono_add_internal_call("Aderite.Log::__Warn(string)", reinterpret_cast<void*>(Warn));
     mono_add_internal_call("Aderite.Log::__Error(string)", reinterpret_cast<void*>(Error));

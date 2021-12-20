@@ -211,27 +211,27 @@ void Renderer::render() {
     static std::unordered_map<size_t, DrawCall> drawCalls;
     drawCalls.clear();
 
-    for (scene::Visual* visual : currentScene->getVisuals()) {
+    for (const auto& visual : currentScene->getVisuals()) {
         if (visual->isValid()) {
             DrawCall& dc = drawCalls[visual->hash()];
-            dc.Renderable = visual;
-            dc.Transformations.push_back(calculateTransformationMatrix(visual));
+            dc.Renderable = visual.get();
+            dc.Transformations.push_back(calculateTransformationMatrix(visual.get()));
         }
     }
 
-    for (scene::Scenery* scenery : currentScene->getScenery()) {
+    for (const auto& scenery : currentScene->getScenery()) {
         if (scenery->isValid()) {
             DrawCall& dc = drawCalls[scenery->hash()];
-            dc.Renderable = scenery;
-            dc.Transformations.push_back(calculateTransformationMatrix(scenery));
+            dc.Renderable = scenery.get();
+            dc.Transformations.push_back(calculateTransformationMatrix(scenery.get()));
         }
     }
 
-    for (scene::Entity* entity : currentScene->getEntities()) {
+    for (const auto& entity : currentScene->getEntities()) {
         if (entity->isValid()) {
             DrawCall& dc = drawCalls[entity->hash()];
-            dc.Renderable = entity;
-            dc.Transformations.push_back(calculateTransformationMatrix(entity));
+            dc.Renderable = entity.get();
+            dc.Transformations.push_back(calculateTransformationMatrix(entity.get()));
         }
     }
 
@@ -253,7 +253,6 @@ void Renderer::render() {
 
         // 4. Submit draw calls
         for (auto& kvp : drawCalls) {
-
             // Extract assets
             const Renderable* renderable = kvp.second.Renderable;
             const asset::MaterialAsset* material = renderable->getMaterial();
@@ -297,9 +296,9 @@ void Renderer::render() {
 
             bgfx::setState(state);
 
-            //uint8_t flags = BGFX_DISCARD_ALL &
+            // uint8_t flags = BGFX_DISCARD_ALL &
             //                ~(BGFX_DISCARD_BINDINGS | BGFX_DISCARD_INDEX_BUFFER | BGFX_DISCARD_VERTEX_STREAMS | BGFX_DISCARD_STATE);
-            // 
+            //
             // Submit draw call
             bgfx::submit(viewIdx, mType->getShaderHandle(), 0, BGFX_DISCARD_ALL);
         }
@@ -310,8 +309,8 @@ void Renderer::render() {
         viewIdx += 2;
     };
 
-    for (scene::Camera* camera : currentScene->getCameras()) {
-        perCamera(camera);
+    for (const auto& camera : currentScene->getCameras()) {
+        perCamera(camera.get());
     }
 
     if (m_editorCamera != nullptr) {
@@ -362,7 +361,7 @@ void Renderer::prepareTargets() {
 void Renderer::setupView(uint8_t idx, const std::string& name) {
     ADERITE_DYNAMIC_ASSERT((((uint16_t)idx) + 1) <= 255, "To many cameras view index >255");
 
-    //static const uint32_t ColorClearColor = 0x252525FF;
+    // static const uint32_t ColorClearColor = 0x252525FF;
     static const uint32_t ColorClearColor = 0x9ACBFFFF;
     static const float DepthClearValue = 1.0f;
     static const uint8_t StencilClearValue = 0;

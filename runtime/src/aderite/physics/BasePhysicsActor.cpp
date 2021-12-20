@@ -23,6 +23,7 @@ BasePhysicsActor::~BasePhysicsActor() {
     if (scene != nullptr) {
         scene->removeActor(*p_actor);
     }
+    p_actor->userData = nullptr;
 }
 
 void BasePhysicsActor::addGeometry(Geometry* geometry) {

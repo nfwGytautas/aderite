@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "aderite/audio/Forward.hpp"
@@ -45,7 +46,7 @@ public:
     /**
      * @brief Returns the visuals of this scene
      */
-    const std::vector<Visual*> getVisuals() const;
+    const std::vector<std::unique_ptr<Visual>>& getVisuals() const;
 
     /**
      * @brief Add a scenery to the scene (takes ownership)
@@ -62,7 +63,7 @@ public:
     /**
      * @brief Returns the scenery of this scene
      */
-    const std::vector<Scenery*> getScenery() const;
+    const std::vector<std::unique_ptr<Scenery>>& getScenery() const;
 
     /**
      * @brief Add a entity to the scene (takes ownership)
@@ -79,41 +80,7 @@ public:
     /**
      * @brief Returns the entities of this scene
      */
-    const std::vector<Entity*> getEntities() const;
-
-    /**
-     * @brief Add a static physics region to the scene (takes ownership)
-     * @param region StaticPhysicsRegion to add
-     */
-    void add(StaticPhysicsRegion* region);
-
-    /**
-     * @brief Remove static physics region from the scene
-     * @param region StaticPhysicsRegion to remove
-     */
-    void remove(StaticPhysicsRegion* region);
-
-    /**
-     * @brief Returns the static physics regions of this scene
-     */
-    const std::vector<StaticPhysicsRegion*> getStaticPhysicsRegions() const;
-
-    /**
-     * @brief Add a physics region to the scene (takes ownership)
-     * @param region DynamicPhysicsRegion to add
-     */
-    void add(DynamicPhysicsRegion* region);
-
-    /**
-     * @brief Remove physics region from the scene
-     * @param region DynamicPhysicsRegion to remove
-     */
-    void remove(DynamicPhysicsRegion* region);
-
-    /**
-     * @brief Returns the dynamic physics regions of this scene
-     */
-    const std::vector<DynamicPhysicsRegion*> getDynamicPhysicsRegions() const;
+    const std::vector<std::unique_ptr<Entity>>& getEntities() const;
 
     /**
      * @brief Add a audio listener to the scene (takes ownership)
@@ -130,7 +97,7 @@ public:
     /**
      * @brief Returns audio listeners of this scene
      */
-    const std::vector<audio::AudioListener*>& getAudioListeners() const;
+    const std::vector<std::unique_ptr<audio::AudioListener>>& getAudioListeners() const;
 
     /**
      * @brief Add a audio source to the scene (takes ownership)
@@ -147,7 +114,7 @@ public:
     /**
      * @brief Returns audio sources of this scene
      */
-    const std::vector<audio::AudioSource*>& getAudioSources() const;
+    const std::vector<std::unique_ptr<audio::AudioSource>>& getAudioSources() const;
 
     /**
      * @brief Add a camera to the scene (takes ownership)
@@ -164,7 +131,7 @@ public:
     /**
      * @brief Returns cameras of this scene
      */
-    const std::vector<Camera*>& getCameras() const;
+    const std::vector<std::unique_ptr<Camera>>& getCameras() const;
 
     /**
      * @brief Adds/removes new or deleted scripts from this scene
@@ -174,7 +141,7 @@ public:
     /**
      * @brief Returns script data of this scene
      */
-    const std::vector<scripting::ScriptData*> getScriptData() const;
+    const std::vector<std::unique_ptr<scripting::ScriptData>>& getScriptData() const;
 
     /**
      * @brief Returns the audio source with the specified name
@@ -194,21 +161,17 @@ private:
 
 private:
     // Objects
-    std::vector<Visual*> m_visuals;
-    std::vector<Scenery*> m_scenery;
-    std::vector<Entity*> m_entities;
-
-    // Physics
-    std::vector<StaticPhysicsRegion*> m_staticPhysicsRegions;
-    std::vector<DynamicPhysicsRegion*> m_dynamicPhysicsRegions;
+    std::vector<std::unique_ptr<Visual>> m_visuals;
+    std::vector<std::unique_ptr<Scenery>> m_scenery;
+    std::vector<std::unique_ptr<Entity>> m_entities;
 
     // Audio
-    std::vector<audio::AudioSource*> m_audioSources;
-    std::vector<audio::AudioListener*> m_audioListeners;
+    std::vector<std::unique_ptr<audio::AudioSource>> m_audioSources;
+    std::vector<std::unique_ptr<audio::AudioListener>> m_audioListeners;
 
     // Other
-    std::vector<Camera*> m_cameras;
-    std::vector<scripting::ScriptData*> m_scriptData;
+    std::vector<std::unique_ptr<Camera>> m_cameras;
+    std::vector<std::unique_ptr<scripting::ScriptData>> m_scriptData;
 };
 
 } // namespace scene

@@ -226,6 +226,8 @@ void WindowsEditor::onStartGame() {
     Engine::getAudioController()->disable(false);
     editor::State::IsGameMode = true;
 
+    Engine::getScriptManager()->onSceneChanged(Engine::getSceneManager()->getCurrentScene());
+
     // TODO: Enable all cameras in scene
 }
 

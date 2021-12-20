@@ -4,9 +4,9 @@ namespace aderite {
 namespace scripting {
 
 /**
- * @brief Links logging internal calls
+ * @brief Links Core namespace internal calls
  */
-void logInternals();
+void coreInternals();
 
 } // namespace scripting
 } // namespace aderite

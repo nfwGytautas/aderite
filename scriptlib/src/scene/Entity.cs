@@ -8,13 +8,21 @@ namespace Aderite
     /// </summary>
     public class Entity
     {
-        public string Name { get { return __GetEntityName(Instance); } }
+        public string Name { get { return __GetName(Instance); } }
 
         IntPtr Instance = IntPtr.Zero;
 
         internal Entity(IntPtr instance)
         {
             Instance = instance;
+        }
+
+        /// <summary>
+        /// Destroy this instance of an entity, using this object after calling Destroy is undefined behavior
+        /// </summary>
+        public void Destroy()
+        {
+            __Destroy(Instance);
         }
 
         /// <summary>
@@ -27,6 +35,9 @@ namespace Aderite
         }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static string __GetEntityName(IntPtr instance);
+        private extern static string __GetName(IntPtr instance);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern static string __Destroy(IntPtr instance);
     }
 }

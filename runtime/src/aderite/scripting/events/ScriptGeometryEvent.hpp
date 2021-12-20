@@ -18,6 +18,9 @@ public:
      */
     void call(physics::Geometry* geometry);
 
+    // Inherited from ScriptEvent
+    ScriptEventType getEventType() const override;
+
 private:
     ScriptGeometryEvent(ScriptClass* script, MonoMethod* method);
     friend class ScriptClass;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Aderite
 {
@@ -15,6 +16,15 @@ namespace Aderite
         }
 
         /// <summary>
+        /// Returns the entity attached to this geometry
+        /// </summary>
+        /// <returns>Entity instance</returns>
+        public Entity GetEntity()
+        {
+            return __GetEntity(Instance);
+        }
+
+        /// <summary>
         /// Returns the C++ instance of the geometry
         /// </summary>
         /// <returns>IntPtr where the C++ object is located at</returns>
@@ -22,5 +32,8 @@ namespace Aderite
         {
             return Instance;
         }
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern static Entity __GetEntity(IntPtr instance);
     }
 }

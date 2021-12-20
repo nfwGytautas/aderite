@@ -7,25 +7,24 @@ namespace aderite {
 namespace scripting {
 
 /**
- * @brief Script update event implementation
+ * @brief Script scene loaded event implementation
  */
-class ScriptUpdateEvent : public ScriptEvent {
+class ScriptSceneLoadedEvent : public ScriptEvent {
 public:
     /**
-     * @brief Invoke the event with the specified delta parameter
-     * @param delta Delta of the frame
+     * @brief Invoke the event
      */
-    void call(float delta);
+    void call();
 
     // Inherited from ScriptEvent
     ScriptEventType getEventType() const override;
 
 private:
-    ScriptUpdateEvent(ScriptClass* script, MonoMethod* method);
+    ScriptSceneLoadedEvent(ScriptClass* script, MonoMethod* method);
     friend class ScriptClass;
 
 private:
-    ThunkedMethod<void, float> m_update;
+    ThunkedMethod<void> m_loaded;
 };
 
 } // namespace scripting

@@ -141,9 +141,13 @@ void ScriptManager::onSceneChanged(scene::Scene* scene) const {
     // Update entries
     scene->updateScriptDataEntries();
 
-    for (ScriptData* sd : scene->getScriptData()) {
+    // Load script data
+    for (const auto& sd : scene->getScriptData()) {
         sd->load();
     }
+
+    // Initialize scripts
+    scene->callSceneLoaded();
 }
 
 MonoDomain* ScriptManager::getDomain() const {

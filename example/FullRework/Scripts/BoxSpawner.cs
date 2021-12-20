@@ -8,7 +8,12 @@ namespace Scripts
 
         void Update(float delta)
         {
-            Log.Trace("Will spawn " + MaxLive.ToString());
+
+        }
+
+        public void EntityDestroyed()
+        {
+            Log.Trace("Box destroyed creating a new one");
         }
     }
 }

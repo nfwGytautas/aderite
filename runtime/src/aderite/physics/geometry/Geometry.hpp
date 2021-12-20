@@ -5,8 +5,9 @@
 #include <glm/glm.hpp>
 #include <physx/PxShape.h>
 
-#include "aderite/scripting/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
+#include "aderite/physics/Forward.hpp"
+#include "aderite/scripting/Forward.hpp"
 
 namespace aderite {
 namespace physics {
@@ -34,12 +35,12 @@ public:
     /**
      * @brief Set the C# event to be called when another geometry entered it
      * @param e Event instance
-    */
+     */
     void setEnterEvent(scripting::ScriptGeometryEvent* e);
 
     /**
      * @brief Get the C# event instance, nullptr if not set
-    */
+     */
     scripting::ScriptGeometryEvent* getEnterEvent();
 
     /**
@@ -52,6 +53,11 @@ public:
      * @brief Get the C# event instance, nullptr if not set
      */
     scripting::ScriptGeometryEvent* getLeaveEvent();
+
+    /**
+     * @brief Returns the actor of the geometry
+     */
+    BasePhysicsActor* getActor() const;
 
     /**
      * @brief Apply scale to geometry

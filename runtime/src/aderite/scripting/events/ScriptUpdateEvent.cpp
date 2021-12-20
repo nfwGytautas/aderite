@@ -9,6 +9,10 @@ void ScriptUpdateEvent::call(float delta) {
     m_update(p_script->getInstance(), delta);
 }
 
+ScriptEventType ScriptUpdateEvent::getEventType() const {
+    return ScriptEventType::UPDATE;
+}
+
 ScriptUpdateEvent::ScriptUpdateEvent(ScriptClass* script, MonoMethod* method) : ScriptEvent(script, method) {
     m_update = ThunkedMethod<void, float>(p_method);
 }

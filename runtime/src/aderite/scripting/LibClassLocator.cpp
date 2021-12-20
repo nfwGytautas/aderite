@@ -6,6 +6,7 @@
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/geometry/Geometry.hpp"
+#include "aderite/scene/Entity.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -47,8 +48,6 @@ bool LibClassLocator::locate(MonoImage* image) {
     findClass(image, "Aderite", "Material", m_material.Klass, result);
     findClass(image, "Aderite", "Audio", m_audio.Klass, result);
     findClass(image, "Aderite", "AudioSource", m_audioSource.Klass, result);
-    findClass(image, "Aderite", "TriggerEvent", m_triggerEvent.Klass, result);
-    findClass(image, "Aderite", "CollisionEvent", m_collisionEvent.Klass, result);
     findClass(image, "Aderite", "RaycastHit", m_raycastHit.Klass, result);
     findClass(image, "Aderite", "Geometry", m_geometry.Klass, result);
 
@@ -66,8 +65,6 @@ bool LibClassLocator::locate(MonoImage* image) {
     findMethod(m_material.Klass, ".ctor", 1, m_material.Ctor, result);
     findMethod(m_audio.Klass, ".ctor", 1, m_audio.Ctor, result);
     findMethod(m_audioSource.Klass, ".ctor", 1, m_audioSource.Ctor, result);
-    findMethod(m_triggerEvent.Klass, ".ctor", 2, m_triggerEvent.Ctor, result);
-    findMethod(m_collisionEvent.Klass, ".ctor", 2, m_collisionEvent.Ctor, result);
     findMethod(m_raycastHit.Klass, ".ctor", 2, m_raycastHit.Ctor, result);
     findMethod(m_geometry.Klass, ".ctor", 1, m_geometry.Ctor, result);
 
@@ -116,8 +113,11 @@ MonoObject* LibClassLocator::create(io::SerializableObject* serializable) const 
     case reflection::RuntimeTypes::BOX_GEOMETRY: {
         return this->create(static_cast<physics::Geometry*>(serializable));
     }
+    case reflection::RuntimeTypes::ENTITY: {
+        return this->create(static_cast<scene::Entity*>(serializable));
+    }
     default: {
-        LOG_ERROR("[Scripting] Unknown implementation for creating a {0} serializable", serializable->getType());
+        ADERITE_ABORT("Unknown serializable type");
         return nullptr;
     }
     }
@@ -143,16 +143,6 @@ MonoObject* LibClassLocator::create(audio::AudioSource* source) const {
     return this->genericInstanceCreate(m_audioSource.Klass, m_audioSource.Ctor, args);
 }
 
-// MonoObject* LibClassLocator::create(const physics::TriggerEvent& triggerEvent) const {
-//    void* args[2] = {create(triggerEvent.Actor->getEntity()), create(triggerEvent.Trigger->getEntity())};
-//    return this->genericInstanceCreate(m_triggerEvent.Klass, m_triggerEvent.Ctor, args);
-//}
-//
-// MonoObject* LibClassLocator::create(const physics::CollisionEvent& collisionEvent) const {
-//    void* args[2] = {create(collisionEvent.Actor1->getEntity()), create(collisionEvent.Actor2->getEntity())};
-//    return this->genericInstanceCreate(m_collisionEvent.Klass, m_collisionEvent.Ctor, args);
-//}
-//
 // MonoObject* LibClassLocator::create(const physics::RaycastHit& hit) const {
 //    void* args[2] = {create(hit.Actor->getEntity()), (void*)(&hit.Distance)};
 //    return this->genericInstanceCreate(m_raycastHit.Klass, m_raycastHit.Ctor, args);
@@ -160,6 +150,11 @@ MonoObject* LibClassLocator::create(audio::AudioSource* source) const {
 
 MonoObject* LibClassLocator::create(physics::Geometry* geometry) const {
     void* args[1] = {&geometry};
+    return this->genericInstanceCreate(m_geometry.Klass, m_geometry.Ctor, args);
+}
+
+MonoObject* LibClassLocator::create(scene::Entity* entity) const {
+    void* args[1] = {&entity};
     return this->genericInstanceCreate(m_geometry.Klass, m_geometry.Ctor, args);
 }
 
@@ -181,14 +176,6 @@ const LibClassLocator::Audio& LibClassLocator::getAudio() const {
 
 const LibClassLocator::AudioSource& LibClassLocator::getAudioSource() const {
     return m_audioSource;
-}
-
-const LibClassLocator::TriggerEvent& LibClassLocator::getTriggerEvent() const {
-    return m_triggerEvent;
-}
-
-const LibClassLocator::CollisionEvent& LibClassLocator::getCollisionEvent() const {
-    return m_collisionEvent;
 }
 
 const LibClassLocator::RaycastHit& LibClassLocator::getRaycastHit() const {

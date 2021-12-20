@@ -8,12 +8,10 @@
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
-#include "aderite/scene/DynamicPhysicsRegion.hpp"
 #include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/Scenery.hpp"
-#include "aderite/scene/StaticPhysicsRegion.hpp"
 #include "aderite/scene/Visual.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
@@ -31,12 +29,12 @@ static ImGuiTreeNodeFlags c_BaseFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTr
                                         ImGuiTreeNodeFlags_SpanAvailWidth;
 
 template<typename T, typename DelFn>
-void genericNodeList(const std::vector<T*>& list, DelFn onDelete) {
-    for (T* item : list) {
+void genericNodeList(const std::vector<std::unique_ptr<T>>& list, DelFn onDelete) {
+    for (const auto& item : list) {
         ImGuiTreeNodeFlags leafFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
         io::SerializableObject* selectedObject = editor::State::getInstance().getSelectedObject();
-        if (selectedObject == item) {
+        if (selectedObject == item.get()) {
             leafFlags |= ImGuiTreeNodeFlags_Selected;
         }
 
@@ -56,18 +54,17 @@ void genericNodeList(const std::vector<T*>& list, DelFn onDelete) {
         }
 
         // Drag drop
-        DragDrop::renderSource(item);
+        DragDrop::renderSource(item.get());
 
         // Selection
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            editor::State::getInstance().setSelectedObject(item);
+            editor::State::getInstance().setSelectedObject(item.get());
         }
     }
 }
 
 SceneHierarchy::SceneHierarchy() {
     m_nodes.push_back(new ObjectNode());
-    m_nodes.push_back(new PhysicsRegionNode());
     m_nodes.push_back(new AudioNode());
 }
 
@@ -137,22 +134,22 @@ void SceneHierarchy::ObjectNode::render() {
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Objects")) {
         if (ImGui::TreeNode("Visuals")) {
-            genericNodeList(currentScene->getVisuals(), [&currentScene](auto item) {
-                currentScene->remove(item);
+            genericNodeList(currentScene->getVisuals(), [&currentScene](const auto& item) {
+                currentScene->remove(item.get());
             });
             ImGui::TreePop();
         }
 
         if (ImGui::TreeNode("Scenery")) {
-            genericNodeList(currentScene->getScenery(), [&currentScene](auto item) {
-                currentScene->remove(item);
+            genericNodeList(currentScene->getScenery(), [&currentScene](const auto& item) {
+                currentScene->remove(item.get());
             });
             ImGui::TreePop();
         }
 
         if (ImGui::TreeNode("Entities")) {
-            genericNodeList(currentScene->getEntities(), [&currentScene](auto item) {
-                currentScene->remove(item);
+            genericNodeList(currentScene->getEntities(), [&currentScene](const auto& item) {
+                currentScene->remove(item.get());
             });
             ImGui::TreePop();
         }
@@ -187,15 +184,15 @@ void SceneHierarchy::AudioNode::render() {
     ImGui::SetNextItemOpen(false, ImGuiCond_Once);
     if (ImGui::TreeNode("Audio")) {
         if (ImGui::TreeNode("Listeners")) {
-            genericNodeList(currentScene->getAudioListeners(), [&currentScene](auto item) {
-                currentScene->remove(item);
+            genericNodeList(currentScene->getAudioListeners(), [&currentScene](const auto& item) {
+                currentScene->remove(item.get());
             });
             ImGui::TreePop();
         }
 
         if (ImGui::TreeNode("Sources")) {
-            genericNodeList(currentScene->getAudioSources(), [&currentScene](auto item) {
-                currentScene->remove(item);
+            genericNodeList(currentScene->getAudioSources(), [&currentScene](const auto& item) {
+                currentScene->remove(item.get());
             });
             ImGui::TreePop();
         }
@@ -216,45 +213,6 @@ void SceneHierarchy::AudioNode::contextMenu() {
         if (ImGui::MenuItem("Create listener")) {
             audio::AudioListener* listener = new audio::AudioListener();
             currentScene->add(listener);
-        }
-
-        ImGui::EndMenu();
-    }
-}
-
-void SceneHierarchy::PhysicsRegionNode::render() {
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-
-    ImGui::SetNextItemOpen(false, ImGuiCond_Once);
-    if (ImGui::TreeNode("Physics regions")) {
-        if (ImGui::TreeNode("Static")) {
-            genericNodeList(currentScene->getStaticPhysicsRegions(), [&currentScene](auto item) {
-                currentScene->remove(item);
-            });
-            ImGui::TreePop();
-        }
-
-        if (ImGui::TreeNode("Dynamic")) {
-            genericNodeList(currentScene->getDynamicPhysicsRegions(), [&currentScene](auto item) {
-                currentScene->remove(item);
-            });
-            ImGui::TreePop();
-        }
-
-        ImGui::TreePop();
-    }
-}
-
-void SceneHierarchy::PhysicsRegionNode::contextMenu() {
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-
-    if (ImGui::BeginMenu("Add physics region")) {
-        if (ImGui::MenuItem("Static")) {
-            currentScene->add(new scene::StaticPhysicsRegion());
-        }
-
-        if (ImGui::MenuItem("Dynamic")) {
-            currentScene->add(new scene::DynamicPhysicsRegion());
         }
 
         ImGui::EndMenu();

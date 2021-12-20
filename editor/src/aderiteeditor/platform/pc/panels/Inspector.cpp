@@ -836,7 +836,7 @@ void Inspector::renderBaseGeometry(physics::Geometry* geometry) {
 
         if (clicked) {
             WindowsEditor::getInstance()->getUI().pushModal(
-                new SelectScriptModal(SelectScriptModal::FilterType::GEOMETRY, [geometry](scripting::ScriptEvent* e) {
+                new SelectScriptModal(scripting::ScriptEventType::GEOMETRY, [geometry](scripting::ScriptEvent* e) {
                     geometry->setEnterEvent(static_cast<scripting::ScriptGeometryEvent*>(e));
                 }));
         }
@@ -858,7 +858,7 @@ void Inspector::renderBaseGeometry(physics::Geometry* geometry) {
 
         if (clicked) {
             WindowsEditor::getInstance()->getUI().pushModal(
-                new SelectScriptModal(SelectScriptModal::FilterType::GEOMETRY, [geometry](scripting::ScriptEvent* e) {
+                new SelectScriptModal(scripting::ScriptEventType::GEOMETRY, [geometry](scripting::ScriptEvent* e) {
                     geometry->setLeaveEvent(static_cast<scripting::ScriptGeometryEvent*>(e));
                 }));
         }

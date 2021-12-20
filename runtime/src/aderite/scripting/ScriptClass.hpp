@@ -7,6 +7,7 @@
 
 #include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/Forward.hpp"
+#include "aderite/scripting/ScriptEventType.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -46,14 +47,15 @@ public:
     ScriptEvent* getEvent(const std::string& eventName) const;
 
     /**
-     * @brief Returns a list of update events in this script
+     * @brief Returns all events in this class
      */
-    const std::vector<ScriptUpdateEvent*>& getUpdateEvents() const;
+    const std::vector<ScriptEvent*>& getEvents() const;
 
     /**
-     * @brief Returns a list of geometry events in this script
+     * @brief Returns all events of the specified type
+     * @param type Type of events to return
      */
-    const std::vector<ScriptGeometryEvent*>& getGeometryEvents() const;
+    std::vector<ScriptEvent*> getEvents(ScriptEventType type) const;
 
     /**
      * @brief Returns a list of field in this script
@@ -82,8 +84,7 @@ private:
     std::vector<FieldWrapper> m_fields;
 
     // Possible mappings
-    std::vector<ScriptUpdateEvent*> m_updateEvents;
-    std::vector<ScriptGeometryEvent*> m_geometryEvents;
+    std::vector<ScriptEvent*> m_events;
 };
 
 } // namespace scripting

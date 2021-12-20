@@ -5,6 +5,7 @@
 #include <mono/jit/jit.h>
 
 #include "aderite/scripting/Forward.hpp"
+#include "aderite/scripting/ScriptEventType.hpp"
 
 namespace aderite {
 namespace scripting {
@@ -25,6 +26,11 @@ public:
      * @brief Returns the full name of the event
      */
     std::string getFullName() const;
+
+    /**
+     * @brief Returns the type of the script event
+     */
+    virtual ScriptEventType getEventType() const = 0;
 
 protected:
     ScriptEvent(ScriptClass* script, MonoMethod* method);
