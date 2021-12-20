@@ -30,14 +30,17 @@
 #include "aderite/scripting/MonoUtils.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
+#include "aderite/scripting/events/ScriptGeometryEvent.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 
 #include "aderiteeditor/asset/EditorMaterialType.hpp"
 #include "aderiteeditor/asset/property/Property.hpp"
 //#include "aderiteeditor/node/Node.hpp"
+#include "aderiteeditor/platform/pc/WindowsEditor.hpp"
 #include "aderiteeditor/platform/pc/modals/FileDialog.hpp"
 #include "aderiteeditor/platform/pc/modals/SelectAudioModal.hpp"
+#include "aderiteeditor/platform/pc/modals/SelectScriptModal.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/shared/DragDrop.hpp"
 #include "aderiteeditor/shared/IEventSink.hpp"
@@ -812,7 +815,56 @@ void Inspector::renderBaseGeometry(physics::Geometry* geometry) {
     }
 
     // Script mappings
-    // TODO: Script mappings
+    if (ImGui::BeginTable("GeometryScriptMappingTable", 2)) {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+        ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+        ImGui::TableNextRow();
+
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Enter");
+
+        ImGui::TableSetColumnIndex(1);
+        ImGui::PushItemWidth(-FLT_MIN);
+
+        bool clicked = false;
+        if (geometry->getEnterEvent() != nullptr) {
+            clicked = ImGui::Button(geometry->getEnterEvent()->getFullName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        } else {
+            clicked = ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        }
+
+        if (clicked) {
+            WindowsEditor::getInstance()->getUI().pushModal(
+                new SelectScriptModal(SelectScriptModal::FilterType::GEOMETRY, [geometry](scripting::ScriptEvent* e) {
+                    geometry->setEnterEvent(static_cast<scripting::ScriptGeometryEvent*>(e));
+                }));
+        }
+
+        ImGui::TableNextRow();
+
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Leave");
+
+        ImGui::TableSetColumnIndex(1);
+        ImGui::PushItemWidth(-FLT_MIN);
+
+        clicked = false;
+        if (geometry->getLeaveEvent() != nullptr) {
+            clicked = ImGui::Button(geometry->getLeaveEvent()->getFullName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        } else {
+            clicked = ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        }
+
+        if (clicked) {
+            WindowsEditor::getInstance()->getUI().pushModal(
+                new SelectScriptModal(SelectScriptModal::FilterType::GEOMETRY, [geometry](scripting::ScriptEvent* e) {
+                    geometry->setLeaveEvent(static_cast<scripting::ScriptGeometryEvent*>(e));
+                }));
+        }
+
+        ImGui::EndTable();
+    }
 }
 
 void Inspector::renderBaseActor(physics::BasePhysicsActor* actor) {
@@ -866,7 +918,7 @@ void Inspector::renderDynamicActor(physics::DynamicPhysicsActor* actor) {
     if (ImGui::Checkbox("Has gravity", &hasGravity)) {
         actor->setGravity(hasGravity);
     }
-    
+
     ImGui::Text("Mass");
     ImGui::SameLine();
     float mass = actor->getMass();

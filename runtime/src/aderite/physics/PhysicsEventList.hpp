@@ -11,8 +11,8 @@ namespace physics {
  * @brief Trigger event
  */
 struct TriggerEvent {
-    const Geometry* Trigger = nullptr;
-    const Geometry* Actor = nullptr;
+    Geometry* Trigger = nullptr;
+    Geometry* Actor = nullptr;
 
     bool Enter = false;
 };
@@ -21,8 +21,8 @@ struct TriggerEvent {
  * @brief Collision event
  */
 struct CollisionEvent {
-    const Geometry* Actor1 = nullptr;
-    const Geometry* Actor2 = nullptr;
+    Geometry* Actor1 = nullptr;
+    Geometry* Actor2 = nullptr;
 
     bool Start = false;
 };

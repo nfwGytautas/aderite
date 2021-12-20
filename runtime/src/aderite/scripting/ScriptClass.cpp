@@ -6,6 +6,7 @@
 #include "aderite/scripting/ScriptData.hpp"
 #include "aderite/scripting/ScriptEvent.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/scripting/events/ScriptGeometryEvent.hpp"
 #include "aderite/scripting/events/ScriptUpdateEvent.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
@@ -13,7 +14,7 @@
 namespace aderite {
 namespace scripting {
 
-inline bool isUpdateSignature(MonoMethodSignature* signature) {
+inline bool isUpdateEventSignature(MonoMethodSignature* signature) {
     // Update method:
     //  return void
     //  1 parameter (float)
@@ -40,6 +41,40 @@ inline bool isUpdateSignature(MonoMethodSignature* signature) {
     }
 
     if (mono_type_get_type(params[0]) != MONO_TYPE_R4) {
+        // 1 parameter not float
+        return false;
+    }
+
+    return true;
+}
+
+inline bool isGeometryEventSignature(MonoMethodSignature* signature) {
+    // Update method:
+    //  return void
+    //  1 parameter (Aderite.Geometry)
+
+    const uint32_t paramCount = mono_signature_get_param_count(signature);
+    MonoType* retType = mono_signature_get_return_type(signature);
+
+    std::vector<MonoType*> params;
+
+    void* iter = NULL;
+    MonoType* param;
+    while (param = mono_signature_get_params(signature, &iter)) {
+        params.push_back(param);
+    }
+
+    if (mono_type_get_class(retType) != nullptr) {
+        // Non void return
+        return false;
+    }
+
+    if (params.size() != 1) {
+        // More than 1 parameter
+        return false;
+    }
+
+    if (::aderite::Engine::getScriptManager()->getLocator().getType(params[0]) != FieldType::Geometry) {
         // 1 parameter not float
         return false;
     }
@@ -78,11 +113,21 @@ ScriptEvent* ScriptClass::getEvent(const std::string& eventName) const {
         }
     }
 
+    for (ScriptGeometryEvent* sge : m_geometryEvents) {
+        if (sge->getName() == eventName) {
+            return sge;
+        }
+    }
+
     return nullptr;
 }
 
 const std::vector<ScriptUpdateEvent*>& ScriptClass::getUpdateEvents() const {
     return m_updateEvents;
+}
+
+const std::vector<ScriptGeometryEvent*>& ScriptClass::getGeometryEvents() const {
+    return m_geometryEvents;
 }
 
 const std::vector<FieldWrapper>& ScriptClass::getFields() const {
@@ -102,8 +147,10 @@ void ScriptClass::locateMethods() {
         MonoMethodSignature* signature = mono_method_signature(method);
 
         // Analyze signature
-        if (isUpdateSignature(signature)) {
+        if (isUpdateEventSignature(signature)) {
             m_updateEvents.push_back(new ScriptUpdateEvent(this, method));
+        } else if (isGeometryEventSignature(signature)) {
+            m_geometryEvents.push_back(new ScriptGeometryEvent(this, method));
         }
     }
 }

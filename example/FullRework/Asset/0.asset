@@ -48,6 +48,7 @@ Data:
               - Type: 75
                 Name: Collider
                 Data:
+                  OnEnterEvent: Despawner.OnCollisionEnter
                   Size: [1, 1, 1]
         Renderable:
           Mesh: 1
@@ -100,3 +101,6 @@ Data:
     - Script: BoxSpawner
       Fields:
         MaxLive: 15
+    - Script: Despawner
+      Fields:
+        {}

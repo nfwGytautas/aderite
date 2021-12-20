@@ -20,6 +20,7 @@ class ScriptEvent;
 class ScriptData;
 
 class ScriptUpdateEvent;
+class ScriptGeometryEvent;
 
 } // namespace scripting
 } // namespace aderite

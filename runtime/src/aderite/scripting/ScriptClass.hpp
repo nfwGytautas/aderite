@@ -51,6 +51,11 @@ public:
     const std::vector<ScriptUpdateEvent*>& getUpdateEvents() const;
 
     /**
+     * @brief Returns a list of geometry events in this script
+     */
+    const std::vector<ScriptGeometryEvent*>& getGeometryEvents() const;
+
+    /**
      * @brief Returns a list of field in this script
      */
     const std::vector<FieldWrapper>& getFields() const;
@@ -78,6 +83,7 @@ private:
 
     // Possible mappings
     std::vector<ScriptUpdateEvent*> m_updateEvents;
+    std::vector<ScriptGeometryEvent*> m_geometryEvents;
 };
 
 } // namespace scripting

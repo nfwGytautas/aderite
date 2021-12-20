@@ -6,6 +6,7 @@
 #include "aderite/scripting/ScriptClass.hpp"
 #include "aderite/scripting/ScriptEvent.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/scripting/events/ScriptGeometryEvent.hpp"
 #include "aderite/scripting/events/ScriptUpdateEvent.hpp"
 
 #include "aderiteeditor/shared/IEventSink.hpp"
@@ -66,6 +67,15 @@ void SelectScriptModal::render() {
                             m_event = sue;
                         }
                     }
+                    break;
+                }
+                case FilterType::GEOMETRY: {
+                    for (scripting::ScriptGeometryEvent* sge : m_class->getGeometryEvents()) {
+                        if (ImGui::Selectable(sge->getName())) {
+                            m_event = sge;
+                        }
+                    }
+                    break;
                 }
                 }
 

@@ -19,6 +19,9 @@ enum class FieldType {
     Material,
     Audio,
 
+    // Physics
+    Geometry,
+
     // Scene objects
     AudioSource,
 };

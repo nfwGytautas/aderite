@@ -58,6 +58,11 @@ public:
         MonoMethod* Ctor = nullptr;
     };
 
+    struct Geometry {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    };
+
 public:
     /**
      * @brief Locates engine classes from the specified image
@@ -140,6 +145,13 @@ public:
     // */
     // MonoObject* create(asset::PrefabAsset* prefab) const;
 
+    /**
+     * @brief Creates a C# geometry object from C++
+     * @param geometry Geometry object
+     * @return MonoObject instance
+     */
+    MonoObject* create(physics::Geometry* geometry) const;
+
     // ====================================================================================
     // Class getters
     // ====================================================================================
@@ -184,6 +196,11 @@ public:
      */
     const RaycastHit& getRaycastHit() const;
 
+    /**
+     * @brief Returns the geometry information struct
+     */
+    const Geometry& getGeometry() const;
+
 private:
     /**
      * @brief Handle mono exception object
@@ -209,6 +226,7 @@ private:
     TriggerEvent m_triggerEvent;
     CollisionEvent m_collisionEvent;
     RaycastHit m_raycastHit;
+    Geometry m_geometry;
 };
 
 } // namespace scripting

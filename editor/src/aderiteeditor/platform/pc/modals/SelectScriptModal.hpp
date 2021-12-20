@@ -21,7 +21,7 @@ public:
     /**
      * @brief Filtering options for modal
      */
-    enum class FilterType { UPDATE, NONE };
+    enum class FilterType { UPDATE, GEOMETRY, NONE };
 
 public:
     SelectScriptModal(FilterType filter, SelectFn fn);

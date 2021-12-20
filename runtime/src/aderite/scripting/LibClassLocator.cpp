@@ -5,6 +5,7 @@
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/audio/AudioSource.hpp"
+#include "aderite/physics/geometry/Geometry.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -49,6 +50,7 @@ bool LibClassLocator::locate(MonoImage* image) {
     findClass(image, "Aderite", "TriggerEvent", m_triggerEvent.Klass, result);
     findClass(image, "Aderite", "CollisionEvent", m_collisionEvent.Klass, result);
     findClass(image, "Aderite", "RaycastHit", m_raycastHit.Klass, result);
+    findClass(image, "Aderite", "Geometry", m_geometry.Klass, result);
 
     // Can't proceed if classes are not found
     if (result == false) {
@@ -67,9 +69,10 @@ bool LibClassLocator::locate(MonoImage* image) {
     findMethod(m_triggerEvent.Klass, ".ctor", 2, m_triggerEvent.Ctor, result);
     findMethod(m_collisionEvent.Klass, ".ctor", 2, m_collisionEvent.Ctor, result);
     findMethod(m_raycastHit.Klass, ".ctor", 2, m_raycastHit.Ctor, result);
+    findMethod(m_geometry.Klass, ".ctor", 1, m_geometry.Ctor, result);
 
     if (result) {
-        LOG_INFO("[Scripting] Engine classed located");
+        LOG_INFO("[Scripting] Engine classes located");
     } else {
         LOG_ERROR("[Scripting] Some engine classed couldn't be loaded");
     }
@@ -89,6 +92,8 @@ FieldType LibClassLocator::getType(MonoType* type) const {
         return FieldType::Audio;
     } else if (klass == m_audioSource.Klass) {
         return FieldType::AudioSource;
+    } else if (klass == m_geometry.Klass) {
+        return FieldType::Geometry;
     }
 
     return FieldType::Null;
@@ -107,6 +112,9 @@ MonoObject* LibClassLocator::create(io::SerializableObject* serializable) const 
     }
     case reflection::RuntimeTypes::AUDIO_SOURCE: {
         return this->create(static_cast<audio::AudioSource*>(serializable));
+    }
+    case reflection::RuntimeTypes::BOX_GEOMETRY: {
+        return this->create(static_cast<physics::Geometry*>(serializable));
     }
     default: {
         LOG_ERROR("[Scripting] Unknown implementation for creating a {0} serializable", serializable->getType());
@@ -150,6 +158,11 @@ MonoObject* LibClassLocator::create(audio::AudioSource* source) const {
 //    return this->genericInstanceCreate(m_raycastHit.Klass, m_raycastHit.Ctor, args);
 //}
 
+MonoObject* LibClassLocator::create(physics::Geometry* geometry) const {
+    void* args[1] = {&geometry};
+    return this->genericInstanceCreate(m_geometry.Klass, m_geometry.Ctor, args);
+}
+
 const LibClassLocator::Entity& LibClassLocator::getEntity() const {
     return m_entity;
 }
@@ -180,6 +193,10 @@ const LibClassLocator::CollisionEvent& LibClassLocator::getCollisionEvent() cons
 
 const LibClassLocator::RaycastHit& LibClassLocator::getRaycastHit() const {
     return m_raycastHit;
+}
+
+const LibClassLocator::Geometry& LibClassLocator::getGeometry() const {
+    return m_geometry;
 }
 
 void LibClassLocator::handleException(MonoObject* exception) const {
