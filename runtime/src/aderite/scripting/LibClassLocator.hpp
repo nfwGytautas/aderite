@@ -121,12 +121,12 @@ public:
      */
     MonoObject* create(physics::Geometry* geometry) const;
 
-    /**
-     * @brief Creates a C# entity object from C++
-     * @param entity Entity object
-     * @return MonoObject instance
-     */
-    MonoObject* create(scene::Entity* entity) const;
+    ///**
+    // * @brief Creates a C# entity object from C++
+    // * @param entity Entity object
+    // * @return MonoObject instance
+    // */
+    //MonoObject* create(scene::Entity* entity) const;
 
     // ====================================================================================
     // Class getters

@@ -34,7 +34,7 @@ void SceneView::render() {
         return;
     }
 
-    bgfx::TextureHandle outHandle = editor::State::getInstance().getEditorCamera()->getCamera()->getOutputHandle();
+    bgfx::TextureHandle outHandle = editor::State::getInstance().getEditorCamera()->getOutputHandle();
 
     if (!bgfx::isValid(outHandle)) {
         ImGui::End();

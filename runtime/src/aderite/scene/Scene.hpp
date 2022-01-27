@@ -32,55 +32,21 @@ public:
     void update(float delta);
 
     /**
-     * @brief Add a visual to the scene (takes ownership)
-     * @param visual Visual to add
+     * @brief Creates an empty game object
+     * @return New game object instance
      */
-    void add(Visual* visual);
+    GameObject* createGameObject();
 
     /**
-     * @brief Remove visual from the scene
-     * @param visual Visual to remove
+     * @brief Destroy the specified game object
+     * @param object Object to destroy
      */
-    void remove(Visual* visual);
+    void destroyGameObject(GameObject* object);
 
     /**
-     * @brief Returns the visuals of this scene
+     * @brief Returns the game objects in this scene
      */
-    const std::vector<std::unique_ptr<Visual>>& getVisuals() const;
-
-    /**
-     * @brief Add a scenery to the scene (takes ownership)
-     * @param scenery Scenery to add
-     */
-    void add(Scenery* scenery);
-
-    /**
-     * @brief Remove scenery from the scene
-     * @param scenery Scenery to remove
-     */
-    void remove(Scenery* scenery);
-
-    /**
-     * @brief Returns the scenery of this scene
-     */
-    const std::vector<std::unique_ptr<Scenery>>& getScenery() const;
-
-    /**
-     * @brief Add a entity to the scene (takes ownership)
-     * @param entity Entity to add
-     */
-    void add(Entity* entity);
-
-    /**
-     * @brief Remove entity from the scene
-     * @param entity Entity to remove
-     */
-    void remove(Entity* entity);
-
-    /**
-     * @brief Returns the entities of this scene
-     */
-    const std::vector<std::unique_ptr<Entity>>& getEntities() const;
+    const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
 
     /**
      * @brief Add a audio listener to the scene (takes ownership)
@@ -117,23 +83,6 @@ public:
     const std::vector<std::unique_ptr<audio::AudioSource>>& getAudioSources() const;
 
     /**
-     * @brief Add a camera to the scene (takes ownership)
-     * @param camera Camera instance
-     */
-    void add(Camera* camera);
-
-    /**
-     * @brief Remove camera from the scene
-     * @param camera Camera to remove
-     */
-    void remove(Camera* camera);
-
-    /**
-     * @brief Returns cameras of this scene
-     */
-    const std::vector<std::unique_ptr<Camera>>& getCameras() const;
-
-    /**
      * @brief Adds/removes new or deleted scripts from this scene
      */
     void updateScriptDataEntries();
@@ -161,16 +110,13 @@ private:
 
 private:
     // Objects
-    std::vector<std::unique_ptr<Visual>> m_visuals;
-    std::vector<std::unique_ptr<Scenery>> m_scenery;
-    std::vector<std::unique_ptr<Entity>> m_entities;
+    std::vector<std::unique_ptr<GameObject>> m_gameObjects;
 
     // Audio
     std::vector<std::unique_ptr<audio::AudioSource>> m_audioSources;
     std::vector<std::unique_ptr<audio::AudioListener>> m_audioListeners;
 
     // Other
-    std::vector<std::unique_ptr<Camera>> m_cameras;
     std::vector<std::unique_ptr<scripting::ScriptData>> m_scriptData;
 };
 

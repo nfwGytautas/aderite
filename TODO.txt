@@ -107,6 +107,7 @@ Editor:
 		Window resize for viewport
 		Drag drop files to folders
 		Crash on bad graph compile
+		Crash when selected entity is destroyed
 	Maybe:
 		Don't compile when loading project
 		Dont load scripts if they are out of date

@@ -7,6 +7,7 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/input/InputManager.hpp"
+#include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/Camera.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -17,16 +18,18 @@ namespace aderite {
 namespace editor {
 
 EditorCamera::EditorCamera() {
-    m_camera = new scene::Camera();
-    m_camera->setName("Editor");
+    const uint64_t flags = BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP |
+                           BGFX_SAMPLER_V_CLAMP | BGFX_TEXTURE_BLIT_DST;
+
+    m_output = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::BGRA8, flags);
 }
 
 EditorCamera::~EditorCamera() {
-    delete m_camera;
+    bgfx::destroy(m_output);
 }
 
-scene::Camera* EditorCamera::getCamera() const {
-    return m_camera;
+bgfx::TextureHandle EditorCamera::getOutputHandle() const {
+    return m_output;
 }
 
 void EditorCamera::onViewportResize(const glm::uvec2& size) {
@@ -50,7 +53,6 @@ void EditorCamera::update(float delta) {
                 m_focalpoint += getForwardDirection();
                 m_distance = 1.0f;
             }
-            m_camera->setPosition(this->calculatePosition());
         }
 
         // Pan
@@ -60,7 +62,6 @@ void EditorCamera::update(float delta) {
             glm::vec2 speed = panSpeed();
             m_focalpoint += -getRightDirection() * mouseDelta.x * speed.x * m_distance * delta;
             m_focalpoint += getUpDirection() * mouseDelta.y * speed.y * m_distance * delta;
-            m_camera->setPosition(this->calculatePosition());
         }
     } else {
         // Rotate
@@ -68,13 +69,24 @@ void EditorCamera::update(float delta) {
             glm::vec2 mouseDelta = inputManager->getMouseDelta();
 
             float yawSign = getUpDirection().y < 0 ? -1.0f : 1.0f;
-            glm::vec3 rotation = m_camera->getRotation();
-            rotation.x += delta * mouseDelta.y * Settings::EditorCameraRotationSpeed;
-            rotation.y -= delta * yawSign * mouseDelta.x * Settings::EditorCameraRotationSpeed;
-            m_camera->setRotation(rotation);
-            m_camera->setPosition(this->calculatePosition());
+            m_currentEulerRotation.x += delta * mouseDelta.y * Settings::EditorCameraRotationSpeed;
+            m_currentEulerRotation.y -= delta * yawSign * mouseDelta.x * Settings::EditorCameraRotationSpeed;
         }
     }
+
+    // Add to frame data
+    rendering::FrameData& fd = ::aderite::Engine::getRenderer()->getWriteFrameData();
+
+    // Fill camera data
+    rendering::CameraData cd;
+    cd.Name = "Editor";
+    cd.Output = m_output;
+    cd.ProjectionMatrix = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 1000.0f);
+    cd.ViewMatrix =
+        glm::inverse(glm::translate(glm::mat4(1.0f), this->calculatePosition()) * glm::toMat4(glm::quat(m_currentEulerRotation)));
+
+    // Push to the list
+    fd.Cameras.push_back(cd);
 }
 
 glm::vec3 EditorCamera::getUpDirection() const {
@@ -94,7 +106,7 @@ glm::vec3 EditorCamera::calculatePosition() const {
 }
 
 glm::quat EditorCamera::getOrientation() const {
-    return glm::quat(m_camera->getRotation());
+    return glm::quat(m_currentEulerRotation);
 }
 
 float EditorCamera::zoomSpeed() const {

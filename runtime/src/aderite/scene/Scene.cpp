@@ -5,9 +5,7 @@
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/scene/Camera.hpp"
-#include "aderite/scene/Entity.hpp"
-#include "aderite/scene/Scenery.hpp"
-#include "aderite/scene/Visual.hpp"
+#include "aderite/scene/GameObject.hpp"
 #include "aderite/scripting/ScriptClass.hpp"
 #include "aderite/scripting/ScriptData.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
@@ -69,66 +67,45 @@ Scene::~Scene() {
     LOG_TRACE("[Scene] Deleting scene {0}", this->getName());
 
     // Objects
-    m_visuals.clear();
-    m_scenery.clear();
-    m_entities.clear();
+    m_gameObjects.clear();
 
     // Audio
     m_audioSources.clear();
     m_audioListeners.clear();
 
     // Other
-    m_cameras.clear();
     m_scriptData.clear();
 
     LOG_INFO("[Scene] Scene {0} deleted", this->getName());
 }
 
 void Scene::update(float delta) {
-    // Free marked entities
-    m_entities.erase(std::remove_if(m_entities.begin(), m_entities.end(),
-                                    [](const std::unique_ptr<Entity>& e) {
-                                        return e->isMarkedForDeletion();
-                                    }),
-                     m_entities.end());
+    // Free marked objects
+    m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),
+                                       [](const std::unique_ptr<GameObject>& gObject) {
+                                           return gObject->isMarkedForDeletion();
+                                       }),
+                        m_gameObjects.end());
+
+    // Update all game objects
+    for (auto& gObject : m_gameObjects) {
+        gObject->update(delta);
+    }
 }
 
-void Scene::add(Visual* visual) {
-    addObject(m_visuals, visual);
+GameObject* Scene::createGameObject() {
+    static size_t nextId = 0;
+    GameObject* go = new GameObject(this, "New object (" + std::to_string(nextId++) + ")");
+    addObject(m_gameObjects, go);
+    return go;
 }
 
-void Scene::remove(Visual* visual) {
-    removeObject(m_visuals, visual);
+void Scene::destroyGameObject(GameObject* object) {
+    removeObject(m_gameObjects, object);
 }
 
-const std::vector<std::unique_ptr<Visual>>& Scene::getVisuals() const {
-    return m_visuals;
-}
-
-void Scene::add(Scenery* scenery) {
-    addObject(m_scenery, scenery);
-    this->addActor(scenery);
-}
-
-void Scene::remove(Scenery* scenery) {
-    removeObject(m_scenery, scenery);
-}
-
-const std::vector<std::unique_ptr<Scenery>>& Scene::getScenery() const {
-    return m_scenery;
-}
-
-void Scene::add(Entity* entity) {
-    addObject(m_entities, entity);
-    this->addActor(entity);
-}
-
-void Scene::remove(Entity* entity) {
-    removeObject(m_entities, entity);
-}
-
-const std::vector<std::unique_ptr<Entity>>& Scene::getEntities() const {
-    return m_entities;
+const std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects() const {
+    return m_gameObjects;
 }
 
 void Scene::add(audio::AudioListener* listener) {
@@ -153,18 +130,6 @@ void Scene::remove(audio::AudioSource* source) {
 
 const std::vector<std::unique_ptr<audio::AudioSource>>& Scene::getAudioSources() const {
     return m_audioSources;
-}
-
-void Scene::add(Camera* camera) {
-    addObject(m_cameras, camera);
-}
-
-void Scene::remove(Camera* camera) {
-    removeObject(m_cameras, camera);
-}
-
-const std::vector<std::unique_ptr<Camera>>& Scene::getCameras() const {
-    return m_cameras;
 }
 
 void Scene::updateScriptDataEntries() {
@@ -228,16 +193,11 @@ bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
     }
 
     // Object
-    SERIALIZE_LIST("Visuals", m_visuals);
-    SERIALIZE_LIST("Scenery", m_scenery);
-    SERIALIZE_LIST("Entities", m_entities);
+    SERIALIZE_LIST("Objects", m_gameObjects);
 
     // Audio
     SERIALIZE_LIST("AudioListeners", m_audioListeners);
     SERIALIZE_LIST("AudioSources", m_audioSources);
-
-    // Other
-    SERIALIZE_LIST("Cameras", m_cameras);
 
     // Script data
     emitter << YAML::Key << "Scripts" << YAML::BeginSeq;
@@ -257,16 +217,11 @@ bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     }
 
     // Object
-    DESERIALIZE_LIST("Visuals", Visual);
-    DESERIALIZE_LIST("Scenery", Scenery);
-    DESERIALIZE_LIST("Entities", Entity);
+    // DESERIALIZE_LIST("Objects", GameObject);
 
     // Audio
     DESERIALIZE_LIST("AudioListeners", audio::AudioListener);
     DESERIALIZE_LIST("AudioSources", audio::AudioSource);
-
-    // Other
-    DESERIALIZE_LIST("Cameras", Camera);
 
     // Script data
     auto scripts = data["Scripts"];

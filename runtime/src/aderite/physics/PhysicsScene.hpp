@@ -29,7 +29,7 @@ public:
      * @brief Add actor to the scene
      * @param actor Actor to add
      */
-    void addActor(BasePhysicsActor* actor);
+    void addActor(PhysXActor* actor);
 
     /**
      * @brief Sends queued physics events to specified user callbacks

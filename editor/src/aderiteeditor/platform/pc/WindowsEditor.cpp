@@ -212,7 +212,6 @@ void WindowsEditor::onNewScene(const std::string& name) {
 void WindowsEditor::onStopGame() {
     Engine::get()->stopPhysicsUpdates();
     Engine::get()->stopScriptUpdates();
-    Engine::get()->stopSceneUpdates();
     Engine::getAudioController()->disable(true);
     editor::State::IsGameMode = false;
 
@@ -222,7 +221,6 @@ void WindowsEditor::onStopGame() {
 void WindowsEditor::onStartGame() {
     Engine::get()->startPhysicsUpdates();
     Engine::get()->startScriptUpdates();
-    Engine::get()->startSceneUpdates();
     Engine::getAudioController()->disable(false);
     editor::State::IsGameMode = true;
 

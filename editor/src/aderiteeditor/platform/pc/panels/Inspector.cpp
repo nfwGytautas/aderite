@@ -17,15 +17,15 @@
 #include "aderite/io/LoaderPool.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/Serializer.hpp"
+#include "aderite/physics/PhysXActor.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/geometry/BoxGeometry.hpp"
 #include "aderite/physics/geometry/Geometry.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/rendering/Renderable.hpp"
-#include "aderite/scene/Entity.hpp"
+#include "aderite/scene/GameObject.hpp"
 #include "aderite/scene/Scene.hpp"
-#include "aderite/scene/Scenery.hpp"
-#include "aderite/scene/Visual.hpp"
+#include "aderite/scene/TransformProvider.hpp"
 #include "aderite/scripting/FieldWrapper.hpp"
 #include "aderite/scripting/MonoUtils.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
@@ -36,7 +36,6 @@
 
 #include "aderiteeditor/asset/EditorMaterialType.hpp"
 #include "aderiteeditor/asset/property/Property.hpp"
-//#include "aderiteeditor/node/Node.hpp"
 #include "aderiteeditor/platform/pc/WindowsEditor.hpp"
 #include "aderiteeditor/platform/pc/modals/FileDialog.hpp"
 #include "aderiteeditor/platform/pc/modals/SelectAudioModal.hpp"
@@ -659,16 +658,8 @@ void Inspector::render() {
         this->renderMaterial(object);
         break;
     }
-    case reflection::RuntimeTypes::VISUAL: {
-        this->renderVisual(object);
-        break;
-    }
-    case reflection::RuntimeTypes::SCENERY: {
-        this->renderScenery(object);
-        break;
-    }
-    case reflection::RuntimeTypes::ENTITY: {
-        this->renderEntity(object);
+    case reflection::RuntimeTypes::GAME_OBJECT: {
+        this->renderGameObject(object);
         break;
     }
     default: {
@@ -679,7 +670,7 @@ void Inspector::render() {
     ImGui::End();
 }
 
-void Inspector::renderTransformProvider(scene::ITransformProvider* provider) {
+void Inspector::renderTransformProvider(scene::TransformProvider* provider) {
     ImGui::Text("Transform");
 
     // Position
@@ -752,127 +743,100 @@ void Inspector::renderRenderable(rendering::Renderable* renderable) {
     }
 }
 
-void Inspector::renderVisual(io::SerializableObject* object) {
-    scene::Visual* visual = static_cast<scene::Visual*>(object);
+void Inspector::renderGameObject(io::SerializableObject* object) {
+    scene::GameObject* gObject = static_cast<scene::GameObject*>(object);
 
-    ImGui::Dummy(ImVec2(0, 5));
-    this->renderTransformProvider(visual);
+    // Collect component pointers
+    scene::TransformProvider* const transform = gObject->getTransform();
+    rendering::Renderable* const renderable = gObject->getRenderable();
+    physics::PhysXActor* const actor = gObject->getActor();
 
-    ImGui::Dummy(ImVec2(0, 5));
-    this->renderRenderable(visual);
-}
-
-void Inspector::renderScenery(io::SerializableObject* object) {
-    scene::Scenery* scenery = static_cast<scene::Scenery*>(object);
-
-    ImGui::Dummy(ImVec2(0, 5));
-    this->renderTransformProvider(scenery);
-
-    ImGui::Dummy(ImVec2(0, 5));
-    this->renderRenderable(scenery);
-
-    ImGui::Dummy(ImVec2(0, 5));
-    this->renderStaticActor(scenery);
-}
-
-void Inspector::renderEntity(io::SerializableObject* object) {
-    scene::Entity* entity = static_cast<scene::Entity*>(object);
-
-    ImGui::Dummy(ImVec2(0, 5));
-    this->renderTransformProvider(entity);
-
-    ImGui::Dummy(ImVec2(0, 5));
-    this->renderRenderable(entity);
-
-    ImGui::Dummy(ImVec2(0, 5));
-    this->renderDynamicActor(entity);
-}
-
-void Inspector::renderBaseGeometry(physics::Geometry* geometry) {
-    static utility::InlineRename renamer;
-
-    // Shared
-    if (renamer.renderUI(std::hash<std::string>()(geometry->getName()), geometry->getName())) {
-        geometry->setName(renamer.getValue());
+    // Render the game object components
+    if (transform != nullptr) {
+        ImGui::Dummy(ImVec2(0, 5));
+        this->renderTransformProvider(transform);
     }
 
+    if (renderable != nullptr) {
+        ImGui::Dummy(ImVec2(0, 5));
+        this->renderRenderable(renderable);
+    }
+
+    if (actor != nullptr) {
+        ImGui::Dummy(ImVec2(0, 5));
+        this->renderActor(actor);
+    }
+
+    // Add components
     ImGui::Separator();
 
-    // Properties
-    switch (static_cast<reflection::RuntimeTypes>(geometry->getType())) {
-    case reflection::RuntimeTypes::BOX_GEOMETRY: {
-        physics::BoxGeometry* boxGeom = static_cast<physics::BoxGeometry*>(geometry);
-
-        glm::vec3 size = boxGeom->getSize();
-        if (utility::DrawVec3Control("Size", size)) {
-            boxGeom->setSize(size);
-        }
-        break;
-    }
-    default: {
-        ADERITE_ABORT("Unknown geometry type");
-    }
+    float width = ImGui::GetContentRegionAvail().x * 0.4855f;
+    ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
+    if (ImGui::Button("Add component", ImVec2(width, 0.0f))) {
+        ImGui::OpenPopup("AddComponent");
     }
 
-    // Script mappings
-    if (ImGui::BeginTable("GeometryScriptMappingTable", 2)) {
-        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
-        ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
-
-        ImGui::TableNextRow();
-
-        ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Enter");
-
-        ImGui::TableSetColumnIndex(1);
-        ImGui::PushItemWidth(-FLT_MIN);
-
-        bool clicked = false;
-        if (geometry->getEnterEvent() != nullptr) {
-            clicked = ImGui::Button(geometry->getEnterEvent()->getFullName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-        } else {
-            clicked = ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+    if (ImGui::BeginPopup("AddComponent")) {
+        if (transform == nullptr && ImGui::MenuItem("Transform")) {
+            gObject->addTransform();
+            ImGui::CloseCurrentPopup();
         }
 
-        if (clicked) {
-            WindowsEditor::getInstance()->getUI().pushModal(
-                new SelectScriptModal(scripting::ScriptEventType::GEOMETRY, [geometry](scripting::ScriptEvent* e) {
-                    geometry->setEnterEvent(static_cast<scripting::ScriptGeometryEvent*>(e));
-                }));
+        if (renderable == nullptr && ImGui::MenuItem("Renderable")) {
+            gObject->addRenderable();
+            ImGui::CloseCurrentPopup();
         }
 
-        ImGui::TableNextRow();
-
-        ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Leave");
-
-        ImGui::TableSetColumnIndex(1);
-        ImGui::PushItemWidth(-FLT_MIN);
-
-        clicked = false;
-        if (geometry->getLeaveEvent() != nullptr) {
-            clicked = ImGui::Button(geometry->getLeaveEvent()->getFullName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
-        } else {
-            clicked = ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        if (actor == nullptr && ImGui::MenuItem("Actor")) {
+            gObject->addActor();
+            ImGui::CloseCurrentPopup();
         }
 
-        if (clicked) {
-            WindowsEditor::getInstance()->getUI().pushModal(
-                new SelectScriptModal(scripting::ScriptEventType::GEOMETRY, [geometry](scripting::ScriptEvent* e) {
-                    geometry->setLeaveEvent(static_cast<scripting::ScriptGeometryEvent*>(e));
-                }));
-        }
-
-        ImGui::EndTable();
+        ImGui::EndPopup();
     }
 }
 
-void Inspector::renderBaseActor(physics::BasePhysicsActor* actor) {
-    // Attached geometry
+void Inspector::renderActor(physics::PhysXActor* actor) {
+    ImGui::Text("Physics actor");
+
+    bool isStatic = !actor->isDynamic();
+
+    // Static/Dynamic switch
+    if (ImGui::Checkbox("Static", &isStatic)) {
+        if (isStatic) {
+            actor->makeStatic();
+        } else {
+            actor->makeDynamic();
+        }
+    }
+
+    // Properties
+    physics::PhysicsProperties properties = actor->getProperties();
+
+    if (!isStatic) {
+        bool altered = false;
+
+        if (ImGui::Checkbox("Has gravity", &properties.HasGravity)) {
+            altered = true;
+        }
+
+        ImGui::Text("Mass");
+        ImGui::SameLine();
+        if (ImGui::DragFloat("##X", &properties.Mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+            altered = true;
+        }
+
+        if (altered) {
+            actor->applyProperties(properties);
+        }
+    }
+
+    // Colliders
     ImGui::Dummy(ImVec2(0.0f, 2.5f));
 
     size_t idx = 1;
     for (physics::Geometry* geom : actor->getAttachedGeometries()) {
+        // TODO: Geometry name
         ImGui::Text("%ld", idx++);
         this->renderBaseGeometry(geom);
     }
@@ -901,33 +865,31 @@ void Inspector::renderBaseActor(physics::BasePhysicsActor* actor) {
     }
 }
 
-void Inspector::renderStaticActor(physics::StaticPhysicsActor* actor) {
-    ImGui::Text("Static physics actor");
+void Inspector::renderBaseGeometry(physics::Geometry* geometry) {
+    static utility::InlineRename renamer;
 
-    // Properties
-
-    // Base actor
-    this->renderBaseActor(actor);
-}
-
-void Inspector::renderDynamicActor(physics::DynamicPhysicsActor* actor) {
-    ImGui::Text("Dynamic physics actor");
-
-    // Properties
-    bool hasGravity = actor->getGravity();
-    if (ImGui::Checkbox("Has gravity", &hasGravity)) {
-        actor->setGravity(hasGravity);
+    // Shared
+    if (renamer.renderUI(std::hash<std::string>()(geometry->getName()), geometry->getName())) {
+        geometry->setName(renamer.getValue());
     }
 
-    ImGui::Text("Mass");
-    ImGui::SameLine();
-    float mass = actor->getMass();
-    if (ImGui::DragFloat("##X", &mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
-        actor->setMass(mass);
-    }
+    ImGui::Separator();
 
-    // Base actor
-    this->renderBaseActor(actor);
+    // Properties
+    switch (static_cast<reflection::RuntimeTypes>(geometry->getType())) {
+    case reflection::RuntimeTypes::BOX_GEOMETRY: {
+        physics::BoxGeometry* boxGeom = static_cast<physics::BoxGeometry*>(geometry);
+
+        glm::vec3 size = boxGeom->getSize();
+        if (utility::DrawVec3Control("Size", size)) {
+            boxGeom->setSize(size);
+        }
+        break;
+    }
+    default: {
+        ADERITE_ABORT("Unknown geometry type");
+    }
+    }
 }
 
 void Inspector::renderMaterial(io::SerializableObject* asset) {

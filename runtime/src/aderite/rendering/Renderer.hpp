@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "aderite/rendering/Forward.hpp"
+#include "aderite/rendering/FrameData.hpp"
 #include "aderite/scene/Forward.hpp"
 
 namespace aderite {
@@ -61,13 +62,12 @@ public:
     /**
      * @brief Advances to next frame
      */
-    void commit() const;
+    void commit();
 
     /**
-     * @brief Sets the editor camera instance
-     * @param camera Camera of the editor
+     * @brief Returns the FrameData that can be written into
      */
-    void setEditorCamera(scene::Camera* camera);
+    FrameData& getWriteFrameData();
 
 private:
     /**
@@ -94,7 +94,9 @@ private:
 private:
     bool m_isInitialized = false;
 
-    scene::Camera* m_editorCamera = nullptr;
+    // Frame data
+    FrameData m_readData;
+    FrameData m_writeData;
 
     // BGFX views
     glm::uvec2 m_resolution = glm::uvec2(1280, 920);

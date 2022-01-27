@@ -110,29 +110,17 @@ public:
      */
     void stopScriptUpdates();
 
-    /**
-     * @brief Starts scene updates
-     */
-    void startSceneUpdates();
-
-    /**
-     * @brief Stops scene updates
-     */
-    void stopSceneUpdates();
-
 private:
     Engine() {}
     Engine(const Engine& o) = delete;
 
     // Update functions
     void updateSystem(float delta) const;
-    void updateScenes(float delta) const;
     void updatePhysics(float delta) const;
     void updateScripts(float delta) const;
 
 private:
     bool m_wantsToShutdown = false;
-    bool m_willUpdateScenes = true;
     bool m_willUpdatePhysics = true;
     bool m_willUpdateScripts = true;
 

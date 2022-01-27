@@ -22,35 +22,19 @@ public:
 
 private:
     // Common
-    void renderTransformProvider(scene::ITransformProvider* provider);
+    void renderTransformProvider(scene::TransformProvider* provider);
     void renderRenderable(rendering::Renderable* renderable);
 
     // Objects
-    void renderVisual(io::SerializableObject* object);
-    void renderScenery(io::SerializableObject* object);
-    void renderEntity(io::SerializableObject* object);
+    void renderGameObject(io::SerializableObject* object);
 
     // Physics
+    void renderActor(physics::PhysXActor* actor);
     void renderBaseGeometry(physics::Geometry* geometry);
-    void renderBaseActor(physics::BasePhysicsActor* actor);
-    void renderStaticActor(physics::StaticPhysicsActor* actor);
-    void renderDynamicActor(physics::DynamicPhysicsActor* actor);
 
     // Assets
-    // void renderAsset();
-    // void renderMesh(io::SerializableAsset* asset);
-    // void renderTexture(io::SerializableAsset* asset);
     void renderMaterial(io::SerializableObject* asset);
     void renderMaterialType(io::SerializableObject* object);
-    // void renderScene(io::SerializableAsset* asset);
-    // void renderPipeline(io::SerializableAsset* asset);
-    // void renderAudio(io::SerializableAsset* asset);
-
-    //// Serializables
-    // void renderSerializable();
-    // void renderAudioSource(io::SerializableObject* serializable);
-    // void renderScriptSystem(io::SerializableObject* serializable);
-    // void renderAudioListener(io::SerializableObject* serializable);
 };
 
 } // namespace editor

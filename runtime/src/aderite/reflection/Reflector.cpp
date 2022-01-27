@@ -15,10 +15,7 @@
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/geometry/BoxGeometry.hpp"
 #include "aderite/rendering/Renderable.hpp"
-#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
-#include "aderite/scene/Scenery.hpp"
-#include "aderite/scene/Visual.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 
 namespace aderite {
@@ -42,9 +39,6 @@ bool Reflector::init() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, audio::AudioListener, RuntimeTypes::AUDIO_LISTENER);
 
     // Object
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Visual, RuntimeTypes::VISUAL);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Scenery, RuntimeTypes::SCENERY);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Entity, RuntimeTypes::ENTITY);
 
     // Geometry
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::BoxGeometry, RuntimeTypes::BOX_GEOMETRY);

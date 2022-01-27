@@ -50,19 +50,11 @@ void BoxGeometry::applyScale(const glm::vec3& scale) {
 }
 
 bool BoxGeometry::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    if (!Geometry::serialize(serializer, emitter)) {
-        return false;
-    }
-
     emitter << YAML::Key << "Size" << YAML::Value << m_size;
     return true;
 }
 
 bool BoxGeometry::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    if (!Geometry::deserialize(serializer, data)) {
-        return false;
-    }
-
     setSize(data["Size"].as<glm::vec3>());
     return true;
 }

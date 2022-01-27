@@ -1,9 +1,9 @@
 #pragma once
 
+#include <bgfx/bgfx.h>
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
-
-#include "aderite/scene/Forward.hpp"
 
 namespace aderite {
 namespace editor {
@@ -14,9 +14,9 @@ public:
     ~EditorCamera();
 
     /**
-     * @brief Returns the camera instance that is being manipulated
+     * @brief Returns the output handle of the editor camera
      */
-    scene::Camera* getCamera() const;
+    bgfx::TextureHandle getOutputHandle() const;
 
     /**
      * @brief Called when scene view is resized
@@ -41,10 +41,11 @@ private:
     glm::vec2 panSpeed() const;
 
 private:
-    scene::Camera* m_camera = nullptr;
+    bgfx::TextureHandle m_output = BGFX_INVALID_HANDLE;
     glm::uvec2 m_viewportSize = {};
 
     glm::vec3 m_focalpoint = {};
+    glm::vec3 m_currentEulerRotation = {};
     float m_distance = 10.0f;
 };
 

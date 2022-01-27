@@ -181,7 +181,6 @@ void Engine::loop() {
 
         // Updates
         updateSystem(deltaTimeSec);
-        updateScenes(deltaTimeSec);
         updatePhysics(deltaTimeSec);
         updateScripts(deltaTimeSec);
 
@@ -250,16 +249,6 @@ void Engine::stopScriptUpdates() {
     m_willUpdateScripts = false;
 }
 
-void Engine::startSceneUpdates() {
-    LOG_TRACE("[Engine] Enabling scene updates");
-    m_willUpdateScenes = true;
-}
-
-void Engine::stopSceneUpdates() {
-    LOG_TRACE("[Engine] Disabling scene updates");
-    m_willUpdateScenes = false;
-}
-
 void Engine::updateSystem(float delta) const {
     // Query events
     m_inputManager->update();
@@ -270,18 +259,13 @@ void Engine::updateSystem(float delta) const {
     // Asset manager
     m_assetManager->update();
 
-    MIDDLEWARE_ACTION(onSystemUpdate, delta);
-}
-
-void Engine::updateScenes(float delta) const {
-    if (!m_willUpdateScenes) {
-        return;
+    // Scene
+    scene::Scene* currentScene = m_sceneManager->getCurrentScene();
+    if (currentScene != nullptr) {
+        currentScene->update(delta);
     }
 
-    scene::Scene* currentScene = m_sceneManager->getCurrentScene();
-    currentScene->update(delta);
-
-    MIDDLEWARE_ACTION(onSceneUpdate, delta);
+    MIDDLEWARE_ACTION(onSystemUpdate, delta);
 }
 
 void Engine::updatePhysics(float delta) const {

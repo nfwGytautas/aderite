@@ -12,7 +12,7 @@ struct RaycastHit {
     /**
      * @brief Actor that was hit
      */
-    BasePhysicsActor* Actor = nullptr;
+    PhysXActor* Actor = nullptr;
 
     /**
      * @brief Distance that the ray traveled

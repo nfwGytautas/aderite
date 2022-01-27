@@ -1,5 +1,4 @@
 #include "Renderer.hpp"
-#include <unordered_map>
 
 #include <bgfx/bgfx.h>
 #include <bx/string.h>
@@ -13,12 +12,10 @@
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/rendering/DrawCall.hpp"
 #include "aderite/scene/Camera.hpp"
-#include "aderite/scene/Entity.hpp"
-#include "aderite/scene/ITransformProvider.h"
+#include "aderite/scene/GameObject.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
-#include "aderite/scene/Scenery.hpp"
-#include "aderite/scene/Visual.hpp"
+#include "aderite/scene/TransformProvider.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/LogExtensions.hpp"
 #include "aderite/window/WindowManager.hpp"
@@ -115,15 +112,6 @@ bgfx::FrameBufferHandle createFramebuffer(bool blittable = false, bool hdr = fal
     return handle;
 }
 
-inline glm::mat4 calculateTransformationMatrix(scene::ITransformProvider* transform) {
-    glm::vec3 position = transform->getPosition();
-    glm::quat rotation = transform->getRotation();
-    glm::vec3 scale = transform->getScale();
-
-    glm::mat4 rMat = glm::toMat4(rotation);
-    return glm::translate(glm::mat4(1.0f), position) * rMat * glm::scale(glm::mat4(1.0f), scale);
-}
-
 bool Renderer::init() {
     ADERITE_LOG_BLOCK;
     LOG_DEBUG("[Rendering] Initializing BGFX Renderer");
@@ -206,53 +194,29 @@ void Renderer::render() {
 
     // Valid scene do rendering
 
-    // 1. Aggregate all objects into a drawlist, this is used to create instanced rendering, by adding only unique renderable
-    // configurations
-    static std::unordered_map<size_t, DrawCall> drawCalls;
-    drawCalls.clear();
-
-    for (const auto& visual : currentScene->getVisuals()) {
-        if (visual->isValid()) {
-            DrawCall& dc = drawCalls[visual->hash()];
-            dc.Renderable = visual.get();
-            dc.Transformations.push_back(calculateTransformationMatrix(visual.get()));
-        }
-    }
-
-    for (const auto& scenery : currentScene->getScenery()) {
-        if (scenery->isValid()) {
-            DrawCall& dc = drawCalls[scenery->hash()];
-            dc.Renderable = scenery.get();
-            dc.Transformations.push_back(calculateTransformationMatrix(scenery.get()));
-        }
-    }
-
-    for (const auto& entity : currentScene->getEntities()) {
-        if (entity->isValid()) {
-            DrawCall& dc = drawCalls[entity->hash()];
-            dc.Renderable = entity.get();
-            dc.Transformations.push_back(calculateTransformationMatrix(entity.get()));
-        }
-    }
-
+    // Clear state
     bgfx::discard(BGFX_DISCARD_ALL);
 
+    // Render for each camera
     uint8_t viewIdx = 0;
-    auto perCamera = [&](scene::Camera* camera) {
-        // 2. Setup view
-        this->setupView(viewIdx, camera->getName());
+    for (rendering::CameraData& cd : m_readData.Cameras) {
+        // Debug values
+        bgfx::setName(cd.Output, cd.Name.c_str());
+
+        // Setup view
+        this->setupView(viewIdx, cd.Name);
         bgfx::setViewFrameBuffer(viewIdx, m_mainFbo);
         bgfx::touch(viewIdx);
         bgfx::touch(viewIdx + 1);
 
-        // 3. Setup persistent matrices
-        bgfx::setViewTransform(viewIdx, glm::value_ptr(camera->getViewMatrix()), glm::value_ptr(camera->getProjectionMatrix()));
+        // Setup persistent matrices
+        bgfx::setViewTransform(viewIdx, glm::value_ptr(cd.ViewMatrix), glm::value_ptr(cd.ProjectionMatrix));
 
         // Discard previous state
         bgfx::discard(BGFX_DISCARD_ALL);
 
         // 4. Submit draw calls
-        for (auto& kvp : drawCalls) {
+        for (auto& kvp : m_readData.DrawCalls) {
             // Extract assets
             const Renderable* renderable = kvp.second.Renderable;
             const asset::MaterialAsset* material = renderable->getMaterial();
@@ -272,7 +236,7 @@ void Renderer::render() {
             // Fill instance buffer
             uint8_t* data = idb.data;
             for (uint32_t i = 0; i < modelCount; i++) {
-                // TODO : Can probably optimized
+                // TODO : Can probably be optimized
                 std::memcpy(data, glm::value_ptr(kvp.second.Transformations[i]), instanceStride);
                 data += instanceStride;
             }
@@ -304,17 +268,9 @@ void Renderer::render() {
         }
 
         // 5. Copy result
-        bgfx::blit(viewIdx + 1, camera->getOutputHandle(), 0, 0, bgfx::getTexture(m_mainFbo));
+        bgfx::blit(viewIdx + 1, cd.Output, 0, 0, bgfx::getTexture(m_mainFbo));
 
         viewIdx += 2;
-    };
-
-    for (const auto& camera : currentScene->getCameras()) {
-        perCamera(camera.get());
-    }
-
-    if (m_editorCamera != nullptr) {
-        perCamera(m_editorCamera);
     }
 
     bgfx::discard(BGFX_DISCARD_ALL);
@@ -328,16 +284,24 @@ void Renderer::setResolution(const glm::uvec2& size) {
     m_resolution = size;
 }
 
-void Renderer::commit() const {
+void Renderer::commit() {
     // Commit
     bgfx::frame(false);
+
     // TODO: Display stats in editor
     // const bgfx::Stats* stats = bgfx::getStats();
     // LOG_INFO("Commiting {0} draw calls", stats->numDraw);
+
+    // Copy this frame write data to read data
+    m_readData = m_writeData;
+
+    // Clear write data
+    m_writeData.Cameras.clear();
+    m_writeData.DrawCalls.clear();
 }
 
-void Renderer::setEditorCamera(scene::Camera* camera) {
-    m_editorCamera = camera;
+FrameData& Renderer::getWriteFrameData() {
+    return m_writeData;
 }
 
 bool Renderer::createTargets() {

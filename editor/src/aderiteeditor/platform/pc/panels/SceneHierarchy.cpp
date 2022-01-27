@@ -8,11 +8,10 @@
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
-#include "aderite/scene/Entity.hpp"
+#include "aderite/scene/Camera.hpp"
+#include "aderite/scene/GameObject.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
-#include "aderite/scene/Scenery.hpp"
-#include "aderite/scene/Visual.hpp"
 #include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
@@ -28,51 +27,9 @@ namespace editor {
 static ImGuiTreeNodeFlags c_BaseFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick |
                                         ImGuiTreeNodeFlags_SpanAvailWidth;
 
-template<typename T, typename DelFn>
-void genericNodeList(const std::vector<std::unique_ptr<T>>& list, DelFn onDelete) {
-    for (const auto& item : list) {
-        ImGuiTreeNodeFlags leafFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+SceneHierarchy::SceneHierarchy() {}
 
-        io::SerializableObject* selectedObject = editor::State::getInstance().getSelectedObject();
-        if (selectedObject == item.get()) {
-            leafFlags |= ImGuiTreeNodeFlags_Selected;
-        }
-
-        ImGui::TreeNodeEx(item->getName().c_str(), leafFlags);
-
-        // Context menu
-        if (ImGui::BeginPopupContextItem()) {
-            if (ImGui::MenuItem("Delete")) {
-                onDelete(item);
-
-                // Quit and rerender
-                ImGui::EndPopup();
-                break;
-            }
-
-            ImGui::EndPopup();
-        }
-
-        // Drag drop
-        DragDrop::renderSource(item.get());
-
-        // Selection
-        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-            editor::State::getInstance().setSelectedObject(item.get());
-        }
-    }
-}
-
-SceneHierarchy::SceneHierarchy() {
-    m_nodes.push_back(new ObjectNode());
-    m_nodes.push_back(new AudioNode());
-}
-
-SceneHierarchy::~SceneHierarchy() {
-    for (ISceneHierarchyNode* node : m_nodes) {
-        delete node;
-    }
-}
+SceneHierarchy::~SceneHierarchy() {}
 
 bool SceneHierarchy::init() {
     return true;
@@ -101,9 +58,45 @@ void SceneHierarchy::render() {
 
     // Actual tree
     ImGui::Separator();
-    for (ISceneHierarchyNode* node : m_nodes) {
-        ImGui::Dummy(ImVec2(0.0f, 10.0f));
-        node->render();
+
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Game Objects")) {
+        for (const auto& gameObject : currentScene->getGameObjects()) {
+            ImGuiTreeNodeFlags leafFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+            io::SerializableObject* selectedObject = editor::State::getInstance().getSelectedObject();
+            if (selectedObject != nullptr && selectedObject == gameObject.get()) {
+                leafFlags |= ImGuiTreeNodeFlags_Selected;
+            }
+
+            ImGui::TreeNodeEx(gameObject->getName().c_str(), leafFlags);
+
+            // Context menu
+            if (ImGui::BeginPopupContextItem()) {
+                if (ImGui::MenuItem("Delete")) {
+                    if (selectedObject != nullptr && selectedObject == gameObject.get()) {
+                        editor::State::getInstance().setSelectedObject(nullptr);
+                    }
+
+                    currentScene->destroyGameObject(gameObject.get());
+
+                    // Quit and rerender
+                    ImGui::EndPopup();
+                    break;
+                }
+
+                ImGui::EndPopup();
+            }
+
+            // Drag drop
+            DragDrop::renderSource(gameObject.get());
+
+            // Selection
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                editor::State::getInstance().setSelectedObject(gameObject.get());
+            }
+        }
+        ImGui::TreePop();
     }
 
     ImGui::End();
@@ -113,8 +106,12 @@ void SceneHierarchy::contextMenu() {
     scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 
     if (ImGui::BeginPopupContextWindow()) {
-        for (ISceneHierarchyNode* node : m_nodes) {
-            node->contextMenu();
+        if (ImGui::BeginMenu("New object")) {
+            if (ImGui::MenuItem("Empty")) {
+                currentScene->createGameObject();
+            }
+
+            ImGui::EndMenu();
         }
 
         ImGui::Separator();
@@ -125,97 +122,6 @@ void SceneHierarchy::contextMenu() {
         }
 
         ImGui::EndPopup();
-    }
-}
-
-void SceneHierarchy::ObjectNode::render() {
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Objects")) {
-        if (ImGui::TreeNode("Visuals")) {
-            genericNodeList(currentScene->getVisuals(), [&currentScene](const auto& item) {
-                currentScene->remove(item.get());
-            });
-            ImGui::TreePop();
-        }
-
-        if (ImGui::TreeNode("Scenery")) {
-            genericNodeList(currentScene->getScenery(), [&currentScene](const auto& item) {
-                currentScene->remove(item.get());
-            });
-            ImGui::TreePop();
-        }
-
-        if (ImGui::TreeNode("Entities")) {
-            genericNodeList(currentScene->getEntities(), [&currentScene](const auto& item) {
-                currentScene->remove(item.get());
-            });
-            ImGui::TreePop();
-        }
-
-        ImGui::TreePop();
-    }
-}
-
-void SceneHierarchy::ObjectNode::contextMenu() {
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-
-    if (ImGui::BeginMenu("Add object")) {
-        if (ImGui::MenuItem("Visual")) {
-            currentScene->add(new scene::Visual());
-        }
-
-        if (ImGui::MenuItem("Scenery")) {
-            currentScene->add(new scene::Scenery());
-        }
-
-        if (ImGui::MenuItem("Entity")) {
-            currentScene->add(new scene::Entity());
-        }
-
-        ImGui::EndMenu();
-    }
-}
-
-void SceneHierarchy::AudioNode::render() {
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-
-    ImGui::SetNextItemOpen(false, ImGuiCond_Once);
-    if (ImGui::TreeNode("Audio")) {
-        if (ImGui::TreeNode("Listeners")) {
-            genericNodeList(currentScene->getAudioListeners(), [&currentScene](const auto& item) {
-                currentScene->remove(item.get());
-            });
-            ImGui::TreePop();
-        }
-
-        if (ImGui::TreeNode("Sources")) {
-            genericNodeList(currentScene->getAudioSources(), [&currentScene](const auto& item) {
-                currentScene->remove(item.get());
-            });
-            ImGui::TreePop();
-        }
-
-        ImGui::TreePop();
-    }
-}
-
-void SceneHierarchy::AudioNode::contextMenu() {
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-
-    if (ImGui::BeginMenu("Audio")) {
-        if (ImGui::MenuItem("Create source")) {
-            audio::AudioSource* source = new audio::AudioSource();
-            currentScene->add(source);
-        }
-
-        if (ImGui::MenuItem("Create listener")) {
-            audio::AudioListener* listener = new audio::AudioListener();
-            currentScene->add(listener);
-        }
-
-        ImGui::EndMenu();
     }
 }
 

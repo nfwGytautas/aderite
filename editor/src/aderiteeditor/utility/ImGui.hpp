@@ -4,6 +4,7 @@
 #include <string>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include "aderiteeditor/utility/Macros.hpp"
 
@@ -30,6 +31,16 @@ bool DynamicInputText(const char* label, std::string* value, ImGuiInputTextFlags
  * @return True if altered, false otherwise
  */
 bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+
+/**
+ * @brief Renders a quat ui control
+ * @param label Label of the control
+ * @param values Values
+ * @param resetValue Reset value
+ * @param columnWidth Width of a single entry field
+ * @return True if altered, false otherwise
+*/
+bool DrawQuatControl(const std::string& label, glm::quat& values, float columnWidth = 100.0f);
 
 /**
  * @brief Utility class for creating an inline renaming element

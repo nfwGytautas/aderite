@@ -1,7 +1,7 @@
 #include "PhysicsScene.hpp"
 
 #include "aderite/Aderite.hpp"
-#include "aderite/physics/BasePhysicsActor.hpp"
+#include "aderite/physics/PhysXActor.hpp"
 #include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/PhysicsEventList.hpp"
 #include "aderite/physics/PhysicsSceneQuery.hpp"
@@ -52,13 +52,13 @@ void PhysicsScene::simulate(float step) const {
     m_scene->fetchResults(true);
 }
 
-void PhysicsScene::addActor(BasePhysicsActor* actor) {
-    m_scene->addActor(*actor->p_actor);
+void PhysicsScene::addActor(PhysXActor* actor) {
+    m_scene->addActor(*actor->getActor());
 }
 
 void PhysicsScene::sendEvents() {
     // TODO: Think if only to send to trigger
-    for (const TriggerEvent& te : m_events->getTriggerEvents()) {
+    /*for (const TriggerEvent& te : m_events->getTriggerEvents()) {
         if (te.Enter) {
             te.Actor->onPhysicsEventEnter(te.Trigger);
             te.Trigger->onPhysicsEventEnter(te.Actor);
@@ -76,7 +76,7 @@ void PhysicsScene::sendEvents() {
             ce.Actor1->onPhysicsEventLeave(ce.Actor2);
             ce.Actor2->onPhysicsEventLeave(ce.Actor1);
         }
-    }
+    }*/
 
     // Clear old events
     m_events->clear();
@@ -91,7 +91,7 @@ bool PhysicsScene::raycastSingle(RaycastHit& result, const glm::vec3& from, cons
     }
 
     // Fill result
-    result.Actor = static_cast<BasePhysicsActor*>(hit.block.actor->userData);
+    result.Actor = static_cast<PhysXActor*>(hit.block.actor->userData);
     result.Distance = hit.block.distance;
 
     return true;

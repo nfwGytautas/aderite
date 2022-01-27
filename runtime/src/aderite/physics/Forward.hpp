@@ -14,11 +14,10 @@ class PhysicsScene;
 class PhysicsEventList;
 class Collider;
 class RaycastHit;
-class BasePhysicsActor;
-class StaticPhysicsActor;
-class DynamicPhysicsActor;
 class Geometry;
 class BoxGeometry;
+class PhysXActor;
+struct PhysicsProperties;
 
 } // namespace physics
 } // namespace aderite

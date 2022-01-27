@@ -30,6 +30,7 @@ enum class RuntimeTypes : Type {
     VISUAL = 40,
     SCENERY = 41,
     ENTITY = 42,
+    GAME_OBJECT = 43,
 
     // Other scene objects
     CAMERA = 60,

@@ -8,7 +8,6 @@
 #include "aderite/Aderite.hpp"
 #include "aderite/physics/PhysicsScene.hpp"
 #include "aderite/physics/geometry/Geometry.hpp"
-#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scripting/LibClassLocator.hpp"
@@ -18,9 +17,9 @@
 namespace aderite {
 namespace scripting {
 
-MonoObject* geometryGetEntity(physics::Geometry* geometry) {
-    return ::aderite::Engine::getScriptManager()->createInstance(static_cast<scene::Entity*>(geometry->getActor()));
-}
+//MonoObject* geometryGetEntity(physics::Geometry* geometry) {
+//    return ::aderite::Engine::getScriptManager()->createInstance(static_cast<scene::Entity*>(geometry->getActor()));
+//}
 
 // void MoveActor(physics::PhysicsActor* actor, glm::vec3 position) {
 //    actor->moveActor(position);
@@ -73,7 +72,7 @@ MonoObject* geometryGetEntity(physics::Geometry* geometry) {
 
 void physicsInternals() {
     // Geometry
-    mono_add_internal_call("Aderite.Geometry::__GetEntity(intptr)", reinterpret_cast<void*>(geometryGetEntity));
+    //mono_add_internal_call("Aderite.Geometry::__GetEntity(intptr)", reinterpret_cast<void*>(geometryGetEntity));
 
     //// Base actor
     // mono_add_internal_call("Aderite.PhysicsActor::__Move(intptr,Aderite.Vector3)", reinterpret_cast<void*>(MoveActor));

@@ -6,7 +6,6 @@
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/geometry/Geometry.hpp"
-#include "aderite/scene/Entity.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -113,9 +112,6 @@ MonoObject* LibClassLocator::create(io::SerializableObject* serializable) const 
     case reflection::RuntimeTypes::BOX_GEOMETRY: {
         return this->create(static_cast<physics::Geometry*>(serializable));
     }
-    case reflection::RuntimeTypes::ENTITY: {
-        return this->create(static_cast<scene::Entity*>(serializable));
-    }
     default: {
         ADERITE_ABORT("Unknown serializable type");
         return nullptr;
@@ -153,10 +149,10 @@ MonoObject* LibClassLocator::create(physics::Geometry* geometry) const {
     return this->genericInstanceCreate(m_geometry.Klass, m_geometry.Ctor, args);
 }
 
-MonoObject* LibClassLocator::create(scene::Entity* entity) const {
-    void* args[1] = {&entity};
-    return this->genericInstanceCreate(m_geometry.Klass, m_geometry.Ctor, args);
-}
+//MonoObject* LibClassLocator::create(scene::Entity* entity) const {
+//    void* args[1] = {&entity};
+//    return this->genericInstanceCreate(m_geometry.Klass, m_geometry.Ctor, args);
+//}
 
 const LibClassLocator::Entity& LibClassLocator::getEntity() const {
     return m_entity;

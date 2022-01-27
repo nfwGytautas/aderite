@@ -33,7 +33,6 @@ State& State::getInstance() {
 
 void State::init() {
     m_editorCamera = new editor::EditorCamera();
-    ::aderite::Engine::getRenderer()->setEditorCamera(m_editorCamera->getCamera());
 }
 
 void State::shutdown() {

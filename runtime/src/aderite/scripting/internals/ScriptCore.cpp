@@ -4,7 +4,6 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/input/InputManager.hpp"
-#include "aderite/scene/Entity.hpp"
 #include "aderite/scripting/ScriptClass.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 
