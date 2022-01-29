@@ -93,8 +93,8 @@ bool ScriptData::serialize(const io::Serializer* serializer, YAML::Emitter& emit
                     break;
                 }
                 case scripting::FieldType::AudioSource: {
-                    audio::AudioSource* source = static_cast<audio::AudioSource*>(serializable);
-                    emitter << source->getName();
+                    /*audio::AudioSource* source = static_cast<audio::AudioSource*>(serializable);
+                    emitter << source->getName();*/
                     break;
                 }
                 default: {
@@ -153,8 +153,8 @@ bool ScriptData::deserialize(io::Serializer* serializer, const YAML::Node& data)
                 break;
             }
             case scripting::FieldType::AudioSource: {
-                audio::AudioSource* source = m_scene->getSource(fieldNode.as<std::string>());
-                field.setSerializable(m_instance, source);
+                /*audio::AudioSource* source = m_scene->getSource(fieldNode.as<std::string>());
+                field.setSerializable(m_instance, source);*/
                 break;
             }
             default: {

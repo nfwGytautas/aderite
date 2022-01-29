@@ -208,6 +208,16 @@ bool DrawQuatControl(const std::string& label, glm::quat& values, float columnWi
     return altered;
 }
 
+void WindowSizeDragDrop(const std::function<void()>& callback) {
+    ADERITE_DYNAMIC_ASSERT(callback, "Invalid drag and drop callback");
+
+    ImVec2 cPos = ImGui::GetCursorPos();
+    ImVec2 size = ImGui::GetContentRegionAvail();
+    ImGui::Dummy(size);
+    callback();
+    ImGui::SetCursorPos(cPos);
+}
+
 void ImSpinner(const char* label, const float indicator_radius, const int circle_count, const float speed, glm::vec2 size) {
     const auto style = ImGui::GetStyle();
 

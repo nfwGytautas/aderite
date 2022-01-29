@@ -106,9 +106,9 @@ MonoObject* LibClassLocator::create(io::SerializableObject* serializable) const 
     case reflection::RuntimeTypes::AUDIO: {
         return this->create(static_cast<asset::AudioAsset*>(serializable));
     }
-    case reflection::RuntimeTypes::AUDIO_SOURCE: {
+    /*case reflection::RuntimeTypes::AUDIO_SOURCE: {
         return this->create(static_cast<audio::AudioSource*>(serializable));
-    }
+    }*/
     case reflection::RuntimeTypes::BOX_GEOMETRY: {
         return this->create(static_cast<physics::Geometry*>(serializable));
     }

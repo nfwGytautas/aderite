@@ -38,6 +38,13 @@ public:
     GameObject* createGameObject();
 
     /**
+     * @brief Creates a game object from a prefab
+     * @param prefab Prefab to create from
+     * @return New game object instance
+     */
+    GameObject* createGameObject(asset::PrefabAsset* prefab);
+
+    /**
      * @brief Destroy the specified game object
      * @param object Object to destroy
      */
@@ -47,57 +54,6 @@ public:
      * @brief Returns the game objects in this scene
      */
     const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
-
-    /**
-     * @brief Add a audio listener to the scene (takes ownership)
-     * @param listener AudioListener instance
-     */
-    void add(audio::AudioListener* listener);
-
-    /**
-     * @brief Remove listener from the scene
-     * @param listener Listener to remove
-     */
-    void remove(audio::AudioListener* listener);
-
-    /**
-     * @brief Returns audio listeners of this scene
-     */
-    const std::vector<std::unique_ptr<audio::AudioListener>>& getAudioListeners() const;
-
-    /**
-     * @brief Add a audio source to the scene (takes ownership)
-     * @param source AudioSource instance
-     */
-    void add(audio::AudioSource* source);
-
-    /**
-     * @brief Remove source from the scene
-     * @param source Source to remove
-     */
-    void remove(audio::AudioSource* source);
-
-    /**
-     * @brief Returns audio sources of this scene
-     */
-    const std::vector<std::unique_ptr<audio::AudioSource>>& getAudioSources() const;
-
-    /**
-     * @brief Adds/removes new or deleted scripts from this scene
-     */
-    void updateScriptDataEntries();
-
-    /**
-     * @brief Returns script data of this scene
-     */
-    const std::vector<std::unique_ptr<scripting::ScriptData>>& getScriptData() const;
-
-    /**
-     * @brief Returns the audio source with the specified name
-     * @param name Name of the source
-     * @return AudioSource instance or nullptr if not found
-     */
-    audio::AudioSource* getSource(const std::string& name) const;
 
     // Inherited via SerializableObject
     reflection::Type getType() const override;
@@ -109,15 +65,7 @@ private:
     friend class SceneSerializer;
 
 private:
-    // Objects
     std::vector<std::unique_ptr<GameObject>> m_gameObjects;
-
-    // Audio
-    std::vector<std::unique_ptr<audio::AudioSource>> m_audioSources;
-    std::vector<std::unique_ptr<audio::AudioListener>> m_audioListeners;
-
-    // Other
-    std::vector<std::unique_ptr<scripting::ScriptData>> m_scriptData;
 };
 
 } // namespace scene

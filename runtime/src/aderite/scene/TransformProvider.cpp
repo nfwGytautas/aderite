@@ -18,6 +18,10 @@ bool TransformProvider::serialize(const io::Serializer* serializer, YAML::Emitte
 bool TransformProvider::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     // Transform
     const YAML::Node& transformNode = data["Transform"];
+    if (!transformNode || transformNode.IsNull()) {
+        return false;
+    }
+
     this->setPosition(transformNode["Position"].as<glm::vec3>());
     this->setRotation(transformNode["Rotation"].as<glm::quat>());
     this->setScale(transformNode["Scale"].as<glm::vec3>());

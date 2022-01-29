@@ -11,8 +11,8 @@ class SceneManager;
 class Scene;
 class TransformProvider;
 class GameObject;
-
 class Camera;
+class CameraSettings;
 
 } // namespace scene
 } // namespace aderite

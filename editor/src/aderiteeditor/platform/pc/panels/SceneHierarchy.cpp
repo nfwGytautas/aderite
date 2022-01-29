@@ -4,6 +4,7 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
@@ -20,6 +21,7 @@
 #include "aderiteeditor/shared/DragDrop.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
+#include "aderiteeditor/utility/ImGui.hpp"
 
 namespace aderite {
 namespace editor {
@@ -54,49 +56,54 @@ void SceneHierarchy::render() {
     // Context menu
     this->contextMenu();
 
+    // Prefab drag and drop
+    utility::WindowSizeDragDrop([&]() {
+        asset::PrefabAsset* prefabDrop = DragDrop::renderTarget<asset::PrefabAsset>(aderite::reflection::RuntimeTypes::PREFAB);
+        if (prefabDrop != nullptr) {
+            currentScene->createGameObject(prefabDrop);
+        }
+    });
+
     ImGui::Text("%s", currentScene->getName().c_str());
 
     // Actual tree
     ImGui::Separator();
 
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Game Objects")) {
-        for (const auto& gameObject : currentScene->getGameObjects()) {
-            ImGuiTreeNodeFlags leafFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+    for (const auto& gameObject : currentScene->getGameObjects()) {
+        ImGuiTreeNodeFlags leafFlags = c_BaseFlags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
-            io::SerializableObject* selectedObject = editor::State::getInstance().getSelectedObject();
-            if (selectedObject != nullptr && selectedObject == gameObject.get()) {
-                leafFlags |= ImGuiTreeNodeFlags_Selected;
-            }
+        io::SerializableObject* selectedObject = editor::State::getInstance().getSelectedObject();
+        if (selectedObject != nullptr && selectedObject == gameObject.get()) {
+            leafFlags |= ImGuiTreeNodeFlags_Selected;
+        }
 
-            ImGui::TreeNodeEx(gameObject->getName().c_str(), leafFlags);
+        ImGui::TreeNodeEx(gameObject->getName().c_str(), leafFlags);
 
-            // Context menu
-            if (ImGui::BeginPopupContextItem()) {
-                if (ImGui::MenuItem("Delete")) {
-                    if (selectedObject != nullptr && selectedObject == gameObject.get()) {
-                        editor::State::getInstance().setSelectedObject(nullptr);
-                    }
-
-                    currentScene->destroyGameObject(gameObject.get());
-
-                    // Quit and rerender
-                    ImGui::EndPopup();
-                    break;
+        // Context menu
+        if (ImGui::BeginPopupContextItem()) {
+            if (ImGui::MenuItem("Delete")) {
+                if (selectedObject != nullptr && selectedObject == gameObject.get()) {
+                    editor::State::getInstance().setSelectedObject(nullptr);
                 }
 
+                currentScene->destroyGameObject(gameObject.get());
+
+                // Quit and rerender
                 ImGui::EndPopup();
+                break;
             }
 
-            // Drag drop
-            DragDrop::renderSource(gameObject.get());
-
-            // Selection
-            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                editor::State::getInstance().setSelectedObject(gameObject.get());
-            }
+            ImGui::EndPopup();
         }
-        ImGui::TreePop();
+
+        // Drag drop
+        DragDrop::renderSource(gameObject.get());
+
+        // Selection
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+            editor::State::getInstance().setSelectedObject(gameObject.get());
+        }
     }
 
     ImGui::End();

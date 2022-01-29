@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "aderite/io/ISerializable.hpp"
+#include "aderite/scene/Forward.hpp"
 
 namespace aderite {
 namespace scene {
@@ -13,8 +14,14 @@ namespace scene {
  */
 class Camera : public io::ISerializable {
 public:
-    Camera();
+    Camera(scene::GameObject* gObject);
     ~Camera();
+
+    /**
+     * @brief Update the camera properties
+     * @param delta Delta time of last frame
+     */
+    void update(float delta);
 
     /**
      * @brief Get field of vision of the camera
@@ -37,6 +44,7 @@ public:
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
+    scene::GameObject* m_gObject = nullptr;
     bgfx::TextureHandle m_output = BGFX_INVALID_HANDLE;
 
     float m_fov = 90.0f;

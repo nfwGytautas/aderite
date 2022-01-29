@@ -1,7 +1,8 @@
 #pragma once
 
-#include "aderite/asset/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
+#include "aderite/rendering/RenderableData.hpp"
+#include "aderite/scene/Forward.hpp"
 
 namespace aderite {
 namespace rendering {
@@ -9,49 +10,25 @@ namespace rendering {
 /**
  * @brief A class that provides functionality for renderable objects
  */
-class Renderable : public io::ISerializable {
+class Renderable {
 public:
+    Renderable(scene::GameObject* gObject);
     virtual ~Renderable();
 
     /**
-     * @brief Returns true if the renderable parameters are valid and it can be used for rendering
+     * @brief Update the renderable properties
+     * @param delta Delta time of last frame
      */
-    bool isValid() const;
+    void update(float delta);
 
     /**
-     * @brief Computes a hash value of this renderable
+     * @brief Returns the renderable data of this renderable
      */
-    size_t hash() const;
-
-    /**
-     * @brief Set the mesh of the renderable
-     * @param mesh Mesh to set
-     */
-    void setMesh(asset::MeshAsset* mesh);
-
-    /**
-     * @brief Set the material of the renderable
-     * @param material Material to set
-     */
-    void setMaterial(asset::MaterialAsset* material);
-
-    /**
-     * @brief Returns mesh instance
-     */
-    asset::MeshAsset* getMesh() const;
-
-    /**
-     * @brief Returns material instance
-     */
-    asset::MaterialAsset* getMaterial() const;
-
-    // Inherited via ISerializable
-    virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
-    virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
+    RenderableData& getData();
 
 private:
-    asset::MeshAsset* m_mesh = nullptr;
-    asset::MaterialAsset* m_material = nullptr;
+    scene::GameObject* m_gObject = nullptr;
+    RenderableData m_data;
 };
 
 } // namespace rendering

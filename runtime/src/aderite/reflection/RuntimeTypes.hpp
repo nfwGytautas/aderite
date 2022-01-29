@@ -21,30 +21,13 @@ enum class RuntimeTypes : Type {
     MAT_TYPE = 4,
     PIPELINE = 5,
     AUDIO = 6,
-
-    // Audio
-    AUDIO_SOURCE = 20,
-    AUDIO_LISTENER = 21,
+    PREFAB = 7,
 
     // Object
-    VISUAL = 40,
-    SCENERY = 41,
-    ENTITY = 42,
-    GAME_OBJECT = 43,
-
-    // Other scene objects
-    CAMERA = 60,
+    GAME_OBJECT = 40,
 
     // Geometry
     BOX_GEOMETRY = 75,
-
-    // Physics
-    PHYSICS_ACTOR = 90,
-    DYNAMIC_ACTOR,
-    STATIC_ACTOR,
-
-    // Scripting
-    SCRIPT_SYSTEM = 200,
 
     // Last element of runtime types, used to specify the end runtime serializables
     UNDEFINED = 249,

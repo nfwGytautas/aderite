@@ -43,6 +43,12 @@ bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetVal
 bool DrawQuatControl(const std::string& label, glm::quat& values, float columnWidth = 100.0f);
 
 /**
+ * @brief Draws a full drag drop border around the current window
+ * @param callback Callback to call for drag and drop
+*/
+void WindowSizeDragDrop(const std::function<void()>& callback);
+
+/**
  * @brief Utility class for creating an inline renaming element
  */
 class InlineRename {

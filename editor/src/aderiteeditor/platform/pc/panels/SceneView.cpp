@@ -4,12 +4,15 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
-#include "aderite/rendering/Renderer.hpp"
-#include "aderite/scene/Camera.hpp"
+#include "aderite/asset/PrefabAsset.hpp"
+#include "aderite/scene/Scene.hpp"
+#include "aderite/scene/SceneManager.hpp"
 #include "aderite/utility/Log.hpp"
 
+#include "aderiteeditor/shared/DragDrop.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
 #include "aderiteeditor/shared/State.hpp"
+#include "aderiteeditor/utility/ImGui.hpp"
 
 namespace aderite {
 namespace editor {
@@ -32,6 +35,19 @@ void SceneView::render() {
         ImGui::End();
         ImGui::PopStyleVar();
         return;
+    }
+
+    // Get current scene
+    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+
+    // Prefab drag and drop
+    if (currentScene != nullptr) {
+        utility::WindowSizeDragDrop([&]() {
+            asset::PrefabAsset* prefabDrop = DragDrop::renderTarget<asset::PrefabAsset>(aderite::reflection::RuntimeTypes::PREFAB);
+            if (prefabDrop != nullptr) {
+                currentScene->createGameObject(prefabDrop);
+            }
+        });
     }
 
     bgfx::TextureHandle outHandle = editor::State::getInstance().getEditorCamera()->getOutputHandle();

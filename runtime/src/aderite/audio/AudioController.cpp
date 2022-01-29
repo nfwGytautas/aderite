@@ -8,7 +8,6 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/asset/AudioAsset.hpp"
-#include "aderite/audio/AudioInstance.hpp"
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/io/FileHandler.hpp"
@@ -107,35 +106,6 @@ void AudioController::shutdown() {
 }
 
 void AudioController::update() {
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-    if (currentScene != nullptr) {
-        // Configure listener
-        bool thisFrameMute = false;
-        int enabledListenerCount = 0;
-
-        auto& listeners = currentScene->getAudioListeners();
-
-        // If no listeners no need to update anything
-        for (const auto& listener : listeners) {
-            if (listener->isEnabled()) {
-                if (enabledListenerCount > 1) {
-                    LOG_WARN("[Audio] Multiple enabled listeners, the last one will be used as the listener");
-                }
-
-                listener->update();
-                enabledListenerCount++;
-            }
-        }
-
-        // If no active listeners, mute
-        if (enabledListenerCount > 0) {
-            // Configure sources
-            for (const std::unique_ptr<AudioSource>& source : currentScene->getAudioSources()) {
-                source->update();
-            }
-        }
-    }
-
     if (m_fmodSystem->update() != FMOD_OK) {
         LOG_WARN("[Audio] Failed to update audio controller");
     }
@@ -207,13 +177,13 @@ bool AudioController::masterBanksLoaded() const {
     return m_masterBank != nullptr && m_stringBank != nullptr;
 }
 
-AudioInstance* aderite::audio::AudioController::createAudioInstance(const std::string name) const {
+FMOD::Studio::EventInstance* AudioController::createAudioInstance(const asset::AudioAsset* audioAsset) const {
     FMOD::Studio::EventDescription* desc = nullptr;
     FMOD::Studio::EventInstance* instance;
     FMOD_STUDIO_LOADING_STATE loadState;
 
-    LOG_TRACE("[Audio] Creating AudioInstance for {0}", name);
-    ADERITE_DYNAMIC_ASSERT(m_fmodSystem->getEvent(name.c_str(), &desc) == FMOD_OK, "Failed to get event");
+    LOG_TRACE("[Audio] Creating AudioInstance for {0}", audioAsset->getName());
+    ADERITE_DYNAMIC_ASSERT(m_fmodSystem->getEvent(audioAsset->getEventName().c_str(), &desc) == FMOD_OK, "Failed to get event");
     ADERITE_DYNAMIC_ASSERT(desc->createInstance(&instance) == FMOD_OK, "Failed to create event instance");
 
     desc->getSampleLoadingState(&loadState);
@@ -221,9 +191,8 @@ AudioInstance* aderite::audio::AudioController::createAudioInstance(const std::s
         ADERITE_DYNAMIC_ASSERT(desc->loadSampleData() == FMOD_OK, "Failed to load event sample data");
     }
 
-    AudioInstance* aderiteInstance = new AudioInstance(instance);
-    LOG_INFO("[Audio] {0} instance created", name);
-    return aderiteInstance;
+    LOG_INFO("[Audio] {0} instance created", audioAsset->getName());
+    return instance;
 }
 
 FMOD::Studio::System* AudioController::getFmodSystem() const {
@@ -232,36 +201,12 @@ FMOD::Studio::System* AudioController::getFmodSystem() const {
 
 void AudioController::setMute(bool value) const {
     LOG_TRACE("[Audio] Changing mute state to {0}", value);
-
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-    if (currentScene == nullptr) {
-        return;
-    }
-
-    for (const auto& source : currentScene->getAudioSources()) {
-        if (value) {
-            source->mute();
-        } else {
-            source->unmute();
-        }
-    }
+    ADERITE_UNIMPLEMENTED;
 }
 
 void AudioController::disable(bool value) const {
     LOG_TRACE("[Audio] Changing enabled state to {0}", value);
-
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-    if (currentScene == nullptr) {
-        return;
-    }
-
-    for (const auto& source : currentScene->getAudioSources()) {
-        if (value) {
-            source->stop();
-        } else {
-            // TODO: Play?
-        }
-    }
+    ADERITE_UNIMPLEMENTED;
 }
 
 const std::vector<std::string>& aderite::audio::AudioController::getKnownEvents() const {

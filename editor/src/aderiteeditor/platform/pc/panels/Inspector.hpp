@@ -1,5 +1,6 @@
 #pragma once
 
+#include "aderite/audio/Forward.hpp"
 #include "aderite/io/Forward.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
@@ -21,9 +22,12 @@ public:
     void render() override;
 
 private:
-    // Common
+    // Components
     void renderTransformProvider(scene::TransformProvider* provider);
-    void renderRenderable(rendering::Renderable* renderable);
+    void renderRenderable(rendering::RenderableData& renderable);
+    void renderCamera(scene::Camera* camera);
+    void renderAudioSource(audio::AudioSource* source);
+    void renderAudioListener(audio::AudioListener* listener);
 
     // Objects
     void renderGameObject(io::SerializableObject* object);

@@ -67,9 +67,12 @@ bool PhysXActor::isDynamic() const {
 }
 
 void PhysXActor::applyProperties(const PhysicsProperties& properties) {
-    if (m_actor == nullptr || !m_isDynamic) {
-        // Convert to dynamic actor
-        this->makeDynamic();
+    if (m_actor == nullptr || m_isDynamic != properties.IsDynamic) {
+        if (properties.IsDynamic) {
+            this->makeDynamic();
+        } else {
+            this->makeStatic();
+        }
     }
 
     // Apply properties
@@ -82,6 +85,8 @@ void PhysXActor::applyProperties(const PhysicsProperties& properties) {
 
 PhysicsProperties PhysXActor::getProperties() const {
     PhysicsProperties pp;
+
+    pp.IsDynamic = m_isDynamic;
 
     if (m_isDynamic) {
         physx::PxRigidDynamic* dynamic = static_cast<physx::PxRigidDynamic*>(m_actor);

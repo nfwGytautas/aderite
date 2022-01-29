@@ -695,7 +695,7 @@ void Inspector::renderTransformProvider(scene::TransformProvider* provider) {
     }
 }
 
-void Inspector::renderRenderable(rendering::Renderable* renderable) {
+void Inspector::renderRenderable(rendering::RenderableData& renderable) {
     ImGui::Text("Renderable");
 
     if (ImGui::BeginTable("RenderableTable", 2)) {
@@ -710,15 +710,15 @@ void Inspector::renderRenderable(rendering::Renderable* renderable) {
         ImGui::TableSetColumnIndex(1);
         ImGui::PushItemWidth(-FLT_MIN);
 
-        if (renderable->getMesh() != nullptr) {
-            ImGui::Button(renderable->getMesh()->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        if (renderable.getMesh() != nullptr) {
+            ImGui::Button(renderable.getMesh()->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
         } else {
             ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
         }
 
         asset::MeshAsset* mesh = DragDrop::renderTarget<asset::MeshAsset>(reflection::RuntimeTypes::MESH);
         if (mesh != nullptr) {
-            renderable->setMesh(mesh);
+            renderable.setMesh(mesh);
         }
 
         ImGui::TableNextRow();
@@ -728,19 +728,31 @@ void Inspector::renderRenderable(rendering::Renderable* renderable) {
         ImGui::TableSetColumnIndex(1);
         ImGui::PushItemWidth(-FLT_MIN);
 
-        if (renderable->getMaterial() != nullptr) {
-            ImGui::Button(renderable->getMaterial()->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+        if (renderable.getMaterial() != nullptr) {
+            ImGui::Button(renderable.getMaterial()->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
         } else {
             ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
         }
 
         asset::MaterialAsset* material = DragDrop::renderTarget<asset::MaterialAsset>(reflection::RuntimeTypes::MATERIAL);
         if (material != nullptr) {
-            renderable->setMaterial(material);
+            renderable.setMaterial(material);
         }
 
         ImGui::EndTable();
     }
+}
+
+void Inspector::renderCamera(scene::Camera* camera) {
+    ImGui::Text("Camera");
+}
+
+void Inspector::renderAudioSource(audio::AudioSource* source) {
+    ImGui::Text("Audio source");
+}
+
+void Inspector::renderAudioListener(audio::AudioListener* listener) {
+    ImGui::Text("Audio listener");
 }
 
 void Inspector::renderGameObject(io::SerializableObject* object) {
@@ -750,6 +762,9 @@ void Inspector::renderGameObject(io::SerializableObject* object) {
     scene::TransformProvider* const transform = gObject->getTransform();
     rendering::Renderable* const renderable = gObject->getRenderable();
     physics::PhysXActor* const actor = gObject->getActor();
+    scene::Camera* const camera = gObject->getCamera();
+    audio::AudioListener* const listener = gObject->getAudioListener();
+    audio::AudioSource* const source = gObject->getAudioSource();
 
     // Render the game object components
     if (transform != nullptr) {
@@ -759,12 +774,27 @@ void Inspector::renderGameObject(io::SerializableObject* object) {
 
     if (renderable != nullptr) {
         ImGui::Dummy(ImVec2(0, 5));
-        this->renderRenderable(renderable);
+        this->renderRenderable(renderable->getData());
     }
 
     if (actor != nullptr) {
         ImGui::Dummy(ImVec2(0, 5));
         this->renderActor(actor);
+    }
+
+    if (camera != nullptr) {
+        ImGui::Dummy(ImVec2(0, 5));
+        this->renderCamera(camera);
+    }
+
+    if (listener != nullptr) {
+        ImGui::Dummy(ImVec2(0, 5));
+        this->renderAudioListener(listener);
+    }
+
+    if (source != nullptr) {
+        ImGui::Dummy(ImVec2(0, 5));
+        this->renderAudioSource(source);
     }
 
     // Add components
@@ -787,8 +817,23 @@ void Inspector::renderGameObject(io::SerializableObject* object) {
             ImGui::CloseCurrentPopup();
         }
 
-        if (actor == nullptr && ImGui::MenuItem("Actor")) {
+        if (actor == nullptr && ImGui::MenuItem("Physics actor")) {
             gObject->addActor();
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (camera == nullptr && ImGui::MenuItem("Camera")) {
+            gObject->addCamera();
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (source == nullptr && ImGui::MenuItem("Audio source")) {
+            gObject->addAudioSource();
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (listener == nullptr && ImGui::MenuItem("Audio listener")) {
+            gObject->addAudioListener();
             ImGui::CloseCurrentPopup();
         }
 

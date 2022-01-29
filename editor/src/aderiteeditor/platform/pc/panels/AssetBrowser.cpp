@@ -11,10 +11,12 @@
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
+#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/Serializer.hpp"
+#include "aderite/scene/GameObject.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/utility/Log.hpp"
@@ -190,6 +192,14 @@ void AssetBrowser::renderItems() {
                 }
                 case reflection::RuntimeTypes::AUDIO: {
                     icon = editor::EditorIcons::getInstance().getIcon("audio_clip");
+                    break;
+                }
+                case reflection::RuntimeTypes::PREFAB: {
+                    icon = editor::EditorIcons::getInstance().getIcon("prefab");
+                    break;
+                }
+                default: {
+                    icon = editor::EditorIcons::getInstance().getIcon("null");
                     break;
                 }
                 }
@@ -558,6 +568,15 @@ void AssetBrowser::render() {
         ImGui::End();
         return;
     }
+
+    // Prefab drag and drop
+    utility::WindowSizeDragDrop([&]() {
+        scene::GameObject* prefabDrop = DragDrop::renderTarget<scene::GameObject>(aderite::reflection::RuntimeTypes::GAME_OBJECT);
+        if (prefabDrop != nullptr) {
+            asset::PrefabAsset* prefab = new asset::PrefabAsset(prefabDrop);
+            this->addAsset(prefab);
+        }
+    });
 
     // Display
     if (ImGui::BeginTable("AssetBrowserTable", 2, 0)) {

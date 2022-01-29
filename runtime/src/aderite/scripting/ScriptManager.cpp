@@ -138,16 +138,16 @@ ScriptEvent* ScriptManager::getEventFromName(const std::string& name) const {
 }
 
 void ScriptManager::onSceneChanged(scene::Scene* scene) const {
-    // Update entries
-    scene->updateScriptDataEntries();
+    //// Update entries
+    //scene->updateScriptDataEntries();
 
-    // Load script data
-    for (const auto& sd : scene->getScriptData()) {
-        sd->load();
-    }
+    //// Load script data
+    //for (const auto& sd : scene->getScriptData()) {
+    //    sd->load();
+    //}
 
-    // Initialize scripts
-    scene->callSceneLoaded();
+    //// Initialize scripts
+    //scene->callSceneLoaded();
 }
 
 MonoDomain* ScriptManager::getDomain() const {

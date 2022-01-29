@@ -9,6 +9,8 @@ namespace physics {
  * @brief Properties that can be applied to a physics actor
  */
 struct PhysicsProperties {
+    bool IsDynamic = false;
+
     // Dynamic only
 
     /**

@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "aderite/audio/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
@@ -51,7 +52,7 @@ public:
     /**
      * @brief Attach transform component to this GameObject
      */
-    void addTransform();
+    TransformProvider* addTransform();
 
     /**
      * @brief Remove transform component from this GameObject
@@ -66,7 +67,7 @@ public:
     /**
      * @brief Attach renderable component to this GameObject
      */
-    void addRenderable();
+    rendering::Renderable* addRenderable();
 
     /**
      * @brief Remove renderable component from this GameObject
@@ -81,7 +82,7 @@ public:
     /**
      * @brief Attach actor component to this GameObject
      */
-    void addActor();
+    physics::PhysXActor* addActor();
 
     /**
      * @brief Remove actor component from this GameObject
@@ -91,12 +92,12 @@ public:
     /**
      * @brief Returns the actor of this GameObject
      */
-    physics::PhysXActor* getActor();
+    physics::PhysXActor* getActor() const;
 
     /**
      * @brief Attach camera component to this GameObject
      */
-    void addCamera();
+    Camera* addCamera();
 
     /**
      * @brief Remove camera component from this GameObject
@@ -106,7 +107,37 @@ public:
     /**
      * @brief Returns the camera of this GameObject
      */
-    Camera* getCamera();
+    Camera* getCamera() const;
+
+    /**
+     * @brief Attach audio source component to this GameObject
+     */
+    audio::AudioSource* addAudioSource();
+
+    /**
+     * @brief Remove audio source component from this GameObject
+     */
+    void removeAudioSource();
+
+    /**
+     * @brief Returns the audio source component of this GameObject
+     */
+    audio::AudioSource* getAudioSource() const;
+
+    /**
+     * @brief Attach audio listener component to this GameObject
+     */
+    audio::AudioListener* addAudioListener();
+
+    /**
+     * @brief Remove audio listener component from this GameObject
+     */
+    void removeAudioListener();
+
+    /**
+     * @brief Returns the audio source component of this GameObject
+     */
+    audio::AudioListener* getAudioListener() const;
 
     // Inherited via SerializableObject
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
@@ -123,6 +154,8 @@ private:
     rendering::Renderable* m_renderable = nullptr;
     physics::PhysXActor* m_actor = nullptr;
     Camera* m_camera = nullptr;
+    audio::AudioSource* m_audioSource = nullptr;
+    audio::AudioListener* m_audioListener = nullptr;
 };
 
 } // namespace scene

@@ -1,5 +1,5 @@
 Registry:
-  NextHandle: 10
+  NextHandle: 15
   Entries:
     - Handle: 0
     - Handle: 1
@@ -11,3 +11,8 @@ Registry:
     - Handle: 7
     - Handle: 8
     - Handle: 9
+    - Handle: 10
+    - Handle: 11
+    - Handle: 12
+    - Handle: 13
+    - Handle: 14

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "aderite/io/SerializableAsset.hpp"
+#include "aderite/audio/Forward.hpp"
 
 namespace aderite {
 namespace asset {

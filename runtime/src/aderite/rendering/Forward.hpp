@@ -10,6 +10,7 @@ namespace rendering {
 class Renderer;
 class DrawCall;
 class Renderable;
+class RenderableData;
 struct FrameData;
 
 } // namespace rendering

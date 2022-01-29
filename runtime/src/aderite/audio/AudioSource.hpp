@@ -1,15 +1,11 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
-#include <glm/glm.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
+#include <fmod_studio.hpp>
 
 #include "aderite/asset/Forward.hpp"
 #include "aderite/audio/Forward.hpp"
-#include "aderite/io/SerializableAsset.hpp"
+#include "aderite/io/ISerializable.hpp"
+#include "aderite/scene/Forward.hpp"
 
 namespace aderite {
 namespace audio {
@@ -17,29 +13,37 @@ namespace audio {
 /**
  * @brief Audio source object used to denote a point in the world where audio is emitted from
  */
-class AudioSource final : public io::SerializableObject {
+class AudioSource final : public io::ISerializable {
 public:
-    AudioSource();
+    AudioSource(scene::GameObject* gObject);
     virtual ~AudioSource();
 
     /**
-     * @brief Update audio source
+     * @brief Update the audio source properties
+     * @param delta Delta time of last frame
      */
-    void update() const;
+    void update(float delta);
 
     /**
-     * @brief Creates an audio instance for the specified clip
-     * @param clip Clip to create instance for
-     * @return AudioInstance object
+     * @brief Set the audio clip of this source
+     * @param clip New clip of the audio source
      */
-    AudioInstance* createInstance(const asset::AudioAsset* clip);
+    void setAudioClip(asset::AudioAsset* clip);
 
     /**
-     * @brief Creats a one shot audio instance for the specified clip
-     * @param clip Clip to create instance for
-     * @return AudioInstance object
+     * @brief Returns the audio clip of this source
      */
-    AudioInstance* createOneshot(const asset::AudioAsset* clip);
+    asset::AudioAsset* getAudioClip() const;
+
+    /**
+     * @brief Start playing audio
+     */
+    void start() const;
+
+    /**
+     * @brief Stop playing immediately
+     */
+    void stop() const;
 
     /**
      * @brief Mutes the source
@@ -52,40 +56,9 @@ public:
     void unmute();
 
     /**
-     * @brief Stops all instances in the audio, this will clear oneshots if there were any
-     */
-    void stop();
-
-    /**
-     * @brief Set the name of the source
-     * @param name Name of the source
-     */
-    void setName(const std::string& name);
-
-    /**
-     * @brief Returns the name of the source
-     */
-    std::string getName() const;
-
-    /**
      * @brief Returns the volume of the source
      */
     float getVolume() const;
-
-    /**
-     * @brief Returns the position of the source
-     */
-    glm::vec3 getPosition() const;
-
-    /**
-     * @brief Returns the rotation of the source
-     */
-    glm::quat getRotation() const;
-
-    /**
-     * @brief Returns the velocity of the source
-     */
-    glm::vec3 getVelocity() const;
 
     /**
      * @brief Sets the volume of the source
@@ -93,47 +66,17 @@ public:
      */
     void setVolume(const float volume);
 
-    /**
-     * @brief Sets the position of the source
-     * @param position New position for this source
-     */
-    void setPosition(const glm::vec3& position);
-
-    /**
-     * @brief Sets the rotation of the source
-     * @param rotation New rotation for this source
-     */
-    void setRotation(const glm::quat& rotation);
-
-    /**
-     * @brief Sets the velocity of the source
-     * @param velocity New velocity for this source
-     */
-    void setVelocity(const glm::vec3& velocity);
-
-    // Inherited via SerializableAsset
-    reflection::Type getType() const override;
+    // Inherited via ISerializable
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
-    /**
-     * @brief Synchronizes source parameters with the instance
-     * @param instance Instance to sync
-     */
-    void syncInstance(AudioInstance* instance) const;
-
-private:
-    std::string m_name = "";
-    std::vector<AudioInstance*> m_instances;
-    std::vector<AudioInstance*> m_oneshots;
-
+    scene::GameObject* m_gObject = nullptr;
+    FMOD::Studio::EventInstance* m_instance = nullptr;
+    asset::AudioAsset* m_audioClip = nullptr;
     bool m_muted = false;
 
     // Properties
-    glm::vec3 m_position = {0.0f, 0.0f, 0.0f};
-    glm::quat m_rotation = glm::quat({1.0f, 0.0f, 0.0f, 0.0f});
-    glm::vec3 m_velocity = {0.0f, 0.0f, 0.0f};
     float m_volume = 1.0f;
 };
 

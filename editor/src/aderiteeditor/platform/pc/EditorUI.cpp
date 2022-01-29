@@ -233,7 +233,6 @@ void EditorUI::configureDockspace() {
         ImGui::DockBuilderDockWindow("Inspector", dockMiddleRight);
         ImGui::DockBuilderDockWindow("Scene view", dockMainId);
         ImGui::DockBuilderDockWindow("Node editor", dockMainId);
-        ImGui::DockBuilderDockWindow("Script mapping", dockMainId);
 
         // Make toolbar immutable
         ImGuiDockNode* node = ImGui::DockBuilderGetNode(dockTop);
@@ -259,7 +258,6 @@ void EditorUI::createComponents() {
     m_components.push_back(new editor::SceneHierarchy());
     m_components.push_back(new editor::AssetBrowser());
     m_components.push_back(new editor::NodeEditor());
-    m_components.push_back(new editor::SceneScriptMapping());
 
     // Other
     m_components.push_back(new editor::StartupModal());

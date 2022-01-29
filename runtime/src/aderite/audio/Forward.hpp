@@ -7,7 +7,6 @@ namespace aderite {
 namespace audio {
 
 class AudioController;
-class AudioInstance;
 class AudioSource;
 class AudioListener;
 
