@@ -17,7 +17,7 @@ class RaycastHit;
 class Geometry;
 class BoxGeometry;
 class PhysXActor;
-struct PhysicsProperties;
+class PhysicsProperties;
 
 } // namespace physics
 } // namespace aderite

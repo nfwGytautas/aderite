@@ -1,0 +1,12 @@
+Type: 7
+Name: GroundPrefab
+Data:
+  Renderable:
+    Mesh: 1
+    Material: 4
+  PhysicsActor:
+    Dynamic: false
+    Mass: 1
+    HasGravity: false
+    Geometry:
+      []

@@ -218,9 +218,8 @@ void Renderer::render() {
         // 4. Submit draw calls
         for (auto& kvp : m_readData.DrawCalls) {
             // Extract assets
-            const RenderableData& renderable = kvp.second.Renderable->getData();
-            const asset::MaterialAsset* material = renderable.getMaterial();
-            const asset::MeshAsset* mesh = renderable.getMesh();
+            const asset::MaterialAsset* material = kvp.second.Material;
+            const asset::MeshAsset* mesh = kvp.second.Mesh;
             const asset::MaterialTypeAsset* mType = material->getMaterialType();
 
             // TODO : Check for frame miss and available size

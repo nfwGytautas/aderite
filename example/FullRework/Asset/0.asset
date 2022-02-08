@@ -22,15 +22,35 @@ Data:
           Mesh: 1
           Material: 6
         PhysicsActor:
-          Transform:
-            Position: [0, 0, 0]
-            Rotation: [1, 0, 0, -0.000816169195]
-            Scale: [1, 1, 1]
+          Dynamic: true
+          Mass: 1
+          HasGravity: true
           Geometry:
-            []
+            - Type: 75
+              Name: l5WkM0RMBFYf
+              Data:
+                Size: [1, 1, 1]
         Camera:
           FoV: 90
         AudioSource:
           Volume: 1
         AudioListener:
           Enabled: false
+    - GameObject:
+        Name: Ground
+        Transform:
+          Position: [0, -5, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [10, 0.5, 10]
+        Renderable:
+          Mesh: 1
+          Material: 4
+        PhysicsActor:
+          Dynamic: false
+          Mass: 1
+          HasGravity: false
+          Geometry:
+            - Type: 75
+              Name: idrgZ3MpIFwA
+              Data:
+                Size: [1, 1, 1]

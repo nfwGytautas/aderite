@@ -38,6 +38,7 @@ Runtime:
 		Dont kill entire editor on script run error
 		Load on project open
 	Code:
+		Component interface for getData
 		DLLs instead of static libs
 		Middleware sections
 		Utility operators for types

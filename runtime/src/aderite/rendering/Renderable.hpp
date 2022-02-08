@@ -10,7 +10,7 @@ namespace rendering {
 /**
  * @brief A class that provides functionality for renderable objects
  */
-class Renderable {
+class Renderable final {
 public:
     Renderable(scene::GameObject* gObject);
     virtual ~Renderable();

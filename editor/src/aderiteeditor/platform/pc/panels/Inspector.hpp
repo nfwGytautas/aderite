@@ -34,7 +34,7 @@ private:
 
     // Physics
     void renderActor(physics::PhysXActor* actor);
-    void renderBaseGeometry(physics::Geometry* geometry);
+    void renderColliders(physics::PhysXActor* actor);
 
     // Assets
     void renderMaterial(io::SerializableObject* asset);

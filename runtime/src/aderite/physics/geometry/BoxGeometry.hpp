@@ -29,10 +29,10 @@ public:
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
     reflection::Type getType() const override;
+    Geometry* clone() override;
 
 private:
     glm::vec3 m_size = glm::vec3(1.0f);
-
 };
 
 } // namespace physics

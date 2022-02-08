@@ -63,5 +63,12 @@ reflection::Type BoxGeometry::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::BOX_GEOMETRY);
 }
 
+Geometry* BoxGeometry::clone() {
+    BoxGeometry* bg = new BoxGeometry();
+    bg->setSize(bg->getSize());
+    bg->setName(bg->getName());
+    return bg;
+}
+
 } // namespace physics
 } // namespace aderite

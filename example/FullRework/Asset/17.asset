@@ -1,0 +1,15 @@
+Type: 7
+Name: Ground
+Data:
+  Renderable:
+    Mesh: 1
+    Material: 4
+  PhysicsActor:
+    Dynamic: false
+    Mass: 1
+    HasGravity: false
+    Geometry:
+      - Type: 75
+        Name: qNrzIYt5Siq4
+        Data:
+          Size: [1, 1, 1]

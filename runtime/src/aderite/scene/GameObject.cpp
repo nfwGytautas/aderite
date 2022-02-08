@@ -8,7 +8,6 @@
 #include "aderite/rendering/Renderable.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/Camera.hpp"
-#include "aderite/scene/StandaloneTransformProvider.hpp"
 
 namespace aderite {
 namespace scene {
@@ -54,12 +53,20 @@ void GameObject::update(float delta) {
         m_camera->update(delta);
     }
 
+    if (m_actor != nullptr) {
+        m_actor->update(delta);
+    }
+
     if (m_audioSource != nullptr) {
         m_audioSource->update(delta);
     }
 
     if (m_audioListener != nullptr) {
         m_audioListener->update(delta);
+    }
+
+    if (m_transform != nullptr) {
+        m_transform->resetModifiedFlag();
     }
 }
 
@@ -77,7 +84,7 @@ Scene* GameObject::getScene() const {
 
 TransformProvider* GameObject::addTransform() {
     ADERITE_DYNAMIC_ASSERT(m_transform == nullptr, "Tried to add a transform to an object that already has one");
-    m_transform = new StandaloneTransformProvider();
+    m_transform = new TransformProvider();
     return m_transform;
 }
 
@@ -88,10 +95,6 @@ void GameObject::removeTransform() {
 }
 
 TransformProvider* GameObject::getTransform() const {
-    if (m_actor != nullptr) {
-        return m_actor;
-    }
-
     return m_transform;
 }
 
@@ -116,29 +119,15 @@ rendering::Renderable* GameObject::getRenderable() const {
 
 physics::PhysXActor* GameObject::addActor() {
     ADERITE_DYNAMIC_ASSERT(m_actor == nullptr, "Tried to add a actor to an object that already has one");
-    m_actor = new physics::PhysXActor(this);
-
-    // Static by default
-    m_actor->makeStatic();
-
-    if (m_transform != nullptr) {
-        m_actor->setPosition(m_transform->getPosition());
-        m_actor->setRotation(m_transform->getRotation());
-        m_actor->setScale(m_transform->getScale());
+    if (m_transform == nullptr) {
+        this->addTransform();
     }
-
+    m_actor = new physics::PhysXActor(this);
     return m_actor;
 }
 
 void GameObject::removeActor() {
     ADERITE_DYNAMIC_ASSERT(m_actor != nullptr, "Tried to remove actor from object that doesn't have one");
-
-    if (m_transform != nullptr) {
-        m_transform->setPosition(m_actor->getPosition());
-        m_transform->setRotation(m_actor->getRotation());
-        m_transform->setScale(m_actor->getScale());
-    }
-
     delete m_actor;
     m_actor = nullptr;
 }
@@ -211,8 +200,8 @@ bool GameObject::serialize(const io::Serializer* serializer, YAML::Emitter& emit
     emitter << YAML::Key << "GameObject" << YAML::BeginMap;
     emitter << YAML::Key << "Name" << YAML::Value << this->getName();
 
-    if (m_transform != nullptr) {
-        if (!m_transform->serialize(serializer, emitter)) {
+    if (this->getTransform() != nullptr) {
+        if (!this->getTransform()->serialize(serializer, emitter)) {
             return false;
         }
     }
@@ -224,25 +213,25 @@ bool GameObject::serialize(const io::Serializer* serializer, YAML::Emitter& emit
     }
 
     if (m_actor != nullptr) {
-        if (!m_actor->serialize(serializer, emitter)) {
+        if (!m_actor->getData().serialize(serializer, emitter)) {
             return false;
         }
     }
 
     if (m_camera != nullptr) {
-        if (!m_camera->serialize(serializer, emitter)) {
+        if (!m_camera->getData().serialize(serializer, emitter)) {
             return false;
         }
     }
 
     if (m_audioSource != nullptr) {
-        if (!m_audioSource->serialize(serializer, emitter)) {
+        if (!m_audioSource->getData().serialize(serializer, emitter)) {
             return false;
         }
     }
 
     if (m_audioListener != nullptr) {
-        if (!m_audioListener->serialize(serializer, emitter)) {
+        if (!m_audioListener->getData().serialize(serializer, emitter)) {
             return false;
         }
     }
@@ -281,7 +270,7 @@ bool GameObject::deserialize(io::Serializer* serializer, const YAML::Node& data)
     {
         const YAML::Node& componentNode = gameObject["PhysicsActor"];
         if (componentNode && !componentNode.IsNull()) {
-            if (!this->addActor()->deserialize(serializer, gameObject)) {
+            if (!this->addActor()->getData().deserialize(serializer, gameObject)) {
                 return false;
             }
         }
@@ -290,7 +279,7 @@ bool GameObject::deserialize(io::Serializer* serializer, const YAML::Node& data)
     {
         const YAML::Node& componentNode = gameObject["Camera"];
         if (componentNode && !componentNode.IsNull()) {
-            if (!this->addCamera()->deserialize(serializer, gameObject)) {
+            if (!this->addCamera()->getData().deserialize(serializer, gameObject)) {
                 return false;
             }
         }
@@ -299,7 +288,7 @@ bool GameObject::deserialize(io::Serializer* serializer, const YAML::Node& data)
     {
         const YAML::Node& componentNode = gameObject["AudioSource"];
         if (componentNode && !componentNode.IsNull()) {
-            if (!this->addAudioSource()->deserialize(serializer, gameObject)) {
+            if (!this->addAudioSource()->getData().deserialize(serializer, gameObject)) {
                 return false;
             }
         }
@@ -308,7 +297,7 @@ bool GameObject::deserialize(io::Serializer* serializer, const YAML::Node& data)
     {
         const YAML::Node& componentNode = gameObject["AudioListener"];
         if (componentNode && !componentNode.IsNull()) {
-            if (!this->addAudioListener()->deserialize(serializer, gameObject)) {
+            if (!this->addAudioListener()->getData().deserialize(serializer, gameObject)) {
                 return false;
             }
         }

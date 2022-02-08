@@ -37,7 +37,8 @@ void Renderable::update(float delta) {
     rendering::FrameData& fd = ::aderite::Engine::getRenderer()->getWriteFrameData();
 
     rendering::DrawCall& dc = fd.DrawCalls[m_data.hash()];
-    dc.Renderable = this;
+    dc.Material = m_data.getMaterial();
+    dc.Mesh = m_data.getMesh();
     dc.Transformations.push_back(calculateTransformationMatrix(transform));
 }
 

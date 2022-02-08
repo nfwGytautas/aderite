@@ -36,41 +36,19 @@ void Camera::update(float delta) {
     rendering::CameraData cd;
     cd.Name = m_gObject->getName();
     cd.Output = m_output;
-    cd.ProjectionMatrix = glm::perspective(glm::radians(m_fov), 1.0f, 0.1f, 1000.0f);
+    cd.ProjectionMatrix = glm::perspective(glm::radians(m_settings.getFoV()), 1.0f, 0.1f, 1000.0f);
     cd.ViewMatrix = glm::inverse(glm::translate(glm::mat4(1.0f), transform->getPosition()) * glm::toMat4(transform->getRotation()));
 
     // Push to the list
     fd.Cameras.push_back(cd);
 }
 
-float Camera::getFoV() const {
-    return m_fov;
-}
-
-void Camera::setFoV(float fov) {
-    m_fov = fov;
-}
-
 bgfx::TextureHandle Camera::getOutputHandle() const {
     return m_output;
 }
 
-bool Camera::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    emitter << YAML::Key << "Camera" << YAML::BeginMap;
-    emitter << YAML::Key << "FoV" << YAML::Value << m_fov;
-    emitter << YAML::EndMap;
-    return true;
-}
-
-bool Camera::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    const YAML::Node& camera = data["Camera"];
-    if (!camera || camera.IsNull()) {
-        return false;
-    }
-
-    m_fov = camera["FoV"].as<float>();
-
-    return true;
+CameraSettings& Camera::getData() {
+    return m_settings;
 }
 
 } // namespace scene

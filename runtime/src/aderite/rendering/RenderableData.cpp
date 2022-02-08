@@ -34,8 +34,11 @@ void RenderableData::setMesh(asset::MeshAsset* mesh) {
         m_mesh->release();
     }
 
+    if (mesh != nullptr) {
+        mesh->acquire();
+    }
+
     m_mesh = mesh;
-    m_mesh->acquire();
 }
 
 void RenderableData::setMaterial(asset::MaterialAsset* material) {
@@ -43,8 +46,11 @@ void RenderableData::setMaterial(asset::MaterialAsset* material) {
         m_material->release();
     }
 
+    if (material != nullptr) {
+        material->acquire();
+    }
+
     m_material = material;
-    m_material->acquire();
 }
 
 asset::MeshAsset* RenderableData::getMesh() const {

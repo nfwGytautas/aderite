@@ -25,12 +25,16 @@ bool DynamicInputText(const char* label, std::string* value, ImGuiInputTextFlags
 }
 
 bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth) {
+    return DrawVec3Control(label, label, values, resetValue, columnWidth);
+}
+
+bool DrawVec3Control(const std::string& id, const std::string& label, glm::vec3& values, float resetValue, float columnWidth) {
     bool altered = false;
 
     ImGuiIO& io = ImGui::GetIO();
     auto boldFont = io.Fonts->Fonts[0];
 
-    ImGui::PushID(label.c_str());
+    ImGui::PushID(id.c_str());
 
     ImGui::Columns(2);
     ImGui::SetColumnWidth(0, columnWidth);

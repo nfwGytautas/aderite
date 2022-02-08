@@ -1,7 +1,9 @@
 #pragma once
 
+#include "aderite/audio/Forward.hpp"
 #include "aderite/io/SerializableAsset.hpp"
-#include "aderite/rendering/RenderableData.hpp"
+#include "aderite/physics/Forward.hpp"
+#include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 
 namespace aderite {
@@ -32,7 +34,12 @@ public:
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
 private:
+    scene::TransformProvider* m_transform = nullptr;
     rendering::RenderableData* m_renderable = nullptr;
+    physics::PhysicsProperties* m_actor = nullptr;
+    scene::CameraSettings* m_camera = nullptr;
+    audio::AudioListenerData* m_audioListener = nullptr;
+    audio::AudioSourceData* m_audioSource = nullptr;
 };
 
 } // namespace asset

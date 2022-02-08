@@ -36,6 +36,11 @@ public:
      */
     virtual void applyScale(const glm::vec3& scale) = 0;
 
+    /**
+     * @brief Clone the geometry and return the new instance
+     */
+    virtual Geometry* clone() = 0;
+
 protected:
     physx::PxShape* p_shape = nullptr;
 };

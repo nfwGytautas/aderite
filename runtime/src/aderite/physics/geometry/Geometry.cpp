@@ -8,6 +8,10 @@ namespace physics {
 Geometry::Geometry() {}
 
 Geometry::~Geometry() {
+    if (p_shape->getActor() != nullptr) {
+        p_shape->getActor()->detachShape(*p_shape);
+    }
+
     p_shape->userData = nullptr;
     p_shape->release();
 }

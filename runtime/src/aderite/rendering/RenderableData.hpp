@@ -1,7 +1,7 @@
 #pragma once
 
 #include "aderite/asset/Forward.hpp"
-#include "aderite/io/SerializableObject.hpp"
+#include "aderite/io/ISerializable.hpp"
 
 namespace aderite {
 namespace rendering {
@@ -9,7 +9,7 @@ namespace rendering {
 /**
  * @brief Class containing data for renderables
  */
-class RenderableData : public io::ISerializable {
+class RenderableData final : public io::ISerializable {
 public:
     virtual ~RenderableData();
 

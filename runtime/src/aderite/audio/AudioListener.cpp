@@ -15,7 +15,7 @@ AudioListener::AudioListener(scene::GameObject* gObject) : m_gObject(gObject) {}
 AudioListener::~AudioListener() {}
 
 void AudioListener::update(float delta) {
-    if (!m_enabled) {
+    if (!m_data.isEnabled()) {
         return;
     }
 
@@ -43,35 +43,8 @@ void AudioListener::update(float delta) {
     ::aderite::Engine::getAudioController()->getFmodSystem()->setListenerAttributes(0, &listener3dAttributes, nullptr);
 }
 
-void AudioListener::disable() {
-    LOG_TRACE("[Audio] Disabling listener {0}", m_gObject->getName());
-    m_enabled = false;
-}
-
-void AudioListener::enable() {
-    LOG_TRACE("[Audio] Enabling listener {0}", m_gObject->getName());
-    m_enabled = true;
-}
-
-bool AudioListener::isEnabled() const {
-    return m_enabled;
-}
-
-bool AudioListener::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    emitter << YAML::Key << "AudioListener" << YAML::BeginMap;
-    emitter << YAML::Key << "Enabled" << YAML::Value << m_enabled;
-    emitter << YAML::EndMap;
-    return true;
-}
-
-bool AudioListener::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    const YAML::Node& audioListener = data["AudioListener"];
-    if (!audioListener || audioListener.IsNull()) {
-        return false;
-    }
-
-    m_enabled = audioListener["Enabled"].as<bool>();
-    return true;
+AudioListenerData& AudioListener::getData() {
+    return m_data;
 }
 
 } // namespace audio

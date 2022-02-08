@@ -24,16 +24,20 @@ void AssetManager::shutdown() {
     LOG_TRACE("[Asset] Shutting down asset manager");
 
     // Free memory
-    // 2 Update cycles should free any data during shutdown
-    
+    // 3 Update cycles should free any data during shutdown
+
     // 1 update will delete 0 outstanding reference
     // 2 update will delete any left over dependencies
+    // 3 update will delete every other nested dependency
+    this->update();
     this->update();
     this->update();
 
     // Verify
     for (auto& obj : m_registry) {
-        ADERITE_DYNAMIC_ASSERT(obj.Asset == nullptr, "Failed to free asset");
+        if (obj.Asset != nullptr) {
+            LOG_WARN("[Asset] Asset memory leak for {1}({0}) it has {2} references", obj.Handle, obj.Asset->getName(), obj.Asset->getRefCount());
+        }
     }
 
     // Save registry

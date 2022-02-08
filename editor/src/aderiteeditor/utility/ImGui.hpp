@@ -31,6 +31,16 @@ bool DynamicInputText(const char* label, std::string* value, ImGuiInputTextFlags
  * @return True if altered, false otherwise
  */
 bool DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+/**
+ * @brief Renders a vec3 ui control
+ * @param id ID of the control
+ * @param label Label of the control
+ * @param values Values
+ * @param resetValue Reset value
+ * @param columnWidth Width of a single entry field
+ * @return True if altered, false otherwise
+ */
+bool DrawVec3Control(const std::string& id, const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 
 /**
  * @brief Renders a quat ui control
