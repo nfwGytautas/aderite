@@ -29,5 +29,19 @@ physx::PxShape* Geometry::getShape() const {
     return p_shape;
 }
 
+bool Geometry::isTrigger() const {
+    return p_shape->getFlags() & physx::PxShapeFlag::eTRIGGER_SHAPE;
+}
+
+void Geometry::setTrigger(bool value) {
+    // Reset
+    p_shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
+    p_shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
+
+    // Set
+    p_shape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, !value);
+    p_shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, value);
+}
+
 } // namespace physics
 } // namespace aderite

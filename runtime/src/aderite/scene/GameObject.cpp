@@ -4,10 +4,13 @@
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/PhysXActor.hpp"
+#include "aderite/physics/PhysicsEventList.hpp"
+#include "aderite/physics/geometry/Geometry.hpp"
 #include "aderite/rendering/FrameData.hpp"
 #include "aderite/rendering/Renderable.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/Camera.hpp"
+#include "aderite/utility/Log.hpp"
 
 namespace aderite {
 namespace scene {
@@ -68,6 +71,30 @@ void GameObject::update(float delta) {
     if (m_transform != nullptr) {
         m_transform->resetModifiedFlag();
     }
+}
+
+void GameObject::onTriggerEnter(const physics::TriggerEvent& te) {
+    LOG_TRACE("{0} entered trigger {1}", this->getName(), te.Trigger->getActor()->getGameObject()->getName());
+}
+
+void GameObject::onTriggerLeave(const physics::TriggerEvent& te) {
+    LOG_TRACE("{0} left trigger {1}", this->getName(), te.Trigger->getActor()->getGameObject()->getName());
+}
+
+void GameObject::onTriggerWasEntered(const physics::TriggerEvent& te) {
+    LOG_TRACE("Trigger {0} was entered by {1}", this->getName(), te.Actor->getActor()->getGameObject()->getName());
+}
+
+void GameObject::onTriggerWasLeft(const physics::TriggerEvent& te) {
+    LOG_TRACE("Trigger {0} was left by {1}", this->getName(), te.Actor->getActor()->getGameObject()->getName());
+}
+
+void GameObject::onCollisionEnter(const physics::CollisionEvent& ce) {
+    LOG_TRACE("{0} collision start with {1}", this->getName(), ce.Actor2->getActor()->getGameObject()->getName());
+}
+
+void GameObject::onCollisionLeave(const physics::CollisionEvent& ce) {
+    LOG_TRACE("{0} collision end with {1}", this->getName(), ce.Actor2->getActor()->getGameObject()->getName());
 }
 
 void GameObject::markForDeletion() {

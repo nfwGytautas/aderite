@@ -31,6 +31,17 @@ public:
     physx::PxShape* getShape() const;
 
     /**
+     * @brief Returns true if this geometry is used as a trigger, false otherwise
+     */
+    bool isTrigger() const;
+
+    /**
+     * @brief Sets how the geometry should be used, if true then this geometry will become a trigger if false then a collider
+     * @param value New value of the geometry
+     */
+    void setTrigger(bool value);
+
+    /**
      * @brief Apply scale to geometry
      * @param scale Scale to apply
      */

@@ -6,6 +6,7 @@
 #include "aderite/physics/PhysicsEventList.hpp"
 #include "aderite/physics/PhysicsSceneQuery.hpp"
 #include "aderite/physics/geometry/Geometry.hpp"
+#include "aderite/scene/GameObject.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -58,25 +59,25 @@ void PhysicsScene::addActor(PhysXActor* actor) {
 
 void PhysicsScene::sendEvents() {
     // TODO: Think if only to send to trigger
-    /*for (const TriggerEvent& te : m_events->getTriggerEvents()) {
+    for (const TriggerEvent& te : m_events->getTriggerEvents()) {
         if (te.Enter) {
-            te.Actor->onPhysicsEventEnter(te.Trigger);
-            te.Trigger->onPhysicsEventEnter(te.Actor);
+            te.Actor->getActor()->getGameObject()->onTriggerEnter(te);
+            te.Trigger->getActor()->getGameObject()->onTriggerWasEntered(te);
         } else {
-            te.Actor->onPhysicsEventLeave(te.Trigger);
-            te.Trigger->onPhysicsEventLeave(te.Actor);
+            te.Actor->getActor()->getGameObject()->onTriggerLeave(te);
+            te.Trigger->getActor()->getGameObject()->onTriggerWasLeft(te);
         }
     }
 
     for (const CollisionEvent& ce : m_events->getCollisionEvents()) {
         if (ce.Start) {
-            ce.Actor1->onPhysicsEventEnter(ce.Actor2);
-            ce.Actor2->onPhysicsEventEnter(ce.Actor1);
+            ce.Actor1->getActor()->getGameObject()->onCollisionEnter(ce);
+            ce.Actor2->getActor()->getGameObject()->onCollisionEnter(ce);
         } else {
-            ce.Actor1->onPhysicsEventLeave(ce.Actor2);
-            ce.Actor2->onPhysicsEventLeave(ce.Actor1);
+            ce.Actor1->getActor()->getGameObject()->onCollisionLeave(ce);
+            ce.Actor2->getActor()->getGameObject()->onCollisionLeave(ce);
         }
-    }*/
+    }
 
     // Clear old events
     m_events->clear();

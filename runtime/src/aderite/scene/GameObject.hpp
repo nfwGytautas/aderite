@@ -35,6 +35,42 @@ public:
     void update(float delta);
 
     /**
+     * @brief Function called when this game object enters another trigger
+     * @param te Trigger event
+     */
+    void onTriggerEnter(const physics::TriggerEvent& te);
+
+    /**
+     * @brief Function called when this game object leaves another trigger
+     * @param te Trigger event
+     */
+    void onTriggerLeave(const physics::TriggerEvent& te);
+
+    /**
+     * @brief Function called when the game object enters this trigger zone
+     * @param te Trigger event
+     */
+    void onTriggerWasEntered(const physics::TriggerEvent& te);
+
+    /**
+     * @brief Function called when the game object leaves this trigger zone
+     * @param te Trigger event
+     */
+    void onTriggerWasLeft(const physics::TriggerEvent& te);
+
+    /**
+     * @brief Function called when the game object enters a collision
+     * @param ce Collision event
+     */
+    void onCollisionEnter(const physics::CollisionEvent& ce);
+
+    /**
+     * @brief Function called when the game object leaves a collision
+     * @param ce Collision event
+     */
+    void onCollisionLeave(const physics::CollisionEvent& ce);
+
+    /**
      * @brief Marks the game object for deletion
      */
     void markForDeletion();

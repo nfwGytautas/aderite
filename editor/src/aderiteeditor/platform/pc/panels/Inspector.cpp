@@ -268,6 +268,11 @@ void Inspector::renderColliders(physics::PhysXActor* actor) {
             if (ImGui::CollapsingHeader(("Box collider##" + std::to_string(idx)).c_str())) {
                 physics::BoxGeometry* boxGeom = static_cast<physics::BoxGeometry*>(geom);
 
+                bool isTrigger = boxGeom->isTrigger();
+                if (ImGui::Checkbox(("IsTrigger##" + std::to_string(idx)).c_str(), &isTrigger)) {
+                    boxGeom->setTrigger(isTrigger);
+                }
+
                 glm::vec3 size = boxGeom->getSize();
                 if (utility::DrawVec3Control(std::to_string(idx), "Size", size)) {
                     boxGeom->setSize(size);
@@ -428,16 +433,6 @@ void Inspector::renderGameObject(io::SerializableObject* object) {
         ImGui::SameLine();
 
         this->renderAudioSource(source);
-    }
-
-    if (transform != nullptr && camera != nullptr) {
-        static float y = 2.0f;
-        physics::RaycastHit result1;
-        ::aderite::Engine::getSceneManager()->getCurrentScene()->raycastSingle(
-            result1, transform->getPosition() + (camera->getForwardDirection() * 2.0f), camera->getForwardDirection(), 50);
-        if (result1.Actor != nullptr) {
-            LOG_TRACE("Physics raycast hit: {1} after traveling for {0}", result1.Distance, result1.Actor->getGameObject()->getName());
-        }
     }
 
     // Add components

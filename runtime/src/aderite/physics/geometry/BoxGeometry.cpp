@@ -51,11 +51,13 @@ void BoxGeometry::applyScale(const glm::vec3& scale) {
 
 bool BoxGeometry::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "Size" << YAML::Value << m_size;
+    emitter << YAML::Key << "IsTrigger" << YAML::Value << this->isTrigger();
     return true;
 }
 
 bool BoxGeometry::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     setSize(data["Size"].as<glm::vec3>());
+    setTrigger(data["IsTrigger"].as<bool>());
     return true;
 }
 

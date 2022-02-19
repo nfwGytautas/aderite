@@ -30,6 +30,7 @@ Data:
               Name: l5WkM0RMBFYf
               Data:
                 Size: [1, 1, 1]
+                IsTrigger: false
         Camera:
           FoV: 90
         AudioSource:
@@ -54,3 +55,9 @@ Data:
               Name: idrgZ3MpIFwA
               Data:
                 Size: [1, 1, 1]
+                IsTrigger: false
+            - Type: 75
+              Name: d67RNO0a9wZj
+              Data:
+                Size: [1, 2, 1]
+                IsTrigger: true

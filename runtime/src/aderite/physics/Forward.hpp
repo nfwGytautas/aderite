@@ -18,6 +18,8 @@ class Geometry;
 class BoxGeometry;
 class PhysXActor;
 class PhysicsProperties;
+struct TriggerEvent;
+struct CollisionEvent;
 
 } // namespace physics
 } // namespace aderite
