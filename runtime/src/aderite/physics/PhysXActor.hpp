@@ -36,6 +36,11 @@ public:
      */
     PhysicsProperties& getData();
 
+    /**
+     * @brief Returns the game object of this actor
+     */
+    scene::GameObject* getGameObject() const;
+
 private:
     /**
      * @brief Transfers all geometry to another actor

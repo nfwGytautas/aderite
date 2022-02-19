@@ -33,6 +33,11 @@ public:
      */
     CameraSettings& getData();
 
+    /**
+     * @brief Returns the forward vector of this camera, can be used for raycasting from the camera point of view
+     */
+    glm::vec3 getForwardDirection() const;
+
 private:
     scene::GameObject* m_gObject = nullptr;
     bgfx::TextureHandle m_output = BGFX_INVALID_HANDLE;

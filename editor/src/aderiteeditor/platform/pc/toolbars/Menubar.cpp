@@ -69,54 +69,6 @@ void Menubar::render() {
         }
 
         if (ImGui::BeginMenu("Project")) {
-            if (ImGui::MenuItem("New scene")) {
-                /*m_textModal->setTitle("New scene");
-                m_textModal->setText("Scene name:");
-                m_textModal->setConfirmAction([&](const std::string& value) {
-                    editor::State::Sink->onNewScene(value);
-                });
-
-                m_textModal->show();*/
-            }
-
-            ImGui::Separator();
-
-            if (ImGui::MenuItem("Optimize Raw folder")) {
-                // Removes unused files from Raw folder
-                /*std::vector<std::filesystem::path> used = {};
-                for (asset::Asset* asset : *::aderite::Engine::getAssetManager()) {
-                    if (asset->isInGroup(asset::AssetGroup::DEPENDS_ON_RAW)) {
-                        switch (asset->type()) {
-                        case asset::AssetType::MESH: {
-                            used.push_back(::aderite::Engine::getAssetManager()->getRawDir() /
-                static_cast<asset::MeshAsset*>(asset)->getFields().SourceFile); break;
-                        }
-                        case asset::AssetType::SCENE:
-                        case asset::AssetType::MATERIAL: {
-                            continue;
-                        }
-                        default:
-                            LOG_WARN("Unimplemented type for DEPENDS_ON_RAW asset, aborting");
-                            return;
-                        }
-                    }
-                }
-
-                for (auto& file : std::filesystem::recursive_directory_iterator(::aderite::Engine::getAssetManager()->getRawDir())) {
-                    auto& it = std::find(used.begin(), used.end(), file.path());
-
-                    if (it == used.end()) {
-                        LOG_TRACE("Removing {0}", file.path().string());
-                        std::filesystem::remove(file.path());
-                    }
-                }*/
-            }
-
-            if (ImGui::MenuItem("Recompile shaders")) {
-                // Get all currently used shaders and then complete a unload/load cycle
-                LOG_WARN("Not implemented feature called 'Recompile shaders'");
-            }
-
             if (ImGui::MenuItem("Link FMOD project")) {
                 // Required name and directory
                 std::string dir = FileDialog::selectDirectory();
@@ -157,24 +109,6 @@ void Menubar::render() {
                 // Reload
                 LOG_TRACE("Reloading scripts");
                 ::aderite::Engine::getScriptManager()->loadAssemblies();
-            }
-
-            ImGui::EndMenu();
-        }
-
-        if (ImGui::BeginMenu("Debug")) {
-            if (ImGui::MenuItem("Do action")) {
-                /*static float y = 2.0f;
-                physics::RaycastHit result1;
-                physics::RaycastHit result2;
-                ::aderite::Engine::getSceneManager()->getCurrentScene()->getPhysicsScene()->raycastSingle(result1, {0.0f, y, 0.0f},
-                                                                                                          {0.0f, 1.0f, 0.0f}, 50);
-
-                ::aderite::Engine::getSceneManager()->getCurrentScene()->getPhysicsScene()->raycastSingle(result2, {0.0f, y, 0.0f},
-                                                                                                          {0.0f, -1.0f, 0.0f}, 50);
-
-                LOG_TRACE("{0}", result1.Distance);
-                LOG_TRACE("{0}", result2.Distance);*/
             }
 
             ImGui::EndMenu();

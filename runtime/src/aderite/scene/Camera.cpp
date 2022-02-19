@@ -51,5 +51,15 @@ CameraSettings& Camera::getData() {
     return m_settings;
 }
 
+glm::vec3 Camera::getForwardDirection() const {
+    scene::TransformProvider* const transform = m_gObject->getTransform();
+
+    if (transform == nullptr) {
+        return glm::vec3(0.0f, 0.0f, 0.0f);
+    }
+
+    return glm::rotate(transform->getRotation(), glm::vec3(0.0f, 0.0f, -1.0f));
+}
+
 } // namespace scene
 } // namespace aderite

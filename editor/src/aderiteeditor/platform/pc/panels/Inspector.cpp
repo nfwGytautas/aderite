@@ -4,7 +4,6 @@
 #include <imgui/imgui_internal.h>
 
 #include "aderite/Aderite.hpp"
-#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
@@ -13,24 +12,18 @@
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
-#include "aderite/io/FileHandler.hpp"
-#include "aderite/io/LoaderPool.hpp"
 #include "aderite/io/SerializableObject.hpp"
-#include "aderite/io/Serializer.hpp"
 #include "aderite/physics/PhysXActor.hpp"
-#include "aderite/physics/PhysicsController.hpp"
 #include "aderite/physics/geometry/BoxGeometry.hpp"
 #include "aderite/physics/geometry/Geometry.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/rendering/Renderable.hpp"
+#include "aderite/scene/Camera.hpp"
+#include "aderite/scene/CameraSettings.hpp"
 #include "aderite/scene/GameObject.hpp"
 #include "aderite/scene/Scene.hpp"
+#include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/TransformProvider.hpp"
-#include "aderite/scripting/FieldWrapper.hpp"
-#include "aderite/scripting/MonoUtils.hpp"
-#include "aderite/scripting/ScriptManager.hpp"
-#include "aderite/scripting/ScriptSystem.hpp"
-#include "aderite/scripting/events/ScriptGeometryEvent.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 
@@ -38,6 +31,7 @@
 #include "aderiteeditor/asset/property/Property.hpp"
 #include "aderiteeditor/platform/pc/WindowsEditor.hpp"
 #include "aderiteeditor/platform/pc/modals/FileDialog.hpp"
+#include "aderiteeditor/platform/pc/modals/PromptModal.hpp"
 #include "aderiteeditor/platform/pc/modals/SelectAudioModal.hpp"
 #include "aderiteeditor/platform/pc/modals/SelectScriptModal.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
@@ -126,6 +120,10 @@ void Inspector::render() {
     }
     case reflection::RuntimeTypes::GAME_OBJECT: {
         this->renderGameObject(object);
+        break;
+    }
+    case reflection::RuntimeTypes::AUDIO: {
+        this->renderAudioClip(object);
         break;
     }
     default: {
@@ -233,11 +231,21 @@ void Inspector::renderActor(physics::PhysXActor* actor) {
                 }
             }
 
-            ImGui::Text("Mass");
-            ImGui::SameLine();
-            float mass = properties.getMass();
-            if (ImGui::DragFloat("##X", &mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
-                properties.setMass(mass);
+            if (ImGui::BeginTable("PhysicsPropertiesTable", 2)) {
+                ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+                ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("Mass");
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushItemWidth(-FLT_MIN);
+                float mass = properties.getMass();
+                if (ImGui::DragFloat("##X", &mass, 0.1f, 0.0f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+                    properties.setMass(mass);
+                }
+
+                ImGui::EndTable();
             }
         }
     }
@@ -282,6 +290,53 @@ void Inspector::renderColliders(physics::PhysXActor* actor) {
 
 void Inspector::renderCamera(scene::Camera* camera) {
     if (ImGui::CollapsingHeader("Camera")) {
+        // Settings
+        scene::CameraSettings& settings = camera->getData();
+
+        if (ImGui::BeginTable("CameraSettingsTable", 2)) {
+            ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+            ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("FoV");
+            ImGui::TableSetColumnIndex(1);
+            ImGui::PushItemWidth(-FLT_MIN);
+            float fov = settings.getFoV();
+            if (ImGui::DragFloat("##fov", &fov, 0.1f, 45.0f, 180.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+                settings.setFoV(fov);
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("Near clip");
+            ImGui::TableSetColumnIndex(1);
+            ImGui::PushItemWidth(-FLT_MIN);
+            float nearClip = settings.getNearClip();
+            if (ImGui::DragFloat("##near", &nearClip, 0.1f, 0.1f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+                settings.setNearClip(nearClip);
+            }
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("Far clip");
+            ImGui::TableSetColumnIndex(1);
+            ImGui::PushItemWidth(-FLT_MIN);
+            float farClip = settings.getFarClip();
+            if (ImGui::DragFloat("##far", &farClip, 0.1f, 0.1f, FLT_MAX, "%.2f", ImGuiSliderFlags_AlwaysClamp)) {
+                settings.setFarClip(farClip);
+            }
+
+            ImGui::EndTable();
+        }
+
+        // Preview
+        if (bgfx::isValid(camera->getOutputHandle())) {
+            float width = ImGui::GetContentRegionAvail().x * 0.4855f;
+            ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - width) * 0.5f);
+            ImGui::Image((void*)(intptr_t)camera->getOutputHandle().idx, ImVec2(128.0f, 128.0f), ImVec2(1, 0), ImVec2(0, 1),
+                         ImVec4(1, 1, 1, 1), ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+        }
     }
 }
 
@@ -373,6 +428,16 @@ void Inspector::renderGameObject(io::SerializableObject* object) {
         ImGui::SameLine();
 
         this->renderAudioSource(source);
+    }
+
+    if (transform != nullptr && camera != nullptr) {
+        static float y = 2.0f;
+        physics::RaycastHit result1;
+        ::aderite::Engine::getSceneManager()->getCurrentScene()->raycastSingle(
+            result1, transform->getPosition() + (camera->getForwardDirection() * 2.0f), camera->getForwardDirection(), 50);
+        if (result1.Actor != nullptr) {
+            LOG_TRACE("Physics raycast hit: {1} after traveling for {0}", result1.Distance, result1.Actor->getGameObject()->getName());
+        }
     }
 
     // Add components
@@ -645,6 +710,26 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
             }
         }
         ImGui::EndPopup();
+    }
+}
+
+void Inspector::renderAudioClip(io::SerializableObject* asset) {
+    asset::AudioAsset* audio = static_cast<asset::AudioAsset*>(asset);
+
+    ImGui::Text("Event");
+    ImGui::SameLine();
+    if (ImGui::BeginCombo("##audioCombo", audio->getEventName().empty() ? "None" : audio->getEventName().c_str())) {
+        for (const std::string& aEvent : aderite::Engine::getAudioController()->getKnownEvents()) {
+            bool isSelected = aEvent == audio->getEventName();
+            if (ImGui::Selectable(aEvent.c_str(), isSelected)) {
+                audio->setEventName(aEvent);
+            }
+            if (isSelected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+
+        ImGui::EndCombo();
     }
 }
 

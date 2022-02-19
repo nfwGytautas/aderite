@@ -128,5 +128,9 @@ PhysicsProperties& PhysXActor::getData() {
     return m_properties;
 }
 
+scene::GameObject* PhysXActor::getGameObject() const {
+    return m_gObject;
+}
+
 } // namespace physics
 } // namespace aderite
