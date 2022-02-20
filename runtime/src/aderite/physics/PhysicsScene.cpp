@@ -58,7 +58,6 @@ void PhysicsScene::addActor(PhysXActor* actor) {
 }
 
 void PhysicsScene::sendEvents() {
-    // TODO: Think if only to send to trigger
     for (const TriggerEvent& te : m_events->getTriggerEvents()) {
         if (te.Enter) {
             te.Actor->getActor()->getGameObject()->onTriggerEnter(te);

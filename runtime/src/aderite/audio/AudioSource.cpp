@@ -21,14 +21,14 @@ AudioSource::~AudioSource() {
 }
 
 void AudioSource::update(float delta) {
-    if (m_data.getAudioClip() == nullptr) {
+    /*if (m_data.getAudioClip() == nullptr) {
         this->stop();
         return;
-    }
+    }*/
 
     if (m_instance == nullptr) {
         // Create audio instance
-        m_instance = ::aderite::Engine::getAudioController()->createAudioInstance(m_data.getAudioClip());
+        //m_instance = ::aderite::Engine::getAudioController()->createAudioInstance(m_data.getAudioClip());
 
         // Set properties
         if (m_data.isMuted()) {

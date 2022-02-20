@@ -14,17 +14,6 @@ public:
     virtual ~AudioSourceData();
 
     /**
-     * @brief Set the audio clip of this source
-     * @param clip New clip of the audio source
-     */
-    void setAudioClip(asset::AudioAsset* clip);
-
-    /**
-     * @brief Returns the audio clip of this source
-     */
-    asset::AudioAsset* getAudioClip() const;
-
-    /**
      * @brief Mutes the source
      */
     void mute();
@@ -57,7 +46,6 @@ public:
     AudioSourceData& operator=(const AudioSourceData& other);
 
 private:
-    asset::AudioAsset* m_audioClip = nullptr;
     bool m_muted = false;
     float m_volume = 1.0f;
 };
