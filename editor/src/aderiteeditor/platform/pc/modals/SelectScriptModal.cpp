@@ -3,11 +3,8 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
-#include "aderite/scripting/ScriptClass.hpp"
-#include "aderite/scripting/ScriptEvent.hpp"
+#include "aderite/scripting/BehaviorBase.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
-#include "aderite/scripting/events/ScriptGeometryEvent.hpp"
-#include "aderite/scripting/events/ScriptUpdateEvent.hpp"
 
 #include "aderiteeditor/shared/IEventSink.hpp"
 #include "aderiteeditor/shared/State.hpp"
@@ -16,7 +13,7 @@
 namespace aderite {
 namespace editor {
 
-SelectScriptModal::SelectScriptModal(scripting::ScriptEventType filter, SelectFn fn) : m_filtering(filter), m_callback(fn) {}
+SelectScriptModal::SelectScriptModal(SelectFn fn) : m_callback(fn) {}
 
 void SelectScriptModal::render() {
     if (!m_callback) {
@@ -46,47 +43,17 @@ void SelectScriptModal::render() {
         ImGui::Dummy(ImVec2(500.0f, 0.0f));
         ImGui::Separator();
 
-        if (m_class == nullptr) {
-            // Select class
-            if (ImGui::BeginListBox("##ScriptSelectClass", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
-                for (scripting::ScriptClass* sc : ::aderite::Engine::getScriptManager()->getScripts()) {
-                    if (ImGui::Selectable(sc->getName())) {
-                        m_class = sc;
-                    }
-                }
-
-                ImGui::EndListBox();
-            }
-        } else {
-            // Select method
-            if (ImGui::BeginListBox("##ScriptSelectMethod", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
-                switch (m_filtering) {
-                case scripting::ScriptEventType::NONE: {
-                    for (scripting::ScriptEvent* se : m_class->getEvents()) {
-                        if (ImGui::Selectable(se->getName())) {
-                            m_event = se;
-                        }
-                    }
-                    break;
-                }
-                default: {
-                    for (scripting::ScriptEvent* se : m_class->getEvents(m_filtering)) {
-                        if (ImGui::Selectable(se->getName())) {
-                            m_event = se;
-                        }
-                    }
-                    break;
-                }
-                }
-
-                if (m_event != nullptr) {
-                    m_callback(m_event);
+        // Select class
+        if (ImGui::BeginListBox("##ScriptSelectClass", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
+            for (scripting::BehaviorBase* behavior : ::aderite::Engine::getScriptManager()->getBehaviors()) {
+                if (ImGui::Selectable(behavior->getName().c_str())) {
+                    m_callback(behavior);
                     this->close();
                     ImGui::CloseCurrentPopup();
                 }
-
-                ImGui::EndListBox();
             }
+
+            ImGui::EndListBox();
         }
 
         ImGui::EndPopup();

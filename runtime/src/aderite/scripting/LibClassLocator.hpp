@@ -53,6 +53,11 @@ public:
         MonoMethod* Ctor = nullptr;
     };
 
+    struct Behavior {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    };
+
 public:
     /**
      * @brief Locates engine classes from the specified image
@@ -126,7 +131,7 @@ public:
     // * @param entity Entity object
     // * @return MonoObject instance
     // */
-    //MonoObject* create(scene::Entity* entity) const;
+    // MonoObject* create(scene::Entity* entity) const;
 
     // ====================================================================================
     // Class getters
@@ -167,6 +172,11 @@ public:
      */
     const Geometry& getGeometry() const;
 
+    /**
+     * @brief Returns the behavior information struct
+     */
+    const Behavior& getBehavior() const;
+
 private:
     /**
      * @brief Handle mono exception object
@@ -191,6 +201,7 @@ private:
     AudioSource m_audioSource;
     RaycastHit m_raycastHit;
     Geometry m_geometry;
+    Behavior m_behavior;
 };
 
 } // namespace scripting

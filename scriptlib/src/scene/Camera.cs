@@ -6,7 +6,7 @@ namespace Aderite
     /// <summary>
     /// Camera component used to manipulate a camera that is attached to a game object
     /// </summary>
-    class Camera
+    public class Camera
     {
         /// <summary>
         /// FoV of the camera

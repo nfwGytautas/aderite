@@ -6,7 +6,7 @@ namespace Aderite
     /// <summary>
     /// Object used to manipulate game objects in the scene
     /// </summary>
-    class GameObject
+    public class GameObject
     {
         // The C++ instance of this game object
         IntPtr Instance = IntPtr.Zero;

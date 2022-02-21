@@ -7,10 +7,7 @@
 #include "aderite/io/Serializer.hpp"
 #include "aderite/scene/Camera.hpp"
 #include "aderite/scene/GameObject.hpp"
-#include "aderite/scripting/ScriptClass.hpp"
-#include "aderite/scripting/ScriptData.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
-#include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 
@@ -89,50 +86,12 @@ const std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects() const {
     return m_gameObjects;
 }
 
-// void Scene::updateScriptDataEntries() {
-//    auto scripts = ::aderite::Engine::getScriptManager()->getScripts();
-//
-//    // Remove unused ones
-//    for (auto it = m_scriptData.begin(); it != m_scriptData.end();) {
-//        auto itScripts = std::find_if(scripts.begin(), scripts.end(), [&](const scripting::ScriptClass* sc) {
-//            return (*it)->getScriptName() == sc->getName();
-//        });
-//
-//        if (itScripts == scripts.end()) {
-//            it = m_scriptData.erase(it);
-//        } else {
-//            ++it;
-//        }
-//    }
-//
-//    // Add new ones
-//    for (scripting::ScriptClass* script : scripts) {
-//        auto it = std::find_if(m_scriptData.begin(), m_scriptData.end(), [&](const std::unique_ptr<scripting::ScriptData>& sd) {
-//            return sd->getScriptName() == script->getName();
-//        });
-//
-//        if (it == m_scriptData.end()) {
-//            scripting::ScriptData* sd = new scripting::ScriptData(this);
-//            sd->setScriptName(script->getName());
-//            m_scriptData.push_back(std::unique_ptr<scripting::ScriptData>(sd));
-//        }
-//    }
-//}
-//
-// const std::vector<std::unique_ptr<scripting::ScriptData>>& Scene::getScriptData() const {
-//    return m_scriptData;
-//}
-
 reflection::Type Scene::getType() const {
     return static_cast<reflection::Type>(reflection::RuntimeTypes::SCENE);
 }
 
 bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     if (!PhysicsScene::serialize(serializer, emitter)) {
-        return false;
-    }
-
-    if (!ScriptEventMap::serialize(serializer, emitter)) {
         return false;
     }
 
@@ -148,10 +107,6 @@ bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) 
 
 bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     if (!PhysicsScene::deserialize(serializer, data)) {
-        return false;
-    }
-
-    if (!ScriptEventMap::deserialize(serializer, data)) {
         return false;
     }
 

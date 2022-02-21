@@ -10,10 +10,8 @@
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scripting/BehaviorBase.hpp"
 #include "aderite/scripting/InternalCalls.hpp"
-#include "aderite/scripting/ScriptClass.hpp"
-#include "aderite/scripting/ScriptData.hpp"
-#include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/LogExtensions.hpp"
 
@@ -60,16 +58,6 @@ void ScriptManager::shutdown() {
     LOG_INFO("[Scripting] Script manager shutdown");
 }
 
-void ScriptManager::update(float delta) {
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-
-    if (currentScene == nullptr) {
-        return;
-    }
-
-    currentScene->callUpdateEvents(delta);
-}
-
 void ScriptManager::loadAssemblies() {
     LOG_TRACE("[Scripting] Loading assemblies");
     io::DataChunk assemblyChunk = ::aderite::Engine::getFileHandler()->openReservedLoadable(io::FileHandler::Reserved::GameCode);
@@ -102,52 +90,38 @@ void ScriptManager::loadAssemblies() {
     }
 
     // Get behaviors
-    this->resolveSystemNames();
+    LOG_TRACE("[Scripting] Resolving systems");
+    this->clean();
 
-    LOG_INFO("[Scripting] Assemblies loaded");
-}
+    // Get the number of rows in the metadata table
+    int numRows = mono_image_get_table_rows(m_codeImage, MONO_TABLE_TYPEDEF);
 
-const std::vector<ScriptClass*>& ScriptManager::getScripts() const {
-    return m_scripts;
-}
+    for (int i = 0; i < numRows; i++) {
+        // Get class
+        MonoClass* monoClass = mono_class_get(m_codeImage, (i + 1) | MONO_TOKEN_TYPE_DEF);
 
-ScriptClass* ScriptManager::getScript(const std::string& name) const {
-    for (ScriptClass* sc : m_scripts) {
-        if (sc->getName() == name) {
-            return sc;
+        // Check if the class is found
+        if (monoClass != nullptr) {
+            std::string name = mono_class_get_name(monoClass);
+            std::string nSpace = mono_class_get_namespace(monoClass);
+
+            if (name == "<Module>" || name == "Internal") {
+                // Ignore
+                continue;
+            }
+
+            // Check if inherits from behavior
+            if (mono_class_get_parent(monoClass) != m_locator.getBehavior().Klass) {
+                // Doesn't inherit from ScriptedBehavior
+                continue;
+            }
+
+            LOG_TRACE("[Scripting] Found class. Namespace: {1}, name: {0}", name, nSpace);
+            m_behaviors.push_back(new BehaviorBase(monoClass));
         }
     }
 
-    return nullptr;
-}
-
-ScriptEvent* ScriptManager::getEventFromName(const std::string& name) const {
-    const size_t delimIdx = name.find_first_of('.');
-
-    const std::string& scriptName = name.substr(0, delimIdx);
-    const std::string& eventName = name.substr(delimIdx + 1);
-
-    // Find script
-    ScriptClass* script = this->getScript(scriptName);
-
-    if (script == nullptr) {
-        return nullptr;
-    }
-
-    return script->getEvent(eventName);
-}
-
-void ScriptManager::onSceneChanged(scene::Scene* scene) const {
-    //// Update entries
-    //scene->updateScriptDataEntries();
-
-    //// Load script data
-    //for (const auto& sd : scene->getScriptData()) {
-    //    sd->load();
-    //}
-
-    //// Initialize scripts
-    //scene->callSceneLoaded();
+    LOG_INFO("[Scripting] Assemblies loaded");
 }
 
 MonoDomain* ScriptManager::getDomain() const {
@@ -234,31 +208,24 @@ MonoString* ScriptManager::string(const char* value) const {
     return mono_string_new(m_currentDomain, value);
 }
 
-void ScriptManager::resolveSystemNames() {
-    LOG_TRACE("[Scripting] Resolving systems");
-    this->clean();
+void ScriptManager::onScriptException(MonoException* exception) {
+    LOG_ERROR("[Scripting] Exception was thrown!");
+}
 
-    // Get the number of rows in the metadata table
-    int numRows = mono_image_get_table_rows(m_codeImage, MONO_TABLE_TYPEDEF);
+std::vector<BehaviorBase*> ScriptManager::getBehaviors() const {
+    return m_behaviors;
+}
 
-    for (int i = 0; i < numRows; i++) {
-        // Get class
-        MonoClass* monoClass = mono_class_get(m_codeImage, (i + 1) | MONO_TOKEN_TYPE_DEF);
+BehaviorBase* ScriptManager::getBehavior(const std::string& name) const {
+    auto it = std::find_if(m_behaviors.begin(), m_behaviors.end(), [&](BehaviorBase* behavior) {
+        return name == behavior->getName();
+    });
 
-        // Check if the class is found
-        if (monoClass != nullptr) {
-            std::string name = mono_class_get_name(monoClass);
-            std::string nSpace = mono_class_get_namespace(monoClass);
-
-            if (name == "<Module>" || name == "Internal") {
-                // Ignore
-                continue;
-            }
-
-            LOG_TRACE("[Scripting] Found class. Namespace: {1}, name: {0}", name, nSpace);
-            m_scripts.push_back(new ScriptClass(monoClass));
-        }
+    if (it == m_behaviors.end()) {
+        return nullptr;
     }
+
+    return *it;
 }
 
 bool ScriptManager::setupEngineAssemblies() {
@@ -332,11 +299,11 @@ bool ScriptManager::setupCodeAssemblies() {
 }
 
 void ScriptManager::clean() {
-    for (ScriptClass* klass : m_scripts) {
-        delete klass;
+    for (BehaviorBase* behavior : m_behaviors) {
+        delete behavior;
     }
 
-    m_scripts.clear();
+    m_behaviors.clear();
     m_objectCache.clear();
 
     // TODO: Invoke GC

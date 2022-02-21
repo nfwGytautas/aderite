@@ -31,39 +31,9 @@ public:
     void shutdown();
 
     /**
-     * @brief Updates all scripts
-     * @param delta Delta of the frame
-     */
-    void update(float delta);
-
-    /**
      * @brief Loads the game code assembly
      */
     void loadAssemblies();
-
-    /**
-     * @brief Returns the list of known scripts
-     */
-    const std::vector<ScriptClass*>& getScripts() const;
-
-    /**
-     * @brief Returns script class with specified name or nullptr if doesn't exist
-     * @param name Name of the script class
-     */
-    ScriptClass* getScript(const std::string& name) const;
-
-    /**
-     * @brief Get script event with the specified name, nullptr if doesn't exist
-     * @param name Name of the script event
-     * @return ScriptEvent instance
-     */
-    ScriptEvent* getEventFromName(const std::string& name) const;
-
-    /**
-     * @brief Invoked when a scene is changed
-     * @param scene New scene
-     */
-    void onSceneChanged(scene::Scene* scene) const;
 
     /**
      * @brief Returns the current domain
@@ -133,12 +103,25 @@ public:
      */
     MonoString* string(const char* value) const;
 
-private:
     /**
-     * @brief Resolves all system classes in the loaded assembly
+     * @brief Function invoked when an exception happens in scripted behaviors
+     * @param exception Exception instance
      */
-    void resolveSystemNames();
+    void onScriptException(MonoException* exception);
 
+    /**
+     * @brief Returns the list of discovered behaviors
+     */
+    std::vector<BehaviorBase*> getBehaviors() const;
+
+    /**
+     * @brief Returns a behavior with the specified name
+     * @param name Name of the behavior
+     * @return BehaviorBase instance or nullptr
+    */
+    BehaviorBase* getBehavior(const std::string& name) const;
+
+private:
     /**
      * @brief Sets up all engine runtime related assemblies and information
      */
@@ -173,8 +156,11 @@ private:
     MonoAssembly* m_codeAssembly = nullptr;
     MonoImage* m_codeImage = nullptr;
 
-    // Vector containing the names of systems that exist in the image
-    std::vector<ScriptClass*> m_scripts;
+    // Behaviors that have been loaded
+    std::vector<BehaviorBase*> m_behaviors;
+
+    // Instance cache
+    // TODO: Rethink
     std::unordered_map<io::SerializableObject*, MonoObject*> m_objectCache;
 };
 

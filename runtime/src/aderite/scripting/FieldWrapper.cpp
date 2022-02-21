@@ -8,6 +8,8 @@
 namespace aderite {
 namespace scripting {
 
+FieldWrapper::FieldWrapper() : m_field(nullptr) {}
+
 FieldWrapper::FieldWrapper(MonoClassField* field) : m_field(field) {
     m_name = mono_field_get_name(field);
     m_type = ::aderite::Engine::getScriptManager()->getType(mono_field_get_type(field));

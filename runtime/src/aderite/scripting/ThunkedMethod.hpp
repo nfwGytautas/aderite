@@ -2,6 +2,8 @@
 
 #include <mono/jit/jit.h>
 
+#include "aderite/Aderite.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Macros.hpp"
 
 namespace aderite {
@@ -27,21 +29,14 @@ public:
     }
 
     /**
-     * @brief Set the exception handle of the thunked method
-     */
-    void setExceptionHandler(ExceptionHandler* handler) {
-        m_handler = handler;
-    }
-
-    /**
      * @brief Invoke the thunked method with the given parameters
      */
     Ret invoke(MonoObject* instance, Args... args) const {
         ADERITE_DYNAMIC_ASSERT(this->valid(), "Invalid thunked method invoked");
         MonoException* exception = nullptr;
         Ret result = m_thunk(instance, args..., &exception);
-        if (exception != nullptr && m_handler != nullptr) {
-            this->m_handler(exception);
+        if (exception != nullptr) {
+            ::aderite::Engine::getScriptManager()->onScriptException(exception);
         }
         return result;
     }
@@ -64,7 +59,6 @@ public:
 private:
     MonoMethod* m_method = nullptr;
     ThunkFn m_thunk = nullptr;
-    ExceptionHandler* m_handler = nullptr;
 };
 
 /**
@@ -75,7 +69,6 @@ template<typename... Args>
 class ThunkedMethod<void, Args...> {
 public:
     typedef void (*ThunkFn)(MonoObject*, Args..., MonoException**);
-    using ExceptionHandler = void(MonoException* exception);
 
     ThunkedMethod() {}
 
@@ -86,21 +79,14 @@ public:
     }
 
     /**
-     * @brief Set the exception handle of the thunked method
-     */
-    void setExceptionHandler(ExceptionHandler* handler) {
-        m_handler = handler;
-    }
-
-    /**
      * @brief Invoke the thunked method with the given parameters
      */
     void invoke(MonoObject* instance, Args... args) const {
         ADERITE_DYNAMIC_ASSERT(this->valid(), "Invalid thunked method invoked");
         MonoException* exception = nullptr;
         m_thunk(instance, args..., &exception);
-        if (exception != nullptr && m_handler != nullptr) {
-            this->m_handler(exception);
+        if (exception != nullptr) {
+            ::aderite::Engine::getScriptManager()->onScriptException(exception);
         }
     }
 
@@ -122,7 +108,6 @@ public:
 private:
     MonoMethod* m_method = nullptr;
     ThunkFn m_thunk = nullptr;
-    ExceptionHandler* m_handler = nullptr;
 };
 
 } // namespace scripting

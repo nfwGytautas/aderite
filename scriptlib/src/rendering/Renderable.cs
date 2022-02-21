@@ -6,7 +6,7 @@ namespace Aderite
     /// <summary>
     /// Renderable component is used to control the visual rendering of the game object during runtime
     /// </summary>
-    class Renderable
+    public class Renderable
     {
         /// <summary>
         /// Mesh of the game object

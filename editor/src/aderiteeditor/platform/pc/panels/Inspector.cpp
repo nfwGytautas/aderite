@@ -24,6 +24,8 @@
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scene/TransformProvider.hpp"
+#include "aderite/scripting/BehaviorBase.hpp"
+#include "aderite/scripting/ScriptedBehavior.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 
@@ -355,6 +357,106 @@ void Inspector::renderAudioListener(audio::AudioListener* listener) {
     }
 }
 
+void Inspector::renderBehavior(scripting::ScriptedBehavior* behavior, size_t idx) {
+    std::string id = behavior->getBase()->getName() + "##" + std::to_string(idx);
+    if (ImGui::CollapsingHeader(id.c_str())) {
+        // Fields
+        if (ImGui::BeginTable((id + "EditTable").c_str(), 2)) {
+            ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
+            ImGui::TableSetupColumn("DD", ImGuiTableColumnFlags_None);
+
+            for (scripting::FieldWrapper fw : behavior->getBase()->getFields()) {
+                ImGui::TableNextRow();
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text(fw.getName().c_str());
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushItemWidth(-FLT_MIN);
+
+                switch (fw.getType()) {
+                case scripting::FieldType::Float: {
+                    float val = fw.getValueType<float>(behavior->getInstance());
+                    if (ImGui::InputFloat(std::string("#" + fw.getName()).c_str(), &val, NULL)) {
+                        fw.setValueType(behavior->getInstance(), val);
+                    }
+                    break;
+                }
+                case scripting::FieldType::Boolean: {
+                    bool val = fw.getValueType<bool>(behavior->getInstance());
+                    if (ImGui::Checkbox(std::string("##" + fw.getName()).c_str(), &val)) {
+                        fw.setValueType(behavior->getInstance(), val);
+                    }
+                    break;
+                }
+                case scripting::FieldType::Integer: {
+                    int val = fw.getValueType<int>(behavior->getInstance());
+                    if (ImGui::InputInt(std::string("##" + fw.getName()).c_str(), &val)) {
+                        fw.setValueType(behavior->getInstance(), val);
+                    }
+                    break;
+                }
+                case scripting::FieldType::Mesh: {
+                    asset::MeshAsset* handle = static_cast<asset::MeshAsset*>(fw.getSerializable(behavior->getInstance()));
+
+                    if (handle) {
+                        ImGui::Button(handle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    } else {
+                        ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    }
+
+                    asset::MeshAsset* object = DragDrop::renderTarget<asset::MeshAsset>(reflection::RuntimeTypes::MESH);
+                    if (object != nullptr) {
+                        fw.setSerializable(behavior->getInstance(), object);
+                    }
+
+                    break;
+                }
+                case scripting::FieldType::Material: {
+                    asset::MaterialAsset* handle = static_cast<asset::MaterialAsset*>(fw.getSerializable(behavior->getInstance()));
+
+                    if (handle) {
+                        ImGui::Button(handle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    } else {
+                        ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    }
+
+                    asset::MaterialAsset* object = DragDrop::renderTarget<asset::MaterialAsset>(reflection::RuntimeTypes::MATERIAL);
+                    if (object != nullptr) {
+                        fw.setSerializable(behavior->getInstance(), object);
+                    }
+
+                    break;
+                }
+                case scripting::FieldType::Audio: {
+                    asset::AudioAsset* handle = static_cast<asset::AudioAsset*>(fw.getSerializable(behavior->getInstance()));
+
+                    if (handle) {
+                        ImGui::Button(handle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    } else {
+                        ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    }
+
+                    asset::AudioAsset* object = DragDrop::renderTarget<asset::AudioAsset>(reflection::RuntimeTypes::AUDIO);
+                    if (object != nullptr) {
+                        fw.setSerializable(behavior->getInstance(), object);
+                    }
+
+                    break;
+                }
+                default: {
+                    ImGui::Text("Unknown field type");
+                }
+                }
+
+                ImGui::PopItemWidth();
+            }
+
+            ImGui::EndTable();
+        }
+    }
+}
+
 void Inspector::renderGameObject(io::SerializableObject* object) {
     scene::GameObject* gObject = static_cast<scene::GameObject*>(object);
 
@@ -435,6 +537,21 @@ void Inspector::renderGameObject(io::SerializableObject* object) {
         this->renderAudioSource(source);
     }
 
+    size_t idx = 0;
+    for (scripting::ScriptedBehavior* behavior : gObject->getBehaviors()) {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+        std::string name = "X##behavior" + std::to_string(idx++);
+        if (ImGui::Button(name.c_str())) {
+            gObject->removeBehavior(behavior);
+            ImGui::PopStyleColor();
+            break;
+        }
+        ImGui::PopStyleColor();
+        ImGui::SameLine();
+
+        this->renderBehavior(behavior, idx);
+    }
+
     // Add components
     ImGui::Separator();
 
@@ -479,6 +596,14 @@ void Inspector::renderGameObject(io::SerializableObject* object) {
 
         if (listener == nullptr && ImGui::MenuItem("Audio listener")) {
             gObject->addAudioListener();
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (ImGui::MenuItem("Behavior")) {
+            SelectScriptModal* ssm = new SelectScriptModal([gObject](scripting::BehaviorBase* behavior) {
+                gObject->addBehavior(behavior->createInstance());
+            });
+            WindowsEditor::getInstance()->getUI().pushModal(ssm);
             ImGui::CloseCurrentPopup();
         }
 

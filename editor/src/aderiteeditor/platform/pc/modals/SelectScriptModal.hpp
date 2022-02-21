@@ -5,7 +5,6 @@
 #include <string>
 
 #include "aderite/scripting/Forward.hpp"
-#include "aderite/scripting/ScriptEventType.hpp"
 
 #include "aderiteeditor/platform/pc/modals/IModal.hpp"
 
@@ -17,10 +16,10 @@ namespace editor {
  */
 class SelectScriptModal : public IModal {
 public:
-    using SelectFn = std::function<void(scripting::ScriptEvent*)>;
+    using SelectFn = std::function<void(scripting::BehaviorBase*)>;
 
 public:
-    SelectScriptModal(scripting::ScriptEventType filter, SelectFn fn);
+    SelectScriptModal(SelectFn fn);
 
     // Inherited via IModal
     void render() override;
@@ -30,11 +29,7 @@ public:
 
 private:
     bool m_open = true;
-    scripting::ScriptEventType m_filtering = scripting::ScriptEventType::NONE;
     SelectFn m_callback;
-
-    scripting::ScriptClass* m_class = nullptr;
-    scripting::ScriptEvent* m_event = nullptr;
 };
 
 } // namespace editor

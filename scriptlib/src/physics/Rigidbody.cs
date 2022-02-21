@@ -6,7 +6,7 @@ namespace Aderite
     /// <summary>
     /// Rigidbody component used to control the physical properties of game objects
     /// </summary>
-    class Rigidbody
+    public class Rigidbody
     {
         /// <summary>
         /// Gravity flag of the game object if true then the object is affected by gravity, otherwise gravity will not affect this object

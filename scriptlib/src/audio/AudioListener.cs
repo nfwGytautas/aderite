@@ -6,7 +6,7 @@ namespace Aderite
     /// <summary>
     /// Audio listener object used to configure audio listeners
     /// </summary>
-    class AudioListener
+    public class AudioListener
     {
         /// <summary>
         /// If this is true then this audio listener will be enabled and audio will be heard by this game object, multiple enabled 

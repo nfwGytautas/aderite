@@ -6,7 +6,7 @@ namespace Aderite
     /// <summary>
     /// Audio source object used to manipulate the 
     /// </summary>
-    class AudioSource
+    public class AudioSource
     {
         /// <summary>
         /// If this is true then all audio coming from this source will be muted, otherwise the volume of the source will be used

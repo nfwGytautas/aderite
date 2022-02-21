@@ -15,6 +15,7 @@ namespace scripting {
  */
 class FieldWrapper final {
 public:
+    FieldWrapper();
     FieldWrapper(MonoClassField* field);
 
     /**

@@ -9,7 +9,6 @@
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/scripting/Forward.hpp"
-#include "aderite/scripting/ScriptEventMap.hpp"
 
 namespace aderite {
 namespace scene {
@@ -20,7 +19,7 @@ namespace scene {
  * be it meshes, materials, etc. However these resources are loaded as trunks into the asset manager
  * the actual data is not loaded until needed.
  */
-class Scene final : public io::SerializableAsset, public physics::PhysicsScene, public scripting::ScriptEventMap {
+class Scene final : public io::SerializableAsset, public physics::PhysicsScene {
 public:
     Scene();
     virtual ~Scene();

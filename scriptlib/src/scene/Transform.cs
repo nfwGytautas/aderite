@@ -6,7 +6,7 @@ namespace Aderite
     /// <summary>
     /// Transform component used to control the position, rotation and scale of the game object
     /// </summary>
-    class Transform
+    public class Transform
     {
         /// <summary>
         /// Position of the transform component

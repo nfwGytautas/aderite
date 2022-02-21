@@ -26,6 +26,8 @@ void AudioSource::update(float delta) {
         return;
     }*/
 
+    return;
+
     if (m_instance == nullptr) {
         // Create audio instance
         //m_instance = ::aderite::Engine::getAudioController()->createAudioInstance(m_data.getAudioClip());

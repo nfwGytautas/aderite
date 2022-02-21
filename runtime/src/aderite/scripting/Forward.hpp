@@ -10,18 +10,9 @@ namespace scripting {
 
 class ScriptManager;
 class LibClassLocator;
-
-class ScriptSystem;
+class BehaviorBase;
+class ScriptedBehavior;
 class FieldWrapper;
-
-class ScriptEventMap;
-class ScriptClass;
-class ScriptEvent;
-class ScriptData;
-
-class ScriptUpdateEvent;
-class ScriptGeometryEvent;
-class ScriptSceneLoadedEvent;
 
 } // namespace scripting
 } // namespace aderite

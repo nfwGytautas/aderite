@@ -52,6 +52,8 @@ void GameObject::update(float delta) {
         m_renderable->update(delta);
     }
 
+    // TODO: Don't update some components, when not in play mode
+
     if (m_camera != nullptr) {
         m_camera->update(delta);
     }
@@ -221,6 +223,18 @@ void GameObject::removeAudioListener() {
 
 audio::AudioListener* GameObject::getAudioListener() const {
     return m_audioListener;
+}
+
+void GameObject::addBehavior(scripting::ScriptedBehavior* behavior) {
+    m_behaviors.push_back(behavior);
+}
+
+void GameObject::removeBehavior(scripting::ScriptedBehavior* behavior) {
+    m_behaviors.erase(std::find(m_behaviors.begin(), m_behaviors.end(), behavior));
+}
+
+std::vector<scripting::ScriptedBehavior*> GameObject::getBehaviors() const {
+    return m_behaviors;
 }
 
 bool GameObject::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

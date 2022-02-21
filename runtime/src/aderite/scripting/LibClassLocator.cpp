@@ -42,13 +42,14 @@ bool LibClassLocator::locate(MonoImage* image) {
     bool result = true;
 
     // Classes
-    findClass(image, "Aderite", "Entity", m_entity.Klass, result);
+    /*findClass(image, "Aderite", "Entity", m_entity.Klass, result);
     findClass(image, "Aderite", "Mesh", m_mesh.Klass, result);
     findClass(image, "Aderite", "Material", m_material.Klass, result);
     findClass(image, "Aderite", "Audio", m_audio.Klass, result);
     findClass(image, "Aderite", "AudioSource", m_audioSource.Klass, result);
     findClass(image, "Aderite", "RaycastHit", m_raycastHit.Klass, result);
-    findClass(image, "Aderite", "Geometry", m_geometry.Klass, result);
+    findClass(image, "Aderite", "Geometry", m_geometry.Klass, result);*/
+    findClass(image, "Aderite", "ScriptedBehavior", m_behavior.Klass, result);
 
     // Can't proceed if classes are not found
     if (result == false) {
@@ -59,13 +60,13 @@ bool LibClassLocator::locate(MonoImage* image) {
     // Fields
 
     // Methods
-    findMethod(m_entity.Klass, ".ctor", 1, m_entity.Ctor, result);
+    /*findMethod(m_entity.Klass, ".ctor", 1, m_entity.Ctor, result);
     findMethod(m_mesh.Klass, ".ctor", 1, m_mesh.Ctor, result);
     findMethod(m_material.Klass, ".ctor", 1, m_material.Ctor, result);
     findMethod(m_audio.Klass, ".ctor", 1, m_audio.Ctor, result);
     findMethod(m_audioSource.Klass, ".ctor", 1, m_audioSource.Ctor, result);
     findMethod(m_raycastHit.Klass, ".ctor", 2, m_raycastHit.Ctor, result);
-    findMethod(m_geometry.Klass, ".ctor", 1, m_geometry.Ctor, result);
+    findMethod(m_geometry.Klass, ".ctor", 1, m_geometry.Ctor, result);*/
 
     if (result) {
         LOG_INFO("[Scripting] Engine classes located");
@@ -180,6 +181,10 @@ const LibClassLocator::RaycastHit& LibClassLocator::getRaycastHit() const {
 
 const LibClassLocator::Geometry& LibClassLocator::getGeometry() const {
     return m_geometry;
+}
+
+const LibClassLocator::Behavior& LibClassLocator::getBehavior() const {
+    return m_behavior;
 }
 
 void LibClassLocator::handleException(MonoObject* exception) const {

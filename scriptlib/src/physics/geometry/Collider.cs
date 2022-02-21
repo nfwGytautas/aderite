@@ -6,7 +6,7 @@ namespace Aderite
     /// <summary>
     /// Collider is used to create a trigger zone or create a collision zone
     /// </summary>
-    class Collider
+    public class Collider
     {
         /// <summary>
         /// If true then the collider will be used as a trigger and will not participate in collision detection

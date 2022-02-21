@@ -1,12 +1,14 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "aderite/audio/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
+#include "aderite/scripting/Forward.hpp"
 
 namespace aderite {
 namespace scene {
@@ -175,6 +177,23 @@ public:
      */
     audio::AudioListener* getAudioListener() const;
 
+    /**
+     * @brief Adds behavior to this game object
+     * @param behavior Behavior instance
+     */
+    void addBehavior(scripting::ScriptedBehavior* behavior);
+
+    /**
+     * @brief Remove behavior from this game object
+     * @param behavior Behavior to remove
+     */
+    void removeBehavior(scripting::ScriptedBehavior* behavior);
+
+    /**
+     * @brief Returns the behaviors of this game object
+     */
+    std::vector<scripting::ScriptedBehavior*> getBehaviors() const;
+
     // Inherited via SerializableObject
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
@@ -192,6 +211,7 @@ private:
     Camera* m_camera = nullptr;
     audio::AudioSource* m_audioSource = nullptr;
     audio::AudioListener* m_audioListener = nullptr;
+    std::vector<scripting::ScriptedBehavior*> m_behaviors;
 };
 
 } // namespace scene

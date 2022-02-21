@@ -5,6 +5,7 @@
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
+#include "aderite/scripting/Forward.hpp"
 
 #include "aderiteeditor/platform/pc/UIComponent.hpp"
 
@@ -28,6 +29,7 @@ private:
     void renderCamera(scene::Camera* camera);
     void renderAudioSource(audio::AudioSource* source);
     void renderAudioListener(audio::AudioListener* listener);
+    void renderBehavior(scripting::ScriptedBehavior* behavior, size_t idx);
 
     // Objects
     void renderGameObject(io::SerializableObject* object);
