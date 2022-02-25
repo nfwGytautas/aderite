@@ -3,14 +3,6 @@ Name: FullRework
 Data:
   PhysicsScene:
     {}
-  ScriptEventMap:
-    Events:
-      - Type: 1
-        Name: BoxSpawner.Update
-      - Type: 3
-        Name: Despawner.Initialize
-      - Type: 3
-        Name: StateTracker.Initialize
   GameObjects:
     - GameObject:
         Name: New object (0)
@@ -37,6 +29,10 @@ Data:
           Volume: 1
         AudioListener:
           Enabled: false
+        Behaviors:
+          - Script: Scripts.BoxSpawner
+            Fields:
+              MaxLive: 15
     - GameObject:
         Name: Ground
         Transform:
@@ -61,3 +57,5 @@ Data:
               Data:
                 Size: [1, 2, 1]
                 IsTrigger: true
+        Behaviors:
+          []

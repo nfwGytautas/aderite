@@ -16,7 +16,6 @@
 #include "aderiteeditor/platform/pc/panels/Inspector.hpp"
 #include "aderiteeditor/platform/pc/panels/NodeEditor.hpp"
 #include "aderiteeditor/platform/pc/panels/SceneHierarchy.hpp"
-#include "aderiteeditor/platform/pc/panels/SceneScriptMapping.hpp"
 #include "aderiteeditor/platform/pc/panels/SceneView.hpp"
 #include "aderiteeditor/platform/pc/toolbars/Menubar.hpp"
 #include "aderiteeditor/platform/pc/toolbars/Toolbar.hpp"

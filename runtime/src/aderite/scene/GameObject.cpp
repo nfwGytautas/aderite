@@ -10,6 +10,8 @@
 #include "aderite/rendering/Renderable.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/Camera.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/scripting/ScriptedBehavior.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -277,6 +279,14 @@ bool GameObject::serialize(const io::Serializer* serializer, YAML::Emitter& emit
         }
     }
 
+    emitter << YAML::Key << "Behaviors" << YAML::BeginSeq;
+    for (scripting::ScriptedBehavior* sb : m_behaviors) {
+        if (!sb->serialize(serializer, emitter)) {
+            return false;
+        }
+    }
+    emitter << YAML::EndSeq;
+
     emitter << YAML::EndMap;
     return true;
 }
@@ -341,6 +351,24 @@ bool GameObject::deserialize(io::Serializer* serializer, const YAML::Node& data)
             if (!this->addAudioListener()->getData().deserialize(serializer, gameObject)) {
                 return false;
             }
+        }
+    }
+
+    {
+        for (const YAML::Node& scriptNode : gameObject["Behaviors"]) {
+            scripting::BehaviorBase* behaviorBase = ::aderite::Engine::getScriptManager()->getBehavior(scriptNode["Script"].as<std::string>());
+            if (behaviorBase == nullptr) {
+                LOG_WARN("[Scripting] Behavior with name {0} no longer found so is skipped", scriptNode["Script"].as<std::string>());
+                continue;
+            }
+
+            scripting::ScriptedBehavior* behavior = new scripting::ScriptedBehavior(behaviorBase);
+            if (!behavior->deserialize(serializer, scriptNode)) {
+                delete behavior;
+                return false;
+            }
+
+            this->addBehavior(behavior);
         }
     }
 

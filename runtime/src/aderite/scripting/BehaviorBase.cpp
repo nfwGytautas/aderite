@@ -44,7 +44,9 @@ ScriptedBehavior* BehaviorBase::createInstance() {
 
 const std::string BehaviorBase::getName() const {
     std::string result = mono_class_get_namespace(m_klass);
-    result += ".";
+    if (!result.empty()) {
+        result += ".";
+    }
     result += mono_class_get_name(m_klass);
     return result;
 }

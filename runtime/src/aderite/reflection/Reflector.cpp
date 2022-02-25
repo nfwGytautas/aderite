@@ -17,7 +17,6 @@
 #include "aderite/physics/geometry/BoxGeometry.hpp"
 #include "aderite/rendering/Renderable.hpp"
 #include "aderite/scene/Scene.hpp"
-#include "aderite/scripting/ScriptSystem.hpp"
 
 namespace aderite {
 namespace reflection {
