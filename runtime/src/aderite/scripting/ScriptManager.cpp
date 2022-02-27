@@ -111,7 +111,7 @@ void ScriptManager::loadAssemblies() {
             }
 
             // Check if inherits from behavior
-            if (mono_class_get_parent(monoClass) != m_locator.getBehavior().Klass) {
+            if (mono_class_get_parent(monoClass) != m_locator.Behavior.Klass) {
                 // Doesn't inherit from ScriptedBehavior
                 continue;
             }

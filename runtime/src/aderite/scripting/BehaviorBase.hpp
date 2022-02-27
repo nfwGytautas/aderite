@@ -49,6 +49,13 @@ public:
      */
     MonoClass* getClass() const;
 
+    /**
+     * @brief Copies field information from the specified source behavior to the specified destination behavior
+     * @param source Source behavior to copy information from
+     * @param dst Destination behavior to copy information to
+     */
+    void copyOver(ScriptedBehavior* source, ScriptedBehavior* dst);
+
 private:
     // The C# class representation
     MonoClass* m_klass = nullptr;

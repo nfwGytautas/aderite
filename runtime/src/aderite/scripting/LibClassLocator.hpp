@@ -17,16 +17,26 @@ namespace scripting {
  * @brief Class used to locate engine classes and provide ways to instantiate them
  */
 class LibClassLocator final {
-public: 
-    struct Behavior {
+public:
+    struct {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
-    };
+    } Behavior;
 
-    struct GameObject {
+    struct {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
-    };
+    } GameObject;
+
+    struct {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    } Prefab;
+
+    struct {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    } Transform;
 
 public:
     /**
@@ -61,19 +71,19 @@ public:
      */
     MonoObject* create(scene::GameObject* gObject) const;
 
-    // ====================================================================================
-    // Class getters
-    // ====================================================================================
+    /**
+     * @brief Creates a C# transform from C++ asset
+     * @param Transform Transform object from which to create
+     * @return MonoObject instance
+     */
+    MonoObject* create(scene::TransformProvider* transform) const;
 
     /**
-     * @brief Returns the behavior information struct
+     * @brief Creates a C# prefab from C++ asset
+     * @param prefab Prefab from which to create
+     * @return MonoObject instance
      */
-    const Behavior& getBehavior() const;
-
-    /**
-     * @brief Returns the game object information struct
-     */
-    const GameObject& getGameObject() const;
+    MonoObject* create(asset::PrefabAsset* prefab) const;
 
 private:
     /**
@@ -90,10 +100,6 @@ private:
      * @return MonoObject instance
      */
     MonoObject* genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args) const;
-
-private:
-    Behavior m_behavior;
-    GameObject m_gameObject;
 };
 
 } // namespace scripting

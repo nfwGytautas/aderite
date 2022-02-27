@@ -4,6 +4,7 @@
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
+#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/geometry/Geometry.hpp"
 #include "aderite/scene/GameObject.hpp"
@@ -43,8 +44,10 @@ bool LibClassLocator::locate(MonoImage* image) {
     bool result = true;
 
     // Classes
-    findClass(image, "Aderite", "ScriptedBehavior", m_behavior.Klass, result);
-    findClass(image, "Aderite", "GameObject", m_gameObject.Klass, result);
+    findClass(image, "Aderite", "ScriptedBehavior", Behavior.Klass, result);
+    findClass(image, "Aderite", "GameObject", GameObject.Klass, result);
+    findClass(image, "Aderite", "Prefab", Prefab.Klass, result);
+    findClass(image, "Aderite", "Transform", Transform.Klass, result);
 
     // Can't proceed if classes are not found
     if (result == false) {
@@ -55,7 +58,9 @@ bool LibClassLocator::locate(MonoImage* image) {
     // Fields
 
     // Methods
-    findMethod(m_gameObject.Klass, ".ctor", 1, m_gameObject.Ctor, result);
+    findMethod(GameObject.Klass, ".ctor", 1, GameObject.Ctor, result);
+    findMethod(Prefab.Klass, ".ctor", 1, Prefab.Ctor, result);
+    findMethod(Transform.Klass, ".ctor", 1, Transform.Ctor, result);
 
     if (result) {
         LOG_INFO("[Scripting] Engine classes located");
@@ -69,6 +74,10 @@ bool LibClassLocator::locate(MonoImage* image) {
 FieldType LibClassLocator::getType(MonoType* type) const {
     // Check for engine classes
     MonoClass* klass = mono_type_get_class(type);
+
+    if (klass == Prefab.Klass) {
+        return FieldType::Prefab;
+    }
 
     /*if (klass == m_mesh.Klass) {
         return FieldType::Mesh;
@@ -90,6 +99,9 @@ MonoObject* LibClassLocator::create(io::SerializableObject* serializable) const 
     case reflection::RuntimeTypes::GAME_OBJECT: {
         return this->create(static_cast<scene::GameObject*>(serializable));
     }
+    case reflection::RuntimeTypes::PREFAB: {
+        return this->create(static_cast<asset::PrefabAsset*>(serializable));
+    }
     default: {
         ADERITE_ABORT("Unknown serializable type");
         return nullptr;
@@ -99,15 +111,17 @@ MonoObject* LibClassLocator::create(io::SerializableObject* serializable) const 
 
 MonoObject* LibClassLocator::create(scene::GameObject* gObject) const {
     void* args[1] = {&gObject};
-    return this->genericInstanceCreate(m_gameObject.Klass, m_gameObject.Ctor, args);
+    return this->genericInstanceCreate(GameObject.Klass, GameObject.Ctor, args);
 }
 
-const LibClassLocator::Behavior& LibClassLocator::getBehavior() const {
-    return m_behavior;
+MonoObject* LibClassLocator::create(scene::TransformProvider* transform) const {
+    void* args[1] = {&transform};
+    return this->genericInstanceCreate(Transform.Klass, Transform.Ctor, args);
 }
 
-const LibClassLocator::GameObject& LibClassLocator::getGameObject() const {
-    return m_gameObject;
+MonoObject* LibClassLocator::create(asset::PrefabAsset* prefab) const {
+    void* args[1] = {&prefab};
+    return this->genericInstanceCreate(Prefab.Klass, Prefab.Ctor, args);
 }
 
 void LibClassLocator::handleException(MonoObject* exception) const {

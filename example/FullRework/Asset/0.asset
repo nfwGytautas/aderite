@@ -5,35 +5,6 @@ Data:
     {}
   GameObjects:
     - GameObject:
-        Name: New object (0)
-        Transform:
-          Position: [0, 0, 0]
-          Rotation: [1, 0, 0, 0]
-          Scale: [1, 1, 1]
-        Renderable:
-          Mesh: 1
-          Material: 6
-        PhysicsActor:
-          Dynamic: true
-          Mass: 1
-          HasGravity: true
-          Geometry:
-            - Type: 75
-              Name: l5WkM0RMBFYf
-              Data:
-                Size: [1, 1, 1]
-                IsTrigger: false
-        Camera:
-          FoV: 90
-        AudioSource:
-          Volume: 1
-        AudioListener:
-          Enabled: false
-        Behaviors:
-          - Script: Scripts.BoxSpawner
-            Fields:
-              MaxLive: 15
-    - GameObject:
         Name: Ground
         Transform:
           Position: [0, -5, 0]
@@ -59,3 +30,37 @@ Data:
                 IsTrigger: true
         Behaviors:
           []
+    - GameObject:
+        Name: Spawner
+        Transform:
+          Position: [0, 10, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [1, 1, 1]
+        Behaviors:
+          - Script: Scripts.BoxSpawner
+            Fields:
+              SpawnInterval: 1
+              Prefab: 25
+    - GameObject:
+        Name: Cube 0
+        Transform:
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [1, 1, 1]
+        Renderable:
+          Mesh: 1
+          Material: 9
+        PhysicsActor:
+          Dynamic: true
+          Mass: 1
+          HasGravity: true
+          Geometry:
+            - Type: 75
+              Name: hmCYB00A3v4j
+              Data:
+                Size: [1, 1, 1]
+                IsTrigger: false
+        Behaviors:
+          - Script: Scripts.Destructor
+            Fields:
+              TimeAlive: 5

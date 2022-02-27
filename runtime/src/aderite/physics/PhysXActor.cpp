@@ -83,6 +83,10 @@ void PhysXActor::transferGeometry(physx::PxRigidActor* actor) {
 }
 
 void PhysXActor::freeActor() {
+    if (m_actor == nullptr) {
+        return;
+    }
+
     physx::PxScene* scene = m_actor->getScene();
 
     if (scene != nullptr) {

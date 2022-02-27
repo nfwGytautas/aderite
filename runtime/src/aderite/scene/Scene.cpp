@@ -60,8 +60,8 @@ void Scene::update(float delta) {
                         m_gameObjects.end());
 
     // Update all game objects
-    for (auto& gObject : m_gameObjects) {
-        gObject->update(delta);
+    for (size_t i = 0; i < m_gameObjects.size(); i++) {
+        m_gameObjects[i]->update(delta);
     }
 }
 

@@ -10,6 +10,9 @@
 #include "aderite/scene/Camera.hpp"
 #include "aderite/scene/CameraSettings.hpp"
 #include "aderite/scene/GameObject.hpp"
+#include "aderite/scene/Scene.hpp"
+#include "aderite/scripting/BehaviorBase.hpp"
+#include "aderite/scripting/ScriptedBehavior.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -26,6 +29,7 @@ PrefabAsset::PrefabAsset(scene::GameObject* gObject) {
     scene::Camera* const camera = gObject->getCamera();
     audio::AudioListener* const listener = gObject->getAudioListener();
     audio::AudioSource* const source = gObject->getAudioSource();
+    std::vector<scripting::ScriptedBehavior*> behaviors = gObject->getBehaviors();
 
     if (transform != nullptr) {
         m_transform = new scene::TransformProvider();
@@ -56,6 +60,15 @@ PrefabAsset::PrefabAsset(scene::GameObject* gObject) {
         m_audioSource = new audio::AudioSourceData();
         *m_audioSource = source->getData();
     }
+
+    if (!behaviors.empty()) {
+        for (scripting::ScriptedBehavior* behavior : behaviors) {
+            // Nullptr game object, because this won't actually be used as a behavior only as a data storage
+            scripting::ScriptedBehavior* copy = new scripting::ScriptedBehavior(behavior->getBase(), nullptr);
+            copy->getBase()->copyOver(behavior, copy);
+            m_behaviors.push_back(copy);
+        }
+    }
 }
 
 PrefabAsset::~PrefabAsset() {
@@ -67,11 +80,16 @@ PrefabAsset::~PrefabAsset() {
     delete m_camera;
     delete m_audioListener;
     delete m_audioSource;
+
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        delete behavior;
+    }
 }
 
 scene::GameObject* PrefabAsset::instantiate(scene::Scene* scene) const {
     static size_t nextId = 0;
-    scene::GameObject* go = new scene::GameObject(scene, this->getName() + " " + std::to_string(nextId++));
+    scene::GameObject* go = scene->createGameObject();
+    go->setName(this->getName() + " " + std::to_string(nextId++));
 
     if (m_transform != nullptr) {
         *go->addTransform() = *m_transform;
@@ -95,6 +113,12 @@ scene::GameObject* PrefabAsset::instantiate(scene::Scene* scene) const {
 
     if (m_audioSource != nullptr) {
         go->addAudioSource()->getData() = *m_audioSource;
+    }
+
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        scripting::ScriptedBehavior* copy = new scripting::ScriptedBehavior(behavior->getBase(), go);
+        behavior->getBase()->copyOver(behavior, copy);
+        go->addBehavior(copy);
     }
 
     return go;
@@ -152,6 +176,14 @@ bool PrefabAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emi
             return false;
         }
     }
+
+    emitter << YAML::Key << "Behaviors" << YAML::BeginSeq;
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        if (!behavior->serialize(serializer, emitter)) {
+            return false;
+        }
+    }
+    emitter << YAML::EndSeq;
 
     return true;
 }
@@ -215,6 +247,25 @@ bool PrefabAsset::deserialize(io::Serializer* serializer, const YAML::Node& data
             if (!m_audioSource->deserialize(serializer, data)) {
                 return false;
             }
+        }
+    }
+
+    {
+        for (const YAML::Node& scriptNode : data["Behaviors"]) {
+            scripting::BehaviorBase* behaviorBase =
+                ::aderite::Engine::getScriptManager()->getBehavior(scriptNode["Script"].as<std::string>());
+            if (behaviorBase == nullptr) {
+                LOG_WARN("[Scripting] Behavior with name {0} no longer found so is skipped", scriptNode["Script"].as<std::string>());
+                continue;
+            }
+
+            scripting::ScriptedBehavior* behavior = new scripting::ScriptedBehavior(behaviorBase, nullptr);
+            if (!behavior->deserialize(serializer, scriptNode)) {
+                delete behavior;
+                return false;
+            }
+
+            m_behaviors.push_back(behavior);
         }
     }
 

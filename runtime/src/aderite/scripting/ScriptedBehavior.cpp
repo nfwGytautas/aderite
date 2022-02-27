@@ -38,6 +38,8 @@ void ScriptedBehavior::shutdown() {
         return;
     }
 
+    // TODO: Release asset references
+
     if (m_behaviorBase->m_shutdown) {
         m_behaviorBase->m_shutdown(m_instance);
         m_initialized = false;
@@ -100,6 +102,7 @@ bool ScriptedBehavior::serialize(const io::Serializer* serializer, YAML::Emitter
                 switch (field.getType()) {
                 case scripting::FieldType::Mesh:
                 case scripting::FieldType::Material:
+                case scripting::FieldType::Prefab:
                 case scripting::FieldType::Audio: {
                     // SerializableObject
                     io::SerializableAsset* object = static_cast<io::SerializableAsset*>(serializable);
@@ -150,10 +153,12 @@ bool ScriptedBehavior::deserialize(io::Serializer* serializer, const YAML::Node&
             switch (field.getType()) {
             case scripting::FieldType::Mesh:
             case scripting::FieldType::Material:
+            case scripting::FieldType::Prefab:
             case scripting::FieldType::Audio: {
                 // Serializable object
-                io::SerializableObject* object = ::aderite::Engine::getAssetManager()->get(fieldNode.as<io::SerializableHandle>());
-                field.setSerializable(m_instance, object);
+                io::SerializableAsset* asset = ::aderite::Engine::getAssetManager()->get(fieldNode.as<io::SerializableHandle>());
+                asset->acquire();
+                field.setSerializable(m_instance, asset);
                 break;
             }
             default: {

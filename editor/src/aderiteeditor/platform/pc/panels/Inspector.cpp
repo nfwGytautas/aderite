@@ -8,6 +8,7 @@
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
+#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/audio/AudioListener.hpp"
@@ -407,6 +408,8 @@ void Inspector::renderBehavior(scripting::ScriptedBehavior* behavior, size_t idx
 
                     asset::MeshAsset* object = DragDrop::renderTarget<asset::MeshAsset>(reflection::RuntimeTypes::MESH);
                     if (object != nullptr) {
+                        object->acquire();
+                        handle->release();
                         fw.setSerializable(behavior->getInstance(), object);
                     }
 
@@ -423,6 +426,8 @@ void Inspector::renderBehavior(scripting::ScriptedBehavior* behavior, size_t idx
 
                     asset::MaterialAsset* object = DragDrop::renderTarget<asset::MaterialAsset>(reflection::RuntimeTypes::MATERIAL);
                     if (object != nullptr) {
+                        object->acquire();
+                        handle->release();
                         fw.setSerializable(behavior->getInstance(), object);
                     }
 
@@ -439,6 +444,26 @@ void Inspector::renderBehavior(scripting::ScriptedBehavior* behavior, size_t idx
 
                     asset::AudioAsset* object = DragDrop::renderTarget<asset::AudioAsset>(reflection::RuntimeTypes::AUDIO);
                     if (object != nullptr) {
+                        object->acquire();
+                        handle->release();
+                        fw.setSerializable(behavior->getInstance(), object);
+                    }
+
+                    break;
+                }
+                case scripting::FieldType::Prefab: {
+                    asset::PrefabAsset* handle = static_cast<asset::PrefabAsset*>(fw.getSerializable(behavior->getInstance()));
+
+                    if (handle) {
+                        ImGui::Button(handle->getName().c_str(), ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    } else {
+                        ImGui::Button("None", ImVec2(ImGui::CalcItemWidth(), 0.0f));
+                    }
+
+                    asset::PrefabAsset* object = DragDrop::renderTarget<asset::PrefabAsset>(reflection::RuntimeTypes::PREFAB);
+                    if (object != nullptr) {
+                        object->acquire();
+                        handle->release();
                         fw.setSerializable(behavior->getInstance(), object);
                     }
 

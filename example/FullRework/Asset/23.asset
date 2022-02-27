@@ -1,20 +1,20 @@
 Type: 7
-Name: Ground
+Name: Cube
 Data:
   Transform:
-    Position: [0, -5, 0]
+    Position: [0, 0, 0]
     Rotation: [1, 0, 0, 0]
-    Scale: [10, 0.5, 10]
+    Scale: [1, 1, 1]
   Renderable:
     Mesh: 1
-    Material: 4
+    Material: 9
   PhysicsActor:
-    Dynamic: false
+    Dynamic: true
     Mass: 1
-    HasGravity: false
+    HasGravity: true
     Geometry:
       - Type: 75
-        Name: NsUuAqSCVeD0
+        Name: TkMRyTdusPKn
         Data:
           Size: [1, 1, 1]
           IsTrigger: false

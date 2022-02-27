@@ -18,11 +18,12 @@ enum class FieldType {
     Mesh,
     Material,
     Audio,
+    Prefab,
 
     // Physics
     Geometry,
 
-    // Scene objects
+    // Other components
     AudioSource,
 };
 

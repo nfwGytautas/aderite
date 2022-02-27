@@ -68,5 +68,16 @@ MonoClass* BehaviorBase::getClass() const {
     return m_klass;
 }
 
+void BehaviorBase::copyOver(ScriptedBehavior* source, ScriptedBehavior* dst) {
+    if (source->getBase() != dst->getBase() || source->getBase() != this) {
+        ADERITE_ABORT("[Scripting] BehaviorBase mismatch");
+    }
+
+    // Copy field information
+    for (FieldWrapper& fw : m_fields) {
+        //fw.setValue(dst->getInstance(), fw.getValue(source->getInstance()));
+    }
+}
+
 } // namespace scripting
 } // namespace aderite
