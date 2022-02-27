@@ -601,7 +601,7 @@ void Inspector::renderGameObject(io::SerializableObject* object) {
 
         if (ImGui::MenuItem("Behavior")) {
             SelectScriptModal* ssm = new SelectScriptModal([gObject](scripting::BehaviorBase* behavior) {
-                gObject->addBehavior(behavior->createInstance());
+                gObject->addBehavior(new scripting::ScriptedBehavior(behavior, gObject));
             });
             WindowsEditor::getInstance()->getUI().pushModal(ssm);
             ImGui::CloseCurrentPopup();

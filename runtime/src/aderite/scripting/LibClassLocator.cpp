@@ -6,6 +6,7 @@
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/audio/AudioSource.hpp"
 #include "aderite/physics/geometry/Geometry.hpp"
+#include "aderite/scene/GameObject.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
 
@@ -42,14 +43,8 @@ bool LibClassLocator::locate(MonoImage* image) {
     bool result = true;
 
     // Classes
-    /*findClass(image, "Aderite", "Entity", m_entity.Klass, result);
-    findClass(image, "Aderite", "Mesh", m_mesh.Klass, result);
-    findClass(image, "Aderite", "Material", m_material.Klass, result);
-    findClass(image, "Aderite", "Audio", m_audio.Klass, result);
-    findClass(image, "Aderite", "AudioSource", m_audioSource.Klass, result);
-    findClass(image, "Aderite", "RaycastHit", m_raycastHit.Klass, result);
-    findClass(image, "Aderite", "Geometry", m_geometry.Klass, result);*/
     findClass(image, "Aderite", "ScriptedBehavior", m_behavior.Klass, result);
+    findClass(image, "Aderite", "GameObject", m_gameObject.Klass, result);
 
     // Can't proceed if classes are not found
     if (result == false) {
@@ -60,13 +55,7 @@ bool LibClassLocator::locate(MonoImage* image) {
     // Fields
 
     // Methods
-    /*findMethod(m_entity.Klass, ".ctor", 1, m_entity.Ctor, result);
-    findMethod(m_mesh.Klass, ".ctor", 1, m_mesh.Ctor, result);
-    findMethod(m_material.Klass, ".ctor", 1, m_material.Ctor, result);
-    findMethod(m_audio.Klass, ".ctor", 1, m_audio.Ctor, result);
-    findMethod(m_audioSource.Klass, ".ctor", 1, m_audioSource.Ctor, result);
-    findMethod(m_raycastHit.Klass, ".ctor", 2, m_raycastHit.Ctor, result);
-    findMethod(m_geometry.Klass, ".ctor", 1, m_geometry.Ctor, result);*/
+    findMethod(m_gameObject.Klass, ".ctor", 1, m_gameObject.Ctor, result);
 
     if (result) {
         LOG_INFO("[Scripting] Engine classes located");
@@ -81,7 +70,7 @@ FieldType LibClassLocator::getType(MonoType* type) const {
     // Check for engine classes
     MonoClass* klass = mono_type_get_class(type);
 
-    if (klass == m_mesh.Klass) {
+    /*if (klass == m_mesh.Klass) {
         return FieldType::Mesh;
     } else if (klass == m_material.Klass) {
         return FieldType::Material;
@@ -91,27 +80,15 @@ FieldType LibClassLocator::getType(MonoType* type) const {
         return FieldType::AudioSource;
     } else if (klass == m_geometry.Klass) {
         return FieldType::Geometry;
-    }
+    }*/
 
     return FieldType::Null;
 }
 
 MonoObject* LibClassLocator::create(io::SerializableObject* serializable) const {
     switch (static_cast<reflection::RuntimeTypes>(serializable->getType())) {
-    case reflection::RuntimeTypes::MESH: {
-        return this->create(static_cast<asset::MeshAsset*>(serializable));
-    }
-    case reflection::RuntimeTypes::MATERIAL: {
-        return this->create(static_cast<asset::MaterialAsset*>(serializable));
-    }
-    case reflection::RuntimeTypes::AUDIO: {
-        return this->create(static_cast<asset::AudioAsset*>(serializable));
-    }
-    /*case reflection::RuntimeTypes::AUDIO_SOURCE: {
-        return this->create(static_cast<audio::AudioSource*>(serializable));
-    }*/
-    case reflection::RuntimeTypes::BOX_GEOMETRY: {
-        return this->create(static_cast<physics::Geometry*>(serializable));
+    case reflection::RuntimeTypes::GAME_OBJECT: {
+        return this->create(static_cast<scene::GameObject*>(serializable));
     }
     default: {
         ADERITE_ABORT("Unknown serializable type");
@@ -120,71 +97,17 @@ MonoObject* LibClassLocator::create(io::SerializableObject* serializable) const 
     }
 }
 
-MonoObject* LibClassLocator::create(asset::MeshAsset* mesh) const {
-    void* args[1] = {&mesh};
-    return this->genericInstanceCreate(m_mesh.Klass, m_mesh.Ctor, args);
-}
-
-MonoObject* LibClassLocator::create(asset::MaterialAsset* material) const {
-    void* args[1] = {&material};
-    return this->genericInstanceCreate(m_material.Klass, m_material.Ctor, args);
-}
-
-MonoObject* LibClassLocator::create(asset::AudioAsset* audio) const {
-    void* args[1] = {&audio};
-    return this->genericInstanceCreate(m_audio.Klass, m_audio.Ctor, args);
-}
-
-MonoObject* LibClassLocator::create(audio::AudioSource* source) const {
-    void* args[1] = {&source};
-    return this->genericInstanceCreate(m_audioSource.Klass, m_audioSource.Ctor, args);
-}
-
-// MonoObject* LibClassLocator::create(const physics::RaycastHit& hit) const {
-//    void* args[2] = {create(hit.Actor->getEntity()), (void*)(&hit.Distance)};
-//    return this->genericInstanceCreate(m_raycastHit.Klass, m_raycastHit.Ctor, args);
-//}
-
-MonoObject* LibClassLocator::create(physics::Geometry* geometry) const {
-    void* args[1] = {&geometry};
-    return this->genericInstanceCreate(m_geometry.Klass, m_geometry.Ctor, args);
-}
-
-//MonoObject* LibClassLocator::create(scene::Entity* entity) const {
-//    void* args[1] = {&entity};
-//    return this->genericInstanceCreate(m_geometry.Klass, m_geometry.Ctor, args);
-//}
-
-const LibClassLocator::Entity& LibClassLocator::getEntity() const {
-    return m_entity;
-}
-
-const LibClassLocator::Mesh& LibClassLocator::getMesh() const {
-    return m_mesh;
-}
-
-const LibClassLocator::Material& LibClassLocator::getMaterial() const {
-    return m_material;
-}
-
-const LibClassLocator::Audio& LibClassLocator::getAudio() const {
-    return m_audio;
-}
-
-const LibClassLocator::AudioSource& LibClassLocator::getAudioSource() const {
-    return m_audioSource;
-}
-
-const LibClassLocator::RaycastHit& LibClassLocator::getRaycastHit() const {
-    return m_raycastHit;
-}
-
-const LibClassLocator::Geometry& LibClassLocator::getGeometry() const {
-    return m_geometry;
+MonoObject* LibClassLocator::create(scene::GameObject* gObject) const {
+    void* args[1] = {&gObject};
+    return this->genericInstanceCreate(m_gameObject.Klass, m_gameObject.Ctor, args);
 }
 
 const LibClassLocator::Behavior& LibClassLocator::getBehavior() const {
     return m_behavior;
+}
+
+const LibClassLocator::GameObject& LibClassLocator::getGameObject() const {
+    return m_gameObject;
 }
 
 void LibClassLocator::handleException(MonoObject* exception) const {

@@ -9,7 +9,7 @@
 namespace aderite {
 namespace scripting {
 
-ScriptedBehavior::ScriptedBehavior(BehaviorBase* behavior) : m_behaviorBase(behavior) {
+ScriptedBehavior::ScriptedBehavior(BehaviorBase* behavior, scene::GameObject* gObject) : m_behaviorBase(behavior), m_gameObject(gObject) {
     m_instance = ::aderite::Engine::getScriptManager()->instantiate(m_behaviorBase->getClass());
 }
 
@@ -19,6 +19,10 @@ BehaviorBase* ScriptedBehavior::getBase() const {
 
 MonoObject* ScriptedBehavior::getInstance() const {
     return m_instance;
+}
+
+scene::GameObject* ScriptedBehavior::getGameObject() const {
+    return m_gameObject;
 }
 
 bool ScriptedBehavior::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {

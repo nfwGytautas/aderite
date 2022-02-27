@@ -10,6 +10,7 @@
 #include "aderite/rendering/Renderable.hpp"
 #include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/Camera.hpp"
+#include "aderite/scripting/BehaviorBase.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/ScriptedBehavior.hpp"
 #include "aderite/utility/Log.hpp"
@@ -19,6 +20,7 @@ namespace scene {
 
 GameObject::GameObject(scene::Scene* scene, const std::string& name) : m_scene(scene) {
     this->setName(name);
+    m_instance = ::aderite::Engine::getScriptManager()->createInstance(this);
 }
 
 GameObject::~GameObject() {
@@ -111,6 +113,10 @@ bool GameObject::isMarkedForDeletion() const {
 
 Scene* GameObject::getScene() const {
     return m_scene;
+}
+
+MonoObject* GameObject::getScriptInstance() const {
+    return m_instance;
 }
 
 TransformProvider* GameObject::addTransform() {
@@ -228,6 +234,7 @@ audio::AudioListener* GameObject::getAudioListener() const {
 }
 
 void GameObject::addBehavior(scripting::ScriptedBehavior* behavior) {
+    behavior->getBase()->setupFields(this, behavior);
     m_behaviors.push_back(behavior);
 }
 
@@ -356,13 +363,14 @@ bool GameObject::deserialize(io::Serializer* serializer, const YAML::Node& data)
 
     {
         for (const YAML::Node& scriptNode : gameObject["Behaviors"]) {
-            scripting::BehaviorBase* behaviorBase = ::aderite::Engine::getScriptManager()->getBehavior(scriptNode["Script"].as<std::string>());
+            scripting::BehaviorBase* behaviorBase =
+                ::aderite::Engine::getScriptManager()->getBehavior(scriptNode["Script"].as<std::string>());
             if (behaviorBase == nullptr) {
                 LOG_WARN("[Scripting] Behavior with name {0} no longer found so is skipped", scriptNode["Script"].as<std::string>());
                 continue;
             }
 
-            scripting::ScriptedBehavior* behavior = new scripting::ScriptedBehavior(behaviorBase);
+            scripting::ScriptedBehavior* behavior = new scripting::ScriptedBehavior(behaviorBase, this);
             if (!behavior->deserialize(serializer, scriptNode)) {
                 delete behavior;
                 return false;

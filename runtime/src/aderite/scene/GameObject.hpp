@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include <mono/jit/jit.h>
+
 #include "aderite/audio/Forward.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/physics/Forward.hpp"
@@ -86,6 +88,11 @@ public:
      * @brief Returns the scene of the object
      */
     Scene* getScene() const;
+
+    /**
+     * @brief Returns the MonoObject instance of the object
+     */
+    MonoObject* getScriptInstance() const;
 
     /**
      * @brief Attach transform component to this GameObject
@@ -212,6 +219,9 @@ private:
     audio::AudioSource* m_audioSource = nullptr;
     audio::AudioListener* m_audioListener = nullptr;
     std::vector<scripting::ScriptedBehavior*> m_behaviors;
+
+    // Scripting instance
+    MonoObject* m_instance = nullptr;
 };
 
 } // namespace scene

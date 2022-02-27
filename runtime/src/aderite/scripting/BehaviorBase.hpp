@@ -22,10 +22,11 @@ public:
     BehaviorBase(MonoClass* klass);
 
     /**
-     * @brief Creates an instance of this behavior and returns it
-     * @return ScriptedBehavior instance
+     * @brief Sets the appropriate fields in the behavior base class
+     * @param gObject Game object instance
+     * @param behavior Behavior instance for Instance field
      */
-    ScriptedBehavior* createInstance();
+    void setupFields(scene::GameObject* gObject, scripting::ScriptedBehavior* behavior);
 
     /**
      * @brief Returns the full name of this behavior

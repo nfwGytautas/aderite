@@ -17,43 +17,13 @@ namespace scripting {
  * @brief Class used to locate engine classes and provide ways to instantiate them
  */
 class LibClassLocator final {
-public:
-    struct Entity {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
-    struct Mesh {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
-    struct Material {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
-    struct Audio {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
-    struct AudioSource {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
-    struct RaycastHit {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
-    struct Geometry {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
+public: 
     struct Behavior {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    };
+
+    struct GameObject {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
     };
@@ -85,97 +55,25 @@ public:
     MonoObject* create(io::SerializableObject* serializable) const;
 
     /**
-     * @brief Creates a C# mesh object from C++ asset
-     * @param mesh Mesh from which to create
+     * @brief Creates a C# game object from C++ asset
+     * @param gObject Game object from which to create
      * @return MonoObject instance
      */
-    MonoObject* create(asset::MeshAsset* mesh) const;
-
-    /**
-     * @brief Creates a C# material object from C++ asset
-     * @param material Material from which to create
-     * @return MonoObject instance
-     */
-    MonoObject* create(asset::MaterialAsset* material) const;
-
-    /**
-     * @brief Creates a C# audio object from C++ asset
-     * @param audio Audio from which to create
-     * @return MonoObject instance
-     */
-    MonoObject* create(asset::AudioAsset* audio) const;
-
-    /**
-     * @brief Creates a C# audio source object from C++
-     * @param source Source from which to create
-     * @return MonoObject instance
-     */
-    MonoObject* create(audio::AudioSource* source) const;
-
-    ///**
-    // * @brief Creates a C# raycast hit object from C++
-    // * @param hit RaycastHit object
-    // * @return MonoObject instance
-    // */
-    // MonoObject* create(const physics::RaycastHit& hit) const;
-
-    /**
-     * @brief Creates a C# geometry object from C++
-     * @param geometry Geometry object
-     * @return MonoObject instance
-     */
-    MonoObject* create(physics::Geometry* geometry) const;
-
-    ///**
-    // * @brief Creates a C# entity object from C++
-    // * @param entity Entity object
-    // * @return MonoObject instance
-    // */
-    // MonoObject* create(scene::Entity* entity) const;
+    MonoObject* create(scene::GameObject* gObject) const;
 
     // ====================================================================================
     // Class getters
     // ====================================================================================
 
     /**
-     * @brief Returns the entity mono information struct
-     */
-    const Entity& getEntity() const;
-
-    /**
-     * @brief Returns the mesh mono information struct
-     */
-    const Mesh& getMesh() const;
-
-    /**
-     * @brief Returns the material mono information struct
-     */
-    const Material& getMaterial() const;
-
-    /**
-     * @brief Returns the audio mono information struct
-     */
-    const Audio& getAudio() const;
-
-    /**
-     * @brief Returns the audio source mono information struct
-     */
-    const AudioSource& getAudioSource() const;
-
-    /**
-     * @brief Returns the raycast hit mono information struct
-     */
-    const RaycastHit& getRaycastHit() const;
-
-    /**
-     * @brief Returns the geometry information struct
-     */
-    const Geometry& getGeometry() const;
-
-    /**
      * @brief Returns the behavior information struct
      */
     const Behavior& getBehavior() const;
+
+    /**
+     * @brief Returns the game object information struct
+     */
+    const GameObject& getGameObject() const;
 
 private:
     /**
@@ -194,14 +92,8 @@ private:
     MonoObject* genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args) const;
 
 private:
-    Entity m_entity;
-    Mesh m_mesh;
-    Material m_material;
-    Audio m_audio;
-    AudioSource m_audioSource;
-    RaycastHit m_raycastHit;
-    Geometry m_geometry;
     Behavior m_behavior;
+    GameObject m_gameObject;
 };
 
 } // namespace scripting

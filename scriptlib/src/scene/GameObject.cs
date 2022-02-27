@@ -17,6 +17,11 @@ namespace Aderite
         }
 
         /// <summary>
+        /// The name of the game object
+        /// </summary>
+        public string Name { get { return __GetName(Instance); } }
+
+        /// <summary>
         /// Get the transform component of this game object can return null if the component doesn't exist
         /// </summary>
         /// <returns>Transform instance or null</returns>
@@ -87,6 +92,9 @@ namespace Aderite
         {
             __Destroy(Instance);
         }
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern static string __GetName(IntPtr instance);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         private extern static Transform __GetTransform(IntPtr instance);

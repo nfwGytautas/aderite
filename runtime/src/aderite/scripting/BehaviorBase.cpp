@@ -3,6 +3,7 @@
 #include <mono/metadata/attrdefs.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/scene/GameObject.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/ScriptedBehavior.hpp"
 
@@ -38,8 +39,8 @@ BehaviorBase::BehaviorBase(MonoClass* klass) : m_klass(klass) {
     m_instanceField = FieldWrapper(mono_class_get_field_from_name(m_klass, "Instance"));
 }
 
-ScriptedBehavior* BehaviorBase::createInstance() {
-    return new ScriptedBehavior(this);
+void BehaviorBase::setupFields(scene::GameObject* gObject, scripting::ScriptedBehavior* behavior) {
+    m_instanceField.setValue(behavior->getInstance(), behavior);
 }
 
 const std::string BehaviorBase::getName() const {
