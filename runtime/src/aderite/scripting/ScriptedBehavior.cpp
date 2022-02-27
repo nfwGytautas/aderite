@@ -5,12 +5,58 @@
 #include "aderite/io/SerializableAsset.hpp"
 #include "aderite/scripting/BehaviorBase.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/utility/Log.hpp"
 
 namespace aderite {
 namespace scripting {
 
 ScriptedBehavior::ScriptedBehavior(BehaviorBase* behavior, scene::GameObject* gObject) : m_behaviorBase(behavior), m_gameObject(gObject) {
     m_instance = ::aderite::Engine::getScriptManager()->instantiate(m_behaviorBase->getClass());
+    m_behaviorBase->m_instanceField.setValueType<ScriptedBehavior*>(m_instance, this);
+}
+
+void ScriptedBehavior::init() {
+    if (m_behaviorBase == nullptr) {
+        LOG_ERROR("[Scripting] Behavior base is null for scripted behavior");
+        return;
+    }
+
+    if (m_behaviorBase->m_init) {
+        m_behaviorBase->m_init(m_instance);
+        m_initialized = true;
+    }
+}
+
+void ScriptedBehavior::shutdown() {
+    if (m_behaviorBase == nullptr) {
+        LOG_ERROR("[Scripting] Behavior base is null for scripted behavior");
+        return;
+    }
+
+    if (!m_initialized) {
+        LOG_WARN("[Scripting] Non initialized scripted behavior is being shutdown, ignoring");
+        return;
+    }
+
+    if (m_behaviorBase->m_shutdown) {
+        m_behaviorBase->m_shutdown(m_instance);
+        m_initialized = false;
+    }
+}
+
+void ScriptedBehavior::update(float delta) {
+    if (m_behaviorBase == nullptr) {
+        LOG_ERROR("[Scripting] Behavior base is null for scripted behavior");
+        return;
+    }
+
+    if (!m_initialized) {
+        this->init();
+    }
+
+    if (m_behaviorBase->m_update) {
+        m_behaviorBase->m_update(m_instance, delta);
+    }
 }
 
 BehaviorBase* ScriptedBehavior::getBase() const {

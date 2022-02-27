@@ -62,7 +62,7 @@ void Menubar::render() {
 
             ImGui::Separator();
             if (ImGui::MenuItem("Exit")) {
-                ::aderite::Engine::get()->requestExit();
+                ::aderite::Engine::get()->setState(Engine::CurrentState::AWAITING_SHUTDOWN);
             }
 
             ImGui::EndMenu();

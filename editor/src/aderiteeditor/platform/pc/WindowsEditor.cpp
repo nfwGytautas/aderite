@@ -47,7 +47,7 @@ void WindowsEditor::onRuntimeInitialized() {
     // Check for pfd
     if (!pfd::settings::available()) {
         LOG_ERROR("[Editor] PFD not available on a WINDOWS editor. Incorrect editor choice? Aborting.");
-        ::aderite::Engine::get()->requestExit();
+        ::aderite::Engine::get()->setState(Engine::CurrentState::AWAITING_SHUTDOWN);
         return;
     }
 
@@ -72,7 +72,7 @@ void WindowsEditor::onRendererInitialized() {
     // UI
     if (!m_ui.setup()) {
         // Abort
-        ::aderite::Engine::get()->requestExit();
+        ::aderite::Engine::get()->setState(Engine::CurrentState::AWAITING_SHUTDOWN);
     }
 }
 
@@ -88,7 +88,7 @@ void WindowsEditor::onEndRender() {
     if (::aderite::Engine::get()->getWindowManager()->isClosed()) {
         // TODO: Request save
         m_expected_shutdown = true;
-        ::aderite::Engine::get()->requestExit();
+        ::aderite::Engine::get()->setState(Engine::CurrentState::AWAITING_SHUTDOWN);
     }
 }
 
@@ -210,21 +210,16 @@ void WindowsEditor::onNewScene(const std::string& name) {
 }
 
 void WindowsEditor::onStopGame() {
-    Engine::get()->stopPhysicsUpdates();
-    Engine::get()->stopScriptUpdates();
+    ::aderite::Engine::get()->setState(Engine::CurrentState::SYSTEM_UPDATE);
     Engine::getAudioController()->disable(true);
     editor::State::IsGameMode = false;
-
-    // TODO: Disable all cameras in scene
+    this->onResetGameState();
 }
 
 void WindowsEditor::onStartGame() {
-    Engine::get()->startPhysicsUpdates();
-    Engine::get()->startScriptUpdates();
+    ::aderite::Engine::get()->setState(Engine::CurrentState::FULL);
     Engine::getAudioController()->disable(false);
     editor::State::IsGameMode = true;
-
-    // TODO: Enable all cameras in scene
 }
 
 void WindowsEditor::onResetGameState() {

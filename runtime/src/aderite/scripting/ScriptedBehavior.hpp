@@ -17,6 +17,22 @@ public:
     ScriptedBehavior(BehaviorBase* behavior, scene::GameObject* gObject);
 
     /**
+     * @brief Initializes scripted behavior
+     */
+    void init();
+
+    /**
+     * @brief Shuts down scripted behavior
+     */
+    void shutdown();
+
+    /**
+     * @brief Performs a script update
+     * @param delta Delta time of the frame
+     */
+    void update(float delta);
+
+    /**
      * @brief Returns the behavior base
      */
     BehaviorBase* getBase() const;
@@ -39,6 +55,8 @@ private:
     scene::GameObject* m_gameObject = nullptr;
     BehaviorBase* m_behaviorBase = nullptr;
     MonoObject* m_instance = nullptr;
+
+    bool m_initialized = false;
 };
 
 } // namespace scripting

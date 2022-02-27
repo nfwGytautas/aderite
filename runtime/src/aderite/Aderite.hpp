@@ -35,6 +35,18 @@ public:
      */
     struct InitOptions {};
 
+    /**
+     * @brief Enum representing the current engine state
+     */
+    enum class CurrentState {
+        INIT,              // The initial state of the engine
+        AWAITING_SHUTDOWN, // Shutdown was requested and the engine is now waiting for systems to shutdown before closing
+        RENDER_ONLY,       // Only renders the current information, no updates are issued
+        SYSTEM_UPDATE,     // System updates such as IO is done, while game loop and the physics simulation is paused
+        LOGIC,             // Performs updates and renders, but physics are not simulated
+        FULL,              // Updates including simulation of physics is done and the changes are rendered
+    };
+
 public:
     /**
      * @brief Returns the instance of the engine
@@ -56,16 +68,6 @@ public:
      * @brief Begins aderite engine loop
      */
     void loop();
-
-    /**
-     * @brief Request the engine to shutdown
-     */
-    void requestExit();
-
-    /**
-     * @brief Aborts a requested exit
-     */
-    void abortExit();
 
     /**
      * @brief Function is invoked when the Renderer was initialized
@@ -91,38 +93,22 @@ public:
     void attachMiddleware(interfaces::IEngineMiddleware* middleware);
 
     /**
-     * @brief Starts physics updates
+     * @brief Returns the current state of the engine
      */
-    void startPhysicsUpdates();
+    CurrentState getState() const;
 
     /**
-     * @brief Stops physics updates
+     * @brief Transitions the engine to the specified state
+     * @param state New state of the engine
      */
-    void stopPhysicsUpdates();
-
-    /**
-     * @brief Starts scripts updates
-     */
-    void startScriptUpdates();
-
-    /**
-     * @brief Stops scripts updates
-     */
-    void stopScriptUpdates();
+    void setState(CurrentState state);
 
 private:
     Engine() {}
     Engine(const Engine& o) = delete;
 
-    // Update functions
-    void updateSystem(float delta) const;
-    void updatePhysics(float delta) const;
-    void updateScripts(float delta) const;
-
 private:
-    bool m_wantsToShutdown = false;
-    bool m_willUpdatePhysics = true;
-    bool m_willUpdateScripts = true;
+    CurrentState m_state = CurrentState::INIT;
 
 private:
     ADERITE_SYSTEM_PTR(getWindowManager, window::WindowManager, m_windowManager)

@@ -5,6 +5,7 @@
 #include <mono/jit/jit.h>
 
 #include "aderite/scripting/FieldWrapper.hpp"
+#include "aderite/scripting/Forward.hpp"
 #include "aderite/scripting/ThunkedMethod.hpp"
 
 namespace aderite {
@@ -20,13 +21,6 @@ public:
      * @param klass MonoClass object
      */
     BehaviorBase(MonoClass* klass);
-
-    /**
-     * @brief Sets the appropriate fields in the behavior base class
-     * @param gObject Game object instance
-     * @param behavior Behavior instance for Instance field
-     */
-    void setupFields(scene::GameObject* gObject, scripting::ScriptedBehavior* behavior);
 
     /**
      * @brief Returns the full name of this behavior
@@ -77,6 +71,8 @@ private:
     ThunkedMethod<void, MonoObject*> m_triggerWasLeft;
     ThunkedMethod<void, MonoObject*> m_collisionStart;
     ThunkedMethod<void, MonoObject*> m_collisionEnd;
+
+    friend class ScriptedBehavior;
 };
 
 } // namespace scripting

@@ -39,10 +39,6 @@ BehaviorBase::BehaviorBase(MonoClass* klass) : m_klass(klass) {
     m_instanceField = FieldWrapper(mono_class_get_field_from_name(m_klass, "Instance"));
 }
 
-void BehaviorBase::setupFields(scene::GameObject* gObject, scripting::ScriptedBehavior* behavior) {
-    m_instanceField.setValue(behavior->getInstance(), behavior);
-}
-
 const std::string BehaviorBase::getName() const {
     std::string result = mono_class_get_namespace(m_klass);
     if (!result.empty()) {

@@ -1,10 +1,13 @@
 #pragma once
 
+#include <vector>
+
 #include "aderite/audio/Forward.hpp"
 #include "aderite/io/SerializableAsset.hpp"
 #include "aderite/physics/Forward.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
+#include "aderite/scripting/Forward.hpp"
 
 namespace aderite {
 namespace asset {
@@ -40,6 +43,7 @@ private:
     scene::CameraSettings* m_camera = nullptr;
     audio::AudioListenerData* m_audioListener = nullptr;
     audio::AudioSourceData* m_audioSource = nullptr;
+    std::vector<scripting::ScriptedBehavior*> m_behaviors;
 };
 
 } // namespace asset

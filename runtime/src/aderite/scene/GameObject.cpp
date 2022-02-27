@@ -24,6 +24,10 @@ GameObject::GameObject(scene::Scene* scene, const std::string& name) : m_scene(s
 }
 
 GameObject::~GameObject() {
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        delete behavior;
+    }
+
     if (m_transform != nullptr) {
         delete m_transform;
     }
@@ -56,7 +60,15 @@ void GameObject::update(float delta) {
         m_renderable->update(delta);
     }
 
-    // TODO: Don't update some components, when not in play mode
+    const Engine::CurrentState engineState = ::aderite::Engine::get()->getState();
+
+    if (engineState == Engine::CurrentState::RENDER_ONLY || engineState == Engine::CurrentState::SYSTEM_UPDATE) {
+        return;
+    }
+
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        behavior->update(delta);
+    }
 
     if (m_camera != nullptr) {
         m_camera->update(delta);
@@ -234,7 +246,6 @@ audio::AudioListener* GameObject::getAudioListener() const {
 }
 
 void GameObject::addBehavior(scripting::ScriptedBehavior* behavior) {
-    behavior->getBase()->setupFields(this, behavior);
     m_behaviors.push_back(behavior);
 }
 

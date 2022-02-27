@@ -8,12 +8,17 @@ namespace Scripts
 
         void Initialize()
         {
-            Log.Trace($"BoxSpawner attached to {GameObject.Name}");
+
         }
 
         void Update(float delta)
         {
-            
+
+        }
+
+        void Shutdown()
+        {
+
         }
     }
 }
