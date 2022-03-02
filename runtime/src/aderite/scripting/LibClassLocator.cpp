@@ -6,6 +6,7 @@
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/audio/AudioSource.hpp"
+#include "aderite/physics/PhysXActor.hpp"
 #include "aderite/physics/geometry/Geometry.hpp"
 #include "aderite/scene/GameObject.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
@@ -48,6 +49,9 @@ bool LibClassLocator::locate(MonoImage* image) {
     findClass(image, "Aderite", "GameObject", GameObject.Klass, result);
     findClass(image, "Aderite", "Prefab", Prefab.Klass, result);
     findClass(image, "Aderite", "Transform", Transform.Klass, result);
+    findClass(image, "Aderite", "Camera", Camera.Klass, result);
+    findClass(image, "Aderite", "RaycastResult", RaycastResult.Klass, result);
+    findClass(image, "Aderite", "CollisionEvent", CollisionEvent.Klass, result);
 
     // Can't proceed if classes are not found
     if (result == false) {
@@ -61,6 +65,9 @@ bool LibClassLocator::locate(MonoImage* image) {
     findMethod(GameObject.Klass, ".ctor", 1, GameObject.Ctor, result);
     findMethod(Prefab.Klass, ".ctor", 1, Prefab.Ctor, result);
     findMethod(Transform.Klass, ".ctor", 1, Transform.Ctor, result);
+    findMethod(Camera.Klass, ".ctor", 1, Camera.Ctor, result);
+    findMethod(RaycastResult.Klass, ".ctor", 2, RaycastResult.Ctor, result);
+    findMethod(CollisionEvent.Klass, ".ctor", 2, CollisionEvent.Ctor, result);
 
     if (result) {
         LOG_INFO("[Scripting] Engine classes located");
@@ -119,9 +126,31 @@ MonoObject* LibClassLocator::create(scene::TransformProvider* transform) const {
     return this->genericInstanceCreate(Transform.Klass, Transform.Ctor, args);
 }
 
+MonoObject* LibClassLocator::create(scene::Camera* camera) const {
+    void* args[1] = {&camera};
+    return this->genericInstanceCreate(Camera.Klass, Camera.Ctor, args);
+}
+
 MonoObject* LibClassLocator::create(asset::PrefabAsset* prefab) const {
     void* args[1] = {&prefab};
     return this->genericInstanceCreate(Prefab.Klass, Prefab.Ctor, args);
+}
+
+MonoObject* LibClassLocator::create(const physics::TriggerEvent& te) const {
+    ADERITE_ABORT("Unimplemented");
+    return nullptr;
+}
+
+MonoObject* LibClassLocator::create(const physics::CollisionEvent& ce) const {
+    void* args[2] = {ce.Actor1->getActor()->getGameObject()->getScriptInstance(),
+                     ce.Actor2->getActor()->getGameObject()->getScriptInstance()};
+    return this->genericInstanceCreate(CollisionEvent.Klass, CollisionEvent.Ctor, args);
+}
+
+MonoObject* LibClassLocator::create(const physics::RaycastResult& rr) const {
+    physics::RaycastResult rrCopy = rr;
+    void* args[2] = {rrCopy.Actor->getGameObject()->getScriptInstance(), &rrCopy.Distance};
+    return this->genericInstanceCreate(RaycastResult.Klass, RaycastResult.Ctor, args);
 }
 
 void LibClassLocator::handleException(MonoObject* exception) const {

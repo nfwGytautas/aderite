@@ -143,6 +143,7 @@ private:
 
 private:
     LibClassLocator m_locator;
+    bool m_assembliesValid = false;
 
     MonoDomain* m_jitDomain = nullptr;
 

@@ -5,6 +5,8 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/asset/PrefabAsset.hpp"
+#include "aderite/scene/Camera.hpp"
+#include "aderite/scene/GameObject.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/utility/Log.hpp"
@@ -40,17 +42,33 @@ void SceneView::render() {
     // Get current scene
     scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 
-    // Prefab drag and drop
-    if (currentScene != nullptr) {
-        utility::WindowSizeDragDrop([&]() {
-            asset::PrefabAsset* prefabDrop = DragDrop::renderTarget<asset::PrefabAsset>(aderite::reflection::RuntimeTypes::PREFAB);
-            if (prefabDrop != nullptr) {
-                currentScene->createGameObject(prefabDrop);
-            }
-        });
+    if (currentScene == nullptr) {
+        return;
     }
 
-    bgfx::TextureHandle outHandle = editor::State::getInstance().getEditorCamera()->getOutputHandle();
+    // Prefab drag and drop
+    utility::WindowSizeDragDrop([&]() {
+        asset::PrefabAsset* prefabDrop = DragDrop::renderTarget<asset::PrefabAsset>(aderite::reflection::RuntimeTypes::PREFAB);
+        if (prefabDrop != nullptr) {
+            currentScene->createGameObject(prefabDrop);
+        }
+    });
+
+    bgfx::TextureHandle outHandle = BGFX_INVALID_HANDLE;
+
+    if (State::getInstance().IsGameMode) {
+        // Show active camera output
+        for (auto& gObject : currentScene->getGameObjects()) {
+            scene::Camera* camera = gObject->getCamera();
+
+            if (camera != nullptr) {
+                outHandle = camera->getOutputHandle();
+            }
+        }
+    } else {
+        // Editor camera
+        outHandle = editor::State::getInstance().getEditorCamera()->getOutputHandle();
+    }
 
     if (!bgfx::isValid(outHandle)) {
         ImGui::End();

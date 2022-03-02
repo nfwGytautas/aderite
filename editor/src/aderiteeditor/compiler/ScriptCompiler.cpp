@@ -35,6 +35,7 @@ void ScriptCompiler::compile() {
     // Link scriptlib
     sCommand << " -lib:" << codeChunkPath.parent_path().string();
     sCommand << " -reference:_" << std::to_string(aderite::io::FileHandler::Reserved::ScriptLibCode) << ".data";
+    sCommand << " -reference:_" << "System";
 
     // Sources
     sCommand << " -recurse:" << scriptRoot.string() << "*.cs";

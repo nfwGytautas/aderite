@@ -23,17 +23,14 @@ Data:
               Data:
                 Size: [1, 1, 1]
                 IsTrigger: false
-            - Type: 75
-              Name: d67RNO0a9wZj
-              Data:
-                Size: [1, 2, 1]
-                IsTrigger: true
         Behaviors:
-          []
+          - Script: Scripts.Ground
+            Fields:
+              Lives: 3
     - GameObject:
         Name: Spawner
         Transform:
-          Position: [0, 10, 0]
+          Position: [0, 20, 0]
           Rotation: [1, 0, 0, 0]
           Scale: [1, 1, 1]
         Behaviors:
@@ -42,25 +39,18 @@ Data:
               SpawnInterval: 1
               Prefab: 25
     - GameObject:
-        Name: Cube 0
+        Name: Player
         Transform:
           Position: [0, 0, 0]
           Rotation: [1, 0, 0, 0]
           Scale: [1, 1, 1]
-        Renderable:
-          Mesh: 1
-          Material: 9
-        PhysicsActor:
-          Dynamic: true
-          Mass: 1
-          HasGravity: true
-          Geometry:
-            - Type: 75
-              Name: hmCYB00A3v4j
-              Data:
-                Size: [1, 1, 1]
-                IsTrigger: false
+        Camera:
+          FoV: 90
         Behaviors:
-          - Script: Scripts.Destructor
+          - Script: Scripts.CameraLook
             Fields:
-              TimeAlive: 5
+              Sensitivity: 2
+          - Script: Scripts.Shoot
+            Fields:
+              ShootingSpeed: 2
+              MaxRange: 20

@@ -8,7 +8,7 @@ namespace physics {
 /**
  * @brief Class for constructing a raycast query
  */
-struct RaycastHit {
+struct RaycastResult {
     /**
      * @brief Actor that was hit
      */

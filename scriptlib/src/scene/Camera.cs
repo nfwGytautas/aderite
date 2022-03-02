@@ -23,6 +23,11 @@ namespace Aderite
         /// </summary>
         public float FarClip { get { return __GetFarClip(Instance); } set { __SetFarClip(Instance, value); } }
 
+        /// <summary>
+        /// The front facing vector of this camera
+        /// </summary>
+        public Vector3 Front { get { return __GetFront(Instance); } }
+
         // The C++ instance of this object
         IntPtr Instance = IntPtr.Zero;
 
@@ -48,5 +53,8 @@ namespace Aderite
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         private extern static void __SetFarClip(IntPtr instance, float value);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern static Vector3 __GetFront(IntPtr instance);
     }
 }

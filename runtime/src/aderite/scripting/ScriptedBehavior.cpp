@@ -61,6 +61,42 @@ void ScriptedBehavior::update(float delta) {
     }
 }
 
+void ScriptedBehavior::onTriggerEnter(const physics::TriggerEvent& te) {
+    if (m_behaviorBase->m_triggerEnter) {
+        m_behaviorBase->m_triggerEnter(m_instance, ::aderite::Engine::getScriptManager()->getLocator().create(te));
+    }
+}
+
+void ScriptedBehavior::onTriggerLeave(const physics::TriggerEvent& te) {
+    if (m_behaviorBase->m_triggerLeave) {
+        m_behaviorBase->m_triggerLeave(m_instance, ::aderite::Engine::getScriptManager()->getLocator().create(te));
+    }
+}
+
+void ScriptedBehavior::onTriggerWasEntered(const physics::TriggerEvent& te) {
+    if (m_behaviorBase->m_triggerWasEntered) {
+        m_behaviorBase->m_triggerWasEntered(m_instance, ::aderite::Engine::getScriptManager()->getLocator().create(te));
+    }
+}
+
+void ScriptedBehavior::onTriggerWasLeft(const physics::TriggerEvent& te) {
+    if (m_behaviorBase->m_triggerWasLeft) {
+        m_behaviorBase->m_triggerWasLeft(m_instance, ::aderite::Engine::getScriptManager()->getLocator().create(te));
+    }
+}
+
+void ScriptedBehavior::onCollisionEnter(const physics::CollisionEvent& ce) {
+    if (m_behaviorBase->m_collisionStart) {
+        m_behaviorBase->m_collisionStart(m_instance, ::aderite::Engine::getScriptManager()->getLocator().create(ce));
+    }
+}
+
+void ScriptedBehavior::onCollisionLeave(const physics::CollisionEvent& ce) {
+    if (m_behaviorBase->m_collisionEnd) {
+        m_behaviorBase->m_collisionEnd(m_instance, ::aderite::Engine::getScriptManager()->getLocator().create(ce));
+    }
+}
+
 BehaviorBase* ScriptedBehavior::getBase() const {
     return m_behaviorBase;
 }

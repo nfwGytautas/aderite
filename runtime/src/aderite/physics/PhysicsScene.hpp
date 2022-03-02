@@ -44,7 +44,7 @@ public:
      * @param maxDistance Maximum distance of the ray
      * @return True if there was a hit, false otherwise
      */
-    bool raycastSingle(RaycastHit& result, const glm::vec3& from, const glm::vec3& direction, float maxDistance);
+    bool raycastSingle(RaycastResult& result, const glm::vec3& from, const glm::vec3& direction, float maxDistance);
 
 protected:
     // Inherited via ISerializable

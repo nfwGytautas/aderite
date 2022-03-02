@@ -3,6 +3,7 @@
 #include <mono/jit/jit.h>
 
 #include "aderite/io/ISerializable.hpp"
+#include "aderite/physics/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/scripting/Forward.hpp"
 
@@ -31,6 +32,42 @@ public:
      * @param delta Delta time of the frame
      */
     void update(float delta);
+
+    /**
+     * @brief Function called when this game object enters another trigger
+     * @param te Trigger event
+     */
+    void onTriggerEnter(const physics::TriggerEvent& te);
+
+    /**
+     * @brief Function called when this game object leaves another trigger
+     * @param te Trigger event
+     */
+    void onTriggerLeave(const physics::TriggerEvent& te);
+
+    /**
+     * @brief Function called when the game object enters this trigger zone
+     * @param te Trigger event
+     */
+    void onTriggerWasEntered(const physics::TriggerEvent& te);
+
+    /**
+     * @brief Function called when the game object leaves this trigger zone
+     * @param te Trigger event
+     */
+    void onTriggerWasLeft(const physics::TriggerEvent& te);
+
+    /**
+     * @brief Function called when the game object enters a collision
+     * @param ce Collision event
+     */
+    void onCollisionEnter(const physics::CollisionEvent& ce);
+
+    /**
+     * @brief Function called when the game object leaves a collision
+     * @param ce Collision event
+     */
+    void onCollisionLeave(const physics::CollisionEvent& ce);
 
     /**
      * @brief Returns the behavior base

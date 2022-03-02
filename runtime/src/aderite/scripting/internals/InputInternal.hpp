@@ -6,6 +6,7 @@
 #error "Multiple InputInternal.hpp include"
 #endif
 
+#include <glm/glm.hpp>
 #include <mono/jit/jit.h>
 
 #include "aderite/Aderite.hpp"
@@ -28,12 +29,14 @@ bool inputIsMouseButtonDown(aderite::input::MouseKey key) {
     return ::aderite::Engine::getInputManager()->isMouseKeyPressed(key);
 }
 
-glm::vec2 inputGetMousePosition() {
-    return ::aderite::Engine::getInputManager()->getMousePosition();
+glm::vec3 inputGetMousePosition() {
+    glm::vec2 position = ::aderite::Engine::getInputManager()->getMousePosition();
+    return {position.x, position.y, 0.0f};
 }
 
-glm::vec2 inputGetMouseDelta() {
-    return ::aderite::Engine::getInputManager()->getMouseDelta();
+glm::vec3 inputGetMouseDelta() {
+    glm::vec2 delta = ::aderite::Engine::getInputManager()->getMouseDelta();
+    return {delta.x, delta.y, 0.0f};
 }
 
 double inputGetScrollDelta() {

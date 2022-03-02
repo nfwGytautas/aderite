@@ -3,6 +3,7 @@
 #include <mono/metadata/attrdefs.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/io/SerializableAsset.hpp"
 #include "aderite/scene/GameObject.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/scripting/ScriptedBehavior.hpp"
@@ -75,7 +76,34 @@ void BehaviorBase::copyOver(ScriptedBehavior* source, ScriptedBehavior* dst) {
 
     // Copy field information
     for (FieldWrapper& fw : m_fields) {
-        //fw.setValue(dst->getInstance(), fw.getValue(source->getInstance()));
+        switch (fw.getType()) {
+        case FieldType::Integer: {
+            int val = 0;
+            fw.getValue(source->getInstance(), &val);
+            fw.setValue(dst->getInstance(), &val);
+            break;
+        }
+        case FieldType::Float: {
+            int val = 0;
+            fw.getValue(source->getInstance(), &val);
+            fw.setValue(dst->getInstance(), &val);
+            break;
+        }
+        case FieldType::Boolean: {
+            bool val = false;
+            fw.getValue(source->getInstance(), &val);
+            fw.setValue(dst->getInstance(), &val);
+            break;
+        }
+        case FieldType::Material:
+        case FieldType::Prefab:
+        case FieldType::Audio:
+        case FieldType::Mesh: {
+            io::SerializableAsset* asset = fw.getSerializable(source->getInstance());
+            fw.setSerializable(dst->getInstance(), asset);
+            break;
+        }
+        }
     }
 }
 

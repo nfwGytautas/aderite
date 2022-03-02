@@ -13,7 +13,7 @@ class PhysicsController;
 class PhysicsScene;
 class PhysicsEventList;
 class Collider;
-class RaycastHit;
+class RaycastResult;
 class Geometry;
 class BoxGeometry;
 class PhysXActor;

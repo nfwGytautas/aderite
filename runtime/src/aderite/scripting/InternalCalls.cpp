@@ -1,7 +1,9 @@
 #include "InternalCalls.hpp"
 
 #include "aderite/scripting/internals/AssetInternal.hpp"
+#include "aderite/scripting/internals/EngineInternal.hpp"
 #include "aderite/scripting/internals/InputInternal.hpp"
+#include "aderite/scripting/internals/PhysicsInternal.hpp"
 #include "aderite/scripting/internals/SceneInternal.hpp"
 #include "aderite/scripting/internals/ScriptingInternal.hpp"
 #include "aderite/scripting/internals/UtilityInternal.hpp"
@@ -18,6 +20,8 @@ void linkInternals() {
     linkScene();
     linkScripting();
     linkUtility();
+    linkPhysics();
+    linkEngine();
 
     LOG_TRACE("[Scripting] Internals linked");
 }

@@ -86,6 +86,16 @@ namespace Aderite
         }
 
         /// <summary>
+        /// Returns the behavior of this game object with the specified name if it exists null otherwise
+        /// </summary>
+        /// <param name="name">Name of the behavior</param>
+        /// <returns>Behavior instance or null if not found</returns>
+        public ScriptedBehavior GetBehavior(string name)
+        {
+            return __GetBehavior(Instance, name);
+        }
+
+        /// <summary>
         /// Destroy this game object, accessing this object after calling this object is illegal and might cause a segmentation fault
         /// </summary>
         public void Destroy()
@@ -116,6 +126,9 @@ namespace Aderite
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         private extern static AudioListener __GetAudioListener(IntPtr instance);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern static ScriptedBehavior __GetBehavior(IntPtr instance, string name);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         private extern static void __Destroy(IntPtr instance);

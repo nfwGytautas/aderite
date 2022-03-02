@@ -79,6 +79,7 @@ private:
     ThunkedMethod<void, MonoObject*> m_collisionStart;
     ThunkedMethod<void, MonoObject*> m_collisionEnd;
 
+    // Used to access the ThunkedMethods and fields
     friend class ScriptedBehavior;
 };
 

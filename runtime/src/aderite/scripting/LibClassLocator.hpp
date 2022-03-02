@@ -38,6 +38,21 @@ public:
         MonoMethod* Ctor = nullptr;
     } Transform;
 
+    struct {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    } Camera;
+
+    struct {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    } RaycastResult;
+
+    struct {
+        MonoClass* Klass = nullptr;
+        MonoMethod* Ctor = nullptr;
+    } CollisionEvent;
+
 public:
     /**
      * @brief Locates engine classes from the specified image
@@ -79,11 +94,39 @@ public:
     MonoObject* create(scene::TransformProvider* transform) const;
 
     /**
+     * @brief Creates a C# camera from C++ asset
+     * @param camera Camera object from which to create
+     * @return MonoObject instance
+     */
+    MonoObject* create(scene::Camera* camera) const;
+
+    /**
      * @brief Creates a C# prefab from C++ asset
      * @param prefab Prefab from which to create
      * @return MonoObject instance
      */
     MonoObject* create(asset::PrefabAsset* prefab) const;
+
+    /**
+     * @brief Creates a C# trigger event from C++ object
+     * @param te Trigger event struct from which to create
+     * @return MonoObject instance
+     */
+    MonoObject* create(const physics::TriggerEvent& te) const;
+
+    /**
+     * @brief Creates a C# collision event from C++ object
+     * @param ce Collision event struct from which to create
+     * @return MonoObject instance
+     */
+    MonoObject* create(const physics::CollisionEvent& ce) const;
+
+    /**
+     * @brief Creates a C# raycast hit from C++ object
+     * @param rr Raycast hit struct from which to create
+     * @return MonoObject instance
+     */
+    MonoObject* create(const physics::RaycastResult& rr) const;
 
 private:
     /**

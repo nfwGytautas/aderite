@@ -92,27 +92,39 @@ void GameObject::update(float delta) {
 }
 
 void GameObject::onTriggerEnter(const physics::TriggerEvent& te) {
-    LOG_TRACE("{0} entered trigger {1}", this->getName(), te.Trigger->getActor()->getGameObject()->getName());
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        behavior->onTriggerEnter(te);
+    }
 }
 
 void GameObject::onTriggerLeave(const physics::TriggerEvent& te) {
-    LOG_TRACE("{0} left trigger {1}", this->getName(), te.Trigger->getActor()->getGameObject()->getName());
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        behavior->onTriggerLeave(te);
+    }
 }
 
 void GameObject::onTriggerWasEntered(const physics::TriggerEvent& te) {
-    LOG_TRACE("Trigger {0} was entered by {1}", this->getName(), te.Actor->getActor()->getGameObject()->getName());
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        behavior->onTriggerWasEntered(te);
+    }
 }
 
 void GameObject::onTriggerWasLeft(const physics::TriggerEvent& te) {
-    LOG_TRACE("Trigger {0} was left by {1}", this->getName(), te.Actor->getActor()->getGameObject()->getName());
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        behavior->onTriggerWasLeft(te);
+    }
 }
 
 void GameObject::onCollisionEnter(const physics::CollisionEvent& ce) {
-    LOG_TRACE("{0} collision start with {1}", this->getName(), ce.Actor2->getActor()->getGameObject()->getName());
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        behavior->onCollisionEnter(ce);
+    }
 }
 
 void GameObject::onCollisionLeave(const physics::CollisionEvent& ce) {
-    LOG_TRACE("{0} collision end with {1}", this->getName(), ce.Actor2->getActor()->getGameObject()->getName());
+    for (scripting::ScriptedBehavior* behavior : m_behaviors) {
+        behavior->onCollisionLeave(ce);
+    }
 }
 
 void GameObject::markForDeletion() {

@@ -60,10 +60,12 @@ void ScriptManager::shutdown() {
 
 void ScriptManager::loadAssemblies() {
     LOG_TRACE("[Scripting] Loading assemblies");
+    m_assembliesValid = false;
     io::DataChunk assemblyChunk = ::aderite::Engine::getFileHandler()->openReservedLoadable(io::FileHandler::Reserved::GameCode);
 
     if (assemblyChunk.Data.size() == 0) {
         // Empty nothing to load
+        LOG_WARN("[Scripting] No game code found");
         return;
     }
 
@@ -122,6 +124,7 @@ void ScriptManager::loadAssemblies() {
     }
 
     LOG_INFO("[Scripting] Assemblies loaded");
+    m_assembliesValid = true;
 }
 
 MonoDomain* ScriptManager::getDomain() const {
@@ -134,6 +137,10 @@ MonoImage* ScriptManager::getCodeImage() const {
 
 MonoObject* ScriptManager::createInstance(io::SerializableObject* serializable) {
     ADERITE_DYNAMIC_ASSERT(serializable != nullptr, "Nullptr serializable passed to createInstance");
+
+    if (!m_assembliesValid) {
+        return nullptr;
+    }
 
     // Check if an object already exists
     auto it = m_objectCache.find(serializable);
@@ -171,7 +178,7 @@ MonoObject* ScriptManager::instantiate(MonoClass* klass) const {
 MonoMethod* ScriptManager::getMethod(MonoClass* klass, const std::string& name, size_t paramCount) const {
     MonoMethod* method = mono_class_get_method_from_name(klass, name.c_str(), paramCount);
     if (method == nullptr) {
-        LOG_ERROR("[Scripting] Failed to find {0} method in {1}", name, mono_class_get_name(klass));
+        LOG_WARN("[Scripting] Failed to find {0} method in {1}", name, mono_class_get_name(klass));
         return nullptr;
     }
     return method;

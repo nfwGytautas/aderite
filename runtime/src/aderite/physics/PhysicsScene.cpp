@@ -82,7 +82,7 @@ void PhysicsScene::sendEvents() {
     m_events->clear();
 }
 
-bool PhysicsScene::raycastSingle(RaycastHit& result, const glm::vec3& from, const glm::vec3& direction, float maxDistance) {
+bool PhysicsScene::raycastSingle(RaycastResult& result, const glm::vec3& from, const glm::vec3& direction, float maxDistance) {
     physx::PxRaycastBuffer hit;
     const bool hadHit = m_scene->raycast({from.x, from.y, from.z}, {direction.x, direction.y, direction.z}, maxDistance, hit);
     if (!hadHit) {

@@ -99,16 +99,24 @@ void Menubar::render() {
         }
 
         if (ImGui::BeginMenu("Scripting")) {
-            if (ImGui::MenuItem("Compile scripts")) {
-                // Compile
-                LOG_TRACE("Compiling project scripts");
-                compiler::ScriptCompiler sc;
-                // TODO: Results, errors, warnings, etc.
-                sc.compile();
+            if (ImGui::MenuItem("Load game code")) {
+                // Select the code file
+                std::string file = FileDialog::selectFile("Select game code", {"Game code", "*.dll"});
 
-                // Reload
-                LOG_TRACE("Reloading scripts");
-                ::aderite::Engine::getScriptManager()->loadAssemblies();
+                if (!file.empty()) {
+                    const std::filesystem::path codeChunkPath =
+                        ::aderite::Engine::getFileHandler()->pathToReserved(io::FileHandler::Reserved::GameCode);
+
+                    if (std::filesystem::exists(codeChunkPath)) {
+                        std::filesystem::remove(codeChunkPath);
+                    }
+
+                    std::filesystem::copy(file, codeChunkPath);
+
+                    // Reload
+                    LOG_TRACE("Reloading scripts");
+                    ::aderite::Engine::getScriptManager()->loadAssemblies();
+                }
             }
 
             ImGui::EndMenu();

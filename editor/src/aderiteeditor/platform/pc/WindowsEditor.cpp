@@ -180,8 +180,6 @@ void WindowsEditor::onLoadProject(const std::string& path) {
     ::aderite::Engine::getAudioController()->loadMasterBank();
 
     // Load assemblies
-    compiler::ScriptCompiler sc;
-    sc.compile();
     ::aderite::Engine::getScriptManager()->loadAssemblies();
 
     if (editor::State::Project->getActiveScene() != c_InvalidHandle) {
