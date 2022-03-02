@@ -1,8 +1,8 @@
 #pragma once
 
-#include "aderite/io/SerializableObject.hpp"
+#include <filesystem>
 
-#include "aderiteeditor/vfs/Forward.hpp"
+#include "aderite/io/SerializableObject.hpp"
 
 namespace aderite {
 namespace editor {
@@ -15,19 +15,19 @@ public:
     /**
      * @brief Renders ImGui necessary elements for creating a source
      */
-    static void renderSource(io::ISerializable* serializable);
+    static void renderSource(io::SerializableObject* serializable);
 
     /**
      * @brief Renders ImGui necessary elements for creating a source with the specified type
      */
-    static void renderSource(io::ISerializable* serializable, reflection::Type as);
+    static void renderSource(io::SerializableObject* serializable, reflection::Type as);
 
     /**
      * @brief Will render ImGui necessary elements for accepting a drag drop object of the specified type
      * @param type Type of the dragdrop object
-     * @return io::ISerializable instance in the drag drop payload
+     * @return io::Serializable instance in the drag drop payload
      */
-    static io::ISerializable* renderTarget(reflection::Type type);
+    static io::SerializableObject* renderTarget(reflection::Type type);
 
     template<typename T>
     static T* renderTarget(reflection::RuntimeTypes type) {
@@ -37,32 +37,30 @@ public:
     /**
      * @brief Renders a generic drag drop source that can be accepted with renderGenericTarget
      */
-    static void renderGenericSource(io::ISerializable* serializable);
+    static void renderGenericSource(io::SerializableObject* serializable);
 
     /**
      * @brief Renders a generic drag drop target
      */
-    static io::ISerializable* renderGenericTarget();
-
-    /**
-     * @brief Renders a directory drag drop source
-    */
-    static void renderDirectorySource(vfs::Directory* dir);
-
-    /**
-     * @brief Renders a directory drag drop target
-    */
-    static vfs::Directory* renderDirectoryTarget();
+    static io::SerializableObject* renderGenericTarget();
 
     /**
      * @brief Renders a file drag drop source
+     * @param file File to drag drop
      */
-    static void renderFileSource(vfs::File* file);
+    static void renderFileSource(const std::filesystem::path& file);
 
     /**
      * @brief Renders a file drag drop target
      */
-    static vfs::File* renderFileTarget();
+    static std::filesystem::path renderFileTarget();
+
+    /**
+     * @brief Renders a file and object instance source, allowing multiple values, using the same renderTarget calls
+     * @param file File for source
+     * @param object Object for source
+    */
+    static void renderAssetFileSource(const std::filesystem::path& file, io::SerializableObject* object);
 };
 
 } // namespace editor

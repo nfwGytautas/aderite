@@ -1,13 +1,19 @@
 #pragma once
 
+#include <string>
+
+#include <bgfx/bgfx.h>
 #include <glm/glm.hpp>
 
 #include "aderite/rendering/Forward.hpp"
+#include "aderite/rendering/FrameData.hpp"
+#include "aderite/scene/Forward.hpp"
 
 namespace aderite {
 class Engine;
 
 namespace rendering {
+
 /**
  * @brief The Renderer of aderite powered by bgfx
  */
@@ -56,27 +62,51 @@ public:
     /**
      * @brief Advances to next frame
      */
-    void commit() const;
+    void commit();
 
     /**
-     * @brief Returns the rendering pipeline instance
-     * @return Pipeline instance
+     * @brief Returns the FrameData that can be written into
      */
-    Pipeline* getPipeline() const;
+    FrameData& getWriteFrameData();
+
+private:
+    /**
+     * @brief Creates render targets of the renderer
+     */
+    bool createTargets();
 
     /**
-     * @brief Set the pipeline for the renderer to use
-     * @param pipeline Pipeline to use
+     * @brief Prepares targets for a render pass (clears information)
      */
-    void setPipeline(Pipeline* pipeline);
+    void prepareTargets();
+
+    /**
+     * @brief Sets up the view index
+     * @param idx View index
+     * @param name Name of the view
+     */
+    void setupView(uint8_t idx, const std::string& name);
 
 private:
     Renderer() {}
     friend Engine;
 
 private:
-    Pipeline* m_pipeline = nullptr;
     bool m_isInitialized = false;
+
+    // Frame data
+    FrameData m_readData;
+    FrameData m_writeData;
+
+    // BGFX views
+    glm::uvec2 m_resolution = glm::uvec2(1280, 920);
+
+    // Targets
+
+    /**
+     * @brief This will be the target where the result will be stored
+     */
+    bgfx::FrameBufferHandle m_mainFbo = BGFX_INVALID_HANDLE;
 };
 
 } // namespace rendering

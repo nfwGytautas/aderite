@@ -40,6 +40,7 @@ public:
         static constexpr LoadableHandle StringsAudioBank = 1;
         static constexpr LoadableHandle ScriptLibCode = 2;
         static constexpr LoadableHandle GameCode = 3;
+        static constexpr LoadableHandle AssetRegistry = 4;
     };
 
 public:
@@ -89,6 +90,11 @@ public:
      * @param file Physical file to write
      */
     void writePhysicalFile(LoadableHandle handle, const std::filesystem::path& file) const;
+
+    /**
+     * @brief Returns true if a loadable with the specified handle has a data file
+    */
+    bool exists(LoadableHandle handle) const;
 
 private:
     struct ChunkLocator {

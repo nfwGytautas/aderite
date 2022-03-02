@@ -18,11 +18,20 @@ bool SceneManager::init() {
 void SceneManager::shutdown() {
     ADERITE_LOG_BLOCK;
     LOG_TRACE("[Scene] Shutting down scene manager");
+    if (m_activeScene != nullptr) {
+        m_activeScene->release();
+    }
     LOG_INFO("[Scene] Scene manager shutdown");
 }
 
 void SceneManager::setActive(Scene* scene) {
-    LOG_TRACE("[Scene] Setting active scene to {0}", scene->getHandle());
+    LOG_TRACE("[Scene] Setting active scene to {0}", scene->getName());
+    if (m_activeScene != nullptr) {
+        m_activeScene->release();
+    }
+
+    // Acquire reference
+    scene->acquire();
 
     // Notify engine
     ::aderite::Engine::get()->onSceneChanged(scene);

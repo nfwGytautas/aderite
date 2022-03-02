@@ -2,25 +2,40 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/audio/AudioController.hpp"
+#include "aderite/scene/GameObject.hpp"
+#include "aderite/scene/TransformProvider.hpp"
 #include "aderite/utility/Log.hpp"
-#include "aderite/utility/Random.hpp"
 #include "aderite/utility/YAML.hpp"
 
 namespace aderite {
 namespace audio {
 
-AudioListener::AudioListener() : m_name(utility::generateString(12)) {}
+AudioListener::AudioListener(scene::GameObject* gObject) : m_gObject(gObject) {}
 
 AudioListener::~AudioListener() {}
 
-void AudioListener::update() const {
+void AudioListener::update(float delta) {
+    if (!m_data.isEnabled()) {
+        return;
+    }
+
+    scene::TransformProvider* const transform = m_gObject->getTransform();
+
+    if (transform == nullptr) {
+        return;
+    }
+
     FMOD_3D_ATTRIBUTES listener3dAttributes = {};
-    listener3dAttributes.position = {m_position.x, m_position.y, m_position.z};
-    listener3dAttributes.velocity = {m_velocity.x, m_velocity.y, m_velocity.z};
+    const glm::vec3& position = transform->getPosition();
+
+    listener3dAttributes.position = {position.x, position.y, position.z};
 
     // TODO: Rotation
     listener3dAttributes.up = {0.0f, 1.0f, 0.0f};
     listener3dAttributes.forward = {0.0f, 0.0f, 1.0f};
+
+    // TODO: Velocity
+    listener3dAttributes.velocity = {0.0f, 0.0f, 0.0f};
 
     // TODO: Attenuation
 
@@ -28,74 +43,8 @@ void AudioListener::update() const {
     ::aderite::Engine::getAudioController()->getFmodSystem()->setListenerAttributes(0, &listener3dAttributes, nullptr);
 }
 
-void AudioListener::disable() {
-    LOG_TRACE("[Audio] Disabling listener {0}", m_name);
-    m_enabled = false;
-}
-
-void AudioListener::enable() {
-    LOG_TRACE("[Audio] Enabling listener {0}", m_name);
-    m_enabled = true;
-}
-
-bool AudioListener::isEnabled() const {
-    return m_enabled;
-}
-
-void AudioListener::setName(const std::string& name) {
-    LOG_TRACE("[Audio] Renaming listener {0} to ", m_name, name);
-    m_name = name;
-}
-
-std::string AudioListener::getName() const {
-    return m_name;
-}
-
-glm::vec3 AudioListener::getPosition() const {
-    return m_position;
-}
-
-glm::quat AudioListener::getRotation() const {
-    return m_rotation;
-}
-
-glm::vec3 AudioListener::getVelocity() const {
-    return m_velocity;
-}
-
-void AudioListener::setPosition(const glm::vec3& position) {
-    m_position = position;
-}
-
-void AudioListener::setRotation(const glm::quat& rotation) {
-    m_rotation = rotation;
-}
-
-void AudioListener::setVelocity(const glm::vec3& velocity) {
-    m_velocity = velocity;
-}
-
-reflection::Type AudioListener::getType() const {
-    return static_cast<reflection::Type>(reflection::RuntimeTypes::AUDIO_LISTENER);
-}
-
-bool AudioListener::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    emitter << YAML::Key << "Name" << YAML::Value << m_name;
-    emitter << YAML::Key << "Enabled" << YAML::Value << m_enabled;
-    emitter << YAML::Key << "Position" << YAML::Value << m_position;
-    emitter << YAML::Key << "Rotation" << YAML::Value << m_rotation;
-    emitter << YAML::Key << "Velocity" << YAML::Value << m_velocity;
-    return true;
-}
-
-bool AudioListener::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    m_name = data["Name"].as<std::string>();
-    m_enabled = data["Enabled"].as<bool>();
-    m_position = data["Position"].as<glm::vec3>();
-    m_rotation = data["Rotation"].as<glm::quat>();
-    m_velocity = data["Velocity"].as<glm::vec3>();
-
-    return true;
+AudioListenerData& AudioListener::getData() {
+    return m_data;
 }
 
 } // namespace audio

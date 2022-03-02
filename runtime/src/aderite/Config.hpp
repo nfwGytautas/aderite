@@ -3,7 +3,9 @@
 // Version of the engine
 // History:
 //		0.0 - Initial release
-constexpr const char* EngineVersion = "0.0";
+//		0.1 - Asset manager, Entity split (Scenery, Visual, etc.), Engine event system, Script event map
+//		0.2 - The initial engine version, complete with full scripting, rendering, editor, etc.
+constexpr const char* EngineVersion = "0.2";
 
 // ---------------------------------
 // WINDOWING BACKENDS

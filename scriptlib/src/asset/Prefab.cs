@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Aderite
 {
     /// <summary>
-    /// Prefab class used to spawn entities in aderite
+    /// Aderite Prefab class
     /// </summary>
     public class Prefab
     {
@@ -22,5 +23,17 @@ namespace Aderite
         {
             return Instance;
         }
+
+        /// <summary>
+        /// Creates an instance of a game object from this prefab in the current scene
+        /// </summary>
+        /// <returns>GameObject instance</returns>
+        public GameObject Instantiate()
+        {
+            return __Instantiate(Instance);
+        }
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private extern static GameObject __Instantiate(IntPtr instance);
     }
 }

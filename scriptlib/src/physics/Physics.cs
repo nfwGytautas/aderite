@@ -3,7 +3,7 @@
 namespace Aderite
 {
     /// <summary>
-    /// Class used to invoke various physics function on the current scene
+    /// A class that has various physics methods used in behaviors
     /// </summary>
     public class Physics
     {
@@ -15,12 +15,12 @@ namespace Aderite
         /// <param name="direction">Direction to cast to</param>
         /// <param name="MaxDistance">Max distance of the ray</param>
         /// <returns>True if there was a hit, false otherwise</returns>
-        public static RaycastHit RaycastFirstHit(Vector3 from, Vector3 direction, float MaxDistance) 
+        public static RaycastResult RaycastFirstHit(Vector3 from, Vector3 direction, float MaxDistance)
         {
             return __RaycastSingle(from, direction, MaxDistance);
         }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern static RaycastHit __RaycastSingle(Vector3 from, Vector3 direction, float distance);
+        private extern static RaycastResult __RaycastSingle(Vector3 from, Vector3 direction, float distance);
     }
 }

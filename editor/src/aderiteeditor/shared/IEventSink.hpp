@@ -3,7 +3,6 @@
 #include <string>
 
 #include "aderite/io/Forward.hpp"
-#include "aderite/scene/Entity.hpp"
 
 #include "aderiteeditor/utility/Macros.hpp"
 

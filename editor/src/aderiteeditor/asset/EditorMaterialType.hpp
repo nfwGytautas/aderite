@@ -13,6 +13,7 @@
 
 #include "aderiteeditor/asset/property/Forward.hpp"
 #include "aderiteeditor/node/Forward.hpp"
+#include "aderiteeditor/node/new/GraphX.hpp"
 
 namespace aderite {
 namespace asset {
@@ -20,7 +21,7 @@ namespace asset {
 /**
  * @brief Material type asset implementation
  */
-class EditorMaterialType : public asset::MaterialTypeAsset {
+class EditorMaterialType : public asset::MaterialTypeAsset, public node::Graph {
 public:
     using Properties = std::vector<Property*>;
     using Samplers = std::vector<Sampler*>;
@@ -31,12 +32,6 @@ public:
 
     virtual bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     virtual bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
-
-    /**
-     * @brief Returns this pipeline graph representation
-     * @return node::Graph instance
-     */
-    node::Graph* getGraph() const;
 
     /**
      * @brief Recalculates property offsets
@@ -82,6 +77,11 @@ public:
      */
     void removeSampler(Sampler* sampler);
 
+    /**
+     * @brief Updates the nodes given the material information
+     */
+    void updateIONodes();
+
 private:
     /**
      * @brief Generates a material header for this type and outputs it into the specified stream
@@ -107,10 +107,24 @@ private:
      */
     void generateVertex(std::ostream& os);
 
+    /**
+     * @brief Adds material input, output nodes to the graph
+     */
+    void addIONodes();
+
+    /**
+     * @brief Create a node of the specified type
+     * @param type Type of the node
+     * @return Node instance
+     */
+    node::Node* createNodeInstance(const std::string& type) override;
+
 private:
     Properties m_properties;
     Samplers m_samplers;
-    node::Graph* m_graph = nullptr;
+
+    node::MaterialInputNode* m_inputNode = nullptr;
+    node::MaterialOutputNode* m_outputNode = nullptr;
 };
 
 } // namespace asset

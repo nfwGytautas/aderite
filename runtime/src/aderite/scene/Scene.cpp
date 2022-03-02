@@ -1,233 +1,89 @@
 #include "Scene.hpp"
 
+#include "aderite/Aderite.hpp"
+#include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
-#include "aderite/physics/PhysicsScene.hpp"
-#include "aderite/rendering/Pipeline.hpp"
-#include "aderite/scene/Entity.hpp"
-#include "aderite/scene/EntitySelector.hpp"
-#include "aderite/scene/SceneSerializer.hpp"
-#include "aderite/scene/Transform.hpp"
-#include "aderite/scripting/ScriptSystem.hpp"
+#include "aderite/io/Serializer.hpp"
+#include "aderite/scene/Camera.hpp"
+#include "aderite/scene/GameObject.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Random.hpp"
 
 namespace aderite {
 namespace scene {
 
+template<typename T>
+bool addObject(std::vector<std::unique_ptr<T>>& list, T* object) {
+    ADERITE_DYNAMIC_ASSERT(object != nullptr, "Passed nullptr to addObject");
+
+    // Check if a object with the same name exists
+    auto it = std::find_if(list.begin(), list.end(), [&object](const std::unique_ptr<T>& obj) {
+        return obj->getName() == object->getName();
+    });
+
+    if (it != list.end()) {
+        LOG_WARN("[Scene] Tried to add a object that already exists in the scene {0}", object->getName());
+        return false;
+    }
+
+    list.push_back(std::unique_ptr<T>(object));
+    return true;
+}
+
+template<typename T>
+void removeObject(std::vector<std::unique_ptr<T>>& list, T* object) {
+    ADERITE_DYNAMIC_ASSERT(object != nullptr, "Tried to remove nullptr object");
+    auto it = std::find_if(list.begin(), list.end(), [object](const std::unique_ptr<T>& obj) {
+        return object->getName() == obj->getName();
+    });
+    ADERITE_DYNAMIC_ASSERT(it != list.end(), "Tried to remove entity that doesn't exist in the scene");
+    list.erase(it);
+}
+
 Scene::~Scene() {
-    LOG_TRACE("[Scene] Deleting scene {0}", this->getHandle());
+    LOG_TRACE("[Scene] Deleting scene {0}", this->getName());
 
-    // Free resources
-    delete m_physics;
+    // Objects
+    m_gameObjects.clear();
 
-    for (audio::AudioSource* source : m_audioSources) {
-        delete source;
-    }
-
-    for (audio::AudioListener* listener : m_audioListeners) {
-        delete listener;
-    }
-
-    for (Entity* entity : m_entities) {
-        delete entity;
-    }
-
-    for (scripting::ScriptSystem* system : m_systems) {
-        delete system;
-    }
-
-    for (EntitySelector* selector : m_entitySelectors) {
-        delete selector;
-    }
-
-    LOG_INFO("[Scene] Scene {0} deleted", this->getHandle());
+    LOG_INFO("[Scene] Scene {0} deleted", this->getName());
 }
 
 void Scene::update(float delta) {
-    for (EntitySelector* selector : m_entitySelectors) {
-        // Regenerate selector views
-        selector->regenerate();
+    // Free marked objects
+    m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),
+                                       [](const std::unique_ptr<GameObject>& gObject) {
+                                           return gObject->isMarkedForDeletion();
+                                       }),
+                        m_gameObjects.end());
+
+    // Update all game objects
+    for (size_t i = 0; i < m_gameObjects.size(); i++) {
+        m_gameObjects[i]->update(delta);
     }
 }
 
-void Scene::addScriptSystem(scripting::ScriptSystem* system) {
-    LOG_TRACE("[Scene] Adding system {0} to scene {1}", system->getName(), this->getHandle());
-    ADERITE_DYNAMIC_ASSERT(system != nullptr, "Passed nullptr scripting::ScriptSystem to addScriptSystem");
-
-    // Check if a system with the same name exists
-    auto it = std::find_if(m_systems.begin(), m_systems.end(), [system](const scripting::ScriptSystem* sys) {
-        return sys->getName() == system->getName();
-    });
-
-    if (it != m_systems.end()) {
-        LOG_ERROR("[Scene] Tried to add a system that already exists in the scene {0}", system->getName());
-        return;
-    }
-
-    system->attachToScene(this);
-    m_systems.push_back(system);
+GameObject* Scene::createGameObject() {
+    static size_t nextId = 0;
+    GameObject* go = new GameObject(this, "New object (" + std::to_string(nextId++) + ")");
+    addObject(m_gameObjects, go);
+    return go;
 }
 
-void Scene::addEntitySelector(EntitySelector* selector) {
-    LOG_TRACE("[Scene] Adding entity selector {0} to scene {1}", selector->getName(), this->getHandle());
-    m_entitySelectors.push_back(selector);
-    selector->setScene(this);
+GameObject* Scene::createGameObject(asset::PrefabAsset* prefab) {
+    GameObject* go = prefab->instantiate(this);
+    addObject(m_gameObjects, go);
+    return go;
 }
 
-void Scene::addAudioListener(audio::AudioListener* listener) {
-    LOG_TRACE("[Scene] Adding audio listener {0} to scene {1}", listener->getName(), this->getHandle());
-    m_audioListeners.push_back(listener);
+void Scene::destroyGameObject(GameObject* object) {
+    removeObject(m_gameObjects, object);
 }
 
-void Scene::addAudioSource(audio::AudioSource* source) {
-    LOG_TRACE("[Scene] Adding audio source {0} to scene {1}", source->getName(), this->getHandle());
-    m_audioSources.push_back(source);
-}
-
-size_t Scene::getFreeTagSlots() const {
-    size_t count = 0;
-    for (const std::string& tag : m_tags) {
-        if (tag.empty()) {
-            count++;
-        }
-    }
-
-    return count;
-}
-
-size_t Scene::getTagIndex(const std::string& name) const {
-    for (size_t i = 0; i < m_tags.size(); i++) {
-        if (m_tags[i] == name) {
-            return i + 1;
-        }
-    }
-
-    return c_MaxTags + 2;
-}
-
-void Scene::addTag(const std::string& name) {
-    LOG_TRACE("[Scene] Adding tag {0} to scene {1}", name, this->getHandle());
-    ADERITE_DYNAMIC_ASSERT(this->getFreeTagSlots() > 0, "No more tags can be inserted into the scene tag list");
-
-    // Check if a tag with the same name already exists
-    auto it = std::find(m_tags.begin(), m_tags.end(), name);
-    if (it != m_tags.end()) {
-        LOG_WARN("[Scene] Tried to add a tag {0} that already exists", name);
-        return;
-    }
-
-    // Add tag
-    auto it2 = std::find(m_tags.begin(), m_tags.end(), "");
-    *it2 = name;
-}
-
-void Scene::removeTag(const std::string& name) {
-    auto it = std::find(m_tags.begin(), m_tags.end(), name);
-    if (it == m_tags.end()) {
-        LOG_WARN("[Scene] Tried to remove tag {0} that the scene {1} doesn't have", name, this->getHandle());
-        return;
-    }
-
-    *it = "";
-}
-
-rendering::Pipeline* Scene::getPipeline() const {
-    return m_pipeline;
-}
-
-physics::PhysicsScene* Scene::getPhysicsScene() const {
-    return m_physics;
-}
-
-EntitySelector* Scene::getSelector(const std::string& name) const {
-    auto it = std::find_if(m_entitySelectors.begin(), m_entitySelectors.end(), [name](const EntitySelector* selector) {
-        return selector->getName() == name;
-    });
-
-    if (it == m_entitySelectors.end()) {
-        LOG_WARN("[Scene] Tried to get selector {0} from scene {1}, but the scene doesn't have it", name, this->getHandle());
-        return nullptr;
-    }
-
-    return *it;
-}
-
-audio::AudioSource* Scene::getSource(const std::string& name) const {
-    auto it = std::find_if(m_audioSources.begin(), m_audioSources.end(), [name](const audio::AudioSource* source) {
-        return source->getName() == name;
-    });
-
-    if (it == m_audioSources.end()) {
-        LOG_WARN("[Scene] Tried to get audio source {0} from scene {1}, but the scene doesn't have it", name, this->getHandle());
-        return nullptr;
-    }
-
-    return *it;
-}
-
-void Scene::setPipeline(rendering::Pipeline* pipeline) {
-    LOG_WARN("[Scene] Setting scene {0} pipeline to {1}", this->getHandle(), pipeline->getHandle());
-    m_pipeline = pipeline;
-}
-
-void Scene::addEntity(Entity* entity) {
-    // Make sure name is unique
-    auto it = std::find_if(m_entities.begin(), m_entities.end(), [&](const Entity* e) {
-        return e->getName() == entity->getName();
-    });
-    if (it != m_entities.end()) {
-        entity->setName(entity->getName() + " (" + utility::generateString(6) + ")");
-    }
-
-    // Add entity
-    entity->setScene(this);
-    m_entities.push_back(entity);
-
-    for (EntitySelector* selector : m_entitySelectors) {
-        selector->onEntityAdded(entity);
-    }
-}
-
-void Scene::removeEntity(Entity* entity) {
-    ADERITE_DYNAMIC_ASSERT(entity != nullptr, "Tried to remove nullptr entity");
-    auto it = std::find_if(m_entities.begin(), m_entities.end(), [&](const Entity* e) {
-        return entity->getScene() == this && e->getName() == entity->getName();
-    });
-    ADERITE_DYNAMIC_ASSERT(it != m_entities.end(), "Tried to remove entity that doesn't exist in the scene");
-    m_entities.erase(it);
-
-    entity->m_scene = nullptr;
-
-    if (entity->m_actor != nullptr) {
-        m_physics->detachActor(entity->m_actor);
-    }
-
-    delete entity;
-}
-
-const std::vector<audio::AudioSource*>& Scene::getAudioSources() const {
-    return m_audioSources;
-}
-
-const std::vector<audio::AudioListener*>& Scene::getAudioListeners() const {
-    return m_audioListeners;
-}
-
-const std::vector<scripting::ScriptSystem*> Scene::getScriptSystems() const {
-    return m_systems;
-}
-
-const std::vector<EntitySelector*> Scene::getEntitySelectors() const {
-    return m_entitySelectors;
-}
-
-const std::vector<std::string>& Scene::getTags() const {
-    return m_tags;
-}
-
-const std::vector<Entity*> Scene::getEntities() const {
-    return m_entities;
+const std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects() const {
+    return m_gameObjects;
 }
 
 reflection::Type Scene::getType() const {
@@ -235,19 +91,36 @@ reflection::Type Scene::getType() const {
 }
 
 bool Scene::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    SceneSerializer ss;
-    return ss.serialize(this, serializer, emitter);
+    if (!PhysicsScene::serialize(serializer, emitter)) {
+        return false;
+    }
+
+    // Objects
+    emitter << YAML::Key << "GameObjects" << YAML::BeginSeq;
+    for (const auto& object : m_gameObjects) {
+        emitter << YAML::BeginMap;
+        object->serialize(serializer, emitter);
+        emitter << YAML::EndMap;
+    }
+    emitter << YAML::EndSeq;
 }
 
 bool Scene::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    SceneSerializer ss;
-    return ss.deserialize(this, serializer, data);
+    if (!PhysicsScene::deserialize(serializer, data)) {
+        return false;
+    }
+
+    // Objects
+    auto objects = data["GameObjects"];
+    if (objects) {
+        for (auto object : objects) {
+            scene::GameObject* gObject = this->createGameObject();
+            gObject->deserialize(serializer, object);
+        }
+    }
 }
 
-Scene::Scene() {
-    m_physics = new physics::PhysicsScene();
-    m_tags.resize(c_MaxTags, "");
-}
+Scene::Scene() {}
 
 } // namespace scene
 } // namespace aderite

@@ -1,0 +1,6 @@
+Type: 7
+Name: CubePrefab
+Data:
+  Renderable:
+    Mesh: 1
+    Material: 6

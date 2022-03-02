@@ -1,0 +1,22 @@
+Type: 7
+Name: Ground
+Data:
+  Transform:
+    Position: [0, -5, 0]
+    Rotation: [1, 0, 0, 0]
+    Scale: [10, 0.5, 10]
+  Renderable:
+    Mesh: 1
+    Material: 4
+  PhysicsActor:
+    Dynamic: false
+    Mass: 1
+    HasGravity: false
+    Geometry:
+      - Type: 75
+        Name: NsUuAqSCVeD0
+        Data:
+          Size: [1, 1, 1]
+          IsTrigger: false
+  Behaviors:
+    []

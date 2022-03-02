@@ -14,22 +14,9 @@
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/audio/AudioListener.hpp"
 #include "aderite/audio/AudioSource.hpp"
-#include "aderite/physics/Collider.hpp"
-#include "aderite/physics/DynamicActor.hpp"
-#include "aderite/physics/StaticActor.hpp"
-#include "aderite/physics/collider/BoxCollider.hpp"
-#include "aderite/rendering/Pipeline.hpp"
+#include "aderite/physics/geometry/BoxGeometry.hpp"
 #include "aderite/rendering/Renderable.hpp"
-#include "aderite/rendering/operation/CameraProvideOperation.hpp"
-#include "aderite/rendering/operation/EntityProvideOperation.hpp"
-#include "aderite/rendering/operation/OutputToScreenOperation.hpp"
-#include "aderite/rendering/operation/RenderOperation.hpp"
-#include "aderite/rendering/operation/TargetProvideOperation.hpp"
-#include "aderite/scene/Entity.hpp"
 #include "aderite/scene/Scene.hpp"
-#include "aderite/scene/Transform.hpp"
-#include "aderite/scene/selectors/TagSelector.hpp"
-#include "aderite/scripting/ScriptSystem.hpp"
 
 namespace aderite {
 namespace reflection {
@@ -45,35 +32,11 @@ bool Reflector::init() {
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::TextureAsset, RuntimeTypes::TEXTURE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Scene, RuntimeTypes::SCENE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::MaterialTypeAsset, RuntimeTypes::MAT_TYPE);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::Pipeline, RuntimeTypes::PIPELINE);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::AudioAsset, RuntimeTypes::AUDIO);
     ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, asset::PrefabAsset, RuntimeTypes::PREFAB);
 
-    // Audio
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, audio::AudioSource, RuntimeTypes::AUDIO_SOURCE);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, audio::AudioListener, RuntimeTypes::AUDIO_LISTENER);
-
-    // Entity
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Transform, RuntimeTypes::TRANSFORM);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::Entity, RuntimeTypes::ENTITY);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::Renderable, RuntimeTypes::RENDERABLE);
-
-    // Colliders
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::BoxCollider, RuntimeTypes::BOX_CLDR);
-
-    // Physics actor
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::DynamicActor, RuntimeTypes::DYNAMIC_ACTOR);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::StaticActor, RuntimeTypes::STATIC_ACTOR);
-
-    // Operations
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::CameraProvideOperation, RuntimeTypes::OP_CAMERA);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::EntityProvideOperation, RuntimeTypes::OP_ENTITY);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::OutputToScreenOperation, RuntimeTypes::OP_SCREEN);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::RenderOperation, RuntimeTypes::OP_RENDER);
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, rendering::TargetProvideOperation, RuntimeTypes::OP_TARGET);
-
-    // Scripting
-    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, scene::TagSelector, RuntimeTypes::TAG_SELECTOR);
+    // Geometry
+    ADERITE_REFLECTOR_EXPOSE_INSTANCE(this, physics::BoxGeometry, RuntimeTypes::BOX_GEOMETRY);
 
     LOG_DEBUG("[Reflection] Registered {0} runtime instancers", m_instancers.size());
     ADERITE_DEBUG_SECTION(this->printInstancers(););

@@ -9,9 +9,9 @@ namespace rendering {
 
 class Renderer;
 class DrawCall;
-class Pipeline;
-class PipelineState;
 class Renderable;
+class RenderableData;
+struct FrameData;
 
 } // namespace rendering
 } // namespace aderite

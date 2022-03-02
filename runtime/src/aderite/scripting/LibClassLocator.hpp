@@ -18,54 +18,40 @@ namespace scripting {
  */
 class LibClassLocator final {
 public:
-    struct ScriptSystem {
-        MonoClass* Klass = nullptr;
-    };
-
-    struct Entity {
+    struct {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
-    };
+    } Behavior;
 
-    struct Mesh {
+    struct {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
-    };
+    } GameObject;
 
-    struct Material {
+    struct {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
-    };
+    } Prefab;
 
-    struct Audio {
+    struct {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
-    };
+    } Transform;
 
-    struct AudioSource {
+    struct {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
-    };
+    } Camera;
 
-    struct TriggerEvent {
+    struct {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
-    };
+    } RaycastResult;
 
-    struct CollisionEvent {
+    struct {
         MonoClass* Klass = nullptr;
         MonoMethod* Ctor = nullptr;
-    };
-
-    struct RaycastHit {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
-
-    struct Prefab {
-        MonoClass* Klass = nullptr;
-        MonoMethod* Ctor = nullptr;
-    };
+    } CollisionEvent;
 
 public:
     /**
@@ -82,13 +68,6 @@ public:
      */
     FieldType getType(MonoType* type) const;
 
-    /**
-     * @brief Checks if the specified class is a system class
-     * @param klass Class to check
-     * @return True if the class is or inherits from system class, false otherwise
-     */
-    bool isSystem(MonoClass* klass) const;
-
     // ====================================================================================
     // Object creators
     // ====================================================================================
@@ -98,124 +77,56 @@ public:
      * @param serializable Serializable object
      * @return MonoObject instance
      */
-    MonoObject* create(io::ISerializable* serializable) const;
+    MonoObject* create(io::SerializableObject* serializable) const;
 
     /**
-     * @brief Creates a C# script Entity object from C++ entity
-     * @param entity Entity from which to create
+     * @brief Creates a C# game object from C++ asset
+     * @param gObject Game object from which to create
      * @return MonoObject instance
      */
-    MonoObject* create(scene::Entity* entity) const;
+    MonoObject* create(scene::GameObject* gObject) const;
 
     /**
-     * @brief Creates a C# mesh object from C++ asset
-     * @param mesh Mesh from which to create
+     * @brief Creates a C# transform from C++ asset
+     * @param Transform Transform object from which to create
      * @return MonoObject instance
      */
-    MonoObject* create(asset::MeshAsset* mesh) const;
+    MonoObject* create(scene::TransformProvider* transform) const;
 
     /**
-     * @brief Creates a C# material object from C++ asset
-     * @param material Material from which to create
+     * @brief Creates a C# camera from C++ asset
+     * @param camera Camera object from which to create
      * @return MonoObject instance
      */
-    MonoObject* create(asset::MaterialAsset* material) const;
+    MonoObject* create(scene::Camera* camera) const;
 
     /**
-     * @brief Creates a C# audio object from C++ asset
-     * @param audio Audio from which to create
-     * @return MonoObject instance
-     */
-    MonoObject* create(asset::AudioAsset* audio) const;
-
-    /**
-     * @brief Creates a C# audio source object from C++
-     * @param source Source from which to create
-     * @return MonoObject instance
-     */
-    MonoObject* create(audio::AudioSource* source) const;
-
-    /**
-     * @brief Creates a C# trigger event object from C++
-     * @param triggerEvent TriggerEvent object
-     * @return MonoObject instance
-     */
-    MonoObject* create(const physics::TriggerEvent& triggerEvent) const;
-
-    /**
-     * @brief Creates a C# collision event object from C++
-     * @param collisionEvent CollisionEvent object
-     * @return MonoObject instance
-     */
-    MonoObject* create(const physics::CollisionEvent& collisionEvent) const;
-
-    /**
-     * @brief Creates a C# raycast hit object from C++
-     * @param hit RaycastHit object
-     * @return MonoObject instance
-     */
-    MonoObject* create(const physics::RaycastHit& hit) const;
-
-    /**
-     * @brief Creates a C# prefab object from C++
-     * @param prefab Prefab object
+     * @brief Creates a C# prefab from C++ asset
+     * @param prefab Prefab from which to create
      * @return MonoObject instance
      */
     MonoObject* create(asset::PrefabAsset* prefab) const;
 
-    // ====================================================================================
-    // Class getters
-    // ====================================================================================
+    /**
+     * @brief Creates a C# trigger event from C++ object
+     * @param te Trigger event struct from which to create
+     * @return MonoObject instance
+     */
+    MonoObject* create(const physics::TriggerEvent& te) const;
 
     /**
-     * @brief Returns the script system mono information struct
+     * @brief Creates a C# collision event from C++ object
+     * @param ce Collision event struct from which to create
+     * @return MonoObject instance
      */
-    const ScriptSystem& getScriptSystem() const;
+    MonoObject* create(const physics::CollisionEvent& ce) const;
 
     /**
-     * @brief Returns the entity mono information struct
+     * @brief Creates a C# raycast hit from C++ object
+     * @param rr Raycast hit struct from which to create
+     * @return MonoObject instance
      */
-    const Entity& getEntity() const;
-
-    /**
-     * @brief Returns the mesh mono information struct
-     */
-    const Mesh& getMesh() const;
-
-    /**
-     * @brief Returns the material mono information struct
-     */
-    const Material& getMaterial() const;
-
-    /**
-     * @brief Returns the audio mono information struct
-     */
-    const Audio& getAudio() const;
-
-    /**
-     * @brief Returns the audio source mono information struct
-     */
-    const AudioSource& getAudioSource() const;
-
-    /**
-     * @brief Returns the trigger evnt mono information struct
-     */
-    const TriggerEvent& getTriggerEvent() const;
-
-    /**
-     * @brief Returns the collision event mono information struct
-     */
-    const CollisionEvent& getCollisionEvent() const;
-
-    /**
-     * @brief Returns the raycast hit mono information struct
-     */
-    const RaycastHit& getRaycastHit() const;
-
-    /**
-     * @brief Returns the prefab mono information struct
-     */
-    const Prefab& getPrefab() const;
+    MonoObject* create(const physics::RaycastResult& rr) const;
 
 private:
     /**
@@ -232,18 +143,6 @@ private:
      * @return MonoObject instance
      */
     MonoObject* genericInstanceCreate(MonoClass* klass, MonoMethod* ctor, void** args) const;
-
-private:
-    ScriptSystem m_system;
-    Entity m_entity;
-    Mesh m_mesh;
-    Material m_material;
-    Audio m_audio;
-    AudioSource m_audioSource;
-    TriggerEvent m_triggerEvent;
-    CollisionEvent m_collisionEvent;
-    RaycastHit m_raycastHit;
-    Prefab m_prefab;
 };
 
 } // namespace scripting

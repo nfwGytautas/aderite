@@ -2,6 +2,7 @@
 
 #include <bx/timer.h>
 
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/input/InputManager.hpp"
 #include "aderite/io/FileHandler.hpp"
@@ -47,10 +48,19 @@ bool Engine::init(InitOptions options) {
     }
 #endif
 
+    // File handle
+    m_fileHandler = new io::FileHandler();
+
     // Loader pool
     // TODO: Configurable thread count
-    m_fileHandler = new io::FileHandler();
     m_loaderPool = new io::LoaderPool(2);
+
+    // Asset manager
+    m_assetManager = new asset::AssetManager();
+    if (!m_assetManager->init()) {
+        LOG_ERROR("[Engine] Aborting aderite initialization");
+        return false;
+    }
 
     // Scene manager
     m_sceneManager = new scene::SceneManager();
@@ -118,6 +128,9 @@ bool Engine::init(InitOptions options) {
     LOG_INFO("[Engine] All Aderite engine systems initialized");
     LOG_TRACE("");
 
+    // Transition to ready state
+    this->setState(CurrentState::SYSTEM_UPDATE);
+
     MIDDLEWARE_ACTION(onRuntimeInitialized);
 
     return true;
@@ -134,6 +147,7 @@ void Engine::shutdown() {
     m_inputManager->shutdown();
     m_serializer->shutdown();
     m_reflector->shutdown();
+    m_assetManager->shutdown();
     m_physicsController->shutdown();
     m_renderer->shutdown();
     m_windowManager->shutdown();
@@ -149,6 +163,7 @@ void Engine::shutdown() {
     delete m_fileHandler;
     delete m_reflector;
     delete m_scriptManager;
+    delete m_assetManager;
 
     delete m_middleware;
 
@@ -159,19 +174,50 @@ void Engine::loop() {
     LOG_TRACE("[Engine] Entering engine loop");
     static int64_t last = bx::getHPCounter();
 
-    while (!m_wantsToShutdown) {
+    while (m_state != CurrentState::AWAITING_SHUTDOWN) {
         // Calculate delta
         int64_t now = bx::getHPCounter();
         const int64_t frameTime = now - last;
         last = now;
         const double freq = double(bx::getHPFrequency());
-        const float deltaTimeSec = float(double(frameTime) / freq);
+        const float delta = float(double(frameTime) / freq);
 
         // Updates
-        updateSystem(deltaTimeSec);
-        updateScenes(deltaTimeSec);
-        updatePhysics(deltaTimeSec);
-        updateScripts(deltaTimeSec);
+        switch (m_state) {
+        case CurrentState::FULL: {
+            m_physicsController->update(delta);
+            MIDDLEWARE_ACTION(onPhysicsUpdate, delta);
+
+            // Fall through
+        }
+        case CurrentState::LOGIC: {
+            MIDDLEWARE_ACTION(onScriptUpdate, delta);
+
+            // Fall through
+        }
+        case CurrentState::SYSTEM_UPDATE: {
+            // Query events
+            m_inputManager->update();
+
+            // Update audio and flush queued audio commands to controller (FMOD should always update)
+            m_audioController->update();
+
+            // Asset manager
+            m_assetManager->update();
+
+            MIDDLEWARE_ACTION(onSystemUpdate, delta);
+
+            // Fall through
+        }
+        case CurrentState::RENDER_ONLY: {
+            // Scene
+            scene::Scene* currentScene = m_sceneManager->getCurrentScene();
+            if (currentScene != nullptr) {
+                currentScene->update(delta);
+            }
+            break;
+        }
+        }
 
         // Rendering
         MIDDLEWARE_ACTION(onStartRender);
@@ -184,23 +230,8 @@ void Engine::loop() {
     LOG_TRACE("[Engine] Exiting engine loop");
 }
 
-void Engine::requestExit() {
-    LOG_TRACE("[Engine] Exit requested");
-    m_wantsToShutdown = true;
-    MIDDLEWARE_ACTION(onRequestedExit);
-}
-
-void Engine::abortExit() {
-    LOG_TRACE("[Engine] Exit aborted");
-    m_wantsToShutdown = false;
-}
-
 void Engine::onRendererInitialized() const {
     MIDDLEWARE_ACTION(onRendererInitialized);
-}
-
-void Engine::onPipelineChanged(rendering::Pipeline* pipeline) const {
-    MIDDLEWARE_ACTION(onPipelineChanged, pipeline);
 }
 
 void Engine::onSceneChanged(scene::Scene* scene) const {
@@ -220,76 +251,13 @@ void Engine::attachMiddleware(interfaces::IEngineMiddleware* middleware) {
     m_middleware = middleware;
 }
 
-void Engine::startPhysicsUpdates() {
-    LOG_TRACE("[Engine] Enabling physics updates");
-    // Before starting physics updates reset the engine
-    m_willUpdatePhysics = true;
+Engine::CurrentState Engine::getState() const {
+    return m_state;
 }
 
-void Engine::stopPhysicsUpdates() {
-    LOG_TRACE("[Engine] Disabling physics updates");
-    m_willUpdatePhysics = false;
-}
-
-void Engine::startScriptUpdates() {
-    LOG_TRACE("[Engine] Enabling script updates");
-    m_willUpdateScripts = true;
-}
-
-void Engine::stopScriptUpdates() {
-    LOG_TRACE("[Engine] Disabling script updates");
-    m_willUpdateScripts = false;
-}
-
-void Engine::startSceneUpdates() {
-    LOG_TRACE("[Engine] Enabling scene updates");
-    m_willUpdateScenes = true;
-}
-
-void Engine::stopSceneUpdates() {
-    LOG_TRACE("[Engine] Disabling scene updates");
-    m_willUpdateScenes = false;
-}
-
-void Engine::updateSystem(float delta) const {
-    // Query events
-    m_inputManager->update();
-
-    // Update audio and flush queued audio commands to controller (FMOD should always update)
-    m_audioController->update();
-
-    MIDDLEWARE_ACTION(onSystemUpdate, delta);
-}
-
-void Engine::updateScenes(float delta) const {
-    if (!m_willUpdateScenes) {
-        return;
-    }
-
-    scene::Scene* currentScene = m_sceneManager->getCurrentScene();
-    currentScene->update(delta);
-
-    MIDDLEWARE_ACTION(onSceneUpdate, delta);
-}
-
-void Engine::updatePhysics(float delta) const {
-    if (!m_willUpdatePhysics) {
-        return;
-    }
-
-    m_physicsController->update(delta);
-
-    MIDDLEWARE_ACTION(onPhysicsUpdate, delta);
-}
-
-void Engine::updateScripts(float delta) const {
-    if (!m_willUpdateScripts) {
-        return;
-    }
-
-    m_scriptManager->update(delta);
-
-    MIDDLEWARE_ACTION(onScriptUpdate, delta);
+void Engine::setState(CurrentState state) {
+    LOG_TRACE("[Engine] State transition from {0} to {1}", static_cast<int>(m_state), static_cast<int>(state));
+    m_state = state;
 }
 
 } // namespace aderite

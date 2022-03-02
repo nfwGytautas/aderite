@@ -1,5 +1,7 @@
 #include "MaterialTypeAsset.hpp"
 
+#include "aderite/Aderite.hpp"
+#include "aderite/io/FileHandler.hpp"
 #include "aderite/io/Loader.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/Macros.hpp"
@@ -16,7 +18,7 @@ bgfx::ShaderHandle load_shader(const std::vector<unsigned char>& source, const s
 }
 
 MaterialTypeAsset::~MaterialTypeAsset() {
-    LOG_TRACE("[Asset] Destroying {0}", this->getHandle());
+    LOG_TRACE("[Asset] Destroying {0}", this->getName());
     this->unload();
 }
 
@@ -31,7 +33,7 @@ bool MaterialTypeAsset::isValid() const {
 }
 
 void MaterialTypeAsset::load(const io::Loader* loader) {
-    LOG_TRACE("[Asset] Loading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Loading {0}", this->getName());
     ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_shaderHandle), "Tried to load already loaded material type");
 
     io::Loader::ShaderLoadResult slr = loader->loadShader(this->getHandle());
@@ -39,28 +41,33 @@ void MaterialTypeAsset::load(const io::Loader* loader) {
         return;
     }
 
+    if (slr.FragmentSource.size() == 0 || slr.VertexSource.size() == 0) {
+        // Something is wrong, try again another time
+        return;
+    }
+
     // Load bgfx bin shader
-    bgfx::ShaderHandle vsh = load_shader(slr.VertexSource, this->getHandle() + " vertex");
-    bgfx::ShaderHandle fsh = load_shader(slr.FragmentSource, this->getHandle() + " fragment");
+    bgfx::ShaderHandle vsh = load_shader(slr.VertexSource, this->getName() + " vertex");
+    bgfx::ShaderHandle fsh = load_shader(slr.FragmentSource, this->getName() + " fragment");
 
     // Create program
     m_shaderHandle = bgfx::createProgram(vsh, fsh, true);
 
     // Create uniform
-    const std::string typeName = std::to_string(this->getHandle());
-    m_uniformHandle = bgfx::createUniform(("u_mat_buffer_" + typeName).c_str(), bgfx::UniformType::Vec4, m_info.Size);
+    m_uniformHandle = bgfx::createUniform(("mf_mat_buffer_" + this->getName()).c_str(), bgfx::UniformType::Vec4, m_info.Size);
 
     // Create samplers
     m_samplers.resize(m_info.NumSamplers);
     for (size_t i = 0; i < m_info.NumSamplers; i++) {
-        m_samplers[i] = bgfx::createUniform(("u_" + typeName + "_" + std::to_string(i)).c_str(), bgfx::UniformType::Sampler, 1);
+        m_samplers[i] =
+            bgfx::createUniform(("mf_" + this->getName() + "_" + m_info.SamplerNames[i]).c_str(), bgfx::UniformType::Sampler, 1);
     }
 
-    LOG_INFO("[Asset] Loaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Loaded {0}", this->getName());
 }
 
 void MaterialTypeAsset::unload() {
-    LOG_TRACE("[Asset] Unloading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Unloading {0}", this->getName());
 
     if (bgfx::isValid(m_shaderHandle)) {
         bgfx::destroy(m_shaderHandle);
@@ -80,10 +87,15 @@ void MaterialTypeAsset::unload() {
 
     m_samplers.clear();
 
-    LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Unloaded {0}", this->getName());
 }
 
 bool MaterialTypeAsset::needsLoading() const {
+    // Check if sources exist
+    if (!::aderite::Engine::getFileHandler()->exists(this->getHandle())) {
+        return false;
+    }
+
     return !this->isValid();
 }
 
@@ -94,12 +106,20 @@ reflection::Type MaterialTypeAsset::getType() const {
 bool MaterialTypeAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     emitter << YAML::Key << "DataSize" << YAML::Value << m_info.Size;
     emitter << YAML::Key << "SamplerCount" << YAML::Value << m_info.NumSamplers;
+    emitter << YAML::Key << "SamplerNames" << YAML::Flow << YAML::BeginSeq;
+    for (const std::string& name : m_info.SamplerNames) {
+        emitter << name;
+    }
+    emitter << YAML::EndSeq;
     return true;
 }
 
 bool MaterialTypeAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     m_info.Size = data["DataSize"].as<size_t>();
     m_info.NumSamplers = data["SamplerCount"].as<size_t>();
+    for (const YAML::Node& samplerName : data["SamplerNames"]) {
+        m_info.SamplerNames.push_back(samplerName.as<std::string>());
+    }
     return true;
 }
 

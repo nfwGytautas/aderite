@@ -1,12 +1,12 @@
 #include "InternalCalls.hpp"
 
-#include "aderite/scripting/internals/ScriptAudio.hpp"
-#include "aderite/scripting/internals/ScriptComponents.hpp"
-#include "aderite/scripting/internals/ScriptDebug.hpp"
-#include "aderite/scripting/internals/ScriptEntity.hpp"
-#include "aderite/scripting/internals/ScriptInput.hpp"
-#include "aderite/scripting/internals/ScriptPhysics.hpp"
-#include "aderite/scripting/internals/ScriptSystemInternals.hpp"
+#include "aderite/scripting/internals/AssetInternal.hpp"
+#include "aderite/scripting/internals/EngineInternal.hpp"
+#include "aderite/scripting/internals/InputInternal.hpp"
+#include "aderite/scripting/internals/PhysicsInternal.hpp"
+#include "aderite/scripting/internals/SceneInternal.hpp"
+#include "aderite/scripting/internals/ScriptingInternal.hpp"
+#include "aderite/scripting/internals/UtilityInternal.hpp"
 #include "aderite/utility/Log.hpp"
 
 namespace aderite {
@@ -15,13 +15,13 @@ namespace scripting {
 void linkInternals() {
     LOG_TRACE("[Scripting] Linking internals");
 
-    logInternals();
-    componentInternals();
-    entityInternals();
-    inputInternals();
-    physicsInternals();
-    audioInternals();
-    systemInternals();
+    linkAsset();
+    linkInput();
+    linkScene();
+    linkScripting();
+    linkUtility();
+    linkPhysics();
+    linkEngine();
 
     LOG_TRACE("[Scripting] Internals linked");
 }

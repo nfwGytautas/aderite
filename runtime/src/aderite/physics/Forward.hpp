@@ -10,16 +10,16 @@ namespace aderite {
 namespace physics {
 
 class PhysicsController;
-
 class PhysicsScene;
 class PhysicsEventList;
-
-class PhysicsActor;
-class DynamicActor;
-class StaticActor;
-
 class Collider;
-class RaycastHit;
+class RaycastResult;
+class Geometry;
+class BoxGeometry;
+class PhysXActor;
+class PhysicsProperties;
+struct TriggerEvent;
+struct CollisionEvent;
 
 } // namespace physics
 } // namespace aderite

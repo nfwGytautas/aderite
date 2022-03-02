@@ -8,11 +8,11 @@ namespace physics {
 /**
  * @brief Class for constructing a raycast query
  */
-struct RaycastHit {
+struct RaycastResult {
     /**
      * @brief Actor that was hit
      */
-    PhysicsActor* Actor = nullptr;
+    PhysXActor* Actor = nullptr;
 
     /**
      * @brief Distance that the ray traveled

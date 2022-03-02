@@ -7,6 +7,8 @@
 
 #include "aderite/Aderite.hpp"
 #include "aderite/input/InputManager.hpp"
+#include "aderite/rendering/Renderer.hpp"
+#include "aderite/scene/Camera.hpp"
 #include "aderite/utility/Log.hpp"
 
 #include "aderiteeditor/shared/Settings.hpp"
@@ -16,10 +18,19 @@ namespace aderite {
 namespace editor {
 
 EditorCamera::EditorCamera() {
-    updateViewMatrix();
+    const uint64_t flags = BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP |
+                           BGFX_SAMPLER_V_CLAMP | BGFX_TEXTURE_BLIT_DST;
+
+    m_output = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::BGRA8, flags);
 }
 
-EditorCamera::~EditorCamera() {}
+EditorCamera::~EditorCamera() {
+    bgfx::destroy(m_output);
+}
+
+bgfx::TextureHandle EditorCamera::getOutputHandle() const {
+    return m_output;
+}
 
 void EditorCamera::onViewportResize(const glm::uvec2& size) {
     if (size.x == 0 || size.y == 0) {
@@ -27,21 +38,9 @@ void EditorCamera::onViewportResize(const glm::uvec2& size) {
     }
 
     m_viewportSize = size;
-    m_projectionMatrix =
-        glm::perspective(glm::radians(Settings::EditorCameraFov), (float)m_viewportSize.x / (float)m_viewportSize.y, 0.1f, 1000.0f);
-}
-
-const glm::mat4& EditorCamera::getViewMatrix() const {
-    return m_viewMatrix;
-}
-
-const glm::mat4& EditorCamera::getProjectionMatrix() const {
-    return m_projectionMatrix;
 }
 
 void EditorCamera::update(float delta) {
-    bool wasUpdated = false;
-
     auto inputManager = ::aderite::Engine::getInputManager();
 
     if (inputManager->isKeyPressed(input::Key::LEFT_ALT)) {
@@ -54,8 +53,6 @@ void EditorCamera::update(float delta) {
                 m_focalpoint += getForwardDirection();
                 m_distance = 1.0f;
             }
-
-            wasUpdated = true;
         }
 
         // Pan
@@ -65,8 +62,6 @@ void EditorCamera::update(float delta) {
             glm::vec2 speed = panSpeed();
             m_focalpoint += -getRightDirection() * mouseDelta.x * speed.x * m_distance * delta;
             m_focalpoint += getUpDirection() * mouseDelta.y * speed.y * m_distance * delta;
-
-            wasUpdated = true;
         }
     } else {
         // Rotate
@@ -74,21 +69,24 @@ void EditorCamera::update(float delta) {
             glm::vec2 mouseDelta = inputManager->getMouseDelta();
 
             float yawSign = getUpDirection().y < 0 ? -1.0f : 1.0f;
-            m_yaw -= delta * yawSign * mouseDelta.x * Settings::EditorCameraRotationSpeed;
-            m_pitch += delta * mouseDelta.y * Settings::EditorCameraRotationSpeed;
-
-            wasUpdated = true;
+            m_currentEulerRotation.x += delta * mouseDelta.y * Settings::EditorCameraRotationSpeed;
+            m_currentEulerRotation.y -= delta * yawSign * mouseDelta.x * Settings::EditorCameraRotationSpeed;
         }
     }
 
-    if (wasUpdated) {
-        updateViewMatrix();
-    }
-}
+    // Add to frame data
+    rendering::FrameData& fd = ::aderite::Engine::getRenderer()->getWriteFrameData();
 
-bool EditorCamera::isEnabled() const {
-    // return !State::IsGameMode;
-    return true;
+    // Fill camera data
+    rendering::CameraData cd;
+    cd.Name = "Editor";
+    cd.Output = m_output;
+    cd.ProjectionMatrix = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 1000.0f);
+    cd.ViewMatrix =
+        glm::inverse(glm::translate(glm::mat4(1.0f), this->calculatePosition()) * glm::toMat4(glm::quat(m_currentEulerRotation)));
+
+    // Push to the list
+    fd.Cameras.push_back(cd);
 }
 
 glm::vec3 EditorCamera::getUpDirection() const {
@@ -108,13 +106,7 @@ glm::vec3 EditorCamera::calculatePosition() const {
 }
 
 glm::quat EditorCamera::getOrientation() const {
-    return glm::quat(glm::vec3(m_pitch, m_yaw, 0.0f));
-}
-
-void EditorCamera::updateViewMatrix() {
-    glm::quat orientation = getOrientation();
-    m_viewMatrix = glm::translate(glm::mat4(1.0f), calculatePosition()) * glm::toMat4(orientation);
-    m_viewMatrix = glm::inverse(m_viewMatrix);
+    return glm::quat(m_currentEulerRotation);
 }
 
 float EditorCamera::zoomSpeed() const {

@@ -8,7 +8,7 @@ namespace aderite {
 namespace asset {
 
 MeshAsset::~MeshAsset() {
-    LOG_TRACE("[Asset] Destroying {0}", this->getHandle());
+    LOG_TRACE("[Asset] Destroying {0}", this->getName());
 
     if (bgfx::isValid(m_vbh) || bgfx::isValid(m_ibh)) {
         this->unload();
@@ -20,7 +20,7 @@ bool MeshAsset::isValid() const {
 }
 
 void MeshAsset::load(const io::Loader* loader) {
-    LOG_TRACE("[Asset] Loading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Loading {0}", this->getName());
     ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_vbh), "Tried to load already loaded mesh");
 
     // Create layout
@@ -43,16 +43,19 @@ void MeshAsset::load(const io::Loader* loader) {
         auto& indicesData = result.Indices;
         m_vbh = bgfx::createVertexBuffer(bgfx::copy(positionData.data(), sizeof(float) * positionData.size()), layout);
         m_ibh = bgfx::createIndexBuffer(bgfx::copy(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
+
+        bgfx::setName(m_vbh, this->getName().c_str());
+        bgfx::setName(m_ibh, this->getName().c_str());
     } else {
         LOG_ERROR("[Asset] Unimplemented dynamic mesh");
         return;
     }
 
-    LOG_INFO("[Asset] Loaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Loaded {0}", this->getName());
 }
 
 void MeshAsset::unload() {
-    LOG_TRACE("[Asset] Unloading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Unloading {0}", this->getName());
 
     if (bgfx::isValid(m_vbh)) {
         bgfx::destroy(m_vbh);
@@ -64,7 +67,7 @@ void MeshAsset::unload() {
         m_ibh = BGFX_INVALID_HANDLE;
     }
 
-    LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Unloaded {0}", this->getName());
 }
 
 bool MeshAsset::needsLoading() const {

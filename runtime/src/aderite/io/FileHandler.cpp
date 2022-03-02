@@ -113,5 +113,16 @@ void FileHandler::writePhysicalFile(LoadableHandle handle, const std::filesystem
     LOG_INFO("[IO] Physical file {0} written to {1}", file.string(), handle);
 }
 
+bool FileHandler::exists(LoadableHandle handle) const {
+    ADERITE_DYNAMIC_ASSERT(handle != c_InvalidHandle, "Invalid handle passed to exists");
+    const std::filesystem::path path = m_rootDir / "Data" / (std::to_string(handle) + ".data");
+
+    if (!std::filesystem::exists(path)) {
+        return false;
+    }
+
+    return true;
+}
+
 } // namespace io
 } // namespace aderite

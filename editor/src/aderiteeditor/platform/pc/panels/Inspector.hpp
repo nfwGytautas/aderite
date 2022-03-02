@@ -1,7 +1,11 @@
 #pragma once
 
+#include "aderite/audio/Forward.hpp"
 #include "aderite/io/Forward.hpp"
-#include "aderite/scene/Entity.hpp"
+#include "aderite/physics/Forward.hpp"
+#include "aderite/rendering/Forward.hpp"
+#include "aderite/scene/Forward.hpp"
+#include "aderite/scripting/Forward.hpp"
 
 #include "aderiteeditor/platform/pc/UIComponent.hpp"
 
@@ -19,30 +23,25 @@ public:
     void render() override;
 
 private:
-    // Entity
-    void renderEntity();
+    // Components
+    void renderTransformProvider(scene::TransformProvider* provider);
+    void renderRenderable(rendering::RenderableData& renderable);
+    void renderCamera(scene::Camera* camera);
+    void renderAudioSource(audio::AudioSource* source);
+    void renderAudioListener(audio::AudioListener* listener);
+    void renderBehavior(scripting::ScriptedBehavior* behavior, size_t idx);
+
+    // Objects
+    void renderGameObject(io::SerializableObject* object);
 
     // Physics
-    void renderActor(physics::PhysicsActor* actor);
-    void renderDynamicActor(physics::DynamicActor* actor);
-    void renderStaticActor(physics::StaticActor* actor);
+    void renderActor(physics::PhysXActor* actor);
+    void renderColliders(physics::PhysXActor* actor);
 
     // Assets
-    void renderAsset();
-    void renderMesh(io::SerializableObject* asset);
-    void renderTexture(io::SerializableObject* asset);
     void renderMaterial(io::SerializableObject* asset);
-    void renderMaterialType(io::SerializableObject* asset);
-    void renderScene(io::SerializableObject* asset);
-    void renderPipeline(io::SerializableObject* asset);
-    void renderAudio(io::SerializableObject* asset);
-
-    // Serializables
-    void renderSerializable();
-    void renderAudioSource(io::ISerializable* serializable);
-    void renderScriptSystem(io::ISerializable* serializable);
-    void renderEntitySelector(io::ISerializable* serializable);
-    void renderAudioListener(io::ISerializable* serializable);
+    void renderMaterialType(io::SerializableObject* object);
+    void renderAudioClip(io::SerializableObject* asset);
 };
 
 } // namespace editor

@@ -1,17 +1,24 @@
 ﻿namespace Aderite
 {
     /// <summary>
-    /// A class that represents a collision between two entities
+    /// Event sent when a collision happens
     /// </summary>
     public class CollisionEvent
     {
-        public Entity Actor1;
-        public Entity Actor2;
+        /// <summary>
+        /// First object that collided
+        /// </summary>
+        public GameObject Object1 { get; }
 
-        internal CollisionEvent(Entity actor1, Entity actor2)
+        /// <summary>
+        /// Second object that collided
+        /// </summary>
+        public GameObject Object2 { get; }
+
+        internal CollisionEvent(GameObject obj1, GameObject obj2)
         {
-            this.Actor1 = actor1;
-            this.Actor2 = actor2;
+            this.Object1 = obj1;
+            this.Object2 = obj2;
         }
     }
 }

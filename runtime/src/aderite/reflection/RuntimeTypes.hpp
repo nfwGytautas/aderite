@@ -23,39 +23,14 @@ enum class RuntimeTypes : Type {
     AUDIO = 6,
     PREFAB = 7,
 
-    // Audio
-    AUDIO_SOURCE = 20,
-    AUDIO_LISTENER = 21,
+    // Object
+    GAME_OBJECT = 40,
 
-    // Entity
-    TRANSFORM = 40,
-    ENTITY = 41,
-    RENDERABLE = 42,
-
-    // Colliders
-    CLDR_LIST = 50,
-    BOX_CLDR,
-
-    // Physics
-    PHYSICS_ACTOR = 90,
-    DYNAMIC_ACTOR,
-    STATIC_ACTOR,
-    PHYSICS_SCENE,
-
-    // Operations
-    OP_CAMERA = 100,
-    OP_ENTITY,
-    OP_SCREEN,
-    OP_RENDER,
-    OP_TARGET,
-
-    // Scripting
-    SCRIPT_SYSTEM = 200,
-
-    ENTITY_SELECTOR = 210,
-    TAG_SELECTOR = 211,
+    // Geometry
+    BOX_GEOMETRY = 75,
 
     // Last element of runtime types, used to specify the end runtime serializables
+    UNDEFINED = 249,
     RESERVED = 250,
     // END used to extend runtime types
     END

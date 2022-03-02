@@ -1,0 +1,22 @@
+Type: 7
+Name: Cube
+Data:
+  Transform:
+    Position: [0, 0, 0]
+    Rotation: [1, 0, 0, 0]
+    Scale: [1, 1, 1]
+  Renderable:
+    Mesh: 1
+    Material: 9
+  PhysicsActor:
+    Dynamic: true
+    Mass: 1
+    HasGravity: true
+    Geometry:
+      - Type: 75
+        Name: TkMRyTdusPKn
+        Data:
+          Size: [1, 1, 1]
+          IsTrigger: false
+  Behaviors:
+    []

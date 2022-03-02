@@ -10,8 +10,8 @@
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
+#include "aderite/scripting/BehaviorBase.hpp"
 #include "aderite/scripting/InternalCalls.hpp"
-#include "aderite/scripting/ScriptSystem.hpp"
 #include "aderite/utility/Log.hpp"
 #include "aderite/utility/LogExtensions.hpp"
 
@@ -58,24 +58,14 @@ void ScriptManager::shutdown() {
     LOG_INFO("[Scripting] Script manager shutdown");
 }
 
-void ScriptManager::update(float delta) {
-    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
-
-    if (currentScene == nullptr) {
-        return;
-    }
-
-    for (scripting::ScriptSystem* system : currentScene->getScriptSystems()) {
-        system->update(delta);
-    }
-}
-
 void ScriptManager::loadAssemblies() {
     LOG_TRACE("[Scripting] Loading assemblies");
+    m_assembliesValid = false;
     io::DataChunk assemblyChunk = ::aderite::Engine::getFileHandler()->openReservedLoadable(io::FileHandler::Reserved::GameCode);
 
     if (assemblyChunk.Data.size() == 0) {
         // Empty nothing to load
+        LOG_WARN("[Scripting] No game code found");
         return;
     }
 
@@ -102,9 +92,39 @@ void ScriptManager::loadAssemblies() {
     }
 
     // Get behaviors
-    this->resolveSystemNames();
+    LOG_TRACE("[Scripting] Resolving systems");
+    this->clean();
+
+    // Get the number of rows in the metadata table
+    int numRows = mono_image_get_table_rows(m_codeImage, MONO_TABLE_TYPEDEF);
+
+    for (int i = 0; i < numRows; i++) {
+        // Get class
+        MonoClass* monoClass = mono_class_get(m_codeImage, (i + 1) | MONO_TOKEN_TYPE_DEF);
+
+        // Check if the class is found
+        if (monoClass != nullptr) {
+            std::string name = mono_class_get_name(monoClass);
+            std::string nSpace = mono_class_get_namespace(monoClass);
+
+            if (name == "<Module>" || name == "Internal") {
+                // Ignore
+                continue;
+            }
+
+            // Check if inherits from behavior
+            if (mono_class_get_parent(monoClass) != m_locator.Behavior.Klass) {
+                // Doesn't inherit from ScriptedBehavior
+                continue;
+            }
+
+            LOG_TRACE("[Scripting] Found class. Namespace: {1}, name: {0}", name, nSpace);
+            m_behaviors.push_back(new BehaviorBase(monoClass));
+        }
+    }
 
     LOG_INFO("[Scripting] Assemblies loaded");
+    m_assembliesValid = true;
 }
 
 MonoDomain* ScriptManager::getDomain() const {
@@ -115,8 +135,12 @@ MonoImage* ScriptManager::getCodeImage() const {
     return m_codeImage;
 }
 
-MonoObject* ScriptManager::createInstance(io::ISerializable* serializable) {
+MonoObject* ScriptManager::createInstance(io::SerializableObject* serializable) {
     ADERITE_DYNAMIC_ASSERT(serializable != nullptr, "Nullptr serializable passed to createInstance");
+
+    if (!m_assembliesValid) {
+        return nullptr;
+    }
 
     // Check if an object already exists
     auto it = m_objectCache.find(serializable);
@@ -129,14 +153,6 @@ MonoObject* ScriptManager::createInstance(io::ISerializable* serializable) {
     MonoObject* instance = m_locator.create(serializable);
     m_objectCache[serializable] = instance;
     return instance;
-}
-
-MonoClass* ScriptManager::getSystemClass(const std::string& name) const {
-    auto it = m_knownSystems.find(name);
-    if (it == m_knownSystems.end()) {
-        return nullptr;
-    }
-    return it->second;
 }
 
 MonoClass* ScriptManager::resolveClass(const std::string& nSpace, const std::string& name) const {
@@ -159,22 +175,10 @@ MonoObject* ScriptManager::instantiate(MonoClass* klass) const {
     return object;
 }
 
-std::vector<FieldWrapper> ScriptManager::getPublicFields(MonoObject* object) const {
-    std::vector<FieldWrapper> result;
-    void* iter = NULL;
-    MonoClassField* field;
-    while (field = mono_class_get_fields(mono_object_get_class(object), &iter)) {
-        if (mono_field_get_flags(field) & MONO_FIELD_ATTR_PUBLIC) {
-            result.push_back(FieldWrapper(field, object));
-        }
-    }
-    return result;
-}
-
 MonoMethod* ScriptManager::getMethod(MonoClass* klass, const std::string& name, size_t paramCount) const {
     MonoMethod* method = mono_class_get_method_from_name(klass, name.c_str(), paramCount);
     if (method == nullptr) {
-        LOG_ERROR("[Scripting] Failed to find {0} method in {1}", name, mono_class_get_name(klass));
+        LOG_WARN("[Scripting] Failed to find {0} method in {1}", name, mono_class_get_name(klass));
         return nullptr;
     }
     return method;
@@ -185,10 +189,6 @@ MonoMethod* ScriptManager::getMethod(const std::string& signature) const {
     return nullptr;
 }
 
-std::unordered_map<std::string, MonoClass*> ScriptManager::getKnownSystems() const {
-    return m_knownSystems;
-}
-
 FieldType ScriptManager::getType(MonoType* type) const {
     // Check for value types
     switch (mono_type_get_type(type)) {
@@ -197,6 +197,9 @@ FieldType ScriptManager::getType(MonoType* type) const {
     }
     case MONO_TYPE_BOOLEAN: {
         return FieldType::Boolean;
+    }
+    case MONO_TYPE_I4: {
+        return FieldType::Integer;
     }
     default: {
         return m_locator.getType(type);
@@ -212,33 +215,24 @@ MonoString* ScriptManager::string(const char* value) const {
     return mono_string_new(m_currentDomain, value);
 }
 
-void ScriptManager::resolveSystemNames() {
-    LOG_TRACE("[Scripting] Resolving systems");
-    m_knownSystems.clear();
+void ScriptManager::onScriptException(MonoException* exception) {
+    LOG_ERROR("[Scripting] Exception was thrown!");
+}
 
-    // Get the number of rows in the metadata table
-    int numRows = mono_image_get_table_rows(m_codeImage, MONO_TABLE_TYPEDEF);
+std::vector<BehaviorBase*> ScriptManager::getBehaviors() const {
+    return m_behaviors;
+}
 
-    for (int i = 0; i < numRows; i++) {
-        // Get class
-        MonoClass* monoClass = mono_class_get(m_codeImage, (i + 1) | MONO_TOKEN_TYPE_DEF);
+BehaviorBase* ScriptManager::getBehavior(const std::string& name) const {
+    auto it = std::find_if(m_behaviors.begin(), m_behaviors.end(), [&](BehaviorBase* behavior) {
+        return name == behavior->getName();
+    });
 
-        // Check if the class is found
-        if (monoClass != nullptr) {
-            std::string name = mono_class_get_name(monoClass);
-            std::string nSpace = mono_class_get_namespace(monoClass);
-
-            if (name == "<Module>" || name == "Internal") {
-                // Ignore
-                continue;
-            }
-
-            if (m_locator.isSystem(monoClass)) {
-                LOG_TRACE("[Scripting] Found system. Namespace: {1}, name: {0}", name, nSpace);
-                m_knownSystems[nSpace + "." + name] = monoClass;
-            }
-        }
+    if (it == m_behaviors.end()) {
+        return nullptr;
     }
+
+    return *it;
 }
 
 bool ScriptManager::setupEngineAssemblies() {
@@ -312,6 +306,11 @@ bool ScriptManager::setupCodeAssemblies() {
 }
 
 void ScriptManager::clean() {
+    for (BehaviorBase* behavior : m_behaviors) {
+        delete behavior;
+    }
+
+    m_behaviors.clear();
     m_objectCache.clear();
 
     // TODO: Invoke GC

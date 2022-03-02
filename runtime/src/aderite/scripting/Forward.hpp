@@ -10,8 +10,8 @@ namespace scripting {
 
 class ScriptManager;
 class LibClassLocator;
-
-class ScriptSystem;
+class BehaviorBase;
+class ScriptedBehavior;
 class FieldWrapper;
 
 } // namespace scripting

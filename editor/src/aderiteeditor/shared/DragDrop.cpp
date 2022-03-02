@@ -6,40 +6,64 @@ namespace aderite {
 namespace editor {
 
 struct DragDropInfo {
-    io::ISerializable* Data = nullptr;
+    DragDropInfo(io::SerializableObject* object) {
+        Object = object;
+    }
+
+    DragDropInfo(std::filesystem::path path) {
+        File = path.string();
+    }
+
+    DragDropInfo(const std::filesystem::path& path, io::SerializableObject* object) : Object(object), File(path.string()) {}
+
+    ~DragDropInfo() {}
+
+    io::SerializableObject* Object = nullptr;
+    std::string File = "";
 };
 
-
-void DragDrop::renderSource(io::ISerializable* serializable) {
+void DragDrop::renderSource(io::SerializableObject* serializable) {
     if (serializable == nullptr) {
         return;
     }
 
     if (ImGui::BeginDragDropSource()) {
-        DragDropInfo ddi {serializable};
+        DragDropInfo ddi(serializable);
         ImGui::SetDragDropPayload(std::to_string(serializable->getType()).c_str(), &ddi, sizeof(DragDropInfo));
         ImGui::EndDragDropSource();
     }
 }
 
-void DragDrop::renderSource(io::ISerializable* serializable, reflection::Type as) {
+void DragDrop::renderSource(io::SerializableObject* serializable, reflection::Type as) {
     if (serializable == nullptr) {
         return;
     }
 
     if (ImGui::BeginDragDropSource()) {
-        ImGui::SetDragDropPayload(std::to_string(as).c_str(), serializable, sizeof(io::ISerializable*));
+        ImGui::SetDragDropPayload(std::to_string(as).c_str(), serializable, sizeof(io::SerializableObject*));
         ImGui::EndDragDropSource();
     }
 }
 
-io::ISerializable* DragDrop::renderTarget(reflection::Type type) {
-    io::ISerializable* result = nullptr;
+io::SerializableObject* DragDrop::renderTarget(reflection::Type type) {
+    io::SerializableObject* result = nullptr;
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::to_string(type).c_str())) {
-            result = static_cast<DragDropInfo*>(payload->Data)->Data;
+            result = static_cast<DragDropInfo*>(payload->Data)->Object;
         }
+
+        const ImGuiPayload* peekPayload = ImGui::GetDragDropPayload();
+        if (peekPayload != nullptr) {
+            if (peekPayload->IsDataType("AssetFileDD")) {
+                if (static_cast<DragDropInfo*>(peekPayload->Data)->Object->getType() == type) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("AssetFileDD")) {
+                        result = static_cast<DragDropInfo*>(payload->Data)->Object;
+                    }
+                }
+            }
+        }
+
 
         ImGui::EndDragDropTarget();
     }
@@ -47,23 +71,23 @@ io::ISerializable* DragDrop::renderTarget(reflection::Type type) {
     return result;
 }
 
-void DragDrop::renderGenericSource(io::ISerializable* serializable) {
+void DragDrop::renderGenericSource(io::SerializableObject* serializable) {
     if (serializable == nullptr) {
         return;
     }
 
     if (ImGui::BeginDragDropSource()) {
-        ImGui::SetDragDropPayload("GenericDD", serializable, sizeof(io::ISerializable*));
+        ImGui::SetDragDropPayload("GenericDD", serializable, sizeof(io::SerializableObject*));
         ImGui::EndDragDropSource();
     }
 }
 
-io::ISerializable* DragDrop::renderGenericTarget() {
-    io::ISerializable* result = nullptr;
+io::SerializableObject* DragDrop::renderGenericTarget() {
+    io::SerializableObject* result = nullptr;
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GenericDD")) {
-            result = static_cast<io::ISerializable*>(payload->Data);
+            result = static_cast<io::SerializableObject*>(payload->Data);
         }
 
         ImGui::EndDragDropTarget();
@@ -72,54 +96,38 @@ io::ISerializable* DragDrop::renderGenericTarget() {
     return result;
 }
 
-void DragDrop::renderDirectorySource(vfs::Directory* dir) {
-    if (dir == nullptr) {
-        return;
-    }
-
+void DragDrop::renderFileSource(const std::filesystem::path& file) {
     if (ImGui::BeginDragDropSource()) {
-        ImGui::SetDragDropPayload("DirectoryDD", dir, sizeof(vfs::Directory*));
+        DragDropInfo ddi(file);
+        ImGui::SetDragDropPayload("FileDD", &ddi, sizeof(DragDropInfo));
         ImGui::EndDragDropSource();
     }
 }
 
-vfs::Directory* DragDrop::renderDirectoryTarget() {
-    vfs::Directory* result = nullptr;
-
-    if (ImGui::BeginDragDropTarget()) {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DirectoryDD")) {
-            result = static_cast<vfs::Directory*>(payload->Data);
-        }
-
-        ImGui::EndDragDropTarget();
-    }
-
-    return result;
-}
-
-void DragDrop::renderFileSource(vfs::File* file) {
-    if (file == nullptr) {
-        return;
-    }
-
-    if (ImGui::BeginDragDropSource()) {
-        ImGui::SetDragDropPayload("FileDD", file, sizeof(vfs::File*));
-        ImGui::EndDragDropSource();
-    }
-}
-
-vfs::File* DragDrop::renderFileTarget() {
-    vfs::File* result = nullptr;
+std::filesystem::path DragDrop::renderFileTarget() {
+    std::filesystem::path result;
 
     if (ImGui::BeginDragDropTarget()) {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FileDD")) {
-            result = static_cast<vfs::File*>(payload->Data);
+            result = static_cast<DragDropInfo*>(payload->Data)->File;
+        }
+
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("AssetFileDD")) {
+            result = static_cast<DragDropInfo*>(payload->Data)->File;
         }
 
         ImGui::EndDragDropTarget();
     }
 
     return result;
+}
+
+void DragDrop::renderAssetFileSource(const std::filesystem::path& file, io::SerializableObject* object) {
+    if (ImGui::BeginDragDropSource()) {
+        DragDropInfo ddi(file, object);
+        ImGui::SetDragDropPayload("AssetFileDD", &ddi, sizeof(DragDropInfo));
+        ImGui::EndDragDropSource();
+    }
 }
 
 } // namespace editor

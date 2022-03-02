@@ -1,10 +1,11 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "aderite/audio/Forward.hpp"
-#include "aderite/io/SerializableObject.hpp"
-#include "aderite/physics/Forward.hpp"
+#include "aderite/io/SerializableAsset.hpp"
+#include "aderite/physics/PhysicsScene.hpp"
 #include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/Forward.hpp"
 #include "aderite/scripting/Forward.hpp"
@@ -18,12 +19,10 @@ namespace scene {
  * be it meshes, materials, etc. However these resources are loaded as trunks into the asset manager
  * the actual data is not loaded until needed.
  */
-class Scene final : public io::SerializableObject {
-    static constexpr size_t c_MaxTags = sizeof(size_t) * 8; // Bitflag
-
+class Scene final : public io::SerializableAsset, public physics::PhysicsScene {
 public:
     Scene();
-    ~Scene();
+    virtual ~Scene();
 
     /**
      * @brief Update scene
@@ -32,123 +31,28 @@ public:
     void update(float delta);
 
     /**
-     * @brief Add entity to the scene
-     * @param entity Entity to add
+     * @brief Creates an empty game object
+     * @return New game object instance
      */
-    void addEntity(Entity* entity);
+    GameObject* createGameObject();
 
     /**
-     * @brief Remove entity from the scene
-     * @param entity Entity to remove
-    */
-    void removeEntity(Entity* entity);
+     * @brief Creates a game object from a prefab
+     * @param prefab Prefab to create from
+     * @return New game object instance
+     */
+    GameObject* createGameObject(asset::PrefabAsset* prefab);
 
     /**
-     * @brief Adds a script system to the scene
-     * @param system System to add
+     * @brief Destroy the specified game object
+     * @param object Object to destroy
      */
-    void addScriptSystem(scripting::ScriptSystem* system);
+    void destroyGameObject(GameObject* object);
 
     /**
-     * @brief Adds a entity selector to the scene
-     * @param selector Selector instance
+     * @brief Returns the game objects in this scene
      */
-    void addEntitySelector(EntitySelector* selector);
-
-    /**
-     * @brief Adds a audio listener to the scene
-     * @param listener AudioListener instance
-     */
-    void addAudioListener(audio::AudioListener* listener);
-
-    /**
-     * @brief Adds a audio source to the scene
-     * @param source AudioSource instance
-     */
-    void addAudioSource(audio::AudioSource* source);
-
-    /**
-     * @brief Sets the pipeline of the scene
-     * @param pipeline New pipeline
-     */
-    void setPipeline(rendering::Pipeline* pipeline);
-
-    /**
-     * @brief Add tag to the scene
-     * @param name
-     */
-    void addTag(const std::string& name);
-
-    /**
-     * @brief Removes tag from the scene
-     * @param name
-     */
-    void removeTag(const std::string& name);
-
-    /**
-     * @brief Returns the number of empty tag slots
-     */
-    size_t getFreeTagSlots() const;
-
-    /**
-     * @brief Returns the index of the specified tag
-     * @param name Name of the tag
-     */
-    size_t getTagIndex(const std::string& name) const;
-
-    /**
-     * @brief Returns the pipeline of this scene
-     */
-    rendering::Pipeline* getPipeline() const;
-
-    /**
-     * @brief Returns the physics scene attached to this one
-     */
-    physics::PhysicsScene* getPhysicsScene() const;
-
-    /**
-     * @brief Returns the selector with the specified name
-     * @param name Name of the selector
-     * @return EntitySelector instance or nullptr if not found
-     */
-    EntitySelector* getSelector(const std::string& name) const;
-
-    /**
-     * @brief Returns the audio source with the specified name
-     * @param name Name of the source
-     * @return AudioSource instance or nullptr if not found
-     */
-    audio::AudioSource* getSource(const std::string& name) const;
-
-    /**
-     * @brief Returns audio sources of this scene
-     */
-    const std::vector<audio::AudioSource*>& getAudioSources() const;
-
-    /**
-     * @brief Returns audio listeners of this scene
-     */
-    const std::vector<audio::AudioListener*>& getAudioListeners() const;
-
-    /**
-     * @brief Returns script systems active in this scene
-     */
-    const std::vector<scripting::ScriptSystem*> getScriptSystems() const;
-
-    /**
-     * @brief Returns the entity selectors defined in this scene
-     */
-    const std::vector<EntitySelector*> getEntitySelectors() const;
-
-    /**
-     * @brief Returns the tags of the scene
-     */
-    const std::vector<std::string>& getTags() const;
-
-    /**
-     * @brief Get entities in this scene
-     */
-    const std::vector<Entity*> getEntities() const;
+    const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
 
     // Inherited via SerializableObject
     reflection::Type getType() const override;
@@ -160,15 +64,7 @@ private:
     friend class SceneSerializer;
 
 private:
-    physics::PhysicsScene* m_physics = nullptr;
-    rendering::Pipeline* m_pipeline = nullptr;
-
-    std::vector<audio::AudioSource*> m_audioSources;
-    std::vector<audio::AudioListener*> m_audioListeners;
-    std::vector<Entity*> m_entities;
-    std::vector<scripting::ScriptSystem*> m_systems;
-    std::vector<EntitySelector*> m_entitySelectors;
-    std::vector<std::string> m_tags;
+    std::vector<std::unique_ptr<GameObject>> m_gameObjects;
 };
 
 } // namespace scene

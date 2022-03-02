@@ -6,6 +6,7 @@
 
 #include <fmod_studio.hpp>
 
+#include "aderite/asset/Forward.hpp"
 #include "aderite/audio/Forward.hpp"
 
 namespace aderite {
@@ -60,11 +61,11 @@ public:
     const std::vector<std::string>& getKnownEvents() const;
 
     /**
-     * @brief Creates and returns an audio instance
-     * @param name Name of the audio
-     * @return AudioIntance object
+     * @brief [Internal use] Creates and returns an audio instance
+     * @param audioAsset AudioAsset instance to create FMOD event for
+     * @return FMOD event instance object
      */
-    AudioInstance* createAudioInstance(const std::string name) const;
+    FMOD::Studio::EventInstance* createAudioInstance(const asset::AudioAsset* audioAsset) const;
 
     /**
      * @brief Returns the fmod system instance of aderite

@@ -5,15 +5,13 @@
 #include <pfd/portable-file-dialogs.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/audio/AudioController.hpp"
 #include "aderite/input/InputManager.hpp"
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/io/LoaderPool.hpp"
 #include "aderite/io/Serializer.hpp"
-#include "aderite/rendering/Pipeline.hpp"
 #include "aderite/rendering/Renderer.hpp"
-#include "aderite/rendering/operation/CameraProvideOperation.hpp"
-#include "aderite/rendering/operation/TargetProvideOperation.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
@@ -27,8 +25,6 @@
 #include "aderiteeditor/shared/EditorCamera.hpp"
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
-#include "aderiteeditor/vfs/File.hpp"
-#include "aderiteeditor/vfs/VFS.hpp"
 
 #define EVENT_ROUTE(e, dst) event_router::e = std::bind(&WindowsEditor::dst, this, std::placeholders::_1)
 
@@ -37,8 +33,6 @@ namespace aderite {
 WindowsEditor* WindowsEditor::m_instance = nullptr;
 
 WindowsEditor::WindowsEditor(int argc, char** argv) {
-    editor::State::EditorCamera = new editor::EditorCamera();
-
     // Setup event router
     editor::State::Sink = this;
     editor::State::Project = nullptr;
@@ -53,7 +47,7 @@ void WindowsEditor::onRuntimeInitialized() {
     // Check for pfd
     if (!pfd::settings::available()) {
         LOG_ERROR("[Editor] PFD not available on a WINDOWS editor. Incorrect editor choice? Aborting.");
-        ::aderite::Engine::get()->requestExit();
+        ::aderite::Engine::get()->setState(Engine::CurrentState::AWAITING_SHUTDOWN);
         return;
     }
 
@@ -67,6 +61,8 @@ void WindowsEditor::onRuntimeInitialized() {
 void WindowsEditor::onRendererInitialized() {
     ADERITE_LOG_BLOCK;
 
+    editor::State::getInstance().init();
+
     // Load editor icons
     LOG_TRACE("[Editor] Enqueueing editor icon loading");
     if (!editor::EditorIcons::getInstance().load()) {
@@ -76,7 +72,7 @@ void WindowsEditor::onRendererInitialized() {
     // UI
     if (!m_ui.setup()) {
         // Abort
-        ::aderite::Engine::get()->requestExit();
+        ::aderite::Engine::get()->setState(Engine::CurrentState::AWAITING_SHUTDOWN);
     }
 }
 
@@ -92,7 +88,7 @@ void WindowsEditor::onEndRender() {
     if (::aderite::Engine::get()->getWindowManager()->isClosed()) {
         // TODO: Request save
         m_expected_shutdown = true;
-        ::aderite::Engine::get()->requestExit();
+        ::aderite::Engine::get()->setState(Engine::CurrentState::AWAITING_SHUTDOWN);
     }
 }
 
@@ -103,8 +99,13 @@ void WindowsEditor::onRuntimeShutdown() {
         // onSaveProject();
     }
 
+    // Icons
+    editor::EditorIcons::getInstance().unload();
+
     // UI
     m_ui.shutdown();
+
+    editor::State::getInstance().shutdown();
 
     delete editor::State::Project;
     editor::State::Project = nullptr;
@@ -132,6 +133,9 @@ void WindowsEditor::onNewProject(const std::string& dir, const std::string& name
     // Create new scene
     onNewScene("Untitled scene");
 
+    // Registry
+    ::aderite::Engine::getAssetManager()->saveRegistry();
+
     // Save
     editor::State::Project->save();
 }
@@ -143,7 +147,8 @@ void WindowsEditor::onSaveProject() {
     }
 
     // Save all assets
-    ::aderite::Engine::getSerializer()->saveAll();
+    ::aderite::Engine::getAssetManager()->saveAllTrackedObjects();
+    ::aderite::Engine::getAssetManager()->saveRegistry();
     editor::State::Project->save();
 }
 
@@ -169,19 +174,17 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 
     // Setup asset manager
     ::aderite::Engine::getFileHandler()->setRoot(editor::State::Project->getRootDir());
+    ::aderite::Engine::getAssetManager()->loadRegistry();
 
     // Setup audio controller
     ::aderite::Engine::getAudioController()->loadMasterBank();
 
     // Load assemblies
-    compiler::ScriptCompiler sc;
-    sc.compile();
     ::aderite::Engine::getScriptManager()->loadAssemblies();
 
     if (editor::State::Project->getActiveScene() != c_InvalidHandle) {
         // Read scene
-        scene::Scene* s =
-            static_cast<scene::Scene*>(::aderite::Engine::getSerializer()->getOrRead(editor::State::Project->getActiveScene()));
+        scene::Scene* s = static_cast<scene::Scene*>(::aderite::Engine::getAssetManager()->get(editor::State::Project->getActiveScene()));
         ::aderite::Engine::getSceneManager()->setActive(s);
     }
 }
@@ -189,45 +192,40 @@ void WindowsEditor::onLoadProject(const std::string& path) {
 void WindowsEditor::onSceneChanged(scene::Scene* scene) {}
 
 void WindowsEditor::onSystemUpdate(float delta) {
-    editor::State::EditorCamera->update(delta);
+    editor::State::getInstance().getEditorCamera()->update(delta);
 }
-
-void WindowsEditor::onPipelineChanged(rendering::Pipeline* pipeline) {}
 
 void WindowsEditor::onNewScene(const std::string& name) {
     LOG_TRACE("New scene with name: {0}", name);
 
     // TODO: Error screen or special naming
     scene::Scene* s = new scene::Scene();
-    ::aderite::Engine::getSerializer()->add(s);
-    ::aderite::Engine::getSerializer()->save(s);
-    vfs::File* file = new vfs::File(name, s->getHandle(), editor::State::Project->getVfs()->getRoot());
+    /*::aderite::Engine::getAssetManager()->track(s);
+    ::aderite::Engine::getAssetManager()->save(s);*/
+    // vfs::File* file = new vfs::File(name, s->getHandle(), editor::State::Project->getVfs()->getRoot());
 
     ::aderite::Engine::getSceneManager()->setActive(s);
 }
 
 void WindowsEditor::onStopGame() {
-    Engine::get()->stopPhysicsUpdates();
-    Engine::get()->stopScriptUpdates();
-    Engine::get()->stopSceneUpdates();
+    ::aderite::Engine::get()->setState(Engine::CurrentState::SYSTEM_UPDATE);
     Engine::getAudioController()->disable(true);
     editor::State::IsGameMode = false;
-
-    // TODO: Disable all cameras in scene
+    this->onResetGameState();
 }
 
 void WindowsEditor::onStartGame() {
-    Engine::get()->startPhysicsUpdates();
-    Engine::get()->startScriptUpdates();
-    Engine::get()->startSceneUpdates();
+    ::aderite::Engine::get()->setState(Engine::CurrentState::FULL);
     Engine::getAudioController()->disable(false);
     editor::State::IsGameMode = true;
-
-    // TODO: Enable all cameras in scene
 }
 
 void WindowsEditor::onResetGameState() {
     // TODO: Reset game state, by reloading all scripts or resetting their default parameters
+}
+
+editor::EditorUI& WindowsEditor::getUI() {
+    return m_ui;
 }
 
 WindowsEditor* WindowsEditor::getInstance() {
@@ -259,6 +257,11 @@ void WindowsEditor::createDirectories() {
 
     if (!std::filesystem::exists(editor::State::Project->getRootDir() / "Scripts/")) {
         std::filesystem::create_directory(editor::State::Project->getRootDir() / "Scripts/");
+    }
+
+    // Virtual file system
+    if (!std::filesystem::exists(editor::State::Project->getRootDir() / "VFS/")) {
+        std::filesystem::create_directory(editor::State::Project->getRootDir() / "VFS/");
     }
 }
 

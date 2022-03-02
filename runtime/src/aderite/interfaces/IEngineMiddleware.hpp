@@ -77,12 +77,6 @@ public:
      * multiple outputs should be combined
      */
     virtual void onPreRenderCommit() {};
-
-    /**
-     * @brief Function invoked when the current rendering pipeline has been changed
-     * @param pipeline New pipeline
-     */
-    virtual void onPipelineChanged(rendering::Pipeline* pipeline) {};
 };
 
 /**

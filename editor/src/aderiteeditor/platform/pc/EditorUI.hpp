@@ -1,8 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <stack>
 
 #include "aderiteeditor/platform/pc/UIComponent.hpp"
+#include "aderiteeditor/platform/pc/modals/IModal.hpp"
 
 namespace aderite {
 namespace editor {
@@ -27,6 +29,12 @@ public:
      */
     void shutdown();
 
+    /**
+     * @brief Push modal to the UI
+     * @param modal Modal to push
+     */
+    void pushModal(IModal* modal);
+
 private:
     /**
      * @brief Initializes ImGui and return true if initialized, false otherwise
@@ -40,7 +48,7 @@ private:
 
     /**
      * @brief Configures dockspace
-    */
+     */
     void configureDockspace();
 
     /**
@@ -56,6 +64,9 @@ private:
 private:
     // Components of the editor
     std::vector<UIComponent*> m_components;
+
+    // No modal by default
+    std::stack<IModal*> m_modalStack;
 };
 
 } // namespace editor

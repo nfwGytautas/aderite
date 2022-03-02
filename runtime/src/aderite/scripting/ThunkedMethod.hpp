@@ -2,6 +2,10 @@
 
 #include <mono/jit/jit.h>
 
+#include "aderite/Aderite.hpp"
+#include "aderite/scripting/ScriptManager.hpp"
+#include "aderite/utility/Macros.hpp"
+
 namespace aderite {
 namespace scripting {
 
@@ -18,28 +22,21 @@ public:
 
     ThunkedMethod() {}
 
-    ThunkedMethod(MonoMethod* method, MonoObject* instance) : m_method(method), m_instance(instance) {
+    ThunkedMethod(MonoMethod* method) : m_method(method) {
         if (m_method != nullptr) {
             m_thunk = reinterpret_cast<ThunkFn>(mono_method_get_unmanaged_thunk(m_method));
         }
     }
 
     /**
-     * @brief Set the exception handle of the thunked method
-     */
-    void setExceptionHandler(ExceptionHandler* handler) {
-        m_handler = handler;
-    }
-
-    /**
      * @brief Invoke the thunked method with the given parameters
      */
-    Ret invoke(Args... args) const {
+    Ret invoke(MonoObject* instance, Args... args) const {
         ADERITE_DYNAMIC_ASSERT(this->valid(), "Invalid thunked method invoked");
         MonoException* exception = nullptr;
-        Ret result = m_thunk(m_instance, args..., &exception);
-        if (exception != nullptr && m_handler != nullptr) {
-            this->m_handler(exception);
+        Ret result = m_thunk(instance, args..., &exception);
+        if (exception != nullptr) {
+            ::aderite::Engine::getScriptManager()->onScriptException(exception);
         }
         return result;
     }
@@ -55,15 +52,13 @@ public:
         return this->valid();
     }
 
-    Ret operator()(Args... args) const {
-        return this->invoke(args...);
+    Ret operator()(MonoObject* instance, Args... args) const {
+        return this->invoke(instance, args...);
     }
 
 private:
     MonoMethod* m_method = nullptr;
-    MonoObject* m_instance = nullptr;
     ThunkFn m_thunk = nullptr;
-    ExceptionHandler* m_handler = nullptr;
 };
 
 /**
@@ -73,33 +68,25 @@ private:
 template<typename... Args>
 class ThunkedMethod<void, Args...> {
 public:
-    typedef void (*ThunkFn)(MonoObject*,Args...,MonoException**);
-    using ExceptionHandler = void(MonoException* exception);
+    typedef void (*ThunkFn)(MonoObject*, Args..., MonoException**);
 
     ThunkedMethod() {}
 
-    ThunkedMethod(MonoMethod* method, MonoObject* instance) : m_method(method), m_instance(instance) {
+    ThunkedMethod(MonoMethod* method) : m_method(method) {
         if (m_method != nullptr) {
             m_thunk = reinterpret_cast<ThunkFn>(mono_method_get_unmanaged_thunk(m_method));
         }
     }
 
     /**
-     * @brief Set the exception handle of the thunked method
-     */
-    void setExceptionHandler(ExceptionHandler* handler) {
-        m_handler = handler;
-    }
-
-    /**
      * @brief Invoke the thunked method with the given parameters
      */
-    void invoke(Args... args) const {
+    void invoke(MonoObject* instance, Args... args) const {
         ADERITE_DYNAMIC_ASSERT(this->valid(), "Invalid thunked method invoked");
         MonoException* exception = nullptr;
-        m_thunk(m_instance, args..., &exception);
-        if (exception != nullptr && m_handler != nullptr) {
-            this->m_handler(exception);
+        m_thunk(instance, args..., &exception);
+        if (exception != nullptr) {
+            ::aderite::Engine::getScriptManager()->onScriptException(exception);
         }
     }
 
@@ -114,15 +101,13 @@ public:
         return this->valid();
     }
 
-    void operator()(Args... args) const {
-        this->invoke(args...);
+    void operator()(MonoObject* instance, Args... args) const {
+        this->invoke(instance, args...);
     }
 
 private:
     MonoMethod* m_method = nullptr;
-    MonoObject* m_instance = nullptr;
     ThunkFn m_thunk = nullptr;
-    ExceptionHandler* m_handler = nullptr;
 };
 
 } // namespace scripting

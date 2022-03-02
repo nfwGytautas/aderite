@@ -131,7 +131,7 @@ void InputManager::onMouseScrolled(double yOffset) {
 }
 
 void InputManager::onWindowClosed() {
-    ::aderite::Engine::get()->requestExit();
+    ::aderite::Engine::get()->setState(Engine::CurrentState::AWAITING_SHUTDOWN);
 }
 
 bool InputManager::isKeyPressed(Key key) const {

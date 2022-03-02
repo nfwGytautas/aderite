@@ -1,6 +1,6 @@
 #pragma once
 
-#include "aderite/scene/Entity.hpp"
+#include <vector>
 
 #include "aderiteeditor/platform/pc/UIComponent.hpp"
 
@@ -21,30 +21,7 @@ public:
     void render() override;
 
 private:
-    /**
-     * @brief Render context menu
-     */
-    void renderContextMenu();
-
-    /**
-     * @brief Renders entity tree node of the scene
-     */
-    void renderEntities();
-
-    /**
-     * @brief Renders audio tree node of the scene
-     */
-    void renderAudio();
-
-    /**
-     * @brief Renders scripts tree node of the scene
-     */
-    void renderScripts();
-
-    /**
-     * @brief Renders settings nodes of the scene
-     */
-    void renderSettings();
+    void contextMenu();
 };
 
 } // namespace editor

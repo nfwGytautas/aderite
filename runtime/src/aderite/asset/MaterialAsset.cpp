@@ -3,6 +3,7 @@
 #include <bgfx/bgfx.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/MaterialTypeAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
 #include "aderite/io/LoaderPool.hpp"
@@ -13,16 +14,65 @@ namespace aderite {
 namespace asset {
 
 MaterialAsset::~MaterialAsset() {
-    LOG_TRACE("[Asset] Destroying {0}", this->getHandle());
+    LOG_TRACE("[Asset] Destroying {0}", this->getName());
     std::free(m_udata);
+
+    if (m_type != nullptr) {
+        m_type->release();
+    }
+
+    for (TextureAsset* ta : m_samplers) {
+        if (ta != nullptr) {
+            ta->release();
+        }
+    }
+}
+
+MaterialTypeAsset* MaterialAsset::getMaterialType() const {
+    return m_type;
+}
+
+void MaterialAsset::setMaterialType(MaterialTypeAsset* type) {
+    if (m_type != nullptr) {
+        m_type->release();
+    }
+
+    m_type = type;
+    m_type->acquire();
+
+    // Samplers
+    const size_t dataSize = m_type->getFields().Size * 4 * sizeof(float);
+
+    // Release previous references
+    for (TextureAsset* ta : m_samplers) {
+        if (ta != nullptr) {
+            ta->release();
+        }
+    }
+
+    m_samplers.clear();
+
+    float* realloced = static_cast<float*>(std::realloc(m_udata, dataSize));
+    if (realloced != nullptr) {
+        m_udata = realloced;
+    } else {
+        LOG_ERROR("[Asset] Failed to realloc material {0} data array", this->getName());
+        return;
+    }
+
+    std::memset(m_udata, 0, dataSize);
+
+    for (size_t i = 0; i < m_type->getFields().NumSamplers; i++) {
+        m_samplers.push_back(nullptr);
+    }
 }
 
 bool MaterialAsset::isValid() const {
-    if (m_info.Type == nullptr || !m_info.Type->isValid()) {
+    if (m_type == nullptr || !m_type->isValid()) {
         return false;
     }
 
-    for (asset::TextureAsset* ta : m_info.Samplers) {
+    for (asset::TextureAsset* ta : m_samplers) {
         if (ta == nullptr || !ta->isValid()) {
             return false;
         }
@@ -32,30 +82,40 @@ bool MaterialAsset::isValid() const {
 }
 
 void MaterialAsset::load(const io::Loader* loader) {
-    LOG_TRACE("[Asset] Loading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Loading {0}", this->getName());
 
-    // TODO: Reference
+    ::aderite::Engine::getLoaderPool()->enqueue(m_type, io::LoaderPool::Priority::HIGH);
 
-    ::aderite::Engine::getLoaderPool()->enqueue(m_info.Type, io::LoaderPool::Priority::HIGH);
-
-    for (asset::TextureAsset* ta : m_info.Samplers) {
+    for (asset::TextureAsset* ta : m_samplers) {
         if (ta != nullptr && !ta->isValid()) {
             ::aderite::Engine::getLoaderPool()->enqueue(ta, io::LoaderPool::Priority::HIGH);
         }
     }
 
-    LOG_INFO("[Asset] Loaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Loaded {0}", this->getName());
 }
 
 void MaterialAsset::unload() {
-    LOG_TRACE("[Asset] Unloading {0}", this->getHandle());
+    LOG_TRACE("[Asset] Unloading {0}", this->getName());
 
     // TODO: Rework cause this should be reference counted
 
-    LOG_INFO("[Asset] Unloaded {0}", this->getHandle());
+    LOG_INFO("[Asset] Unloaded {0}", this->getName());
 }
 
 bool MaterialAsset::needsLoading() const {
+    if (m_type == nullptr || !m_type->isValid()) {
+        // No type so no loading
+        return false;
+    }
+
+    // Check if all samplers assigned
+    for (asset::TextureAsset* ta : m_samplers) {
+        if (ta == nullptr || !ta->isValid()) {
+            return false;
+        }
+    }
+
     return !this->isValid();
 }
 
@@ -65,15 +125,15 @@ reflection::Type MaterialAsset::getType() const {
 
 bool MaterialAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
     // Material
-    if (m_info.Type == nullptr) {
+    if (m_type == nullptr) {
         // Can't serialize anything
         return true;
     }
 
-    emitter << YAML::Key << "MaterialType" << YAML::Value << m_info.Type->getHandle();
+    emitter << YAML::Key << "MaterialType" << YAML::Value << m_type->getHandle();
     emitter << YAML::Key << "Properties" << YAML::BeginMap;
     emitter << YAML::Key << "Data" << YAML::Flow << YAML::BeginSeq;
-    for (size_t i = 0; i < m_info.Type->getFields().Size * 4; i++) {
+    for (size_t i = 0; i < m_type->getFields().Size * 4; i++) {
         float val = m_udata[i];
         emitter << m_udata[i];
     }
@@ -81,7 +141,7 @@ bool MaterialAsset::serialize(const io::Serializer* serializer, YAML::Emitter& e
     emitter << YAML::EndMap;
 
     emitter << YAML::Key << "Samplers" << YAML::Flow << YAML::BeginSeq;
-    for (auto sampler : m_info.Samplers) {
+    for (auto sampler : m_samplers) {
         if (sampler != nullptr) {
             emitter << sampler->getHandle();
         } else {
@@ -97,23 +157,13 @@ bool MaterialAsset::deserialize(io::Serializer* serializer, const YAML::Node& da
     if (!data["MaterialType"]) {
         return true;
     }
-    // TODO: Error check
+
     io::SerializableHandle typeName = data["MaterialType"].as<io::SerializableHandle>();
-    m_info.Type = static_cast<MaterialTypeAsset*>(serializer->getOrRead(typeName));
-    const size_t dataSize = m_info.Type->getFields().Size * 4 * sizeof(float);
-    m_udata = static_cast<float*>(std::malloc(dataSize));
-
-    if (m_udata == nullptr) {
-        LOG_ERROR("[Asset] Failed to allocate space for material property data {0}", getHandle());
-        return false;
-    }
-
-    std::memset(m_udata, 0, dataSize);
+    this->setMaterialType(static_cast<MaterialTypeAsset*>(::aderite::Engine::getAssetManager()->get(typeName)));
 
     const YAML::Node& d = data["Properties"]["Data"];
-
-    if (d.size() != (m_info.Type->getFields().Size * 4)) {
-        LOG_ERROR("[Asset] Incorrect size for stored material data and type {0}", getHandle());
+    if (d.size() != (m_type->getFields().Size * 4)) {
+        LOG_ERROR("[Asset] Incorrect size for stored material data and type {0}", this->getName());
         return false;
     }
 
@@ -121,49 +171,41 @@ bool MaterialAsset::deserialize(io::Serializer* serializer, const YAML::Node& da
         m_udata[i] = d[i].as<float>();
     }
 
+    m_samplers.resize(data["Samplers"].size());
+
+    size_t idx = 0;
     for (const YAML::Node& sampler : data["Samplers"]) {
         TextureAsset* texture = nullptr;
 
         if (!sampler.IsNull()) {
-            m_info.Samplers.push_back(static_cast<TextureAsset*>(serializer->getOrRead(sampler.as<io::SerializableHandle>())));
-        } else {
-            m_info.Samplers.push_back(nullptr);
+            this->setSampler(idx,
+                             static_cast<TextureAsset*>(::aderite::Engine::getAssetManager()->get(sampler.as<io::SerializableHandle>())));
         }
+
+        idx++;
     }
 
     return true;
 }
 
-void MaterialAsset::setType(MaterialTypeAsset* type) {
-    // TODO: Move to editor
-    m_info.Type = type;
-    const size_t dataSize = m_info.Type->getFields().Size * 4 * sizeof(float);
+void MaterialAsset::setSampler(size_t index, TextureAsset* ta) {
+    ADERITE_DYNAMIC_ASSERT(this->getSamplerCount() > index, "Invalid sampler index");
 
-    // Samplers
-    m_info.Samplers.clear();
-
-    float* realloced = static_cast<float*>(std::realloc(m_udata, dataSize));
-    if (realloced != nullptr) {
-        m_udata = realloced;
-    } else {
-        LOG_ERROR("[Asset] Failed to realloc material {0} data array", this->getHandle());
-        return;
+    if (m_samplers[index] != nullptr) {
+        m_samplers[index]->release();
     }
 
-    std::memset(m_udata, 0, dataSize);
-
-    // TODO: Dereference textures
-    for (size_t i = 0; i < m_info.Type->getFields().NumSamplers; i++) {
-        m_info.Samplers.push_back(nullptr);
-    }
+    m_samplers[index] = ta;
+    m_samplers[index]->acquire();
 }
 
-MaterialAsset::fields MaterialAsset::getFields() const {
-    return m_info;
+size_t MaterialAsset::getSamplerCount() const {
+    return m_samplers.size();
 }
 
-MaterialAsset::fields& MaterialAsset::getFieldsMutable() {
-    return m_info;
+TextureAsset* MaterialAsset::getSampler(size_t index) const {
+    ADERITE_DYNAMIC_ASSERT(this->getSamplerCount() > index, "Invalid sampler index");
+    return m_samplers[index];
 }
 
 float* MaterialAsset::getPropertyData() const {
@@ -173,11 +215,11 @@ float* MaterialAsset::getPropertyData() const {
 std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> MaterialAsset::getSamplerData() const {
     std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> result;
 
-    for (size_t i = 0; i < m_info.Type->getFields().NumSamplers; i++) {
-        if (m_info.Samplers[i] == nullptr) {
-            result.push_back(std::make_pair(m_info.Type->getSampler(i), bgfx::TextureHandle {bgfx::kInvalidHandle}));
+    for (size_t i = 0; i < m_type->getFields().NumSamplers; i++) {
+        if (m_samplers[i] == nullptr) {
+            result.push_back(std::make_pair(m_type->getSampler(i), bgfx::TextureHandle {bgfx::kInvalidHandle}));
         } else {
-            result.push_back(std::make_pair(m_info.Type->getSampler(i), m_info.Samplers[i]->getTextureHandle()));
+            result.push_back(std::make_pair(m_type->getSampler(i), m_samplers[i]->getTextureHandle()));
         }
     }
 

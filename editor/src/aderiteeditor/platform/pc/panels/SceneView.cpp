@@ -4,11 +4,17 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
-#include "aderite/rendering/Renderer.hpp"
+#include "aderite/asset/PrefabAsset.hpp"
+#include "aderite/scene/Camera.hpp"
+#include "aderite/scene/GameObject.hpp"
+#include "aderite/scene/Scene.hpp"
+#include "aderite/scene/SceneManager.hpp"
 #include "aderite/utility/Log.hpp"
 
+#include "aderiteeditor/shared/DragDrop.hpp"
 #include "aderiteeditor/shared/EditorCamera.hpp"
 #include "aderiteeditor/shared/State.hpp"
+#include "aderiteeditor/utility/ImGui.hpp"
 
 namespace aderite {
 namespace editor {
@@ -33,14 +39,38 @@ void SceneView::render() {
         return;
     }
 
-    if (!bgfx::isValid(editor::State::DebugRenderHandle)) {
-        ImGui::End();
-        ImGui::PopStyleVar();
+    // Get current scene
+    scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
+
+    if (currentScene == nullptr) {
         return;
     }
 
-    m_fbth = bgfx::getTexture(editor::State::DebugRenderHandle, 0);
-    if (!bgfx::isValid(m_fbth)) {
+    // Prefab drag and drop
+    utility::WindowSizeDragDrop([&]() {
+        asset::PrefabAsset* prefabDrop = DragDrop::renderTarget<asset::PrefabAsset>(aderite::reflection::RuntimeTypes::PREFAB);
+        if (prefabDrop != nullptr) {
+            currentScene->createGameObject(prefabDrop);
+        }
+    });
+
+    bgfx::TextureHandle outHandle = BGFX_INVALID_HANDLE;
+
+    if (State::getInstance().IsGameMode) {
+        // Show active camera output
+        for (auto& gObject : currentScene->getGameObjects()) {
+            scene::Camera* camera = gObject->getCamera();
+
+            if (camera != nullptr) {
+                outHandle = camera->getOutputHandle();
+            }
+        }
+    } else {
+        // Editor camera
+        outHandle = editor::State::getInstance().getEditorCamera()->getOutputHandle();
+    }
+
+    if (!bgfx::isValid(outHandle)) {
         ImGui::End();
         ImGui::PopStyleVar();
         return;
@@ -50,19 +80,13 @@ void SceneView::render() {
     ImVec2 viewportSize = {viewportPanelSize.x, viewportPanelSize.y};
     m_size.x = viewportPanelSize.x;
     m_size.y = viewportPanelSize.y;
-    editor::State::EditorCamera->onViewportResize(m_size);
+    editor::State::getInstance().getEditorCamera()->onViewportResize(m_size);
 
-    ImGui::Image((void*)(intptr_t)m_fbth.idx, viewportSize, ImVec2(0, 0), ImVec2(1, 1));
+    ImGui::Image((void*)(intptr_t)outHandle.idx, viewportSize, ImVec2(0, 0), ImVec2(1, 1));
 
     ImGui::End();
     ImGui::PopStyleVar();
 }
 
-void SceneView::onSceneChanged(scene::Scene* scene) {
-    // TODO: Error check
-    m_fbth = bgfx::getTexture(editor::State::DebugRenderHandle, 0);
-    editor::State::EditorCamera->onViewportResize(m_size);
-}
-
-} // namespace editor_ui
+} // namespace editor
 } // namespace aderite

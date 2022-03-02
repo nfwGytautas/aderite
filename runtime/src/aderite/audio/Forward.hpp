@@ -7,9 +7,10 @@ namespace aderite {
 namespace audio {
 
 class AudioController;
-class AudioInstance;
 class AudioSource;
+class AudioSourceData;
 class AudioListener;
+class AudioListenerData;
 
 } // namespace audio
 } // namespace aderite

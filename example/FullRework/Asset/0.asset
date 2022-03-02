@@ -1,0 +1,56 @@
+Type: 3
+Name: FullRework
+Data:
+  PhysicsScene:
+    {}
+  GameObjects:
+    - GameObject:
+        Name: Ground
+        Transform:
+          Position: [0, -5, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [10, 0.5, 10]
+        Renderable:
+          Mesh: 1
+          Material: 4
+        PhysicsActor:
+          Dynamic: false
+          Mass: 1
+          HasGravity: false
+          Geometry:
+            - Type: 75
+              Name: idrgZ3MpIFwA
+              Data:
+                Size: [1, 1, 1]
+                IsTrigger: false
+        Behaviors:
+          - Script: Scripts.Ground
+            Fields:
+              Lives: 3
+    - GameObject:
+        Name: Spawner
+        Transform:
+          Position: [0, 20, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [1, 1, 1]
+        Behaviors:
+          - Script: Scripts.BoxSpawner
+            Fields:
+              SpawnInterval: 1
+              Prefab: 25
+    - GameObject:
+        Name: Player
+        Transform:
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [1, 1, 1]
+        Camera:
+          FoV: 90
+        Behaviors:
+          - Script: Scripts.CameraLook
+            Fields:
+              Sensitivity: 2
+          - Script: Scripts.Shoot
+            Fields:
+              ShootingSpeed: 2
+              MaxRange: 20

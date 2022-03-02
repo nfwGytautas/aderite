@@ -219,7 +219,7 @@ Loader::TextureLoadResult<unsigned char> Loader::loadTexture(LoadableHandle hand
 
     result.Data = std::unique_ptr<unsigned char>(data);
 
-    LOG_INFO("[Asset] {0} loaded ({1} width, {2} height, {3} format, {4} bits per pixel)", result.Width, result.Height, result.Format,
+    LOG_INFO("[Asset] {0} loaded ({1} width, {2} height, {3} format, {4} bits per pixel)", handle, result.Width, result.Height, result.Format,
              result.BPP);
     return result;
 }

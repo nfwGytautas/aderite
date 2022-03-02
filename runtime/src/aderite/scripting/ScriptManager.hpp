@@ -31,12 +31,6 @@ public:
     void shutdown();
 
     /**
-     * @brief Updates all scripts
-     * @param delta Delta of the frame
-     */
-    void update(float delta);
-
-    /**
      * @brief Loads the game code assembly
      */
     void loadAssemblies();
@@ -57,14 +51,7 @@ public:
      * @param serializable Serializable to create for
      * @return MonoObject instance
      */
-    MonoObject* createInstance(io::ISerializable* serializable);
-
-    /**
-     * @brief Returns a system MonoClass instance
-     * @param name Name of the system
-     * @return System MonoClass instance or nullptr if a system with the specified name doesn't exist
-     */
-    MonoClass* getSystemClass(const std::string& name) const;
+    MonoObject* createInstance(io::SerializableObject* serializable);
 
     /**
      * @brief Tries to resolve a class with the specified name
@@ -80,13 +67,6 @@ public:
      * @return MonoObject instance
      */
     MonoObject* instantiate(MonoClass* klass) const;
-
-    /**
-     * @brief Returns public fields of the specified object
-     * @param object Object instance
-     * @return Vector of FieldWrapper objects
-     */
-    std::vector<FieldWrapper> getPublicFields(MonoObject* object) const;
 
     /**
      * @brief Tries to locate a method in the code assembly and returns it
@@ -105,11 +85,6 @@ public:
     MonoMethod* getMethod(const std::string& signature) const;
 
     /**
-     * @brief Returns a list of known systems and their names
-     */
-    std::unordered_map<std::string, MonoClass*> getKnownSystems() const;
-
-    /**
      * @brief Returns FieldType from the MonoType
      * @param type MonoType instance
      * @return Corresponding FieldType enum value
@@ -125,15 +100,28 @@ public:
     /**
      * @brief Creates a MonoString from the specified value
      * @return MonoString object
-    */
+     */
     MonoString* string(const char* value) const;
 
-private:
     /**
-     * @brief Resolves all system classes in the loaded assembly
+     * @brief Function invoked when an exception happens in scripted behaviors
+     * @param exception Exception instance
      */
-    void resolveSystemNames();
+    void onScriptException(MonoException* exception);
 
+    /**
+     * @brief Returns the list of discovered behaviors
+     */
+    std::vector<BehaviorBase*> getBehaviors() const;
+
+    /**
+     * @brief Returns a behavior with the specified name
+     * @param name Name of the behavior
+     * @return BehaviorBase instance or nullptr
+    */
+    BehaviorBase* getBehavior(const std::string& name) const;
+
+private:
     /**
      * @brief Sets up all engine runtime related assemblies and information
      */
@@ -155,6 +143,7 @@ private:
 
 private:
     LibClassLocator m_locator;
+    bool m_assembliesValid = false;
 
     MonoDomain* m_jitDomain = nullptr;
 
@@ -168,9 +157,12 @@ private:
     MonoAssembly* m_codeAssembly = nullptr;
     MonoImage* m_codeImage = nullptr;
 
-    // Vector containing the names of systems that exist in the image
-    std::unordered_map<std::string, MonoClass*> m_knownSystems;
-    std::unordered_map<io::ISerializable*, MonoObject*> m_objectCache;
+    // Behaviors that have been loaded
+    std::vector<BehaviorBase*> m_behaviors;
+
+    // Instance cache
+    // TODO: Rethink
+    std::unordered_map<io::SerializableObject*, MonoObject*> m_objectCache;
 };
 
 } // namespace scripting

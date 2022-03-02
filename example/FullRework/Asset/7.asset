@@ -1,0 +1,100 @@
+Type: 4
+Name: ColorShift
+Data:
+  DataSize: 1
+  SamplerCount: 1
+  SamplerNames: [s_Texture]
+  Properties:
+    - Name: p_Color
+      Type: 3
+      Offset: 0
+  Samplers:
+    - Name: s_Texture
+      Type: 5
+  Graph:
+    Nodes:
+      - Type: Material
+        Name: ColorShift
+        Position: [-26, 93]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 3
+              Name: p_Color
+            - Type: 5
+              Name: s_Texture
+      - Type: Output
+        Name: XBUjmkgKeuT3
+        Position: [655, 140]
+        Pins:
+          In:
+            - Type: 4
+              Name: Output
+              Connected: p7kxbwIWcjvC_Sum
+          Out:
+            []
+      - Type: Sample 2D
+        Name: j9ZlDxNqyC70
+        Position: [221, 192]
+        Pins:
+          In:
+            - Type: 5
+              Name: Texture
+              Connected: ColorShift_s_Texture
+            - Type: 2
+              Name: UV
+              Connected: qB6MH0C7wDOb_v_texcoord
+          Out:
+            - Type: 4
+              Name: Color
+      - Type: Vertex UV
+        Name: qB6MH0C7wDOb
+        Position: [16, 256]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 2
+              Name: v_texcoord
+      - Type: Add
+        Name: p7kxbwIWcjvC
+        Position: [471, 90]
+        Pins:
+          In:
+            - Type: 4
+              Name: Lhs
+              Connected: uKfhWDBUUy1z_Out
+            - Type: 4
+              Name: Rhs
+              Connected: j9ZlDxNqyC70_Color
+          Out:
+            - Type: 4
+              Name: Sum
+        OpType: 4
+      - Type: Value
+        Name: mQyi5vJ3zpi6
+        Position: [-90, -87]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 1
+              Name: Value
+        ValueType: 1
+        Value: 0
+      - Type: Vec4
+        Name: uKfhWDBUUy1z
+        Position: [280, -8]
+        Pins:
+          In:
+            - Type: 3
+              Name: xyz
+              Connected: ColorShift_p_Color
+            - Type: 1
+              Name: w
+              Connected: mQyi5vJ3zpi6_Value
+          Out:
+            - Type: 4
+              Name: Out
+        CtorType: 2

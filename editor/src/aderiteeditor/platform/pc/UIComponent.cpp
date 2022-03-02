@@ -24,7 +24,7 @@ void UIComponent::renderIcon(const std::string& name, size_t width, size_t heigh
 
 bool UIComponent::renderIconButton(const std::string& name, size_t width, size_t height) {
     bgfx::TextureHandle icon = EditorIcons::getInstance().getIcon(name);
-    return ImGui::ImageButton((void*)(intptr_t)icon.idx, ImVec2(width, height), ImVec2(0, 1), ImVec2(1, 0), 0);
+    return ImGui::ImageButton((void*)(intptr_t)icon.idx, ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), 0);
 }
 
 bool UIComponent::renderImageButton(bgfx::TextureHandle texture, size_t width, size_t height, const glm::vec2& uv0, const glm::vec2& uv1) {

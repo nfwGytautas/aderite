@@ -1,22 +1,33 @@
 #include "AssetBrowser.hpp"
+#include <fstream>
 #include <functional>
+#include <map>
 
+#include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/asset/AudioAsset.hpp"
 #include "aderite/asset/MaterialAsset.hpp"
 #include "aderite/asset/MeshAsset.hpp"
 #include "aderite/asset/PrefabAsset.hpp"
 #include "aderite/asset/TextureAsset.hpp"
+#include "aderite/io/FileHandler.hpp"
 #include "aderite/io/SerializableObject.hpp"
 #include "aderite/io/Serializer.hpp"
+#include "aderite/scene/GameObject.hpp"
 #include "aderite/scene/Scene.hpp"
 #include "aderite/scene/SceneManager.hpp"
 #include "aderite/utility/Log.hpp"
+#include "aderite/window/WindowManager.hpp"
 
 #include "aderiteeditor/asset/EditorMaterialType.hpp"
-#include "aderiteeditor/asset/RenderingPipeline.hpp"
+#include "aderiteeditor/platform/pc/EditorUI.hpp"
+#include "aderiteeditor/platform/pc/WindowsEditor.hpp"
+#include "aderiteeditor/platform/pc/modals/DragDropImportModal.hpp"
+#include "aderiteeditor/platform/pc/modals/NotificationModal.hpp"
+#include "aderiteeditor/platform/pc/modals/PromptModal.hpp"
 #include "aderiteeditor/resources/EditorIcons.hpp"
 #include "aderiteeditor/runtime/EditorTypes.hpp"
 #include "aderiteeditor/shared/DragDrop.hpp"
@@ -24,25 +35,41 @@
 #include "aderiteeditor/shared/Project.hpp"
 #include "aderiteeditor/shared/State.hpp"
 #include "aderiteeditor/utility/ImGui.hpp"
-#include "aderiteeditor/vfs/Directory.hpp"
-#include "aderiteeditor/vfs/File.hpp"
-#include "aderiteeditor/vfs/VFS.hpp"
 
 namespace aderite {
 namespace editor {
+
+static AssetBrowser* g_instance = nullptr;
+
+size_t getSubDirectoryCount(const std::filesystem::path& directory) {
+    return static_cast<size_t>(std::distance(std::filesystem::directory_iterator {directory}, std::filesystem::directory_iterator {}));
+}
 
 AssetBrowser::AssetBrowser() {}
 
 AssetBrowser::~AssetBrowser() {}
 
-void AssetBrowser::renderNavigator() {
-    ImGui::Text("Navigator");
+void AssetBrowser::onFilesDropped(int count, const char** paths) {
+    LOG_TRACE("[Editor] {0} files are being imported from drag drop", count);
 
-    vfs::Directory* root = editor::State::Project->getVfs()->getRoot();
+    // Iterate over the paths
+    for (int i = 0; i < count; i++) {
+        // Handle
+        const char* path = paths[i];
+
+        // Push import modals
+        WindowsEditor::getInstance()->getUI().pushModal(
+            new DragDropImportModal(path, std::bind(&AssetBrowser::importAsset, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+}
+
+void AssetBrowser::renderNavigator() {
+    // Header
+    ImGui::Text("Navigator");
 
     // Root is always open
     ImGui::SetNextItemOpen(true);
-    this->renderDirectoryNode(root);
+    this->renderNavigatorDirectory(this->getVFSRootAbsolute());
 }
 
 void AssetBrowser::renderItems() {
@@ -60,6 +87,10 @@ void AssetBrowser::renderItems() {
         return;
     }
 
+    if (m_currentDirectory.empty()) {
+        this->handleDirectoryChange(this->getVFSRootAbsolute());
+    }
+
     ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
 
     if (ImGui::BeginTable("AssetItemBrowserTable", columnCount, flags)) {
@@ -71,106 +102,147 @@ void AssetBrowser::renderItems() {
 
         ImGui::TableNextRow();
 
-        // Render directories first
-        for (vfs::Directory* dir : m_currentDir->getDirectories()) {
-            ImGui::TableNextColumn();
+        for (const auto& entry : std::filesystem::directory_iterator(m_currentDirectory)) {
+            const std::string id = entry.path().string();
+            const std::string name = entry.path().stem().string();
 
-            if (this->renderIconButton("folder", cellSize, cellSize)) {
-            }
+            if (entry.is_directory()) {
+                // Directory
+                ImGui::TableNextColumn();
 
-            // Context menu
-            if (ImGui::BeginPopupContextItem()) {
-                if (ImGui::MenuItem("Delete")) {
-                    // TODO: Confirmation window
-                    editor::State::Project->getVfs()->remove(dir);
+                ImGui::PushID(id.c_str());
+                if (this->renderIconButton("folder", cellSize, cellSize)) {
                 }
 
-                ImGui::EndPopup();
-            }
+                // Context menu
+                if (ImGui::BeginPopupContextItem()) {
+                    if (ImGui::MenuItem("Delete")) {
+                        this->removeDirectory(entry);
+                    }
 
-            this->directoryDragDropHandler(dir);
-            DragDrop::renderDirectorySource(dir);
-
-            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                m_currentDir = dir;
-            }
-
-            std::string path = dir->getPath();
-            if (renamer.renderUI(std::hash<std::string>()(dir->getPath()), dir->getName())) {
-                editor::State::Project->getVfs()->rename(dir, renamer.getValue());
-            }
-        }
-
-        // Files
-        for (vfs::File* file : m_currentDir->getFiles()) {
-            io::SerializableObject* object = ::aderite::Engine::getSerializer()->getOrRead(file->getHandle());
-            bgfx::TextureHandle icon = BGFX_INVALID_HANDLE;
-
-            ImGui::TableNextColumn();
-
-            switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
-            case reflection::RuntimeTypes::SCENE: {
-                icon = editor::EditorIcons::getInstance().getIcon("scene");
-                break;
-            }
-            case reflection::RuntimeTypes::MATERIAL: {
-                icon = editor::EditorIcons::getInstance().getIcon("material");
-                break;
-            }
-            case reflection::RuntimeTypes::MESH: {
-                icon = editor::EditorIcons::getInstance().getIcon("mesh");
-                break;
-            }
-            case reflection::RuntimeTypes::TEXTURE: {
-                icon = static_cast<asset::TextureAsset*>(object)->getTextureHandle();
-                break;
-            }
-            case reflection::RuntimeTypes::MAT_TYPE: {
-                icon = editor::EditorIcons::getInstance().getIcon("material_type");
-                break;
-            }
-            case reflection::RuntimeTypes::PIPELINE: {
-                icon = editor::EditorIcons::getInstance().getIcon("pipeline");
-                break;
-            }
-            case reflection::RuntimeTypes::AUDIO: {
-                icon = editor::EditorIcons::getInstance().getIcon("audio_clip");
-                break;
-            }
-            case reflection::RuntimeTypes::PREFAB: {
-                icon = editor::EditorIcons::getInstance().getIcon("prefab");
-                break;
-            }
-            }
-
-            if (this->renderImageButton(icon, cellSize, cellSize)) {
-            }
-
-            // Context menu
-            if (ImGui::BeginPopupContextItem()) {
-                if (ImGui::MenuItem("Delete")) {
-                    // TODO: Confirmation window
-                    // TODO: Unload from assets, etc.
-                    editor::State::Project->getVfs()->remove(file);
+                    ImGui::EndPopup();
                 }
 
-                ImGui::EndPopup();
-            }
+                ImGui::PopID();
 
-            // Source
-            DragDrop::renderSource(object);
-            //DragDrop::renderFileSource(file);
+                if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                    this->handleDirectoryChange(entry);
 
-            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                if (static_cast<reflection::RuntimeTypes>(object->getType()) == reflection::RuntimeTypes::SCENE) {
-                    ::aderite::Engine::getSceneManager()->setActive(static_cast<scene::Scene*>(object));
+                    // Don't continue cause need to rerender
+                    break;
                 }
 
-                editor::State::LastSelectedObject = editor::SelectableObject(object);
-            }
+                this->directoryDragDropHandler(entry);
+                DragDrop::renderFileSource(entry);
 
-            if (renamer.renderUI(object->getHandle(), file->getName())) {
-                editor::State::Project->getVfs()->rename(file, renamer.getValue());
+                // Name
+                ImGui::SetWindowFontScale(0.75f);
+                if (renamer.renderUI(std::hash<std::string>()(id), name)) {
+                    this->handleDirectoryRename(entry, renamer.getValue());
+                }
+                ImGui::SetWindowFontScale(1.0f);
+
+            } else if (entry.is_regular_file()) {
+                // File
+                ImGui::TableNextColumn();
+                bgfx::TextureHandle icon = BGFX_INVALID_HANDLE;
+                bool loadSpinner = false;
+
+                // Get the actual asset this is pointing to, the handle is the extension of the file
+                const std::string handleString = entry.path().extension().string().substr(1);
+                const io::SerializableHandle handle = std::stoull(handleString);
+
+                // Get it from asset manager
+                io::SerializableAsset* object = ::aderite::Engine::getAssetManager()->get(handle);
+
+                // Resolve icon
+                switch (static_cast<reflection::RuntimeTypes>(object->getType())) {
+                case reflection::RuntimeTypes::SCENE: {
+                    icon = editor::EditorIcons::getInstance().getIcon("scene");
+                    break;
+                }
+                case reflection::RuntimeTypes::MATERIAL: {
+                    icon = editor::EditorIcons::getInstance().getIcon("material");
+                    break;
+                }
+                case reflection::RuntimeTypes::MESH: {
+                    icon = editor::EditorIcons::getInstance().getIcon("mesh");
+                    break;
+                }
+                case reflection::RuntimeTypes::TEXTURE: {
+                    auto texture = static_cast<asset::TextureAsset*>(object);
+
+                    // If loaded show texture, otherwise a loading bar
+                    if (texture->isValid()) {
+                        icon = static_cast<asset::TextureAsset*>(object)->getTextureHandle();
+                    } else {
+                        // Loading the texture
+                        loadSpinner = true;
+                    }
+
+                    break;
+                }
+                case reflection::RuntimeTypes::MAT_TYPE: {
+                    icon = editor::EditorIcons::getInstance().getIcon("material_type");
+                    break;
+                }
+                case reflection::RuntimeTypes::PIPELINE: {
+                    icon = editor::EditorIcons::getInstance().getIcon("pipeline");
+                    break;
+                }
+                case reflection::RuntimeTypes::AUDIO: {
+                    icon = editor::EditorIcons::getInstance().getIcon("audio_clip");
+                    break;
+                }
+                case reflection::RuntimeTypes::PREFAB: {
+                    icon = editor::EditorIcons::getInstance().getIcon("prefab");
+                    break;
+                }
+                default: {
+                    icon = editor::EditorIcons::getInstance().getIcon("null");
+                    break;
+                }
+                }
+
+                // Render element
+                ImGui::PushID(object->getHandle());
+                if (!loadSpinner) {
+                    if (this->renderImageButton(icon, cellSize, cellSize)) {
+                    }
+                } else {
+                    utility::ImSpinner("loading_spinner", (thumbnailSize / 4), 12, 2.0, glm::vec2(cellSize, cellSize));
+                }
+                ImGui::PopID();
+
+                // Context menu
+                if (ImGui::BeginPopupContextItem()) {
+                    if (ImGui::MenuItem("Delete")) {
+                        this->removeFile(entry);
+                    }
+
+                    ImGui::EndPopup();
+                }
+
+                // Source
+                DragDrop::renderAssetFileSource(entry, object);
+
+                if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                    editor::State::getInstance().setSelectedObject(object);
+                }
+
+                // Check for outside name rename
+                if (name != object->getName()) {
+                    // Update the name
+                    this->handleFileRename(entry, object->getName(), object);
+                } else {
+                    ImGui::SetWindowFontScale(0.75f);
+                    if (renamer.renderUI(std::hash<std::string>()(id), name)) {
+                        this->handleFileRename(entry, renamer.getValue(), object);
+                    }
+                    ImGui::SetWindowFontScale(1.0f);
+                }
+            } else {
+                // Unknown
             }
         }
 
@@ -181,120 +253,308 @@ void AssetBrowser::renderItems() {
 }
 
 void AssetBrowser::renderAddItemPopup() {
-    std::string newName = "";
-    io::SerializableObject* object = nullptr;
+    io::SerializableAsset* object = nullptr;
 
     if (ImGui::MenuItem("New folder")) {
-        m_currentDir->createDirectory("New folder");
+        std::filesystem::create_directory(m_currentDirectory / "New folder");
     }
 
     ImGui::Separator();
 
-    if (ImGui::MenuItem("Rendering pipeline")) {
-        object = new asset::RenderingPipeline();
-        newName = "New rendering pipeline";
-    }
-
     if (ImGui::BeginMenu("New asset")) {
         if (ImGui::MenuItem("Scene")) {
             object = new scene::Scene();
-            newName = "New scene";
         }
 
         if (ImGui::MenuItem("Mesh")) {
             object = new asset::MeshAsset();
-            newName = "New mesh";
         }
 
         if (ImGui::MenuItem("Material")) {
             object = new asset::MaterialAsset();
-            newName = "New material";
         }
 
         if (ImGui::MenuItem("Texture")) {
             object = new asset::TextureAsset();
-            newName = "New texture";
         }
 
         if (ImGui::MenuItem("Material type")) {
             object = new asset::EditorMaterialType();
-            newName = "New material type";
         }
 
         if (ImGui::MenuItem("Audio clip")) {
             object = new asset::AudioAsset();
-            newName = "New audio clip";
         }
 
         ImGui::EndMenu();
     }
 
-    if (object != nullptr && !newName.empty()) {
-        ::aderite::Engine::getSerializer()->add(object);
-        ::aderite::Engine::getSerializer()->save(object);
-        vfs::File* file = new vfs::File(newName, object->getHandle(), m_currentDir);
-    }
+    this->addAsset(object);
 }
 
-void AssetBrowser::renderDirectoryNode(vfs::Directory* dir) {
-    static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick |
-                                           ImGuiTreeNodeFlags_SpanAvailWidth;
+void AssetBrowser::renderNavigatorDirectory(const std::filesystem::path& directory) {
+    static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 
     ImGuiTreeNodeFlags node_flags = base_flags;
-    if (dir == m_currentDir) {
+    if (directory == m_currentDirectory) {
         node_flags |= ImGuiTreeNodeFlags_Selected;
+    } else {
+        // For subpaths they must be open
+        if (std::search(m_currentDirectory.begin(), m_currentDirectory.end(), directory.begin(), directory.end()) !=
+            m_currentDirectory.end()) {
+            ImGui::SetNextItemOpen(true);
+        }
     }
 
-    if (dir->getDirectories().size() == 0) {
+    if (getSubDirectoryCount(directory) == 0) {
         node_flags |= ImGuiTreeNodeFlags_Leaf;
     }
 
-    bool open = ImGui::TreeNodeEx(dir->getName().c_str(), node_flags);
+    bool open = ImGui::TreeNodeEx(directory.stem().string().c_str(), node_flags);
     if (ImGui::IsItemClicked()) {
-        m_currentDir = dir;
+        this->handleDirectoryChange(directory);
     }
 
-    this->directoryDragDropHandler(dir);
-    DragDrop::renderDirectorySource(dir);
+    this->directoryDragDropHandler(directory);
+    DragDrop::renderFileSource(directory);
 
     if (ImGui::BeginPopupContextItem()) {
         if (ImGui::MenuItem("Delete")) {
-            // TODO: Confirmation window
-            editor::State::Project->getVfs()->remove(dir);
+            this->removeDirectory(directory);
+
+            ImGui::EndPopup();
+
+            if (open) {
+                ImGui::TreePop();
+            }
+
+            return;
         }
 
         ImGui::EndPopup();
     }
 
     if (open) {
-        for (vfs::Directory* subDir : dir->getDirectories()) {
-            this->renderDirectoryNode(subDir);
+        for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+            if (entry.is_directory()) {
+                this->renderNavigatorDirectory(entry);
+            }
         }
 
         ImGui::TreePop();
     }
 }
 
-void AssetBrowser::directoryDragDropHandler(vfs::Directory* dir) {
-    vfs::File* file = DragDrop::renderFileTarget();
-    if (file != nullptr) {
-        // TODO: Message that already exists
+std::filesystem::path AssetBrowser::getVFSRootAbsolute() const {
+    return editor::State::Project->getRootDir() / "VFS";
+}
 
-        // Get asset from manager and move it to the new directory
-        editor::State::Project->getVfs()->move(dir, file);
+void AssetBrowser::removeDirectory(const std::filesystem::path& directory) {
+    const std::string name = directory.stem().string();
+
+    // Check if empty
+    if (!std::filesystem::is_empty(directory)) {
+        // Non empty directory can't be removed
+        NotificationModal* modal = new NotificationModal("Info", "Can't remove non empty directory, move or delete child items first");
+        WindowsEditor::getInstance()->getUI().pushModal(modal);
+    } else {
+        std::filesystem::remove(directory);
+    }
+}
+
+void AssetBrowser::removeFile(const std::filesystem::path& file) {
+    const std::string name = file.stem().string();
+
+    // Already exist show confirmation window
+    PromptModal* modal = new PromptModal("A file or directory already exists do you want to replace it?", "A file by the name of " + name +
+                                                                                                              " already exists do you want "
+                                                                                                              "to replace it? Doing so "
+                                                                                                              "will overwrite its current "
+                                                                                                              "contents, "
+                                                                                                              "deleting any previous "
+                                                                                                              "assets or directories");
+
+    // Add buttons
+    modal->pushButton({"Cancel"});
+    modal->pushButton({"Delete", [=]() {
+                           std::filesystem::remove(file);
+                       }});
+
+    // Already exists push a notification window
+    WindowsEditor::getInstance()->getUI().pushModal(modal);
+}
+
+void AssetBrowser::handleDirectoryChange(const std::filesystem::path& newDirectory) {
+    // Acquire references in new directory
+    for (const auto& entry : std::filesystem::directory_iterator(newDirectory)) {
+        if (entry.is_regular_file()) {
+            // Get handle
+            const std::string handleString = entry.path().extension().string().substr(1);
+            const io::SerializableHandle handle = std::stoull(handleString);
+
+            if (!::aderite::Engine::getAssetManager()->has(handle)) {
+                // No longer exists
+                std::filesystem::remove(entry);
+            } else {
+                // Get asset
+                io::SerializableAsset* asset = ::aderite::Engine::getAssetManager()->get(handle);
+
+                // Acquire reference
+                asset->acquire();
+            }
+        }
     }
 
-    vfs::Directory* payloadDir = DragDrop::renderDirectoryTarget();
-    if (payloadDir != nullptr) {
-        editor::State::Project->getVfs()->move(dir, payloadDir);
+    // Release from previous directory
+    this->releaseCurrentDirectoryReferences();
+
+    m_currentDirectory = newDirectory;
+}
+
+void AssetBrowser::handleDirectoryRename(const std::filesystem::path& directory, const std::string& newName) {
+    const std::filesystem::path newPath = directory.parent_path() / newName;
+
+    if (std::filesystem::exists(newPath)) {
+        // Already exist show confirmation window
+        PromptModal* modal = new PromptModal("A file or directory already exists do you want to replace it?",
+                                             "A file by the name of " + newName +
+                                                 " already exists do you want to replace it? Doing so will overwrite its current contents, "
+                                                 "deleting any previous assets or directories");
+
+        // Add buttons
+        modal->pushButton({"Cancel"});
+        modal->pushButton({"Replace", [=]() {
+                               std::filesystem::remove(newPath);
+                               std::filesystem::rename(directory, newPath);
+                           }});
+
+        // Already exists push a notification window
+        WindowsEditor::getInstance()->getUI().pushModal(modal);
+    } else {
+        // Rename
+        std::filesystem::remove(newPath);
+        std::filesystem::rename(directory, newPath);
+    }
+}
+
+void AssetBrowser::handleFileRename(const std::filesystem::path& file, const std::string& newName, io::SerializableAsset* asset) {
+    const std::filesystem::path newPath = file.parent_path() / (newName + "." + std::to_string(asset->getHandle()));
+
+    // Check if the same name or not
+    if (file.stem().string() == newName) {
+        return;
+    }
+
+    if (std::filesystem::exists(newPath)) {
+        // Already exist show confirmation window
+        PromptModal* modal = new PromptModal("A file or directory already exists do you want to replace it?",
+                                             "A file by the name of " + newName +
+                                                 " already exists do you want to replace it? Doing so will overwrite its current contents, "
+                                                 "deleting any previous assets or directories");
+
+        // Add buttons
+        modal->pushButton({"Cancel"});
+        modal->pushButton({"Replace", [=]() {
+                               asset->setName(newName);
+                               std::filesystem::remove(newPath);
+                               std::filesystem::rename(file, newPath);
+                               ::aderite::Engine::getAssetManager()->save(asset);
+                           }});
+
+        // Already exists push a notification window
+        WindowsEditor::getInstance()->getUI().pushModal(modal);
+    } else {
+        // Rename
+        asset->setName(newName);
+        std::filesystem::rename(file, newPath);
+        ::aderite::Engine::getAssetManager()->save(asset);
+    }
+}
+
+void AssetBrowser::directoryDragDropHandler(const std::filesystem::path& directory) {
+    const std::filesystem::path entry = DragDrop::renderFileTarget();
+
+    if (!entry.empty()) {
+        std::filesystem::rename(entry, directory / entry.filename());
+
+        if (entry == m_currentDirectory) {
+            m_currentDirectory = directory / entry.filename();
+        }
+    }
+}
+
+void AssetBrowser::importAsset(const std::filesystem::path& path, reflection::RuntimeTypes type) {
+    io::SerializableAsset* asset = nullptr;
+
+    switch (type) {
+    case reflection::RuntimeTypes::MESH: {
+        asset = new asset::MeshAsset();
+        break;
+    }
+    case reflection::RuntimeTypes::TEXTURE: {
+        asset = new asset::TextureAsset();
+        break;
+    }
+    default: {
+        LOG_ERROR("[Editor] Failed to import {0} cause the type is not implemented", path.string());
+    }
+    }
+
+    if (asset != nullptr) {
+        // Add asset
+        this->addAsset(asset);
+
+        // Now copy the source as a loadable id
+        ::aderite::Engine::getFileHandler()->writePhysicalFile(asset->getHandle(), path);
+    }
+}
+
+void AssetBrowser::addAsset(io::SerializableAsset* asset) {
+    if (asset != nullptr) {
+        ::aderite::Engine::getAssetManager()->track(asset);
+        ::aderite::Engine::getAssetManager()->save(asset);
+        asset->acquire();
+
+        // Create VFS file
+        std::ofstream ofs(m_currentDirectory / (asset->getName() + "." + std::to_string(asset->getHandle())));
+    }
+}
+
+void AssetBrowser::releaseCurrentDirectoryReferences() {
+    if (!m_currentDirectory.empty()) {
+        for (const auto& entry : std::filesystem::directory_iterator(m_currentDirectory)) {
+            if (entry.is_regular_file()) {
+                // Get handle
+                const std::string handleString = entry.path().extension().string().substr(1);
+                const io::SerializableHandle handle = std::stoull(handleString);
+
+                // Get asset
+                io::SerializableAsset* asset = ::aderite::Engine::getAssetManager()->get(handle);
+
+                // Release held reference
+                asset->release();
+            }
+        }
     }
 }
 
 bool AssetBrowser::init() {
+    ADERITE_DYNAMIC_ASSERT(g_instance == nullptr, "Multiple asset browsers created");
+
+    GLFWwindow* window = static_cast<GLFWwindow*>(aderite::Engine::getWindowManager()->getImplementationHandle());
+
+    g_instance = this;
+
+    glfwSetDropCallback(window, [](GLFWwindow* window, int count, const char** paths) {
+        g_instance->onFilesDropped(count, paths);
+    });
+
     return true;
 }
 
-void AssetBrowser::shutdown() {}
+void AssetBrowser::shutdown() {
+    this->releaseCurrentDirectoryReferences();
+}
 
 void AssetBrowser::render() {
     if (!this->isProjectLoaded()) {
@@ -309,33 +569,30 @@ void AssetBrowser::render() {
         return;
     }
 
-    if (m_currentDir == nullptr) {
-        m_currentDir = editor::State::Project->getVfs()->getRoot();
-    }
+    // Prefab drag and drop
+    utility::WindowSizeDragDrop([&]() {
+        scene::GameObject* prefabDrop = DragDrop::renderTarget<scene::GameObject>(aderite::reflection::RuntimeTypes::GAME_OBJECT);
+        if (prefabDrop != nullptr) {
+            asset::PrefabAsset* prefab = new asset::PrefabAsset(prefabDrop);
+            this->addAsset(prefab);
+        }
+    });
 
     // Display
-
-    // Navigator
     if (ImGui::BeginTable("AssetBrowserTable", 2, 0)) {
-        scene::Entity* entity = static_cast<scene::Entity*>(
-            DragDrop::renderTarget(static_cast<aderite::reflection::Type>(aderite::reflection::RuntimeTypes::ENTITY)));
-        if (entity != nullptr) {
-            // Create prefab
-            asset::PrefabAsset* prefab = new asset::PrefabAsset();
-            prefab->setPrototype(entity);
-
-            ::aderite::Engine::getSerializer()->add(prefab);
-            ::aderite::Engine::getSerializer()->save(prefab);
-            vfs::File* file = new vfs::File(entity->getName() + "_prefab", prefab->getHandle(), m_currentDir);
-        }
-
+        // Setup table
         ImGui::TableSetupColumn("Navigator", ImGuiTableColumnFlags_WidthFixed, 200.0f);
         ImGui::TableSetupColumn("Items", ImGuiTableColumnFlags_None);
         ImGui::TableNextRow();
+
+        // Navigator
         ImGui::TableSetColumnIndex(0);
-        renderNavigator();
+        this->renderNavigator();
+
+        // Items
         ImGui::TableSetColumnIndex(1);
-        renderItems();
+        this->renderItems();
+
         ImGui::EndTable();
     }
 

@@ -3,6 +3,7 @@
 #include <imgui/imgui.h>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/scripting/BehaviorBase.hpp"
 #include "aderite/scripting/ScriptManager.hpp"
 
 #include "aderiteeditor/shared/IEventSink.hpp"
@@ -12,55 +13,43 @@
 namespace aderite {
 namespace editor {
 
-void SelectScriptModal::show() {
-    m_visible = true;
-    m_show = true;
-}
-
-bool SelectScriptModal::isOpen() const {
-    return m_visible;
-}
-
-void SelectScriptModal::reset() {
-    m_selected = "";
-}
-
-bool SelectScriptModal::init() {
-    return false;
-}
-
-void SelectScriptModal::shutdown() {}
+SelectScriptModal::SelectScriptModal(SelectFn fn) : m_callback(fn) {}
 
 void SelectScriptModal::render() {
-    if (m_show) {
-        ImGui::OpenPopup("Select script");
-        m_show = false;
+    if (!m_callback) {
+        this->close();
+    }
+
+    if (!m_open) {
+        return;
     }
 
     // Center on screen
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Select script", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove)) {
+    if (ImGui::BeginPopupModal("Select script", NULL,
+                               ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+                                   ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::PushItemWidth(-FLT_MIN);
+
         if (ImGui::Button("Close", ImVec2(-FLT_MIN, 0.0f))) {
-            m_visible = false;
+            this->close();
             ImGui::CloseCurrentPopup();
         }
+
         ImGui::PopItemWidth();
 
         ImGui::Dummy(ImVec2(500.0f, 0.0f));
         ImGui::Separator();
 
-        // TODO: Filtering
-
-        if (ImGui::BeginListBox("##ScriptSelectList", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
-            for (auto kvp : ::aderite::Engine::getScriptManager()->getKnownSystems()) {
-                if (ImGui::Selectable(kvp.first.c_str())) {
-                    m_selected = kvp.first;
-                    m_visible = false;
+        // Select class
+        if (ImGui::BeginListBox("##ScriptSelectClass", ImVec2(-FLT_MIN, 5 * ImGui::GetTextLineHeightWithSpacing()))) {
+            for (scripting::BehaviorBase* behavior : ::aderite::Engine::getScriptManager()->getBehaviors()) {
+                if (ImGui::Selectable(behavior->getName().c_str())) {
+                    m_callback(behavior);
+                    this->close();
                     ImGui::CloseCurrentPopup();
-                    break;
                 }
             }
 
@@ -69,6 +58,18 @@ void SelectScriptModal::render() {
 
         ImGui::EndPopup();
     }
+}
+
+bool SelectScriptModal::stillValid() const {
+    return m_open;
+}
+
+void SelectScriptModal::close() {
+    m_open = false;
+}
+
+void SelectScriptModal::show() {
+    ImGui::OpenPopup("Select script");
 }
 
 } // namespace editor
