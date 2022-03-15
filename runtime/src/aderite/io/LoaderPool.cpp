@@ -13,6 +13,7 @@ LoaderPool::LoaderPool() : LoaderPool(std::thread::hardware_concurrency()) {}
 
 LoaderPool::LoaderPool(size_t threadCount) {
     ADERITE_LOG_BLOCK;
+    ADERITE_DYNAMIC_ASSERT(threadCount > 0, "Loader with 0 threads is prohibited");
     LOG_DEBUG("[IO] Loader pool is created with {0} threads", threadCount);
     for (size_t i = 0; i < threadCount; i++) {
         m_loaders.push_back(new Loader(this));

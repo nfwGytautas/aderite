@@ -12,15 +12,18 @@ namespace asset {
  */
 class MeshAsset final : public io::SerializableAsset {
 public:
-    /**
-     * @brief Editable fields of the asset, this information is stored inside the asset file
-     */
-    struct fields {
-        bool IsStatic = true;
-    };
-
-public:
     ~MeshAsset();
+
+    /**
+     * @brief Returns the vertex buffer handle of the mesh
+     */
+    bgfx::VertexBufferHandle getVboHandle() const;
+
+    /**
+     * @brief Returns the index buffer handle of the mesh
+     * @return
+     */
+    bgfx::IndexBufferHandle getIboHandle() const;
 
     /**
      * @brief Returns true if the mesh is valid
@@ -35,33 +38,10 @@ public:
     bool serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const override;
     bool deserialize(io::Serializer* serializer, const YAML::Node& data) override;
 
-    /**
-     * @brief Returns the info of mesh fields
-     */
-    fields getFields() const;
-
-    /**
-     * @brief Returns mutable field structure
-     */
-    fields& getFieldsMutable();
-
-    /**
-     * @brief Returns the vertex buffer handle of the mesh
-     */
-    bgfx::VertexBufferHandle getVboHandle() const;
-
-    /**
-     * @brief Returns the index buffer handle of the mesh
-     * @return
-     */
-    bgfx::IndexBufferHandle getIboHandle() const;
-
 private:
     // BGFX resource handles
     bgfx::VertexBufferHandle m_vbh = BGFX_INVALID_HANDLE;
     bgfx::IndexBufferHandle m_ibh = BGFX_INVALID_HANDLE;
-
-    fields m_info = {};
 };
 
 } // namespace asset

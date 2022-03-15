@@ -23,7 +23,7 @@ void TextureAsset::load(const io::Loader* loader) {
     LOG_TRACE("[Asset] Loading {0}", this->getName());
     ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_handle), "Tried to load already loaded texture");
 
-    if (m_info.IsCubemap) {
+    if (m_isCubemap) {
         LOG_ERROR("Cubemap not implemented");
         return;
     } else {
@@ -63,23 +63,15 @@ reflection::Type TextureAsset::getType() const {
 }
 
 bool TextureAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    emitter << YAML::Key << "IsHDR" << YAML::Value << m_info.IsHDR;
-    emitter << YAML::Key << "IsCubemap" << YAML::Value << m_info.IsCubemap;
+    emitter << YAML::Key << "IsHDR" << YAML::Value << m_isHDR;
+    emitter << YAML::Key << "IsCubemap" << YAML::Value << m_isCubemap;
     return true;
 }
 
 bool TextureAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    m_info.IsHDR = data["IsHDR"].as<bool>();
-    m_info.IsCubemap = data["IsCubemap"].as<bool>();
+    m_isHDR = data["IsHDR"].as<bool>();
+    m_isCubemap = data["IsCubemap"].as<bool>();
     return true;
-}
-
-TextureAsset::fields TextureAsset::getFields() const {
-    return m_info;
-}
-
-TextureAsset::fields& TextureAsset::getFieldsMutable() {
-    return m_info;
 }
 
 bgfx::TextureHandle TextureAsset::getTextureHandle() const {

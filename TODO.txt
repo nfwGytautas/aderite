@@ -1,3 +1,12 @@
+UML:
+	Fix TextureLoadResult to be generic (Data field)
+	Check all visibility of fields
+	IEngineMiddleware
+	Check all inheritances and relationships
+	FieldWrapper generic methods
+	ScriptManager m_objectCache
+	BehaviorBase and ThunkedMethods
+
 General:
 	Engine callbacks (entity deleted, scene deleted, scene unloaded, etc.)
 	Event system?

@@ -61,7 +61,7 @@ public:
     /**
      * @brief Returns the sampler data vector
      */
-    std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> getSamplerData() const;
+    //std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> getSamplerData() const;
 
     // Inherited via SerializableAsset
     void load(const io::Loader* loader) override;

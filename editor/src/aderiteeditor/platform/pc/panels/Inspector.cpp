@@ -759,7 +759,6 @@ void Inspector::renderMaterialType(io::SerializableObject* object) {
     static utility::InlineRename renamer;
 
     asset::EditorMaterialType* type = static_cast<asset::EditorMaterialType*>(object);
-    asset::MaterialTypeAsset::fields& finfo = type->getFieldsMutable();
 
     ImGui::Text("Properties and samplers:");
 

@@ -32,24 +32,19 @@ void MeshAsset::load(const io::Loader* loader) {
     layout.end();
 
     // Create handles
-    if (m_info.IsStatic) {
-        io::Loader::MeshLoadResult result = loader->loadMesh(this->getHandle());
-        if (!result.Error.empty()) {
-            LOG_WARN("[Asset] Mesh load error: {0}", result.Error);
-            return;
-        }
-
-        auto& positionData = result.Vertices;
-        auto& indicesData = result.Indices;
-        m_vbh = bgfx::createVertexBuffer(bgfx::copy(positionData.data(), sizeof(float) * positionData.size()), layout);
-        m_ibh = bgfx::createIndexBuffer(bgfx::copy(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
-
-        bgfx::setName(m_vbh, this->getName().c_str());
-        bgfx::setName(m_ibh, this->getName().c_str());
-    } else {
-        LOG_ERROR("[Asset] Unimplemented dynamic mesh");
+    io::Loader::MeshLoadResult result = loader->loadMesh(this->getHandle());
+    if (!result.Error.empty()) {
+        LOG_WARN("[Asset] Mesh load error: {0}", result.Error);
         return;
     }
+
+    auto& positionData = result.Vertices;
+    auto& indicesData = result.Indices;
+    m_vbh = bgfx::createVertexBuffer(bgfx::copy(positionData.data(), sizeof(float) * positionData.size()), layout);
+    m_ibh = bgfx::createIndexBuffer(bgfx::copy(indicesData.data(), sizeof(unsigned int) * indicesData.size()), BGFX_BUFFER_INDEX32);
+
+    bgfx::setName(m_vbh, this->getName().c_str());
+    bgfx::setName(m_ibh, this->getName().c_str());
 
     LOG_INFO("[Asset] Loaded {0}", this->getName());
 }
@@ -79,22 +74,11 @@ reflection::Type MeshAsset::getType() const {
 }
 
 bool MeshAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    // Layout
-    emitter << YAML::Key << "IsStatic" << YAML::Value << m_info.IsStatic;
     return true;
 }
 
 bool MeshAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    m_info.IsStatic = data["IsStatic"].as<bool>();
     return true;
-}
-
-MeshAsset::fields MeshAsset::getFields() const {
-    return m_info;
-}
-
-MeshAsset::fields& MeshAsset::getFieldsMutable() {
-    return m_info;
 }
 
 bgfx::VertexBufferHandle MeshAsset::getVboHandle() const {

@@ -32,6 +32,30 @@ bool MaterialTypeAsset::isValid() const {
     return bgfx::isValid(m_shaderHandle) && bgfx::isValid(m_uniformHandle);
 }
 
+size_t MaterialTypeAsset::getSize() const {
+    return m_size;
+}
+
+void MaterialTypeAsset::setSize(size_t value) {
+    m_size = value;
+}
+
+size_t MaterialTypeAsset::getSamplerCount() const {
+    return m_numSamplers;
+}
+
+void MaterialTypeAsset::setSamplerCount(size_t count) {
+    m_numSamplers = count;
+}
+
+std::vector<std::string> MaterialTypeAsset::getSamplerNames() const {
+    return m_samplerNames;
+}
+
+void MaterialTypeAsset::setSamplerNames(const std::vector<std::string>& values) {
+    m_samplerNames = values;
+}
+
 void MaterialTypeAsset::load(const io::Loader* loader) {
     LOG_TRACE("[Asset] Loading {0}", this->getName());
     ADERITE_DYNAMIC_ASSERT(!bgfx::isValid(m_shaderHandle), "Tried to load already loaded material type");
@@ -54,13 +78,13 @@ void MaterialTypeAsset::load(const io::Loader* loader) {
     m_shaderHandle = bgfx::createProgram(vsh, fsh, true);
 
     // Create uniform
-    m_uniformHandle = bgfx::createUniform(("mf_mat_buffer_" + this->getName()).c_str(), bgfx::UniformType::Vec4, m_info.Size);
+    m_uniformHandle = bgfx::createUniform(("mf_mat_buffer_" + this->getName()).c_str(), bgfx::UniformType::Vec4, m_size);
 
     // Create samplers
-    m_samplers.resize(m_info.NumSamplers);
-    for (size_t i = 0; i < m_info.NumSamplers; i++) {
+    m_samplers.resize(m_numSamplers);
+    for (size_t i = 0; i < m_numSamplers; i++) {
         m_samplers[i] =
-            bgfx::createUniform(("mf_" + this->getName() + "_" + m_info.SamplerNames[i]).c_str(), bgfx::UniformType::Sampler, 1);
+            bgfx::createUniform(("mf_" + this->getName() + "_" + m_samplerNames[i]).c_str(), bgfx::UniformType::Sampler, 1);
     }
 
     LOG_INFO("[Asset] Loaded {0}", this->getName());
@@ -104,10 +128,10 @@ reflection::Type MaterialTypeAsset::getType() const {
 }
 
 bool MaterialTypeAsset::serialize(const io::Serializer* serializer, YAML::Emitter& emitter) const {
-    emitter << YAML::Key << "DataSize" << YAML::Value << m_info.Size;
-    emitter << YAML::Key << "SamplerCount" << YAML::Value << m_info.NumSamplers;
+    emitter << YAML::Key << "DataSize" << YAML::Value << m_size;
+    emitter << YAML::Key << "SamplerCount" << YAML::Value << m_numSamplers;
     emitter << YAML::Key << "SamplerNames" << YAML::Flow << YAML::BeginSeq;
-    for (const std::string& name : m_info.SamplerNames) {
+    for (const std::string& name : m_samplerNames) {
         emitter << name;
     }
     emitter << YAML::EndSeq;
@@ -115,10 +139,10 @@ bool MaterialTypeAsset::serialize(const io::Serializer* serializer, YAML::Emitte
 }
 
 bool MaterialTypeAsset::deserialize(io::Serializer* serializer, const YAML::Node& data) {
-    m_info.Size = data["DataSize"].as<size_t>();
-    m_info.NumSamplers = data["SamplerCount"].as<size_t>();
+    m_size = data["DataSize"].as<size_t>();
+    m_numSamplers = data["SamplerCount"].as<size_t>();
     for (const YAML::Node& samplerName : data["SamplerNames"]) {
-        m_info.SamplerNames.push_back(samplerName.as<std::string>());
+        m_samplerNames.push_back(samplerName.as<std::string>());
     }
     return true;
 }
@@ -133,14 +157,6 @@ bgfx::UniformHandle MaterialTypeAsset::getUniformHandle() const {
 
 bgfx::UniformHandle MaterialTypeAsset::getSampler(size_t idx) const {
     return m_samplers[idx];
-}
-
-MaterialTypeAsset::fields MaterialTypeAsset::getFields() const {
-    return m_info;
-}
-
-MaterialTypeAsset::fields& MaterialTypeAsset::getFieldsMutable() {
-    return m_info;
 }
 
 } // namespace asset

@@ -110,7 +110,7 @@ void EditorMaterialType::recalculate() {
 
     uint16_t offset = 0;
     uint16_t elements = 0;
-    this->getFieldsMutable().NumSamplers = m_samplers.size();
+    this->setSamplerCount(m_samplers.size());
 
     // Temporary vector for storing floats
     std::vector<Property*> floatProperties;
@@ -167,9 +167,9 @@ void EditorMaterialType::recalculate() {
     }
 
     if (elements % 4 != 0) {
-        this->getFieldsMutable().Size = ((elements - elements % 4) / 4) + 1;
+        this->setSize(((elements - elements % 4) / 4) + 1);
     } else {
-        this->getFieldsMutable().Size = elements / 4;
+        this->setSize(elements / 4);
     }
 }
 
@@ -294,7 +294,7 @@ void EditorMaterialType::generateMaterialHeader(std::ostream& os) {
     std::stringstream properties;
     std::stringstream samplers;
 
-    unsigned int arraySize = this->getFields().Size;
+    unsigned int arraySize = this->getSize();
     if (arraySize > 0) {
         properties << "uniform vec4 mf_mat_buffer_" << this->getName() << "[" << arraySize << "];\n\n";
     }

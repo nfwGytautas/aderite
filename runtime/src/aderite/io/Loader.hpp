@@ -40,10 +40,17 @@ public: // Thread handling
     bool isReady() const;
 
 public: // Loading operations
-    template<class T>
-    struct TextureLoadResult {
+    struct LoadResult {
+    public:
+        virtual ~LoadResult() {};
         std::string Error = "";
 
+    protected:
+        LoadResult() {}
+    };
+
+    template<class T>
+    struct TextureLoadResult : public LoadResult {
         int BPP = 0;
         int Width = 0;
         int Height = 0;
@@ -54,23 +61,17 @@ public: // Loading operations
         std::unique_ptr<T> Data;
     };
 
-    struct MeshLoadResult {
-        std::string Error = "";
-
+    struct MeshLoadResult : public LoadResult {
         std::vector<float> Vertices;
         std::vector<unsigned int> Indices;
     };
 
-    struct ShaderLoadResult {
-        std::string Error = "";
-
+    struct ShaderLoadResult : public LoadResult {
         std::vector<unsigned char> VertexSource;
         std::vector<unsigned char> FragmentSource;
     };
 
-    struct BinaryLoadResult {
-        std::string Error = "";
-
+    struct BinaryLoadResult : public LoadResult {
         std::vector<unsigned char> Content;
     };
 

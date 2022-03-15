@@ -41,7 +41,7 @@ void MaterialAsset::setMaterialType(MaterialTypeAsset* type) {
     m_type->acquire();
 
     // Samplers
-    const size_t dataSize = m_type->getFields().Size * 4 * sizeof(float);
+    const size_t dataSize = m_type->getSize() * 4 * sizeof(float);
 
     // Release previous references
     for (TextureAsset* ta : m_samplers) {
@@ -62,7 +62,7 @@ void MaterialAsset::setMaterialType(MaterialTypeAsset* type) {
 
     std::memset(m_udata, 0, dataSize);
 
-    for (size_t i = 0; i < m_type->getFields().NumSamplers; i++) {
+    for (size_t i = 0; i < m_type->getSamplerCount(); i++) {
         m_samplers.push_back(nullptr);
     }
 }
@@ -133,7 +133,7 @@ bool MaterialAsset::serialize(const io::Serializer* serializer, YAML::Emitter& e
     emitter << YAML::Key << "MaterialType" << YAML::Value << m_type->getHandle();
     emitter << YAML::Key << "Properties" << YAML::BeginMap;
     emitter << YAML::Key << "Data" << YAML::Flow << YAML::BeginSeq;
-    for (size_t i = 0; i < m_type->getFields().Size * 4; i++) {
+    for (size_t i = 0; i < m_type->getSize() * 4; i++) {
         float val = m_udata[i];
         emitter << m_udata[i];
     }
@@ -162,7 +162,7 @@ bool MaterialAsset::deserialize(io::Serializer* serializer, const YAML::Node& da
     this->setMaterialType(static_cast<MaterialTypeAsset*>(::aderite::Engine::getAssetManager()->get(typeName)));
 
     const YAML::Node& d = data["Properties"]["Data"];
-    if (d.size() != (m_type->getFields().Size * 4)) {
+    if (d.size() != (m_type->getSize() * 4)) {
         LOG_ERROR("[Asset] Incorrect size for stored material data and type {0}", this->getName());
         return false;
     }
@@ -212,19 +212,19 @@ float* MaterialAsset::getPropertyData() const {
     return m_udata;
 }
 
-std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> MaterialAsset::getSamplerData() const {
-    std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> result;
-
-    for (size_t i = 0; i < m_type->getFields().NumSamplers; i++) {
-        if (m_samplers[i] == nullptr) {
-            result.push_back(std::make_pair(m_type->getSampler(i), bgfx::TextureHandle {bgfx::kInvalidHandle}));
-        } else {
-            result.push_back(std::make_pair(m_type->getSampler(i), m_samplers[i]->getTextureHandle()));
-        }
-    }
-
-    return result;
-}
+//std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> MaterialAsset::getSamplerData() const {
+//    std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> result;
+//
+//    for (size_t i = 0; i < m_type->getFields().NumSamplers; i++) {
+//        if (m_samplers[i] == nullptr) {
+//            result.push_back(std::make_pair(m_type->getSampler(i), bgfx::TextureHandle {bgfx::kInvalidHandle}));
+//        } else {
+//            result.push_back(std::make_pair(m_type->getSampler(i), m_samplers[i]->getTextureHandle()));
+//        }
+//    }
+//
+//    return result;
+//}
 
 } // namespace asset
 } // namespace aderite

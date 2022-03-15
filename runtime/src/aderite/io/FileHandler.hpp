@@ -97,11 +97,6 @@ public:
     bool exists(LoadableHandle handle) const;
 
 private:
-    struct ChunkLocator {
-        size_t Offset;
-        size_t Size;
-    };
-
     std::filesystem::path m_rootDir;
 };
 

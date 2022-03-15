@@ -101,10 +101,12 @@ bool Loader::isReady() const {
 
 Loader::MeshLoadResult Loader::loadMesh(LoadableHandle handle) const {
     LOG_TRACE("[Asset] Loading mesh from {0}", handle);
+    Loader::MeshLoadResult result = {};
     DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
     if (chunk.Data.size() == 0) {
         LOG_ERROR("[Asset] {0} doesn't exist", handle);
-        return {"File doesn't exist"};
+        result.Error = "File doesn't exist";
+        return result;
     }
 
     unsigned int flags = 0;
@@ -124,23 +126,24 @@ Loader::MeshLoadResult Loader::loadMesh(LoadableHandle handle) const {
 
     // Sanity checks
     if (scene == nullptr) {
-        return {m_impl->Importer.GetErrorString()};
+        result.Error = m_impl->Importer.GetErrorString();
+        return result;
     }
 
     if (scene->mNumMeshes > 1) {
         LOG_ERROR("[Asset] {0} has multiple defined meshes", handle);
-        return {"File contains more than 1 mesh"};
+        result.Error = "File contains more than 1 mesh";
+        return result;
     }
 
     if (scene->mNumMeshes == 0) {
         LOG_ERROR("[Asset] {0} has no meshes", handle);
-        return {"File contains no meshes"};
+        result.Error = "File contains no meshes";
+        return result;
     }
 
     // There should only be one mesh
     aiMesh* mesh = scene->mMeshes[0];
-
-    MeshLoadResult result = {};
 
     // Reserve memory for the mesh
     result.Vertices.reserve(mesh->mNumVertices * 3 * 3 * 2);
@@ -182,13 +185,14 @@ Loader::MeshLoadResult Loader::loadMesh(LoadableHandle handle) const {
 
 Loader::TextureLoadResult<unsigned char> Loader::loadTexture(LoadableHandle handle) const {
     LOG_TRACE("[Asset] Loading texture from {0}", handle);
+    TextureLoadResult<unsigned char> result = {};
     DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
     if (chunk.Data.size() == 0) {
         LOG_ERROR("[Asset] {0} doesn't exist", handle);
-        return {"File doesn't exist"};
+        result.Error = "File doesn't exist";
+        return result;
     }
 
-    TextureLoadResult<unsigned char> result = {};
     unsigned char* data = stbi_load_from_memory(chunk.Data.data(), chunk.Data.size(), &result.Width, &result.Height, &result.BPP, 0);
 
     if (data == nullptr) {
@@ -219,20 +223,21 @@ Loader::TextureLoadResult<unsigned char> Loader::loadTexture(LoadableHandle hand
 
     result.Data = std::unique_ptr<unsigned char>(data);
 
-    LOG_INFO("[Asset] {0} loaded ({1} width, {2} height, {3} format, {4} bits per pixel)", handle, result.Width, result.Height, result.Format,
-             result.BPP);
+    LOG_INFO("[Asset] {0} loaded ({1} width, {2} height, {3} format, {4} bits per pixel)", handle, result.Width, result.Height,
+             result.Format, result.BPP);
     return result;
 }
 
 Loader::TextureLoadResult<float> Loader::loadHdrTexture(LoadableHandle handle) const {
     LOG_TRACE("[Asset] Loading HDR texture from {0}", handle);
+    TextureLoadResult<float> result = {};
     DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
     if (chunk.Data.size() == 0) {
         LOG_ERROR("[Asset] {0} doesn't exist", handle);
-        return {"File doesn't exist"};
+        result.Error = "File doesn't exist";
+        return result;
     }
 
-    TextureLoadResult<float> result = {};
     float* data = stbi_loadf_from_memory(chunk.Data.data(), chunk.Data.size(), &result.Width, &result.Height, &result.BPP, 4);
 
     if (data == nullptr) {
@@ -270,17 +275,18 @@ Loader::TextureLoadResult<float> Loader::loadHdrTexture(LoadableHandle handle) c
 
 Loader::ShaderLoadResult Loader::loadShader(LoadableHandle handle) const {
     LOG_TRACE("[Asset] Loading shader from {0}", handle);
+    ShaderLoadResult result = {};
     DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
     if (chunk.Data.size() == 0) {
         LOG_ERROR("[Asset] {0} doesn't exist", handle);
-        return {"File doesn't exist"};
+        result.Error = "File doesn't exist";
+        return result;
     }
 
     // First std::uint64_t is the size of vertex shader, following it is fragment shader to the end
     std::uint64_t vertexSize = 0;
     std::memcpy(&vertexSize, chunk.Data.data(), sizeof(std::uint64_t));
 
-    ShaderLoadResult result = {};
     const size_t fragmentSize = chunk.Data.size() - sizeof(std::uint64_t) - vertexSize;
     result.VertexSource.resize(vertexSize);
     result.FragmentSource.resize(fragmentSize);
@@ -296,15 +302,18 @@ Loader::ShaderLoadResult Loader::loadShader(LoadableHandle handle) const {
 
 Loader::BinaryLoadResult Loader::loadBinary(LoadableHandle handle) const {
     LOG_TRACE("[Asset] Loading binary file from {0}", handle);
+    Loader::BinaryLoadResult result = {};
     DataChunk chunk = ::aderite::Engine::getFileHandler()->openLoadable(handle);
     if (chunk.Data.size() == 0) {
         LOG_ERROR("[Asset] {0} doesn't exist", handle);
-        return {"File doesn't exist"};
+        result.Error = "File doesn't exist";
+        return result;
     }
 
     LOG_INFO("[Asset] {0} loaded ({1} bytes)", chunk.Data.size());
+    result.Content = chunk.Data;
 
-    return {"", chunk.Data};
+    return result;
 }
 
 } // namespace io
