@@ -70,6 +70,11 @@ public:
     void loop();
 
     /**
+     * @brief Does a single engine system tick, can be used for custom game loops
+     */
+    void tick();
+
+    /**
      * @brief Function is invoked when the Renderer was initialized
      */
     void onRendererInitialized() const;

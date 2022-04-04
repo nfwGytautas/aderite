@@ -212,19 +212,5 @@ float* MaterialAsset::getPropertyData() const {
     return m_udata;
 }
 
-//std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> MaterialAsset::getSamplerData() const {
-//    std::vector<std::pair<bgfx::UniformHandle, bgfx::TextureHandle>> result;
-//
-//    for (size_t i = 0; i < m_type->getFields().NumSamplers; i++) {
-//        if (m_samplers[i] == nullptr) {
-//            result.push_back(std::make_pair(m_type->getSampler(i), bgfx::TextureHandle {bgfx::kInvalidHandle}));
-//        } else {
-//            result.push_back(std::make_pair(m_type->getSampler(i), m_samplers[i]->getTextureHandle()));
-//        }
-//    }
-//
-//    return result;
-//}
-
 } // namespace asset
 } // namespace aderite

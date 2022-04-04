@@ -172,62 +172,67 @@ void Engine::shutdown() {
 
 void Engine::loop() {
     LOG_TRACE("[Engine] Entering engine loop");
-    static int64_t last = bx::getHPCounter();
-
+    
     while (m_state != CurrentState::AWAITING_SHUTDOWN) {
-        // Calculate delta
-        int64_t now = bx::getHPCounter();
-        const int64_t frameTime = now - last;
-        last = now;
-        const double freq = double(bx::getHPFrequency());
-        const float delta = float(double(frameTime) / freq);
-
-        // Updates
-        switch (m_state) {
-        case CurrentState::FULL: {
-            m_physicsController->update(delta);
-            MIDDLEWARE_ACTION(onPhysicsUpdate, delta);
-
-            // Fall through
-        }
-        case CurrentState::LOGIC: {
-            MIDDLEWARE_ACTION(onScriptUpdate, delta);
-
-            // Fall through
-        }
-        case CurrentState::SYSTEM_UPDATE: {
-            // Query events
-            m_inputManager->update();
-
-            // Update audio and flush queued audio commands to controller (FMOD should always update)
-            m_audioController->update();
-
-            // Asset manager
-            m_assetManager->update();
-
-            MIDDLEWARE_ACTION(onSystemUpdate, delta);
-
-            // Fall through
-        }
-        case CurrentState::RENDER_ONLY: {
-            // Scene
-            scene::Scene* currentScene = m_sceneManager->getCurrentScene();
-            if (currentScene != nullptr) {
-                currentScene->update(delta);
-            }
-            break;
-        }
-        }
-
-        // Rendering
-        MIDDLEWARE_ACTION(onStartRender);
-        m_renderer->render();
-        MIDDLEWARE_ACTION(onPreRenderCommit);
-        m_renderer->commit();
-        MIDDLEWARE_ACTION(onEndRender);
+        this->tick();
     }
 
     LOG_TRACE("[Engine] Exiting engine loop");
+}
+
+void Engine::tick() {
+    static int64_t last = bx::getHPCounter();
+
+    // Calculate delta
+    int64_t now = bx::getHPCounter();
+    const int64_t frameTime = now - last;
+    last = now;
+    const double freq = double(bx::getHPFrequency());
+    const float delta = float(double(frameTime) / freq);
+
+    // Updates
+    switch (m_state) {
+    case CurrentState::FULL: {
+        m_physicsController->update(delta);
+        MIDDLEWARE_ACTION(onPhysicsUpdate, delta);
+
+        // Fall through
+    }
+    case CurrentState::LOGIC: {
+        MIDDLEWARE_ACTION(onScriptUpdate, delta);
+
+        // Fall through
+    }
+    case CurrentState::SYSTEM_UPDATE: {
+        // Query events
+        m_inputManager->update();
+
+        // Update audio and flush queued audio commands to controller (FMOD should always update)
+        m_audioController->update();
+
+        // Asset manager
+        m_assetManager->update();
+
+        MIDDLEWARE_ACTION(onSystemUpdate, delta);
+
+        // Fall through
+    }
+    case CurrentState::RENDER_ONLY: {
+        // Scene
+        scene::Scene* currentScene = m_sceneManager->getCurrentScene();
+        if (currentScene != nullptr) {
+            currentScene->update(delta);
+        }
+        break;
+    }
+    }
+
+    // Rendering
+    MIDDLEWARE_ACTION(onStartRender);
+    m_renderer->render();
+    MIDDLEWARE_ACTION(onPreRenderCommit);
+    m_renderer->commit();
+    MIDDLEWARE_ACTION(onEndRender);
 }
 
 void Engine::onRendererInitialized() const {

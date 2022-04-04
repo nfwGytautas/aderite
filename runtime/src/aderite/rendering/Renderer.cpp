@@ -177,6 +177,12 @@ void Renderer::onWindowResized(unsigned int newWidth, unsigned int newHeight, bo
     this->setResolution(glm::uvec2(newWidth, newHeight));
 
     if (reset) {
+        // Do not reset to 0
+        if (newWidth == 0 || newHeight == 0) {
+            LOG_WARN("[Rendering] onWindowResized call ignored because new width or height is 0");
+            return;
+        }
+
         bgfx::reset(newWidth, newHeight);
     }
 }
