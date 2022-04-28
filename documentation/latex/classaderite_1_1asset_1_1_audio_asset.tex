@@ -1,0 +1,135 @@
+\hypertarget{classaderite_1_1asset_1_1_audio_asset}{}\doxysection{aderite\+::asset\+::Audio\+Asset Class Reference}
+\label{classaderite_1_1asset_1_1_audio_asset}\index{aderite::asset::AudioAsset@{aderite::asset::AudioAsset}}
+
+
+Class representing an audio asset with it\textquotesingle{}s own properties.  
+
+
+
+
+{\ttfamily \#include $<$Audio\+Asset.\+hpp$>$}
+
+Inheritance diagram for aderite\+::asset\+::Audio\+Asset\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.992870cm]{classaderite_1_1asset_1_1_audio_asset}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_af8be0e81db39af94bb52dc4e7d7ecacf}{set\+Event\+Name}} (const std\+::string \&name)
+\begin{DoxyCompactList}\small\item\em Set the name of the audio event. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_audio_asset_a8c3de2dc6f26bd4b6ccb2d6dfb39a7e6}\label{classaderite_1_1asset_1_1_audio_asset_a8c3de2dc6f26bd4b6ccb2d6dfb39a7e6}} 
+std\+::string \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a8c3de2dc6f26bd4b6ccb2d6dfb39a7e6}{get\+Event\+Name}} () const
+\begin{DoxyCompactList}\small\item\em Returns the name of the audio event. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a9725bd4a9db1b07bbe4801cd62357736}{load}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$loader) override
+\begin{DoxyCompactList}\small\item\em Load the object data, this function is executed in a separate thread. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_audio_asset_a2063908711bb62ccd285c8b6c6ab6624}\label{classaderite_1_1asset_1_1_audio_asset_a2063908711bb62ccd285c8b6c6ab6624}} 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a2063908711bb62ccd285c8b6c6ab6624}{unload}} () override
+\begin{DoxyCompactList}\small\item\em Unload the object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_audio_asset_a723ef4e53908e59cb6f5952debc76ea9}\label{classaderite_1_1asset_1_1_audio_asset_a723ef4e53908e59cb6f5952debc76ea9}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a723ef4e53908e59cb6f5952debc76ea9}{needs\+Loading}} () const override
+\begin{DoxyCompactList}\small\item\em Returns true if the object needs loading, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_audio_asset_a223cd40f1e9e3a50ff0370ea3b4093d8}\label{classaderite_1_1asset_1_1_audio_asset_a223cd40f1e9e3a50ff0370ea3b4093d8}} 
+reflection\+::\+Type \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a223cd40f1e9e3a50ff0370ea3b4093d8}{get\+Type}} () const override
+\begin{DoxyCompactList}\small\item\em Returns the type of the reflectable. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a94873653fa40f7bd1da8cc58687ec23d}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a0be026e90d45d4548faaa655944cc1a2}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+Class representing an audio asset with it\textquotesingle{}s own properties. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_audio_asset_a0be026e90d45d4548faaa655944cc1a2}\label{classaderite_1_1asset_1_1_audio_asset_a0be026e90d45d4548faaa655944cc1a2}} 
+\index{aderite::asset::AudioAsset@{aderite::asset::AudioAsset}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::asset::AudioAsset@{aderite::asset::AudioAsset}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Audio\+Asset\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_audio_asset_a9725bd4a9db1b07bbe4801cd62357736}\label{classaderite_1_1asset_1_1_audio_asset_a9725bd4a9db1b07bbe4801cd62357736}} 
+\index{aderite::asset::AudioAsset@{aderite::asset::AudioAsset}!load@{load}}
+\index{load@{load}!aderite::asset::AudioAsset@{aderite::asset::AudioAsset}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Audio\+Asset\+::load (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$}]{loader }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Load the object data, this function is executed in a separate thread. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em loader} & Loader instance \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a6a6ae7d870dc85b66cbdd2766f1dd0ac}{aderite\+::io\+::\+Serializable\+Asset}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_audio_asset_a94873653fa40f7bd1da8cc58687ec23d}\label{classaderite_1_1asset_1_1_audio_asset_a94873653fa40f7bd1da8cc58687ec23d}} 
+\index{aderite::asset::AudioAsset@{aderite::asset::AudioAsset}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::asset::AudioAsset@{aderite::asset::AudioAsset}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Audio\+Asset\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_audio_asset_af8be0e81db39af94bb52dc4e7d7ecacf}\label{classaderite_1_1asset_1_1_audio_asset_af8be0e81db39af94bb52dc4e7d7ecacf}} 
+\index{aderite::asset::AudioAsset@{aderite::asset::AudioAsset}!setEventName@{setEventName}}
+\index{setEventName@{setEventName}!aderite::asset::AudioAsset@{aderite::asset::AudioAsset}}
+\doxysubsubsection{\texorpdfstring{setEventName()}{setEventName()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Audio\+Asset\+::set\+Event\+Name (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{name }\end{DoxyParamCaption})}
+
+
+
+Set the name of the audio event. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the event \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/asset/Audio\+Asset.\+hpp\item 
+src/aderite/asset/Audio\+Asset.\+cpp\end{DoxyCompactItemize}

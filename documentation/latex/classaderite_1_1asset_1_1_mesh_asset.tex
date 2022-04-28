@@ -1,0 +1,136 @@
+\hypertarget{classaderite_1_1asset_1_1_mesh_asset}{}\doxysection{aderite\+::asset\+::Mesh\+Asset Class Reference}
+\label{classaderite_1_1asset_1_1_mesh_asset}\index{aderite::asset::MeshAsset@{aderite::asset::MeshAsset}}
+
+
+Mesh asset implementation.  
+
+
+
+
+{\ttfamily \#include $<$Mesh\+Asset.\+hpp$>$}
+
+Inheritance diagram for aderite\+::asset\+::Mesh\+Asset\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.992870cm]{classaderite_1_1asset_1_1_mesh_asset}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_mesh_asset_a83efd8e1f21f5e4749cf98207ed8eddc}\label{classaderite_1_1asset_1_1_mesh_asset_a83efd8e1f21f5e4749cf98207ed8eddc}} 
+bgfx\+::\+Vertex\+Buffer\+Handle \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a83efd8e1f21f5e4749cf98207ed8eddc}{get\+Vbo\+Handle}} () const
+\begin{DoxyCompactList}\small\item\em Returns the vertex buffer handle of the mesh. \end{DoxyCompactList}\item 
+bgfx\+::\+Index\+Buffer\+Handle \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a11558d97e213e6cd55dd52f6388d30c4}{get\+Ibo\+Handle}} () const
+\begin{DoxyCompactList}\small\item\em Returns the index buffer handle of the mesh. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_mesh_asset_a3656f800e4e633eac20bed98b7f8f624}\label{classaderite_1_1asset_1_1_mesh_asset_a3656f800e4e633eac20bed98b7f8f624}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a3656f800e4e633eac20bed98b7f8f624}{is\+Valid}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the mesh is valid. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a0f5858eea4b5bf070d1ba4d9aeb7398e}{load}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$loader) override
+\begin{DoxyCompactList}\small\item\em Load the object data, this function is executed in a separate thread. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_mesh_asset_ad1d5a34b96860c93a16cd7df2ba7aae8}\label{classaderite_1_1asset_1_1_mesh_asset_ad1d5a34b96860c93a16cd7df2ba7aae8}} 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_ad1d5a34b96860c93a16cd7df2ba7aae8}{unload}} () override
+\begin{DoxyCompactList}\small\item\em Unload the object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_mesh_asset_a2f6e7f97be4a7009a205158d62ff0b26}\label{classaderite_1_1asset_1_1_mesh_asset_a2f6e7f97be4a7009a205158d62ff0b26}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a2f6e7f97be4a7009a205158d62ff0b26}{needs\+Loading}} () const override
+\begin{DoxyCompactList}\small\item\em Returns true if the object needs loading, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_mesh_asset_a9cc544c702127990894e1e4f0e847169}\label{classaderite_1_1asset_1_1_mesh_asset_a9cc544c702127990894e1e4f0e847169}} 
+reflection\+::\+Type \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a9cc544c702127990894e1e4f0e847169}{get\+Type}} () const override
+\begin{DoxyCompactList}\small\item\em Returns the type of the reflectable. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a4e499b447de18c0d533b9ca1f43f9dfd}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a89ea0d41ce0015b74e5766c1d7781fda}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+Mesh asset implementation. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_mesh_asset_a89ea0d41ce0015b74e5766c1d7781fda}\label{classaderite_1_1asset_1_1_mesh_asset_a89ea0d41ce0015b74e5766c1d7781fda}} 
+\index{aderite::asset::MeshAsset@{aderite::asset::MeshAsset}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::asset::MeshAsset@{aderite::asset::MeshAsset}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Mesh\+Asset\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_mesh_asset_a11558d97e213e6cd55dd52f6388d30c4}\label{classaderite_1_1asset_1_1_mesh_asset_a11558d97e213e6cd55dd52f6388d30c4}} 
+\index{aderite::asset::MeshAsset@{aderite::asset::MeshAsset}!getIboHandle@{getIboHandle}}
+\index{getIboHandle@{getIboHandle}!aderite::asset::MeshAsset@{aderite::asset::MeshAsset}}
+\doxysubsubsection{\texorpdfstring{getIboHandle()}{getIboHandle()}}
+{\footnotesize\ttfamily bgfx\+::\+Index\+Buffer\+Handle aderite\+::asset\+::\+Mesh\+Asset\+::get\+Ibo\+Handle (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Returns the index buffer handle of the mesh. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_mesh_asset_a0f5858eea4b5bf070d1ba4d9aeb7398e}\label{classaderite_1_1asset_1_1_mesh_asset_a0f5858eea4b5bf070d1ba4d9aeb7398e}} 
+\index{aderite::asset::MeshAsset@{aderite::asset::MeshAsset}!load@{load}}
+\index{load@{load}!aderite::asset::MeshAsset@{aderite::asset::MeshAsset}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Mesh\+Asset\+::load (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$}]{loader }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Load the object data, this function is executed in a separate thread. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em loader} & Loader instance \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a6a6ae7d870dc85b66cbdd2766f1dd0ac}{aderite\+::io\+::\+Serializable\+Asset}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_mesh_asset_a4e499b447de18c0d533b9ca1f43f9dfd}\label{classaderite_1_1asset_1_1_mesh_asset_a4e499b447de18c0d533b9ca1f43f9dfd}} 
+\index{aderite::asset::MeshAsset@{aderite::asset::MeshAsset}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::asset::MeshAsset@{aderite::asset::MeshAsset}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Mesh\+Asset\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/asset/Mesh\+Asset.\+hpp\item 
+src/aderite/asset/Mesh\+Asset.\+cpp\end{DoxyCompactItemize}

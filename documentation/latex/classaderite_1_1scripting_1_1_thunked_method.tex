@@ -1,0 +1,58 @@
+\hypertarget{classaderite_1_1scripting_1_1_thunked_method}{}\doxysection{aderite\+::scripting\+::Thunked\+Method$<$ Ret, Args $>$ Class Template Reference}
+\label{classaderite_1_1scripting_1_1_thunked_method}\index{aderite::scripting::ThunkedMethod$<$ Ret, Args $>$@{aderite::scripting::ThunkedMethod$<$ Ret, Args $>$}}
+
+
+Helper class for thunked mono methods.  
+
+
+
+
+{\ttfamily \#include $<$Thunked\+Method.\+hpp$>$}
+
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_thunked_method_ade4d357e569e7123801f6535315911a2}\label{classaderite_1_1scripting_1_1_thunked_method_ade4d357e569e7123801f6535315911a2}} 
+typedef void($\ast$ {\bfseries Thunk\+Fn}) (Mono\+Object $\ast$, Args..., Mono\+Exception $\ast$$\ast$)
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_thunked_method_a12f343f44ad1490ba31cad4382348375}\label{classaderite_1_1scripting_1_1_thunked_method_a12f343f44ad1490ba31cad4382348375}} 
+using {\bfseries Exception\+Handler} = void(Mono\+Exception $\ast$exception)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_thunked_method_ad45126fd424142da4a7deeda053cd832}\label{classaderite_1_1scripting_1_1_thunked_method_ad45126fd424142da4a7deeda053cd832}} 
+{\bfseries Thunked\+Method} (Mono\+Method $\ast$method)
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_thunked_method_a66b461b1dab9caca05e3734779d789c7}\label{classaderite_1_1scripting_1_1_thunked_method_a66b461b1dab9caca05e3734779d789c7}} 
+Ret \mbox{\hyperlink{classaderite_1_1scripting_1_1_thunked_method_a66b461b1dab9caca05e3734779d789c7}{invoke}} (Mono\+Object $\ast$instance, Args... args) const
+\begin{DoxyCompactList}\small\item\em Invoke the thunked method with the given parameters. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_thunked_method_a4f5a33e77880024ac79766b8d35592a1}\label{classaderite_1_1scripting_1_1_thunked_method_a4f5a33e77880024ac79766b8d35592a1}} 
+bool \mbox{\hyperlink{classaderite_1_1scripting_1_1_thunked_method_a4f5a33e77880024ac79766b8d35592a1}{valid}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the thunked method is valid, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_thunked_method_a04b058244901a17c49790de4e884d5d5}\label{classaderite_1_1scripting_1_1_thunked_method_a04b058244901a17c49790de4e884d5d5}} 
+{\bfseries operator bool} () const
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_thunked_method_a8999e62b175d693d8a36d31ca04a09b9}\label{classaderite_1_1scripting_1_1_thunked_method_a8999e62b175d693d8a36d31ca04a09b9}} 
+Ret {\bfseries operator()} (Mono\+Object $\ast$instance, Args... args) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Ret, typename... Args$>$\newline
+class aderite\+::scripting\+::\+Thunked\+Method$<$ Ret, Args $>$}
+
+Helper class for thunked mono methods. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Ret} & Return type \\
+\hline
+{\em ...\+Args} & Arguments \\
+\hline
+\end{DoxyTemplParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scripting/Thunked\+Method.\+hpp\end{DoxyCompactItemize}

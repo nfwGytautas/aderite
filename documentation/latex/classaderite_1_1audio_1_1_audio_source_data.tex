@@ -1,0 +1,116 @@
+\hypertarget{classaderite_1_1audio_1_1_audio_source_data}{}\doxysection{aderite\+::audio\+::Audio\+Source\+Data Class Reference}
+\label{classaderite_1_1audio_1_1_audio_source_data}\index{aderite::audio::AudioSourceData@{aderite::audio::AudioSourceData}}
+
+
+Data of the audio source.  
+
+
+
+
+{\ttfamily \#include $<$Audio\+Source\+Data.\+hpp$>$}
+
+Inheritance diagram for aderite\+::audio\+::Audio\+Source\+Data\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classaderite_1_1audio_1_1_audio_source_data}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_source_data_ac504677191cb8151d97d28de23c621b7}\label{classaderite_1_1audio_1_1_audio_source_data_ac504677191cb8151d97d28de23c621b7}} 
+void \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data_ac504677191cb8151d97d28de23c621b7}{mute}} ()
+\begin{DoxyCompactList}\small\item\em Mutes the source. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_source_data_a2b993a1445abcadcf9c0d4dbec63c3d4}\label{classaderite_1_1audio_1_1_audio_source_data_a2b993a1445abcadcf9c0d4dbec63c3d4}} 
+void \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data_a2b993a1445abcadcf9c0d4dbec63c3d4}{unmute}} ()
+\begin{DoxyCompactList}\small\item\em Unmutes the source. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_source_data_a711d131334876e4382a970e5570ee701}\label{classaderite_1_1audio_1_1_audio_source_data_a711d131334876e4382a970e5570ee701}} 
+bool \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data_a711d131334876e4382a970e5570ee701}{is\+Muted}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the source is muted, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_source_data_a0518c8060be1f301e506b952463b873b}\label{classaderite_1_1audio_1_1_audio_source_data_a0518c8060be1f301e506b952463b873b}} 
+float \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data_a0518c8060be1f301e506b952463b873b}{get\+Volume}} () const
+\begin{DoxyCompactList}\small\item\em Returns the volume of the source. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data_a332c9d6d52a5c6b9022f7832873f218a}{set\+Volume}} (const float volume)
+\begin{DoxyCompactList}\small\item\em Sets the volume of the source. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data_ab2011a2a8ea75e0c5f01f05507a7a1e9}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data_aee3673d824930fa322340102753d33a6}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_source_data_a4fec3a77bb5f41efb13071488a3ed206}\label{classaderite_1_1audio_1_1_audio_source_data_a4fec3a77bb5f41efb13071488a3ed206}} 
+\mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data}{Audio\+Source\+Data}} \& {\bfseries operator=} (const \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data}{Audio\+Source\+Data}} \&other)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Data of the audio source. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_source_data_aee3673d824930fa322340102753d33a6}\label{classaderite_1_1audio_1_1_audio_source_data_aee3673d824930fa322340102753d33a6}} 
+\index{aderite::audio::AudioSourceData@{aderite::audio::AudioSourceData}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::audio::AudioSourceData@{aderite::audio::AudioSourceData}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::audio\+::\+Audio\+Source\+Data\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_source_data_ab2011a2a8ea75e0c5f01f05507a7a1e9}\label{classaderite_1_1audio_1_1_audio_source_data_ab2011a2a8ea75e0c5f01f05507a7a1e9}} 
+\index{aderite::audio::AudioSourceData@{aderite::audio::AudioSourceData}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::audio::AudioSourceData@{aderite::audio::AudioSourceData}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::audio\+::\+Audio\+Source\+Data\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_source_data_a332c9d6d52a5c6b9022f7832873f218a}\label{classaderite_1_1audio_1_1_audio_source_data_a332c9d6d52a5c6b9022f7832873f218a}} 
+\index{aderite::audio::AudioSourceData@{aderite::audio::AudioSourceData}!setVolume@{setVolume}}
+\index{setVolume@{setVolume}!aderite::audio::AudioSourceData@{aderite::audio::AudioSourceData}}
+\doxysubsubsection{\texorpdfstring{setVolume()}{setVolume()}}
+{\footnotesize\ttfamily void aderite\+::audio\+::\+Audio\+Source\+Data\+::set\+Volume (\begin{DoxyParamCaption}\item[{const float}]{volume }\end{DoxyParamCaption})}
+
+
+
+Sets the volume of the source. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em volume} & New volume for this source \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/audio/Audio\+Source\+Data.\+hpp\item 
+src/aderite/audio/Audio\+Source\+Data.\+cpp\end{DoxyCompactItemize}

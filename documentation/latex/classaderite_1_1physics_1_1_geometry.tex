@@ -1,0 +1,88 @@
+\hypertarget{classaderite_1_1physics_1_1_geometry}{}\doxysection{aderite\+::physics\+::Geometry Class Reference}
+\label{classaderite_1_1physics_1_1_geometry}\index{aderite::physics::Geometry@{aderite::physics::Geometry}}
+
+
+\mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} is the interface class for geometry types for collider shapes.  
+
+
+
+
+{\ttfamily \#include $<$Geometry.\+hpp$>$}
+
+Inheritance diagram for aderite\+::physics\+::Geometry\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{classaderite_1_1physics_1_1_geometry}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_geometry_adde8a5c6a3ce6d22a5bc8b266035d146}\label{classaderite_1_1physics_1_1_geometry_adde8a5c6a3ce6d22a5bc8b266035d146}} 
+\mbox{\hyperlink{classaderite_1_1physics_1_1_phys_x_actor}{Phys\+XActor}} $\ast$ \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry_adde8a5c6a3ce6d22a5bc8b266035d146}{get\+Actor}} () const
+\begin{DoxyCompactList}\small\item\em Returns the actor of the geometry. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_geometry_a993b756c67c6d568ba4069d98166c24a}\label{classaderite_1_1physics_1_1_geometry_a993b756c67c6d568ba4069d98166c24a}} 
+physx\+::\+Px\+Shape $\ast$ \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry_a993b756c67c6d568ba4069d98166c24a}{get\+Shape}} () const
+\begin{DoxyCompactList}\small\item\em Returns the PhysX shape of the geometry. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_geometry_ad21882c6e1f680ca48935ed2b75daae6}\label{classaderite_1_1physics_1_1_geometry_ad21882c6e1f680ca48935ed2b75daae6}} 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry_ad21882c6e1f680ca48935ed2b75daae6}{is\+Trigger}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if this geometry is used as a trigger, false otherwise. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry_a713d9c21e7591b0b4412c59aeb1ca074}{set\+Trigger}} (bool value)
+\begin{DoxyCompactList}\small\item\em Sets how the geometry should be used, if true then this geometry will become a trigger if false then a collider. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry_a9a957e5eef086e4144d4b1a6eca56634}{apply\+Scale}} (const glm\+::vec3 \&scale)=0
+\begin{DoxyCompactList}\small\item\em Apply scale to geometry. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_geometry_a118fe916a90903badb738c94673f44cf}\label{classaderite_1_1physics_1_1_geometry_a118fe916a90903badb738c94673f44cf}} 
+virtual \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} $\ast$ \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry_a118fe916a90903badb738c94673f44cf}{clone}} ()=0
+\begin{DoxyCompactList}\small\item\em Clone the geometry and return the new instance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_geometry_a204398b2fcbca914bbe99e53512292cc}\label{classaderite_1_1physics_1_1_geometry_a204398b2fcbca914bbe99e53512292cc}} 
+physx\+::\+Px\+Shape $\ast$ {\bfseries p\+\_\+shape} = nullptr
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} is the interface class for geometry types for collider shapes. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_geometry_a9a957e5eef086e4144d4b1a6eca56634}\label{classaderite_1_1physics_1_1_geometry_a9a957e5eef086e4144d4b1a6eca56634}} 
+\index{aderite::physics::Geometry@{aderite::physics::Geometry}!applyScale@{applyScale}}
+\index{applyScale@{applyScale}!aderite::physics::Geometry@{aderite::physics::Geometry}}
+\doxysubsubsection{\texorpdfstring{applyScale()}{applyScale()}}
+{\footnotesize\ttfamily virtual void aderite\+::physics\+::\+Geometry\+::apply\+Scale (\begin{DoxyParamCaption}\item[{const glm\+::vec3 \&}]{scale }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Apply scale to geometry. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em scale} & Scale to apply \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \mbox{\hyperlink{classaderite_1_1physics_1_1_box_geometry_af73d630c9c3c52069aaeb77e056fa1fa}{aderite\+::physics\+::\+Box\+Geometry}}.
+
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_geometry_a713d9c21e7591b0b4412c59aeb1ca074}\label{classaderite_1_1physics_1_1_geometry_a713d9c21e7591b0b4412c59aeb1ca074}} 
+\index{aderite::physics::Geometry@{aderite::physics::Geometry}!setTrigger@{setTrigger}}
+\index{setTrigger@{setTrigger}!aderite::physics::Geometry@{aderite::physics::Geometry}}
+\doxysubsubsection{\texorpdfstring{setTrigger()}{setTrigger()}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Geometry\+::set\+Trigger (\begin{DoxyParamCaption}\item[{bool}]{value }\end{DoxyParamCaption})}
+
+
+
+Sets how the geometry should be used, if true then this geometry will become a trigger if false then a collider. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & New value of the geometry \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/physics/geometry/Geometry.\+hpp\item 
+src/aderite/physics/geometry/Geometry.\+cpp\end{DoxyCompactItemize}

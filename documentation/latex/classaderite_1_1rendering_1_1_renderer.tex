@@ -1,0 +1,83 @@
+\hypertarget{classaderite_1_1rendering_1_1_renderer}{}\doxysection{aderite\+::rendering\+::Renderer Class Reference}
+\label{classaderite_1_1rendering_1_1_renderer}\index{aderite::rendering::Renderer@{aderite::rendering::Renderer}}
+
+
+The \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer}{Renderer}} of aderite powered by bgfx.  
+
+
+
+
+{\ttfamily \#include $<$Renderer.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1rendering_1_1_renderer_a926a3ad2ab996f7224ff0b235386566a}\label{classaderite_1_1rendering_1_1_renderer_a926a3ad2ab996f7224ff0b235386566a}} 
+bool \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer_a926a3ad2ab996f7224ff0b235386566a}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer}{Renderer}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1rendering_1_1_renderer_a81f18ffa9927e0513c1fee81fd590309}\label{classaderite_1_1rendering_1_1_renderer_a81f18ffa9927e0513c1fee81fd590309}} 
+void \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer_a81f18ffa9927e0513c1fee81fd590309}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shutdown \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer}{Renderer}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1rendering_1_1_renderer_a4774e022bba51d988eabeeaac89a2160}\label{classaderite_1_1rendering_1_1_renderer_a4774e022bba51d988eabeeaac89a2160}} 
+void \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer_a4774e022bba51d988eabeeaac89a2160}{set\+Vsync}} (bool enabled)
+\begin{DoxyCompactList}\small\item\em Enables or disables vsync. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer_a30f7edc5e958a0dbe9ceb66f6f4c7e00}{on\+Window\+Resized}} (unsigned int new\+Width, unsigned int new\+Height, bool reset=true)
+\begin{DoxyCompactList}\small\item\em Function invoked when the window has been resized. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1rendering_1_1_renderer_a637ca32d7c5a81c9ac31fca5220d3d38}\label{classaderite_1_1rendering_1_1_renderer_a637ca32d7c5a81c9ac31fca5220d3d38}} 
+void \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer_a637ca32d7c5a81c9ac31fca5220d3d38}{render}} ()
+\begin{DoxyCompactList}\small\item\em Executes the rendering pipeline. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1rendering_1_1_renderer_a707a45cfc817811252ad7f89031ffb9e}\label{classaderite_1_1rendering_1_1_renderer_a707a45cfc817811252ad7f89031ffb9e}} 
+bool \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer_a707a45cfc817811252ad7f89031ffb9e}{is\+Ready}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer}{Renderer}} ready to render. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer_ad6cbc7c3c1109a6f06614c7f2e7fbfd2}{set\+Resolution}} (const glm\+::uvec2 \&size)
+\begin{DoxyCompactList}\small\item\em Sets the resolution of the renderer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1rendering_1_1_renderer_a7a982638d43dfd30d3ceb240466bb935}\label{classaderite_1_1rendering_1_1_renderer_a7a982638d43dfd30d3ceb240466bb935}} 
+void \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer_a7a982638d43dfd30d3ceb240466bb935}{commit}} ()
+\begin{DoxyCompactList}\small\item\em Advances to next frame. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1rendering_1_1_renderer_a0a8798f75964ac64bfb897a3cf743e89}\label{classaderite_1_1rendering_1_1_renderer_a0a8798f75964ac64bfb897a3cf743e89}} 
+\mbox{\hyperlink{structaderite_1_1rendering_1_1_frame_data}{Frame\+Data}} \& \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer_a0a8798f75964ac64bfb897a3cf743e89}{get\+Write\+Frame\+Data}} ()
+\begin{DoxyCompactList}\small\item\em Returns the \mbox{\hyperlink{structaderite_1_1rendering_1_1_frame_data}{Frame\+Data}} that can be written into. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderer}{Renderer}} of aderite powered by bgfx. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1rendering_1_1_renderer_a30f7edc5e958a0dbe9ceb66f6f4c7e00}\label{classaderite_1_1rendering_1_1_renderer_a30f7edc5e958a0dbe9ceb66f6f4c7e00}} 
+\index{aderite::rendering::Renderer@{aderite::rendering::Renderer}!onWindowResized@{onWindowResized}}
+\index{onWindowResized@{onWindowResized}!aderite::rendering::Renderer@{aderite::rendering::Renderer}}
+\doxysubsubsection{\texorpdfstring{onWindowResized()}{onWindowResized()}}
+{\footnotesize\ttfamily void aderite\+::rendering\+::\+Renderer\+::on\+Window\+Resized (\begin{DoxyParamCaption}\item[{unsigned int}]{new\+Width,  }\item[{unsigned int}]{new\+Height,  }\item[{bool}]{reset = {\ttfamily true} }\end{DoxyParamCaption})}
+
+
+
+Function invoked when the window has been resized. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em new\+Width} & New width of the window \\
+\hline
+{\em new\+Height} & New height of the window \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1rendering_1_1_renderer_ad6cbc7c3c1109a6f06614c7f2e7fbfd2}\label{classaderite_1_1rendering_1_1_renderer_ad6cbc7c3c1109a6f06614c7f2e7fbfd2}} 
+\index{aderite::rendering::Renderer@{aderite::rendering::Renderer}!setResolution@{setResolution}}
+\index{setResolution@{setResolution}!aderite::rendering::Renderer@{aderite::rendering::Renderer}}
+\doxysubsubsection{\texorpdfstring{setResolution()}{setResolution()}}
+{\footnotesize\ttfamily void aderite\+::rendering\+::\+Renderer\+::set\+Resolution (\begin{DoxyParamCaption}\item[{const glm\+::uvec2 \&}]{size }\end{DoxyParamCaption})}
+
+
+
+Sets the resolution of the renderer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em size} & The new resolution \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/rendering/Renderer.\+hpp\item 
+src/aderite/rendering/Renderer.\+cpp\end{DoxyCompactItemize}

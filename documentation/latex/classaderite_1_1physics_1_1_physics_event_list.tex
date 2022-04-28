@@ -1,0 +1,69 @@
+\hypertarget{classaderite_1_1physics_1_1_physics_event_list}{}\doxysection{aderite\+::physics\+::Physics\+Event\+List Class Reference}
+\label{classaderite_1_1physics_1_1_physics_event_list}\index{aderite::physics::PhysicsEventList@{aderite::physics::PhysicsEventList}}
+
+
+A class containing physics events.  
+
+
+
+
+{\ttfamily \#include $<$Physics\+Event\+List.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_event_list_a45672d7c5b9a33406faa7b6b750a7493}{register\+Event}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{Trigger\+Event}} \&te)
+\begin{DoxyCompactList}\small\item\em Register a trigger event to the list. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_event_list_abbaca505b0fd1d52463872f9a9e8b9bf}{register\+Event}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{Collision\+Event}} \&ce)
+\begin{DoxyCompactList}\small\item\em Register a collision event to the list. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_event_list_a9a19d43e19ff528ed693c20b7bb9b83c}\label{classaderite_1_1physics_1_1_physics_event_list_a9a19d43e19ff528ed693c20b7bb9b83c}} 
+const std\+::vector$<$ \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{Trigger\+Event}} $>$ \& \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_event_list_a9a19d43e19ff528ed693c20b7bb9b83c}{get\+Trigger\+Events}} () const
+\begin{DoxyCompactList}\small\item\em Returns the trigger events. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_event_list_ae104752b0df12a483d4b130bd29e13c9}\label{classaderite_1_1physics_1_1_physics_event_list_ae104752b0df12a483d4b130bd29e13c9}} 
+const std\+::vector$<$ \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{Collision\+Event}} $>$ \& \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_event_list_ae104752b0df12a483d4b130bd29e13c9}{get\+Collision\+Events}} () const
+\begin{DoxyCompactList}\small\item\em Returns the collision events. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_event_list_a6b3d8f4660585cce2ed97c538a70fce8}\label{classaderite_1_1physics_1_1_physics_event_list_a6b3d8f4660585cce2ed97c538a70fce8}} 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_event_list_a6b3d8f4660585cce2ed97c538a70fce8}{clear}} ()
+\begin{DoxyCompactList}\small\item\em Clears all events in the list. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A class containing physics events. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_event_list_abbaca505b0fd1d52463872f9a9e8b9bf}\label{classaderite_1_1physics_1_1_physics_event_list_abbaca505b0fd1d52463872f9a9e8b9bf}} 
+\index{aderite::physics::PhysicsEventList@{aderite::physics::PhysicsEventList}!registerEvent@{registerEvent}}
+\index{registerEvent@{registerEvent}!aderite::physics::PhysicsEventList@{aderite::physics::PhysicsEventList}}
+\doxysubsubsection{\texorpdfstring{registerEvent()}{registerEvent()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Physics\+Event\+List\+::register\+Event (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{Collision\+Event}} \&}]{ce }\end{DoxyParamCaption})}
+
+
+
+Register a collision event to the list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ce} & Collision event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_event_list_a45672d7c5b9a33406faa7b6b750a7493}\label{classaderite_1_1physics_1_1_physics_event_list_a45672d7c5b9a33406faa7b6b750a7493}} 
+\index{aderite::physics::PhysicsEventList@{aderite::physics::PhysicsEventList}!registerEvent@{registerEvent}}
+\index{registerEvent@{registerEvent}!aderite::physics::PhysicsEventList@{aderite::physics::PhysicsEventList}}
+\doxysubsubsection{\texorpdfstring{registerEvent()}{registerEvent()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Physics\+Event\+List\+::register\+Event (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{Trigger\+Event}} \&}]{te }\end{DoxyParamCaption})}
+
+
+
+Register a trigger event to the list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em te} & Trigger event \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/physics/Physics\+Event\+List.\+hpp\item 
+src/aderite/physics/Physics\+Event\+List.\+cpp\end{DoxyCompactItemize}

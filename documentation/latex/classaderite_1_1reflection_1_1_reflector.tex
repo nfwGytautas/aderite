@@ -1,0 +1,138 @@
+\hypertarget{classaderite_1_1reflection_1_1_reflector}{}\doxysection{aderite\+::reflection\+::Reflector Class Reference}
+\label{classaderite_1_1reflection_1_1_reflector}\index{aderite::reflection::Reflector@{aderite::reflection::Reflector}}
+
+
+\mbox{\hyperlink{classaderite_1_1reflection_1_1_reflector}{Reflector}} is responsible for the entire aderite reflection system.  
+
+
+
+
+{\ttfamily \#include $<$Reflector.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classaderite_1_1reflection_1_1_reflector_aeaf65b2197cb800d91b19c8b81ba231c}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the reflector. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1reflection_1_1_reflector_a98fe139c2f7d50a5d64093988fb3bab6}\label{classaderite_1_1reflection_1_1_reflector_a98fe139c2f7d50a5d64093988fb3bab6}} 
+void \mbox{\hyperlink{classaderite_1_1reflection_1_1_reflector_a98fe139c2f7d50a5d64093988fb3bab6}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shutdown reflector. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\void \mbox{\hyperlink{classaderite_1_1reflection_1_1_reflector_a00ec98514b174ae2c0e9820652b685d5}{expose}} (Type type, const std\+::string \&name=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Expose a type to the reflector. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\T $\ast$ \mbox{\hyperlink{classaderite_1_1reflection_1_1_reflector_a9575e4dadfeabf685ba1c15105cdc209}{reflect}} (Type type) const
+\begin{DoxyCompactList}\small\item\em Creates an object if it\textquotesingle{}s reflectable. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{classaderite_1_1reflection_1_1_reflector_a2b63c068636cc1693c314f5266495299}{reflect\+Name}} (Type type) const
+\begin{DoxyCompactList}\small\item\em Reflect the name of the type. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1reflection_1_1_instancer_base}{Instancer\+Base}} $\ast$ \mbox{\hyperlink{classaderite_1_1reflection_1_1_reflector_a77558b7a4c3818947448bced12adb102}{resolve\+Instancer}} (Type type) const
+\begin{DoxyCompactList}\small\item\em Resolves an instancer for a type, asserts if a type doesn\textquotesingle{}t have a type. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1reflection_1_1_reflector_a723929531e85549f81a1a2c4afffa4c3}\label{classaderite_1_1reflection_1_1_reflector_a723929531e85549f81a1a2c4afffa4c3}} 
+{\bfseries ADERITE\+\_\+\+DEBUG\+\_\+\+SECTION} (void print\+Instancers();)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classaderite_1_1reflection_1_1_reflector}{Reflector}} is responsible for the entire aderite reflection system. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1reflection_1_1_reflector_a00ec98514b174ae2c0e9820652b685d5}\label{classaderite_1_1reflection_1_1_reflector_a00ec98514b174ae2c0e9820652b685d5}} 
+\index{aderite::reflection::Reflector@{aderite::reflection::Reflector}!expose@{expose}}
+\index{expose@{expose}!aderite::reflection::Reflector@{aderite::reflection::Reflector}}
+\doxysubsubsection{\texorpdfstring{expose()}{expose()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void aderite\+::reflection\+::\+Reflector\+::expose (\begin{DoxyParamCaption}\item[{Type}]{type,  }\item[{const std\+::string \&}]{name = {\ttfamily \char`\"{}\char`\"{}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Expose a type to the reflector. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Type of the object to expose \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em type} & Numerical index of the type \\
+\hline
+{\em name} & Optional name of the type \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1reflection_1_1_reflector_aeaf65b2197cb800d91b19c8b81ba231c}\label{classaderite_1_1reflection_1_1_reflector_aeaf65b2197cb800d91b19c8b81ba231c}} 
+\index{aderite::reflection::Reflector@{aderite::reflection::Reflector}!init@{init}}
+\index{init@{init}!aderite::reflection::Reflector@{aderite::reflection::Reflector}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily bool aderite\+::reflection\+::\+Reflector\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Initializes the reflector. 
+
+\begin{DoxyReturn}{Returns}
+True if initialized without error, false otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1reflection_1_1_reflector_a9575e4dadfeabf685ba1c15105cdc209}\label{classaderite_1_1reflection_1_1_reflector_a9575e4dadfeabf685ba1c15105cdc209}} 
+\index{aderite::reflection::Reflector@{aderite::reflection::Reflector}!reflect@{reflect}}
+\index{reflect@{reflect}!aderite::reflection::Reflector@{aderite::reflection::Reflector}}
+\doxysubsubsection{\texorpdfstring{reflect()}{reflect()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+T$\ast$ aderite\+::reflection\+::\+Reflector\+::reflect (\begin{DoxyParamCaption}\item[{Type}]{type }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Creates an object if it\textquotesingle{}s reflectable. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Type of the reflectable \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em type} & Type ENUM \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1reflection_1_1_reflector_a2b63c068636cc1693c314f5266495299}\label{classaderite_1_1reflection_1_1_reflector_a2b63c068636cc1693c314f5266495299}} 
+\index{aderite::reflection::Reflector@{aderite::reflection::Reflector}!reflectName@{reflectName}}
+\index{reflectName@{reflectName}!aderite::reflection::Reflector@{aderite::reflection::Reflector}}
+\doxysubsubsection{\texorpdfstring{reflectName()}{reflectName()}}
+{\footnotesize\ttfamily std\+::string aderite\+::reflection\+::\+Reflector\+::reflect\+Name (\begin{DoxyParamCaption}\item[{Type}]{type }\end{DoxyParamCaption}) const}
+
+
+
+Reflect the name of the type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & Type whose name to reflect \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Name associated with type 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1reflection_1_1_reflector_a77558b7a4c3818947448bced12adb102}\label{classaderite_1_1reflection_1_1_reflector_a77558b7a4c3818947448bced12adb102}} 
+\index{aderite::reflection::Reflector@{aderite::reflection::Reflector}!resolveInstancer@{resolveInstancer}}
+\index{resolveInstancer@{resolveInstancer}!aderite::reflection::Reflector@{aderite::reflection::Reflector}}
+\doxysubsubsection{\texorpdfstring{resolveInstancer()}{resolveInstancer()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1reflection_1_1_instancer_base}{Instancer\+Base}} $\ast$ aderite\+::reflection\+::\+Reflector\+::resolve\+Instancer (\begin{DoxyParamCaption}\item[{Type}]{type }\end{DoxyParamCaption}) const}
+
+
+
+Resolves an instancer for a type, asserts if a type doesn\textquotesingle{}t have a type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & Type to get instancer for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classaderite_1_1reflection_1_1_instancer}{Instancer}} instance 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/reflection/Reflector.\+hpp\item 
+src/aderite/reflection/Reflector.\+cpp\end{DoxyCompactItemize}

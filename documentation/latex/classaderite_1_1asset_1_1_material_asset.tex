@@ -1,0 +1,183 @@
+\hypertarget{classaderite_1_1asset_1_1_material_asset}{}\doxysection{aderite\+::asset\+::Material\+Asset Class Reference}
+\label{classaderite_1_1asset_1_1_material_asset}\index{aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}}
+
+
+Material asset implementation.  
+
+
+
+
+{\ttfamily \#include $<$Material\+Asset.\+hpp$>$}
+
+Inheritance diagram for aderite\+::asset\+::Material\+Asset\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.992870cm]{classaderite_1_1asset_1_1_material_asset}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_a335b0387df5578e27ac9cdeaf4c5bc66}\label{classaderite_1_1asset_1_1_material_asset_a335b0387df5578e27ac9cdeaf4c5bc66}} 
+Material\+Type\+Asset $\ast$ \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a335b0387df5578e27ac9cdeaf4c5bc66}{get\+Material\+Type}} () const
+\begin{DoxyCompactList}\small\item\em Returns the type of this material. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a0a5c2e8f88b0dfd3cb4b8520a4df7eb7}{set\+Material\+Type}} (Material\+Type\+Asset $\ast$type)
+\begin{DoxyCompactList}\small\item\em Set the type of the material asset. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_a4215d3f91145b5b9ff29cefeb674d729}\label{classaderite_1_1asset_1_1_material_asset_a4215d3f91145b5b9ff29cefeb674d729}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a4215d3f91145b5b9ff29cefeb674d729}{is\+Valid}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the material is valid and can be used for rendering. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a61579fa426fa4bffcf1cf140db46096f}{set\+Sampler}} (size\+\_\+t index, \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset}{Texture\+Asset}} $\ast$ta)
+\begin{DoxyCompactList}\small\item\em Set the sampler. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_a3b3f0fa97fbf0910cd1493edef506065}\label{classaderite_1_1asset_1_1_material_asset_a3b3f0fa97fbf0910cd1493edef506065}} 
+size\+\_\+t \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a3b3f0fa97fbf0910cd1493edef506065}{get\+Sampler\+Count}} () const
+\begin{DoxyCompactList}\small\item\em Returns the number of samplers in the material. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset}{Texture\+Asset}} $\ast$ \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a97128d1ae15a6997f83228a4490fa222}{get\+Sampler}} (size\+\_\+t index) const
+\begin{DoxyCompactList}\small\item\em Returns the sampler at the specified index. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_a8aeded8ac4a0ab8c7e6f6a247b62a277}\label{classaderite_1_1asset_1_1_material_asset_a8aeded8ac4a0ab8c7e6f6a247b62a277}} 
+float $\ast$ \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a8aeded8ac4a0ab8c7e6f6a247b62a277}{get\+Property\+Data}} () const
+\begin{DoxyCompactList}\small\item\em Returns material property data array. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a30d49bb617ad318d385367005a44a820}{load}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$loader) override
+\begin{DoxyCompactList}\small\item\em Load the object data, this function is executed in a separate thread. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_aba796770f71923764b92c103f748df5e}\label{classaderite_1_1asset_1_1_material_asset_aba796770f71923764b92c103f748df5e}} 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_aba796770f71923764b92c103f748df5e}{unload}} () override
+\begin{DoxyCompactList}\small\item\em Unload the object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_aeac87ac1a652f822fddb4d5714b132de}\label{classaderite_1_1asset_1_1_material_asset_aeac87ac1a652f822fddb4d5714b132de}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_aeac87ac1a652f822fddb4d5714b132de}{needs\+Loading}} () const override
+\begin{DoxyCompactList}\small\item\em Returns true if the object needs loading, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_a4aabd9b0da4e9e47d45d6697f59c79ff}\label{classaderite_1_1asset_1_1_material_asset_a4aabd9b0da4e9e47d45d6697f59c79ff}} 
+reflection\+::\+Type \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a4aabd9b0da4e9e47d45d6697f59c79ff}{get\+Type}} () const override
+\begin{DoxyCompactList}\small\item\em Returns the type of the reflectable. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a06df010ac592fe0f815699de8907cd67}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_ad58901a8a739d5b7eb04729b22232837}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+Material asset implementation. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_ad58901a8a739d5b7eb04729b22232837}\label{classaderite_1_1asset_1_1_material_asset_ad58901a8a739d5b7eb04729b22232837}} 
+\index{aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Material\+Asset\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_a97128d1ae15a6997f83228a4490fa222}\label{classaderite_1_1asset_1_1_material_asset_a97128d1ae15a6997f83228a4490fa222}} 
+\index{aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}!getSampler@{getSampler}}
+\index{getSampler@{getSampler}!aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}}
+\doxysubsubsection{\texorpdfstring{getSampler()}{getSampler()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset}{Texture\+Asset}} $\ast$ aderite\+::asset\+::\+Material\+Asset\+::get\+Sampler (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index }\end{DoxyParamCaption}) const}
+
+
+
+Returns the sampler at the specified index. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & Index of the sampler \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset}{Texture\+Asset}} instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_a30d49bb617ad318d385367005a44a820}\label{classaderite_1_1asset_1_1_material_asset_a30d49bb617ad318d385367005a44a820}} 
+\index{aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}!load@{load}}
+\index{load@{load}!aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Material\+Asset\+::load (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$}]{loader }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Load the object data, this function is executed in a separate thread. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em loader} & Loader instance \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a6a6ae7d870dc85b66cbdd2766f1dd0ac}{aderite\+::io\+::\+Serializable\+Asset}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_a06df010ac592fe0f815699de8907cd67}\label{classaderite_1_1asset_1_1_material_asset_a06df010ac592fe0f815699de8907cd67}} 
+\index{aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Material\+Asset\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_a0a5c2e8f88b0dfd3cb4b8520a4df7eb7}\label{classaderite_1_1asset_1_1_material_asset_a0a5c2e8f88b0dfd3cb4b8520a4df7eb7}} 
+\index{aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}!setMaterialType@{setMaterialType}}
+\index{setMaterialType@{setMaterialType}!aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}}
+\doxysubsubsection{\texorpdfstring{setMaterialType()}{setMaterialType()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Material\+Asset\+::set\+Material\+Type (\begin{DoxyParamCaption}\item[{Material\+Type\+Asset $\ast$}]{type }\end{DoxyParamCaption})}
+
+
+
+Set the type of the material asset. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & New type of the material \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_material_asset_a61579fa426fa4bffcf1cf140db46096f}\label{classaderite_1_1asset_1_1_material_asset_a61579fa426fa4bffcf1cf140db46096f}} 
+\index{aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}!setSampler@{setSampler}}
+\index{setSampler@{setSampler}!aderite::asset::MaterialAsset@{aderite::asset::MaterialAsset}}
+\doxysubsubsection{\texorpdfstring{setSampler()}{setSampler()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Material\+Asset\+::set\+Sampler (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index,  }\item[{\mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset}{Texture\+Asset}} $\ast$}]{ta }\end{DoxyParamCaption})}
+
+
+
+Set the sampler. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & Index of the sampler \\
+\hline
+{\em ta} & Texture asset \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/asset/Material\+Asset.\+hpp\item 
+src/aderite/asset/Material\+Asset.\+cpp\end{DoxyCompactItemize}

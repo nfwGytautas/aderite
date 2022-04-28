@@ -1,0 +1,55 @@
+\hypertarget{classaderite_1_1scene_1_1_camera}{}\doxysection{aderite\+::scene\+::Camera Class Reference}
+\label{classaderite_1_1scene_1_1_camera}\index{aderite::scene::Camera@{aderite::scene::Camera}}
+
+
+\mbox{\hyperlink{classaderite_1_1scene_1_1_camera}{Camera}} class used as a main way to see rendering results.  
+
+
+
+
+{\ttfamily \#include $<$Camera.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_a6a2f4e7589a4e94e2b16e300c9fb00a7}\label{classaderite_1_1scene_1_1_camera_a6a2f4e7589a4e94e2b16e300c9fb00a7}} 
+{\bfseries Camera} (\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{scene\+::\+Game\+Object}} $\ast$g\+Object)
+\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_a705fe6d105a40330d2a8dedea988e8be}{update}} (float delta)
+\begin{DoxyCompactList}\small\item\em Update the camera properties. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_ae4fd83fbcfbb2141f9de18f91b202b81}\label{classaderite_1_1scene_1_1_camera_ae4fd83fbcfbb2141f9de18f91b202b81}} 
+bgfx\+::\+Texture\+Handle \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_ae4fd83fbcfbb2141f9de18f91b202b81}{get\+Output\+Handle}} () const
+\begin{DoxyCompactList}\small\item\em Returns the texture output of the \mbox{\hyperlink{classaderite_1_1scene_1_1_camera}{Camera}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_ae912d5ec01522524527f5ccb422562c9}\label{classaderite_1_1scene_1_1_camera_ae912d5ec01522524527f5ccb422562c9}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings}{Camera\+Settings}} \& \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_ae912d5ec01522524527f5ccb422562c9}{get\+Data}} ()
+\begin{DoxyCompactList}\small\item\em Returns the camera data. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_a17d233c26f27400733586ed8778a7f91}\label{classaderite_1_1scene_1_1_camera_a17d233c26f27400733586ed8778a7f91}} 
+glm\+::vec3 \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_a17d233c26f27400733586ed8778a7f91}{get\+Forward\+Direction}} () const
+\begin{DoxyCompactList}\small\item\em Returns the forward vector of this camera, can be used for raycasting from the camera point of view. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classaderite_1_1scene_1_1_camera}{Camera}} class used as a main way to see rendering results. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_a705fe6d105a40330d2a8dedea988e8be}\label{classaderite_1_1scene_1_1_camera_a705fe6d105a40330d2a8dedea988e8be}} 
+\index{aderite::scene::Camera@{aderite::scene::Camera}!update@{update}}
+\index{update@{update}!aderite::scene::Camera@{aderite::scene::Camera}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Camera\+::update (\begin{DoxyParamCaption}\item[{float}]{delta }\end{DoxyParamCaption})}
+
+
+
+Update the camera properties. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em delta} & Delta time of last frame \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scene/Camera.\+hpp\item 
+src/aderite/scene/Camera.\+cpp\end{DoxyCompactItemize}

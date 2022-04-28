@@ -1,0 +1,147 @@
+\hypertarget{classaderite_1_1scene_1_1_camera_settings}{}\doxysection{aderite\+::scene\+::Camera\+Settings Class Reference}
+\label{classaderite_1_1scene_1_1_camera_settings}\index{aderite::scene::CameraSettings@{aderite::scene::CameraSettings}}
+
+
+Class that holds camera settings.  
+
+
+
+
+{\ttfamily \#include $<$Camera\+Settings.\+hpp$>$}
+
+Inheritance diagram for aderite\+::scene\+::Camera\+Settings\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classaderite_1_1scene_1_1_camera_settings}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_settings_a1ca6c6545d8cdc4a854adf2b1db171b6}\label{classaderite_1_1scene_1_1_camera_settings_a1ca6c6545d8cdc4a854adf2b1db171b6}} 
+float \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings_a1ca6c6545d8cdc4a854adf2b1db171b6}{get\+FoV}} () const
+\begin{DoxyCompactList}\small\item\em Get field of vision. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings_a692ed4c71df5a0542efe1a3712bb4fa6}{set\+FoV}} (float fov)
+\begin{DoxyCompactList}\small\item\em Set field of vision. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_settings_a23a749db856c607668b5533784a7822c}\label{classaderite_1_1scene_1_1_camera_settings_a23a749db856c607668b5533784a7822c}} 
+float \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings_a23a749db856c607668b5533784a7822c}{get\+Near\+Clip}} () const
+\begin{DoxyCompactList}\small\item\em Get near clipping plane distance. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings_ae2d0ac6ca49f131141c19cdabe494164}{set\+Near\+Clip}} (float distance)
+\begin{DoxyCompactList}\small\item\em Set the near clipping plane distance. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_settings_ae939ca7938a86cbd9c5e89bc5ddab88a}\label{classaderite_1_1scene_1_1_camera_settings_ae939ca7938a86cbd9c5e89bc5ddab88a}} 
+float \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings_ae939ca7938a86cbd9c5e89bc5ddab88a}{get\+Far\+Clip}} () const
+\begin{DoxyCompactList}\small\item\em Get far clipping plane distance. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings_aea890fc7161d9f2f3f1195c4d21b5686}{set\+Far\+Clip}} (float distance)
+\begin{DoxyCompactList}\small\item\em Set the far clipping plane distance. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings_a4dd7372c6ea488b926d7e89d9b55449e}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings_aeb6a726262a87e6bd2ce2b18728c8192}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_settings_ac11433701a2dd88763d222b4c2a69bf2}\label{classaderite_1_1scene_1_1_camera_settings_ac11433701a2dd88763d222b4c2a69bf2}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings}{Camera\+Settings}} \& {\bfseries operator=} (const \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings}{Camera\+Settings}} \&other)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class that holds camera settings. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_settings_aeb6a726262a87e6bd2ce2b18728c8192}\label{classaderite_1_1scene_1_1_camera_settings_aeb6a726262a87e6bd2ce2b18728c8192}} 
+\index{aderite::scene::CameraSettings@{aderite::scene::CameraSettings}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::scene::CameraSettings@{aderite::scene::CameraSettings}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::scene\+::\+Camera\+Settings\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_settings_a4dd7372c6ea488b926d7e89d9b55449e}\label{classaderite_1_1scene_1_1_camera_settings_a4dd7372c6ea488b926d7e89d9b55449e}} 
+\index{aderite::scene::CameraSettings@{aderite::scene::CameraSettings}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::scene::CameraSettings@{aderite::scene::CameraSettings}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::scene\+::\+Camera\+Settings\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_settings_aea890fc7161d9f2f3f1195c4d21b5686}\label{classaderite_1_1scene_1_1_camera_settings_aea890fc7161d9f2f3f1195c4d21b5686}} 
+\index{aderite::scene::CameraSettings@{aderite::scene::CameraSettings}!setFarClip@{setFarClip}}
+\index{setFarClip@{setFarClip}!aderite::scene::CameraSettings@{aderite::scene::CameraSettings}}
+\doxysubsubsection{\texorpdfstring{setFarClip()}{setFarClip()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Camera\+Settings\+::set\+Far\+Clip (\begin{DoxyParamCaption}\item[{float}]{distance }\end{DoxyParamCaption})}
+
+
+
+Set the far clipping plane distance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em distance} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_settings_a692ed4c71df5a0542efe1a3712bb4fa6}\label{classaderite_1_1scene_1_1_camera_settings_a692ed4c71df5a0542efe1a3712bb4fa6}} 
+\index{aderite::scene::CameraSettings@{aderite::scene::CameraSettings}!setFoV@{setFoV}}
+\index{setFoV@{setFoV}!aderite::scene::CameraSettings@{aderite::scene::CameraSettings}}
+\doxysubsubsection{\texorpdfstring{setFoV()}{setFoV()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Camera\+Settings\+::set\+FoV (\begin{DoxyParamCaption}\item[{float}]{fov }\end{DoxyParamCaption})}
+
+
+
+Set field of vision. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fov} & New fov value \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_camera_settings_ae2d0ac6ca49f131141c19cdabe494164}\label{classaderite_1_1scene_1_1_camera_settings_ae2d0ac6ca49f131141c19cdabe494164}} 
+\index{aderite::scene::CameraSettings@{aderite::scene::CameraSettings}!setNearClip@{setNearClip}}
+\index{setNearClip@{setNearClip}!aderite::scene::CameraSettings@{aderite::scene::CameraSettings}}
+\doxysubsubsection{\texorpdfstring{setNearClip()}{setNearClip()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Camera\+Settings\+::set\+Near\+Clip (\begin{DoxyParamCaption}\item[{float}]{distance }\end{DoxyParamCaption})}
+
+
+
+Set the near clipping plane distance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em distance} & \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scene/Camera\+Settings.\+hpp\item 
+src/aderite/scene/Camera\+Settings.\+cpp\end{DoxyCompactItemize}

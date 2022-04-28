@@ -1,0 +1,83 @@
+\hypertarget{classaderite_1_1io_1_1_serializer}{}\doxysection{aderite\+::io\+::Serializer Class Reference}
+\label{classaderite_1_1io_1_1_serializer}\index{aderite::io::Serializer@{aderite::io::Serializer}}
+
+
+\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{Serializer}} class that is responsible for serializing and deserializing asset meta objects.  
+
+
+
+
+{\ttfamily \#include $<$Serializer.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classaderite_1_1io_1_1_serializer_a3829c7d94c1f7c9f5aeb0cc96460ce44}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the serializer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializer_ac75d2d2a558a6b9d61b86311fa7bbe0a}\label{classaderite_1_1io_1_1_serializer_ac75d2d2a558a6b9d61b86311fa7bbe0a}} 
+void \mbox{\hyperlink{classaderite_1_1io_1_1_serializer_ac75d2d2a558a6b9d61b86311fa7bbe0a}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shutdown serializer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{Serializable\+Object}} $\ast$ \mbox{\hyperlink{classaderite_1_1io_1_1_serializer_a4ba5a8f9b579c6c5ad82521d62649d83}{parse\+Object}} (const YAML\+::\+Node \&data)
+\begin{DoxyCompactList}\small\item\em Parses the object inside the current data scope and returns it. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1io_1_1_serializer_a261ca98d90348d20085a6d3f39b24837}{write\+Object}} (YAML\+::\+Emitter \&emitter, const \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{Serializable\+Object}} $\ast$object) const
+\begin{DoxyCompactList}\small\item\em Write an object to the specified emitter. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{Serializer}} class that is responsible for serializing and deserializing asset meta objects. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializer_a3829c7d94c1f7c9f5aeb0cc96460ce44}\label{classaderite_1_1io_1_1_serializer_a3829c7d94c1f7c9f5aeb0cc96460ce44}} 
+\index{aderite::io::Serializer@{aderite::io::Serializer}!init@{init}}
+\index{init@{init}!aderite::io::Serializer@{aderite::io::Serializer}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily bool aderite\+::io\+::\+Serializer\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Initializes the serializer. 
+
+\begin{DoxyReturn}{Returns}
+True if initialized without error, false otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializer_a4ba5a8f9b579c6c5ad82521d62649d83}\label{classaderite_1_1io_1_1_serializer_a4ba5a8f9b579c6c5ad82521d62649d83}} 
+\index{aderite::io::Serializer@{aderite::io::Serializer}!parseObject@{parseObject}}
+\index{parseObject@{parseObject}!aderite::io::Serializer@{aderite::io::Serializer}}
+\doxysubsubsection{\texorpdfstring{parseObject()}{parseObject()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{Serializable\+Object}} $\ast$ aderite\+::io\+::\+Serializer\+::parse\+Object (\begin{DoxyParamCaption}\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})}
+
+
+
+Parses the object inside the current data scope and returns it. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Data node, must have Type, Name keys \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{Serializable\+Object}} instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializer_a261ca98d90348d20085a6d3f39b24837}\label{classaderite_1_1io_1_1_serializer_a261ca98d90348d20085a6d3f39b24837}} 
+\index{aderite::io::Serializer@{aderite::io::Serializer}!writeObject@{writeObject}}
+\index{writeObject@{writeObject}!aderite::io::Serializer@{aderite::io::Serializer}}
+\doxysubsubsection{\texorpdfstring{writeObject()}{writeObject()}}
+{\footnotesize\ttfamily void aderite\+::io\+::\+Serializer\+::write\+Object (\begin{DoxyParamCaption}\item[{YAML\+::\+Emitter \&}]{emitter,  }\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{Serializable\+Object}} $\ast$}]{object }\end{DoxyParamCaption}) const}
+
+
+
+Write an object to the specified emitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em emitter} & Emitter to write to \\
+\hline
+{\em object} & Object to write \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/io/Serializer.\+hpp\item 
+src/aderite/io/Serializer.\+cpp\end{DoxyCompactItemize}

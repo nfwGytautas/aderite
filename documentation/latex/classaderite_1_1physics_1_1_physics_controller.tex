@@ -1,0 +1,93 @@
+\hypertarget{classaderite_1_1physics_1_1_physics_controller}{}\doxysection{aderite\+::physics\+::Physics\+Controller Class Reference}
+\label{classaderite_1_1physics_1_1_physics_controller}\index{aderite::physics::PhysicsController@{aderite::physics::PhysicsController}}
+
+
+Class used to handle all physics related functionality for aderite.  
+
+
+
+
+{\ttfamily \#include $<$Physics\+Controller.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_controller_a6ccd717cdb2c2a00f8e16345112a6e15}\label{classaderite_1_1physics_1_1_physics_controller_a6ccd717cdb2c2a00f8e16345112a6e15}} 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_controller_a6ccd717cdb2c2a00f8e16345112a6e15}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the physics controller. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_controller_ad180c6b574117e9db97e882f5942becf}\label{classaderite_1_1physics_1_1_physics_controller_ad180c6b574117e9db97e882f5942becf}} 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_controller_ad180c6b574117e9db97e882f5942becf}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shutdown the physics controller. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_controller_a4dfde562bc9896eec1735d12c83f16e3}{update}} (float delta)
+\begin{DoxyCompactList}\small\item\em Function invoked by the engine when it\textquotesingle{}s time to update physics. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_controller_a4941baa0cb87e91489b9b2d844f0b7ab}\label{classaderite_1_1physics_1_1_physics_controller_a4941baa0cb87e91489b9b2d844f0b7ab}} 
+physx\+::\+Px\+Physics $\ast$ \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_controller_a4941baa0cb87e91489b9b2d844f0b7ab}{get\+Physics}} () const
+\begin{DoxyCompactList}\small\item\em Returns the PhysX physics object instance. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_controller_a1919bf222a110b1a2e73632c432606ce}\label{classaderite_1_1physics_1_1_physics_controller_a1919bf222a110b1a2e73632c432606ce}} 
+physx\+::\+Px\+Cpu\+Dispatcher $\ast$ \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_controller_a1919bf222a110b1a2e73632c432606ce}{get\+Dispatcher}} () const
+\begin{DoxyCompactList}\small\item\em Returns the PhysX CPU dispatcher. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_controller_a622672a7a96d772cfc3998304b25c9f0}\label{classaderite_1_1physics_1_1_physics_controller_a622672a7a96d772cfc3998304b25c9f0}} 
+physx\+::\+Px\+Material $\ast$ \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_controller_a622672a7a96d772cfc3998304b25c9f0}{get\+Default\+Material}} () const
+\begin{DoxyCompactList}\small\item\em Returns the default physics material instance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static physx\+::\+Px\+Filter\+Flags \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_controller_a8053f262ce2dcf3a2bc6f079a7ff7fe0}{filter\+Shader}} (physx\+::\+Px\+Filter\+Object\+Attributes attributes0, physx\+::\+Px\+Filter\+Data filter\+Data0, physx\+::\+Px\+Filter\+Object\+Attributes attributes1, physx\+::\+Px\+Filter\+Data filter\+Data1, physx\+::\+Px\+Pair\+Flags \&pair\+Flags, const void $\ast$constant\+Block, physx\+::\+Px\+U32 constant\+Block\+Size)
+\begin{DoxyCompactList}\small\item\em Filter shader of the physics controller. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class used to handle all physics related functionality for aderite. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_controller_a8053f262ce2dcf3a2bc6f079a7ff7fe0}\label{classaderite_1_1physics_1_1_physics_controller_a8053f262ce2dcf3a2bc6f079a7ff7fe0}} 
+\index{aderite::physics::PhysicsController@{aderite::physics::PhysicsController}!filterShader@{filterShader}}
+\index{filterShader@{filterShader}!aderite::physics::PhysicsController@{aderite::physics::PhysicsController}}
+\doxysubsubsection{\texorpdfstring{filterShader()}{filterShader()}}
+{\footnotesize\ttfamily physx\+::\+Px\+Filter\+Flags aderite\+::physics\+::\+Physics\+Controller\+::filter\+Shader (\begin{DoxyParamCaption}\item[{physx\+::\+Px\+Filter\+Object\+Attributes}]{attributes0,  }\item[{physx\+::\+Px\+Filter\+Data}]{filter\+Data0,  }\item[{physx\+::\+Px\+Filter\+Object\+Attributes}]{attributes1,  }\item[{physx\+::\+Px\+Filter\+Data}]{filter\+Data1,  }\item[{physx\+::\+Px\+Pair\+Flags \&}]{pair\+Flags,  }\item[{const void $\ast$}]{constant\+Block,  }\item[{physx\+::\+Px\+U32}]{constant\+Block\+Size }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Filter shader of the physics controller. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em attributes0} & Attributes of the first actor \\
+\hline
+{\em filter\+Data0} & Filter data of the first actor \\
+\hline
+{\em attributes1} & Attributes of the second actor \\
+\hline
+{\em filter\+Data1} & Filter data of the second actor \\
+\hline
+{\em pair\+Flags} & Pair flags that are returned \\
+\hline
+{\em constant\+Block} & -\/ \\
+\hline
+{\em constant\+Block\+Size} & -\/ \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Filter flag, to be suppressed or not 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_controller_a4dfde562bc9896eec1735d12c83f16e3}\label{classaderite_1_1physics_1_1_physics_controller_a4dfde562bc9896eec1735d12c83f16e3}} 
+\index{aderite::physics::PhysicsController@{aderite::physics::PhysicsController}!update@{update}}
+\index{update@{update}!aderite::physics::PhysicsController@{aderite::physics::PhysicsController}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Physics\+Controller\+::update (\begin{DoxyParamCaption}\item[{float}]{delta }\end{DoxyParamCaption})}
+
+
+
+Function invoked by the engine when it\textquotesingle{}s time to update physics. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em delta} & Delta between two frames \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/physics/Physics\+Controller.\+hpp\item 
+src/aderite/physics/Physics\+Controller.\+cpp\end{DoxyCompactItemize}

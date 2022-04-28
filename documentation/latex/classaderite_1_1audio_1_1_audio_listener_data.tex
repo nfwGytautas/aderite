@@ -1,0 +1,96 @@
+\hypertarget{classaderite_1_1audio_1_1_audio_listener_data}{}\doxysection{aderite\+::audio\+::Audio\+Listener\+Data Class Reference}
+\label{classaderite_1_1audio_1_1_audio_listener_data}\index{aderite::audio::AudioListenerData@{aderite::audio::AudioListenerData}}
+
+
+Data of audio listeners.  
+
+
+
+
+{\ttfamily \#include $<$Audio\+Listener\+Data.\+hpp$>$}
+
+Inheritance diagram for aderite\+::audio\+::Audio\+Listener\+Data\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classaderite_1_1audio_1_1_audio_listener_data}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_listener_data_a7c97cef314a075259e5c7b3ea5ed3e14}\label{classaderite_1_1audio_1_1_audio_listener_data_a7c97cef314a075259e5c7b3ea5ed3e14}} 
+void \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener_data_a7c97cef314a075259e5c7b3ea5ed3e14}{disable}} ()
+\begin{DoxyCompactList}\small\item\em Disables listener. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_listener_data_a391720424b4d6c92d7f79be4a809fe87}\label{classaderite_1_1audio_1_1_audio_listener_data_a391720424b4d6c92d7f79be4a809fe87}} 
+void \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener_data_a391720424b4d6c92d7f79be4a809fe87}{enable}} ()
+\begin{DoxyCompactList}\small\item\em Enables listener. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_listener_data_a1fe7f1763794d6b01a0dafba6c505c8d}\label{classaderite_1_1audio_1_1_audio_listener_data_a1fe7f1763794d6b01a0dafba6c505c8d}} 
+bool \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener_data_a1fe7f1763794d6b01a0dafba6c505c8d}{is\+Enabled}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the listener is enabled, false otherwise. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener_data_aaf2f52871421d9e98585faed59cecf01}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener_data_a1f9483a2a7d909cec3a5231fc9e51b19}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_listener_data_af944400e7918fb312c4ac942252decfa}\label{classaderite_1_1audio_1_1_audio_listener_data_af944400e7918fb312c4ac942252decfa}} 
+\mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener_data}{Audio\+Listener\+Data}} \& {\bfseries operator=} (const \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener_data}{Audio\+Listener\+Data}} \&other)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Data of audio listeners. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_listener_data_a1f9483a2a7d909cec3a5231fc9e51b19}\label{classaderite_1_1audio_1_1_audio_listener_data_a1f9483a2a7d909cec3a5231fc9e51b19}} 
+\index{aderite::audio::AudioListenerData@{aderite::audio::AudioListenerData}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::audio::AudioListenerData@{aderite::audio::AudioListenerData}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::audio\+::\+Audio\+Listener\+Data\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_listener_data_aaf2f52871421d9e98585faed59cecf01}\label{classaderite_1_1audio_1_1_audio_listener_data_aaf2f52871421d9e98585faed59cecf01}} 
+\index{aderite::audio::AudioListenerData@{aderite::audio::AudioListenerData}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::audio::AudioListenerData@{aderite::audio::AudioListenerData}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::audio\+::\+Audio\+Listener\+Data\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/audio/Audio\+Listener\+Data.\+hpp\item 
+src/aderite/audio/Audio\+Listener\+Data.\+cpp\end{DoxyCompactItemize}

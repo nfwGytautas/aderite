@@ -1,0 +1,154 @@
+\hypertarget{classaderite_1_1asset_1_1_asset_manager}{}\doxysection{aderite\+::asset\+::Asset\+Manager Class Reference}
+\label{classaderite_1_1asset_1_1_asset_manager}\index{aderite::asset::AssetManager@{aderite::asset::AssetManager}}
+
+
+\mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager}{Asset\+Manager}} class is used to hold references and manage asset that are currently loaded.  
+
+
+
+
+{\ttfamily \#include $<$Asset\+Manager.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_a8d7ad59afa3908a366be9021c3e5f5ff}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the asset manager. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a5386e14d5c89f14f71337eb599a285ec}\label{classaderite_1_1asset_1_1_asset_manager_a5386e14d5c89f14f71337eb599a285ec}} 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_a5386e14d5c89f14f71337eb599a285ec}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shutdown asset manager. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_af0ce7586bc4b64c6bc50022e900a930e}\label{classaderite_1_1asset_1_1_asset_manager_af0ce7586bc4b64c6bc50022e900a930e}} 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_af0ce7586bc4b64c6bc50022e900a930e}{update}} ()
+\begin{DoxyCompactList}\small\item\em Updates the asset manager, queueing necessary assets, freeing unneeded, etc. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_a38098778fb1705fde541cb0e4003518b}{load\+Registry}} ()
+\begin{DoxyCompactList}\small\item\em Loads the asset manager registry using the File\+Handler. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_aeda9537b53c2c78dc36377f82481ef3e}\label{classaderite_1_1asset_1_1_asset_manager_aeda9537b53c2c78dc36377f82481ef3e}} 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_aeda9537b53c2c78dc36377f82481ef3e}{save\+Registry}} ()
+\begin{DoxyCompactList}\small\item\em Saves the asset manager registry to file. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a8f52d282d8eb6bb62f4521c6aa74c58c}\label{classaderite_1_1asset_1_1_asset_manager_a8f52d282d8eb6bb62f4521c6aa74c58c}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_a8f52d282d8eb6bb62f4521c6aa74c58c}{has}} (io\+::\+Serializable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Returns true if the asset manager has the specified asset tracked, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset}{io\+::\+Serializable\+Asset}} $\ast$ \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_a735b3415b2114fcc5c2dcd12d5448d2e}{get}} (io\+::\+Serializable\+Handle handle)
+\begin{DoxyCompactList}\small\item\em Returns object associated with the serializable handle. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_a8f1506f4fb64e3f3adac14aa3812ffdf}{save}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset}{io\+::\+Serializable\+Asset}} $\ast$object) const
+\begin{DoxyCompactList}\small\item\em Serializes object into a file. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_a349ceb6424067867ef9b1cf1955fb68f}{track}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset}{io\+::\+Serializable\+Asset}} $\ast$object)
+\begin{DoxyCompactList}\small\item\em Adds an object to the asset manager look up table, if already existing object is added an assert will be triggered. This method will set the object handle. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_a42e44852f74dd1ae8e67a7f5b86aa55c}{untrack}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset}{io\+::\+Serializable\+Asset}} $\ast$asset)
+\begin{DoxyCompactList}\small\item\em Removes an object from the asset manager look up table, if a non tracked object is untracked an assert will be triggered. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a5f6404b24c916219afe5cd02de5bad44}\label{classaderite_1_1asset_1_1_asset_manager_a5f6404b24c916219afe5cd02de5bad44}} 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager_a5f6404b24c916219afe5cd02de5bad44}{save\+All\+Tracked\+Objects}} () const
+\begin{DoxyCompactList}\small\item\em Utility method for saving all objects that are currently tracked. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_abdbcf984e88dabd871dd6d1ccd8dca5b}\label{classaderite_1_1asset_1_1_asset_manager_abdbcf984e88dabd871dd6d1ccd8dca5b}} 
+auto {\bfseries begin} ()
+\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_ae49d0ee96a2a69edd4f4783aff9fd1a4}\label{classaderite_1_1asset_1_1_asset_manager_ae49d0ee96a2a69edd4f4783aff9fd1a4}} 
+auto {\bfseries begin} () const
+\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a4af7fa049a0167e5b312ced614ef02c6}\label{classaderite_1_1asset_1_1_asset_manager_a4af7fa049a0167e5b312ced614ef02c6}} 
+auto {\bfseries end} ()
+\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a7f125315e7e06b4c84d317c091377c4d}\label{classaderite_1_1asset_1_1_asset_manager_a7f125315e7e06b4c84d317c091377c4d}} 
+auto {\bfseries end} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classaderite_1_1asset_1_1_asset_manager}{Asset\+Manager}} class is used to hold references and manage asset that are currently loaded. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a735b3415b2114fcc5c2dcd12d5448d2e}\label{classaderite_1_1asset_1_1_asset_manager_a735b3415b2114fcc5c2dcd12d5448d2e}} 
+\index{aderite::asset::AssetManager@{aderite::asset::AssetManager}!get@{get}}
+\index{get@{get}!aderite::asset::AssetManager@{aderite::asset::AssetManager}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset}{io\+::\+Serializable\+Asset}} $\ast$ aderite\+::asset\+::\+Asset\+Manager\+::get (\begin{DoxyParamCaption}\item[{io\+::\+Serializable\+Handle}]{handle }\end{DoxyParamCaption})}
+
+
+
+Returns object associated with the serializable handle. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Handle of the object \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Serializable object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a8d7ad59afa3908a366be9021c3e5f5ff}\label{classaderite_1_1asset_1_1_asset_manager_a8d7ad59afa3908a366be9021c3e5f5ff}} 
+\index{aderite::asset::AssetManager@{aderite::asset::AssetManager}!init@{init}}
+\index{init@{init}!aderite::asset::AssetManager@{aderite::asset::AssetManager}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Asset\+Manager\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Initializes the asset manager. 
+
+\begin{DoxyReturn}{Returns}
+True if initialized without error, false otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a38098778fb1705fde541cb0e4003518b}\label{classaderite_1_1asset_1_1_asset_manager_a38098778fb1705fde541cb0e4003518b}} 
+\index{aderite::asset::AssetManager@{aderite::asset::AssetManager}!loadRegistry@{loadRegistry}}
+\index{loadRegistry@{loadRegistry}!aderite::asset::AssetManager@{aderite::asset::AssetManager}}
+\doxysubsubsection{\texorpdfstring{loadRegistry()}{loadRegistry()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Asset\+Manager\+::load\+Registry (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Loads the asset manager registry using the File\+Handler. 
+
+\begin{DoxyReturn}{Returns}
+True if loaded and valid, false otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a8f1506f4fb64e3f3adac14aa3812ffdf}\label{classaderite_1_1asset_1_1_asset_manager_a8f1506f4fb64e3f3adac14aa3812ffdf}} 
+\index{aderite::asset::AssetManager@{aderite::asset::AssetManager}!save@{save}}
+\index{save@{save}!aderite::asset::AssetManager@{aderite::asset::AssetManager}}
+\doxysubsubsection{\texorpdfstring{save()}{save()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Asset\+Manager\+::save (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset}{io\+::\+Serializable\+Asset}} $\ast$}]{object }\end{DoxyParamCaption}) const}
+
+
+
+Serializes object into a file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em object} & Object to serialize \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a349ceb6424067867ef9b1cf1955fb68f}\label{classaderite_1_1asset_1_1_asset_manager_a349ceb6424067867ef9b1cf1955fb68f}} 
+\index{aderite::asset::AssetManager@{aderite::asset::AssetManager}!track@{track}}
+\index{track@{track}!aderite::asset::AssetManager@{aderite::asset::AssetManager}}
+\doxysubsubsection{\texorpdfstring{track()}{track()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Asset\+Manager\+::track (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset}{io\+::\+Serializable\+Asset}} $\ast$}]{object }\end{DoxyParamCaption})}
+
+
+
+Adds an object to the asset manager look up table, if already existing object is added an assert will be triggered. This method will set the object handle. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em object} & Object to track \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_asset_manager_a42e44852f74dd1ae8e67a7f5b86aa55c}\label{classaderite_1_1asset_1_1_asset_manager_a42e44852f74dd1ae8e67a7f5b86aa55c}} 
+\index{aderite::asset::AssetManager@{aderite::asset::AssetManager}!untrack@{untrack}}
+\index{untrack@{untrack}!aderite::asset::AssetManager@{aderite::asset::AssetManager}}
+\doxysubsubsection{\texorpdfstring{untrack()}{untrack()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Asset\+Manager\+::untrack (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset}{io\+::\+Serializable\+Asset}} $\ast$}]{asset }\end{DoxyParamCaption})}
+
+
+
+Removes an object from the asset manager look up table, if a non tracked object is untracked an assert will be triggered. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em object} & Object to untrack \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/asset/Asset\+Manager.\+hpp\item 
+src/aderite/asset/Asset\+Manager.\+cpp\end{DoxyCompactItemize}

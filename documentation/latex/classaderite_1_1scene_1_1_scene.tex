@@ -1,0 +1,169 @@
+\hypertarget{classaderite_1_1scene_1_1_scene}{}\doxysection{aderite\+::scene\+::Scene Class Reference}
+\label{classaderite_1_1scene_1_1_scene}\index{aderite::scene::Scene@{aderite::scene::Scene}}
+
+
+\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} object, at any given time a single \mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} can be active in aderite. Scenes are guaranteed to be serializable. This includes all the possible resources that it uses be it meshes, materials, etc. However these resources are loaded as trunks into the asset manager the actual data is not loaded until needed.  
+
+
+
+
+{\ttfamily \#include $<$Scene.\+hpp$>$}
+
+Inheritance diagram for aderite\+::scene\+::Scene\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.123223cm]{classaderite_1_1scene_1_1_scene}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_a2d18faaec5a7bacf2101f624e8afcc06}{update}} (float delta)
+\begin{DoxyCompactList}\small\item\em Update scene. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_a405cdda3a070175a0eff25037871bd44}{create\+Game\+Object}} ()
+\begin{DoxyCompactList}\small\item\em Creates an empty game object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_a89282ad552261245c4da16efd1bf1601}{create\+Game\+Object}} (\mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset}{asset\+::\+Prefab\+Asset}} $\ast$prefab)
+\begin{DoxyCompactList}\small\item\em Creates a game object from a prefab. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_ad865b7997811b92cf9d78e7162cb90cd}{destroy\+Game\+Object}} (\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}} $\ast$object)
+\begin{DoxyCompactList}\small\item\em Destroy the specified game object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_a13367e4c8497e01229dc529d41783191}\label{classaderite_1_1scene_1_1_scene_a13367e4c8497e01229dc529d41783191}} 
+const std\+::vector$<$ std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}} $>$ $>$ \& \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_a13367e4c8497e01229dc529d41783191}{get\+Game\+Objects}} () const
+\begin{DoxyCompactList}\small\item\em Returns the game objects in this scene. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_a17c268e1284c47e31f30e222905491a1}\label{classaderite_1_1scene_1_1_scene_a17c268e1284c47e31f30e222905491a1}} 
+reflection\+::\+Type \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_a17c268e1284c47e31f30e222905491a1}{get\+Type}} () const override
+\begin{DoxyCompactList}\small\item\em Returns the type of the reflectable. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_aa671f6c9017c7200210d31bf7a078208}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_a447099e321c8efb7a5f0f3738e58a92c}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_a284464b0561a6f2915f04b0245b987f0}\label{classaderite_1_1scene_1_1_scene_a284464b0561a6f2915f04b0245b987f0}} 
+class {\bfseries Scene\+Manager}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_a5fa7cde0ffbc72d80ef032c1ea3e9c85}\label{classaderite_1_1scene_1_1_scene_a5fa7cde0ffbc72d80ef032c1ea3e9c85}} 
+class {\bfseries Scene\+Serializer}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} object, at any given time a single \mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} can be active in aderite. Scenes are guaranteed to be serializable. This includes all the possible resources that it uses be it meshes, materials, etc. However these resources are loaded as trunks into the asset manager the actual data is not loaded until needed. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_a405cdda3a070175a0eff25037871bd44}\label{classaderite_1_1scene_1_1_scene_a405cdda3a070175a0eff25037871bd44}} 
+\index{aderite::scene::Scene@{aderite::scene::Scene}!createGameObject@{createGameObject}}
+\index{createGameObject@{createGameObject}!aderite::scene::Scene@{aderite::scene::Scene}}
+\doxysubsubsection{\texorpdfstring{createGameObject()}{createGameObject()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}} $\ast$ aderite\+::scene\+::\+Scene\+::create\+Game\+Object (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Creates an empty game object. 
+
+\begin{DoxyReturn}{Returns}
+New game object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_a89282ad552261245c4da16efd1bf1601}\label{classaderite_1_1scene_1_1_scene_a89282ad552261245c4da16efd1bf1601}} 
+\index{aderite::scene::Scene@{aderite::scene::Scene}!createGameObject@{createGameObject}}
+\index{createGameObject@{createGameObject}!aderite::scene::Scene@{aderite::scene::Scene}}
+\doxysubsubsection{\texorpdfstring{createGameObject()}{createGameObject()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}} $\ast$ aderite\+::scene\+::\+Scene\+::create\+Game\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset}{asset\+::\+Prefab\+Asset}} $\ast$}]{prefab }\end{DoxyParamCaption})}
+
+
+
+Creates a game object from a prefab. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em prefab} & Prefab to create from \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+New game object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_a447099e321c8efb7a5f0f3738e58a92c}\label{classaderite_1_1scene_1_1_scene_a447099e321c8efb7a5f0f3738e58a92c}} 
+\index{aderite::scene::Scene@{aderite::scene::Scene}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::scene::Scene@{aderite::scene::Scene}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::scene\+::\+Scene\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Reimplemented from \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_scene_a7f45979f0e9cbecacbfb5629e4032ea5}{aderite\+::physics\+::\+Physics\+Scene}}.
+
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_ad865b7997811b92cf9d78e7162cb90cd}\label{classaderite_1_1scene_1_1_scene_ad865b7997811b92cf9d78e7162cb90cd}} 
+\index{aderite::scene::Scene@{aderite::scene::Scene}!destroyGameObject@{destroyGameObject}}
+\index{destroyGameObject@{destroyGameObject}!aderite::scene::Scene@{aderite::scene::Scene}}
+\doxysubsubsection{\texorpdfstring{destroyGameObject()}{destroyGameObject()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Scene\+::destroy\+Game\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}} $\ast$}]{object }\end{DoxyParamCaption})}
+
+
+
+Destroy the specified game object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em object} & Object to destroy \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_aa671f6c9017c7200210d31bf7a078208}\label{classaderite_1_1scene_1_1_scene_aa671f6c9017c7200210d31bf7a078208}} 
+\index{aderite::scene::Scene@{aderite::scene::Scene}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::scene::Scene@{aderite::scene::Scene}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::scene\+::\+Scene\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Reimplemented from \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_scene_afb83c440a2db56218d9968c31e01f63b}{aderite\+::physics\+::\+Physics\+Scene}}.
+
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_a2d18faaec5a7bacf2101f624e8afcc06}\label{classaderite_1_1scene_1_1_scene_a2d18faaec5a7bacf2101f624e8afcc06}} 
+\index{aderite::scene::Scene@{aderite::scene::Scene}!update@{update}}
+\index{update@{update}!aderite::scene::Scene@{aderite::scene::Scene}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Scene\+::update (\begin{DoxyParamCaption}\item[{float}]{delta }\end{DoxyParamCaption})}
+
+
+
+Update scene. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em delta} & Delta time between frames \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scene/Scene.\+hpp\item 
+src/aderite/scene/Scene.\+cpp\end{DoxyCompactItemize}

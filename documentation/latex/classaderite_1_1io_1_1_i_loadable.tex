@@ -1,0 +1,67 @@
+\hypertarget{classaderite_1_1io_1_1_i_loadable}{}\doxysection{aderite\+::io\+::ILoadable Class Reference}
+\label{classaderite_1_1io_1_1_i_loadable}\index{aderite::io::ILoadable@{aderite::io::ILoadable}}
+
+
+Class to specify that the class uses loader.  
+
+
+
+
+{\ttfamily \#include $<$ILoadable.\+hpp$>$}
+
+Inheritance diagram for aderite\+::io\+::ILoadable\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=0.842105cm]{classaderite_1_1io_1_1_i_loadable}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classaderite_1_1io_1_1_i_loadable_a56604c6e1d7136a3dedff9167375a87c}{load}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$loader)=0
+\begin{DoxyCompactList}\small\item\em Load the object data, this function is executed in a separate thread. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_i_loadable_a8b7ce5c2f27921bdfc9d399a47dbe09c}\label{classaderite_1_1io_1_1_i_loadable_a8b7ce5c2f27921bdfc9d399a47dbe09c}} 
+virtual void \mbox{\hyperlink{classaderite_1_1io_1_1_i_loadable_a8b7ce5c2f27921bdfc9d399a47dbe09c}{unload}} ()=0
+\begin{DoxyCompactList}\small\item\em Unload the object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_i_loadable_af78ef9a91ab22963037a77d071bd8ea4}\label{classaderite_1_1io_1_1_i_loadable_af78ef9a91ab22963037a77d071bd8ea4}} 
+virtual bool \mbox{\hyperlink{classaderite_1_1io_1_1_i_loadable_af78ef9a91ab22963037a77d071bd8ea4}{needs\+Loading}} () const =0
+\begin{DoxyCompactList}\small\item\em Returns true if the object needs loading, false otherwise. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_i_loadable_ac8e5438321e35520c4088ff6ca4116ee}\label{classaderite_1_1io_1_1_i_loadable_ac8e5438321e35520c4088ff6ca4116ee}} 
+class {\bfseries Loader}
+\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_i_loadable_aae1a3aa8515767fd9010fc6d3e480451}\label{classaderite_1_1io_1_1_i_loadable_aae1a3aa8515767fd9010fc6d3e480451}} 
+class {\bfseries Loader\+Pool}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class to specify that the class uses loader. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_i_loadable_a56604c6e1d7136a3dedff9167375a87c}\label{classaderite_1_1io_1_1_i_loadable_a56604c6e1d7136a3dedff9167375a87c}} 
+\index{aderite::io::ILoadable@{aderite::io::ILoadable}!load@{load}}
+\index{load@{load}!aderite::io::ILoadable@{aderite::io::ILoadable}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily virtual void aderite\+::io\+::\+ILoadable\+::load (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$}]{loader }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Load the object data, this function is executed in a separate thread. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em loader} & \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{Loader}} instance \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a6a6ae7d870dc85b66cbdd2766f1dd0ac}{aderite\+::io\+::\+Serializable\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a76623de0e65fad6bf036c00b7e6e98db}{aderite\+::asset\+::\+Texture\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_a507f59b2574c881c1156fb4a8c7b4ffd}{aderite\+::asset\+::\+Prefab\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a0f5858eea4b5bf070d1ba4d9aeb7398e}{aderite\+::asset\+::\+Mesh\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_a_d_e_r_i_t_e___m_i_d_d_l_e_w_a_r_e___f_i_n_a_l_a9cc2d3ccdc7e79876cf0ed2a2b6998f4}{aderite\+::asset\+::\+ADERITE\+\_\+\+MIDDLEWARE\+\_\+\+FINAL}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a30d49bb617ad318d385367005a44a820}{aderite\+::asset\+::\+Material\+Asset}}, and \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a9725bd4a9db1b07bbe4801cd62357736}{aderite\+::asset\+::\+Audio\+Asset}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/io/ILoadable.\+hpp\end{DoxyCompactItemize}

@@ -1,0 +1,83 @@
+\hypertarget{classaderite_1_1io_1_1_i_serializable}{}\doxysection{aderite\+::io\+::ISerializable Class Reference}
+\label{classaderite_1_1io_1_1_i_serializable}\index{aderite::io::ISerializable@{aderite::io::ISerializable}}
+
+
+\mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable}{ISerializable}} provides an interface for serializing various objects.  
+
+
+
+
+{\ttfamily \#include $<$ISerializable.\+hpp$>$}
+
+Inheritance diagram for aderite\+::io\+::ISerializable\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=10.000000cm]{classaderite_1_1io_1_1_i_serializable}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const =0
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data)=0
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable}{ISerializable}} provides an interface for serializing various objects. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}\label{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}} 
+\index{aderite::io::ISerializable@{aderite::io::ISerializable}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::io::ISerializable@{aderite::io::ISerializable}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily virtual bool aderite\+::io\+::\+ISerializable\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{Serializer}} instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a857c8086565c8f78d97c6655dde39529}{aderite\+::scripting\+::\+Scripted\+Behavior}}, \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_a280fb5a12d63888a3fcdb9d86e41357d}{aderite\+::scene\+::\+Transform\+Provider}}, \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_a447099e321c8efb7a5f0f3738e58a92c}{aderite\+::scene\+::\+Scene}}, \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a92da7d0b50934605613846dffee303a3}{aderite\+::scene\+::\+Game\+Object}}, \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings_aeb6a726262a87e6bd2ce2b18728c8192}{aderite\+::scene\+::\+Camera\+Settings}}, \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderable_data_a5cda8d7987298208c776ff5367c4d25a}{aderite\+::rendering\+::\+Renderable\+Data}}, \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_scene_a7f45979f0e9cbecacbfb5629e4032ea5}{aderite\+::physics\+::\+Physics\+Scene}}, \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a4dfe3027c6e8f9ed82f175f6da401300}{aderite\+::physics\+::\+Physics\+Properties}}, \mbox{\hyperlink{classaderite_1_1physics_1_1_box_geometry_a9f6b07994fd5288b676ce4e28250a2fe}{aderite\+::physics\+::\+Box\+Geometry}}, \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data_aee3673d824930fa322340102753d33a6}{aderite\+::audio\+::\+Audio\+Source\+Data}}, \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener_data_a1f9483a2a7d909cec3a5231fc9e51b19}{aderite\+::audio\+::\+Audio\+Listener\+Data}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a75746f7d3f1317d08c593678b3f81b84}{aderite\+::asset\+::\+Texture\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_a6a9636a22bfdcfa2a60ec0b691e002d3}{aderite\+::asset\+::\+Prefab\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a89ea0d41ce0015b74e5766c1d7781fda}{aderite\+::asset\+::\+Mesh\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_a_d_e_r_i_t_e___m_i_d_d_l_e_w_a_r_e___f_i_n_a_l_aae11b11efb7bf5e6638a7642bc129f93}{aderite\+::asset\+::\+ADERITE\+\_\+\+MIDDLEWARE\+\_\+\+FINAL}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_ad58901a8a739d5b7eb04729b22232837}{aderite\+::asset\+::\+Material\+Asset}}, and \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a0be026e90d45d4548faaa655944cc1a2}{aderite\+::asset\+::\+Audio\+Asset}}.
+
+\mbox{\Hypertarget{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}\label{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}} 
+\index{aderite::io::ISerializable@{aderite::io::ISerializable}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::io::ISerializable@{aderite::io::ISerializable}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily virtual bool aderite\+::io\+::\+ISerializable\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{Serializer}} instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_aeb99cbd57a28dcd31e7b54c818a35de0}{aderite\+::scripting\+::\+Scripted\+Behavior}}, \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_af2e64c2a1ac195c1452f56c2aff9c439}{aderite\+::scene\+::\+Transform\+Provider}}, \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_aa671f6c9017c7200210d31bf7a078208}{aderite\+::scene\+::\+Scene}}, \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a75a36a0d4a93cda5a512be719200c40a}{aderite\+::scene\+::\+Game\+Object}}, \mbox{\hyperlink{classaderite_1_1scene_1_1_camera_settings_a4dd7372c6ea488b926d7e89d9b55449e}{aderite\+::scene\+::\+Camera\+Settings}}, \mbox{\hyperlink{classaderite_1_1rendering_1_1_renderable_data_a251cf91a38a367c6c74839f5f931889a}{aderite\+::rendering\+::\+Renderable\+Data}}, \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_scene_afb83c440a2db56218d9968c31e01f63b}{aderite\+::physics\+::\+Physics\+Scene}}, \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a6128e6ac3e4ba27c20669b3e4a2144f1}{aderite\+::physics\+::\+Physics\+Properties}}, \mbox{\hyperlink{classaderite_1_1physics_1_1_box_geometry_a66b6b2ba4a47e31718d59a0e14a3bfc3}{aderite\+::physics\+::\+Box\+Geometry}}, \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source_data_ab2011a2a8ea75e0c5f01f05507a7a1e9}{aderite\+::audio\+::\+Audio\+Source\+Data}}, \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener_data_aaf2f52871421d9e98585faed59cecf01}{aderite\+::audio\+::\+Audio\+Listener\+Data}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a830e56e066664a309e85d409a789edfe}{aderite\+::asset\+::\+Texture\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_a4a48dfaaa3e0f3e7a934aa39b5a20a59}{aderite\+::asset\+::\+Prefab\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a4e499b447de18c0d533b9ca1f43f9dfd}{aderite\+::asset\+::\+Mesh\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_a_d_e_r_i_t_e___m_i_d_d_l_e_w_a_r_e___f_i_n_a_l_a26749a3aa7aaa82c26f28f67db9c8696}{aderite\+::asset\+::\+ADERITE\+\_\+\+MIDDLEWARE\+\_\+\+FINAL}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a06df010ac592fe0f815699de8907cd67}{aderite\+::asset\+::\+Material\+Asset}}, and \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a94873653fa40f7bd1da8cc58687ec23d}{aderite\+::asset\+::\+Audio\+Asset}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/io/ISerializable.\+hpp\end{DoxyCompactItemize}

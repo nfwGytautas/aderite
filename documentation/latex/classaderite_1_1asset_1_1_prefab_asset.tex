@@ -1,0 +1,138 @@
+\hypertarget{classaderite_1_1asset_1_1_prefab_asset}{}\doxysection{aderite\+::asset\+::Prefab\+Asset Class Reference}
+\label{classaderite_1_1asset_1_1_prefab_asset}\index{aderite::asset::PrefabAsset@{aderite::asset::PrefabAsset}}
+
+
+Class representing a prefab asset with it\textquotesingle{}s own properties.  
+
+
+
+
+{\ttfamily \#include $<$Prefab\+Asset.\+hpp$>$}
+
+Inheritance diagram for aderite\+::asset\+::Prefab\+Asset\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.992870cm]{classaderite_1_1asset_1_1_prefab_asset}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_prefab_asset_aab999cb5578a8037266aeacbf627af69}\label{classaderite_1_1asset_1_1_prefab_asset_aab999cb5578a8037266aeacbf627af69}} 
+{\bfseries Prefab\+Asset} (\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{scene\+::\+Game\+Object}} $\ast$g\+Object)
+\item 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{scene\+::\+Game\+Object}} $\ast$ \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_a0683a21042d1ced43abe4a11aea673b8}{instantiate}} (\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{scene\+::\+Scene}} $\ast$scene) const
+\begin{DoxyCompactList}\small\item\em Create a game object from this prefab in a specified scene. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_a507f59b2574c881c1156fb4a8c7b4ffd}{load}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$loader) override
+\begin{DoxyCompactList}\small\item\em Load the object data, this function is executed in a separate thread. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_prefab_asset_a0fb499945a065274a3dc173b42cd5fbe}\label{classaderite_1_1asset_1_1_prefab_asset_a0fb499945a065274a3dc173b42cd5fbe}} 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_a0fb499945a065274a3dc173b42cd5fbe}{unload}} () override
+\begin{DoxyCompactList}\small\item\em Unload the object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_prefab_asset_af396db9605138e6aeae6002715dad587}\label{classaderite_1_1asset_1_1_prefab_asset_af396db9605138e6aeae6002715dad587}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_af396db9605138e6aeae6002715dad587}{needs\+Loading}} () const override
+\begin{DoxyCompactList}\small\item\em Returns true if the object needs loading, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_prefab_asset_ae019f659789d85312202122f001cf503}\label{classaderite_1_1asset_1_1_prefab_asset_ae019f659789d85312202122f001cf503}} 
+reflection\+::\+Type \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_ae019f659789d85312202122f001cf503}{get\+Type}} () const override
+\begin{DoxyCompactList}\small\item\em Returns the type of the reflectable. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_a4a48dfaaa3e0f3e7a934aa39b5a20a59}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_a6a9636a22bfdcfa2a60ec0b691e002d3}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+Class representing a prefab asset with it\textquotesingle{}s own properties. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_prefab_asset_a6a9636a22bfdcfa2a60ec0b691e002d3}\label{classaderite_1_1asset_1_1_prefab_asset_a6a9636a22bfdcfa2a60ec0b691e002d3}} 
+\index{aderite::asset::PrefabAsset@{aderite::asset::PrefabAsset}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::asset::PrefabAsset@{aderite::asset::PrefabAsset}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Prefab\+Asset\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_prefab_asset_a0683a21042d1ced43abe4a11aea673b8}\label{classaderite_1_1asset_1_1_prefab_asset_a0683a21042d1ced43abe4a11aea673b8}} 
+\index{aderite::asset::PrefabAsset@{aderite::asset::PrefabAsset}!instantiate@{instantiate}}
+\index{instantiate@{instantiate}!aderite::asset::PrefabAsset@{aderite::asset::PrefabAsset}}
+\doxysubsubsection{\texorpdfstring{instantiate()}{instantiate()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{scene\+::\+Game\+Object}} $\ast$ aderite\+::asset\+::\+Prefab\+Asset\+::instantiate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{scene\+::\+Scene}} $\ast$}]{scene }\end{DoxyParamCaption}) const}
+
+
+
+Create a game object from this prefab in a specified scene. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em scene} & Scene to create game object in \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Created game object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_prefab_asset_a507f59b2574c881c1156fb4a8c7b4ffd}\label{classaderite_1_1asset_1_1_prefab_asset_a507f59b2574c881c1156fb4a8c7b4ffd}} 
+\index{aderite::asset::PrefabAsset@{aderite::asset::PrefabAsset}!load@{load}}
+\index{load@{load}!aderite::asset::PrefabAsset@{aderite::asset::PrefabAsset}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Prefab\+Asset\+::load (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$}]{loader }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Load the object data, this function is executed in a separate thread. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em loader} & Loader instance \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a6a6ae7d870dc85b66cbdd2766f1dd0ac}{aderite\+::io\+::\+Serializable\+Asset}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_prefab_asset_a4a48dfaaa3e0f3e7a934aa39b5a20a59}\label{classaderite_1_1asset_1_1_prefab_asset_a4a48dfaaa3e0f3e7a934aa39b5a20a59}} 
+\index{aderite::asset::PrefabAsset@{aderite::asset::PrefabAsset}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::asset::PrefabAsset@{aderite::asset::PrefabAsset}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Prefab\+Asset\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/asset/Prefab\+Asset.\+hpp\item 
+src/aderite/asset/Prefab\+Asset.\+cpp\end{DoxyCompactItemize}

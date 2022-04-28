@@ -1,0 +1,158 @@
+\hypertarget{classaderite_1_1physics_1_1_physics_scene}{}\doxysection{aderite\+::physics\+::Physics\+Scene Class Reference}
+\label{classaderite_1_1physics_1_1_physics_scene}\index{aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}}
+
+
+Physics scene for aderite.  
+
+
+
+
+{\ttfamily \#include $<$Physics\+Scene.\+hpp$>$}
+
+Inheritance diagram for aderite\+::physics\+::Physics\+Scene\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classaderite_1_1physics_1_1_physics_scene}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_scene_a154df393c8f11803cf875be579f2e820}{simulate}} (float step) const
+\begin{DoxyCompactList}\small\item\em Physics update. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_scene_a8e3573eaf8305836351582e3bae86f81}{add\+Actor}} (\mbox{\hyperlink{classaderite_1_1physics_1_1_phys_x_actor}{Phys\+XActor}} $\ast$actor)
+\begin{DoxyCompactList}\small\item\em Add actor to the scene. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_scene_a3ec516c87d77442aa5d0cc17a6a5dadf}\label{classaderite_1_1physics_1_1_physics_scene_a3ec516c87d77442aa5d0cc17a6a5dadf}} 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_scene_a3ec516c87d77442aa5d0cc17a6a5dadf}{send\+Events}} ()
+\begin{DoxyCompactList}\small\item\em Sends queued physics events to specified user callbacks. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_scene_a301ab3e481ecb847decaebacf2a063f6}{raycast\+Single}} (\mbox{\hyperlink{structaderite_1_1physics_1_1_raycast_result}{Raycast\+Result}} \&result, const glm\+::vec3 \&from, const glm\+::vec3 \&direction, float max\+Distance)
+\begin{DoxyCompactList}\small\item\em Do a first hit raycast. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_scene_afb83c440a2db56218d9968c31e01f63b}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_scene_a7f45979f0e9cbecacbfb5629e4032ea5}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Physics scene for aderite. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_scene_a8e3573eaf8305836351582e3bae86f81}\label{classaderite_1_1physics_1_1_physics_scene_a8e3573eaf8305836351582e3bae86f81}} 
+\index{aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}!addActor@{addActor}}
+\index{addActor@{addActor}!aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}}
+\doxysubsubsection{\texorpdfstring{addActor()}{addActor()}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Physics\+Scene\+::add\+Actor (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1physics_1_1_phys_x_actor}{Phys\+XActor}} $\ast$}]{actor }\end{DoxyParamCaption})}
+
+
+
+Add actor to the scene. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em actor} & Actor to add \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_scene_a7f45979f0e9cbecacbfb5629e4032ea5}\label{classaderite_1_1physics_1_1_physics_scene_a7f45979f0e9cbecacbfb5629e4032ea5}} 
+\index{aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::physics\+::\+Physics\+Scene\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_a447099e321c8efb7a5f0f3738e58a92c}{aderite\+::scene\+::\+Scene}}.
+
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_scene_a301ab3e481ecb847decaebacf2a063f6}\label{classaderite_1_1physics_1_1_physics_scene_a301ab3e481ecb847decaebacf2a063f6}} 
+\index{aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}!raycastSingle@{raycastSingle}}
+\index{raycastSingle@{raycastSingle}!aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}}
+\doxysubsubsection{\texorpdfstring{raycastSingle()}{raycastSingle()}}
+{\footnotesize\ttfamily bool aderite\+::physics\+::\+Physics\+Scene\+::raycast\+Single (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaderite_1_1physics_1_1_raycast_result}{Raycast\+Result}} \&}]{result,  }\item[{const glm\+::vec3 \&}]{from,  }\item[{const glm\+::vec3 \&}]{direction,  }\item[{float}]{max\+Distance }\end{DoxyParamCaption})}
+
+
+
+Do a first hit raycast. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em result} & Raycast\+Hit object where to store result \\
+\hline
+{\em from} & Point where to raycast from \\
+\hline
+{\em direction} & Direction which to raycast in \\
+\hline
+{\em max\+Distance} & Maximum distance of the ray \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if there was a hit, false otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_scene_afb83c440a2db56218d9968c31e01f63b}\label{classaderite_1_1physics_1_1_physics_scene_afb83c440a2db56218d9968c31e01f63b}} 
+\index{aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::physics\+::\+Physics\+Scene\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_aa671f6c9017c7200210d31bf7a078208}{aderite\+::scene\+::\+Scene}}.
+
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_scene_a154df393c8f11803cf875be579f2e820}\label{classaderite_1_1physics_1_1_physics_scene_a154df393c8f11803cf875be579f2e820}} 
+\index{aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}!simulate@{simulate}}
+\index{simulate@{simulate}!aderite::physics::PhysicsScene@{aderite::physics::PhysicsScene}}
+\doxysubsubsection{\texorpdfstring{simulate()}{simulate()}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Physics\+Scene\+::simulate (\begin{DoxyParamCaption}\item[{float}]{step }\end{DoxyParamCaption}) const}
+
+
+
+Physics update. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em step} & Fixed step size \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/physics/Physics\+Scene.\+hpp\item 
+src/aderite/physics/Physics\+Scene.\+cpp\end{DoxyCompactItemize}

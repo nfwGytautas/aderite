@@ -1,0 +1,81 @@
+\hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware}{}\doxysection{aderite\+::interfaces\+::IEngine\+Middleware Class Reference}
+\label{classaderite_1_1interfaces_1_1_i_engine_middleware}\index{aderite::interfaces::IEngineMiddleware@{aderite::interfaces::IEngineMiddleware}}
+
+
+A special interface that is used to hookup a custom editor layer/object, functionality to aderite engine. By using this users can create a custom editor for example if a special lightweight debug editor is needed, a user can implement the interface and attach it to the runtime.  
+
+
+
+
+{\ttfamily \#include $<$IEngine\+Middleware.\+hpp$>$}
+
+Inheritance diagram for aderite\+::interfaces\+::IEngine\+Middleware\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classaderite_1_1interfaces_1_1_i_engine_middleware}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_ae3bddce5ea138452cbe2331509cf2025}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_ae3bddce5ea138452cbe2331509cf2025}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_ae3bddce5ea138452cbe2331509cf2025}{on\+Runtime\+Initialized}} ()
+\begin{DoxyCompactList}\small\item\em Function invoked when the engine was initialized. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_a2e7d48bba5307f7313885e4c3d44dbb9}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_a2e7d48bba5307f7313885e4c3d44dbb9}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_a2e7d48bba5307f7313885e4c3d44dbb9}{on\+Runtime\+Shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Function invoked when the engine is about to shutdown. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_adfdbea54a4b6f03165e5bb590976969a}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_adfdbea54a4b6f03165e5bb590976969a}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_adfdbea54a4b6f03165e5bb590976969a}{on\+Renderer\+Initialized}} ()
+\begin{DoxyCompactList}\small\item\em Function invoked when the engine created a window and used it to initialize a Renderer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_ae37a951d18844f67c45dde126eb69f05}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_ae37a951d18844f67c45dde126eb69f05}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_ae37a951d18844f67c45dde126eb69f05}{on\+Start\+Render}} ()
+\begin{DoxyCompactList}\small\item\em Function invoked when the engine is about to start rendering a frame. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_aa5b72b4f2418e87c6c3782687ef51456}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_aa5b72b4f2418e87c6c3782687ef51456}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_aa5b72b4f2418e87c6c3782687ef51456}{on\+End\+Render}} ()
+\begin{DoxyCompactList}\small\item\em Function invoked when the engine is about to end rendering a frame. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_aafd439dbbbc2ddd9e8c4904d3ec065f5}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_aafd439dbbbc2ddd9e8c4904d3ec065f5}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_aafd439dbbbc2ddd9e8c4904d3ec065f5}{on\+Requested\+Exit}} ()
+\begin{DoxyCompactList}\small\item\em Function invoked when a exit was requested from the engine. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_a0f095d02ce08f60cbeac7c71920779bb}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_a0f095d02ce08f60cbeac7c71920779bb}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_a0f095d02ce08f60cbeac7c71920779bb}{on\+System\+Update}} (float delta)
+\begin{DoxyCompactList}\small\item\em Function invoked when a system update has happened. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_ab1c6195bfd81a23e7689cdbdbf2adb2f}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_ab1c6195bfd81a23e7689cdbdbf2adb2f}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_ab1c6195bfd81a23e7689cdbdbf2adb2f}{on\+Scene\+Update}} (float delta)
+\begin{DoxyCompactList}\small\item\em Function invoked when a scene update has happened. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_a3c871698ba62122c9d8d0bd04a9ebdb4}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_a3c871698ba62122c9d8d0bd04a9ebdb4}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_a3c871698ba62122c9d8d0bd04a9ebdb4}{on\+Physics\+Update}} (float delta)
+\begin{DoxyCompactList}\small\item\em Function invoked when a physics update has happened. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_a2a6356043e5e56b799075b1c5dedc58e}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_a2a6356043e5e56b799075b1c5dedc58e}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_a2a6356043e5e56b799075b1c5dedc58e}{on\+Script\+Update}} (float delta)
+\begin{DoxyCompactList}\small\item\em Function invoked when a script update has happened. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_a14d4eb99c47950f8f748f340dc8120a5}{on\+Scene\+Changed}} (\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{scene\+::\+Scene}} $\ast$scene)
+\begin{DoxyCompactList}\small\item\em Function invoked when a new scene was made active. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_a0b8b8e77c4644251ea04ec763009f0cf}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_a0b8b8e77c4644251ea04ec763009f0cf}} 
+virtual void \mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware_a0b8b8e77c4644251ea04ec763009f0cf}{on\+Pre\+Render\+Commit}} ()
+\begin{DoxyCompactList}\small\item\em Function invoked right before all rendering is commited, this is usually the step where multiple outputs should be combined. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A special interface that is used to hookup a custom editor layer/object, functionality to aderite engine. By using this users can create a custom editor for example if a special lightweight debug editor is needed, a user can implement the interface and attach it to the runtime. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1interfaces_1_1_i_engine_middleware_a14d4eb99c47950f8f748f340dc8120a5}\label{classaderite_1_1interfaces_1_1_i_engine_middleware_a14d4eb99c47950f8f748f340dc8120a5}} 
+\index{aderite::interfaces::IEngineMiddleware@{aderite::interfaces::IEngineMiddleware}!onSceneChanged@{onSceneChanged}}
+\index{onSceneChanged@{onSceneChanged}!aderite::interfaces::IEngineMiddleware@{aderite::interfaces::IEngineMiddleware}}
+\doxysubsubsection{\texorpdfstring{onSceneChanged()}{onSceneChanged()}}
+{\footnotesize\ttfamily virtual void aderite\+::interfaces\+::\+IEngine\+Middleware\+::on\+Scene\+Changed (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{scene\+::\+Scene}} $\ast$}]{scene }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Function invoked when a new scene was made active. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em scene} & The scene that was made active \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/interfaces/IEngine\+Middleware.\+hpp\end{DoxyCompactItemize}

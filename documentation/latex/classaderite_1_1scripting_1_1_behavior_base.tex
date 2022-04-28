@@ -1,0 +1,114 @@
+\hypertarget{classaderite_1_1scripting_1_1_behavior_base}{}\doxysection{aderite\+::scripting\+::Behavior\+Base Class Reference}
+\label{classaderite_1_1scripting_1_1_behavior_base}\index{aderite::scripting::BehaviorBase@{aderite::scripting::BehaviorBase}}
+
+
+Class used to wrap around a scripted behavior, this acts as a base changeable for \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{Scripted\+Behavior}} class using composition.  
+
+
+
+
+{\ttfamily \#include $<$Behavior\+Base.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base_a0d7538de002a902bf834c9962cee45c6}{Behavior\+Base}} (Mono\+Class $\ast$klass)
+\begin{DoxyCompactList}\small\item\em Create \mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base}{Behavior\+Base}} class from Mono\+Class object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_behavior_base_ab1120d94cc171c21d39fc84e4c5071ed}\label{classaderite_1_1scripting_1_1_behavior_base_ab1120d94cc171c21d39fc84e4c5071ed}} 
+const std\+::string \mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base_ab1120d94cc171c21d39fc84e4c5071ed}{get\+Name}} () const
+\begin{DoxyCompactList}\small\item\em Returns the full name of this behavior. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_behavior_base_a627c9742825dd2e3a8cb0f08227b821c}\label{classaderite_1_1scripting_1_1_behavior_base_a627c9742825dd2e3a8cb0f08227b821c}} 
+const std\+::vector$<$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper}{Field\+Wrapper}} $>$ \& \mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base_a627c9742825dd2e3a8cb0f08227b821c}{get\+Fields}} () const
+\begin{DoxyCompactList}\small\item\em Returns the public fields of this system. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base_ab669a71b6fcb47807596e035ed5514a8}{has\+Field}} (const std\+::string \&name) const
+\begin{DoxyCompactList}\small\item\em Returns true if the system has a field with the specified name. \end{DoxyCompactList}\item 
+const \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper}{Field\+Wrapper}} \& \mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base_a091eb5cd52ebd4b7891b062d129d4046}{get\+Field}} (const std\+::string \&name) const
+\begin{DoxyCompactList}\small\item\em Returns the field wrapper with the specified name. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_behavior_base_a53057b09cd71ebe9ba416afafb1fb60f}\label{classaderite_1_1scripting_1_1_behavior_base_a53057b09cd71ebe9ba416afafb1fb60f}} 
+Mono\+Class $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base_a53057b09cd71ebe9ba416afafb1fb60f}{get\+Class}} () const
+\begin{DoxyCompactList}\small\item\em Returns the Mono\+Class of this behavior. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base_a9eec207ca8f231d9d47e80a5ca83fa7f}{copy\+Over}} (\mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{Scripted\+Behavior}} $\ast$source, \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{Scripted\+Behavior}} $\ast$dst)
+\begin{DoxyCompactList}\small\item\em Copies field information from the specified source behavior to the specified destination behavior. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_behavior_base_a58eda435b0d93e10b9c249be6fa01b4a}\label{classaderite_1_1scripting_1_1_behavior_base_a58eda435b0d93e10b9c249be6fa01b4a}} 
+class {\bfseries Scripted\+Behavior}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class used to wrap around a scripted behavior, this acts as a base changeable for \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{Scripted\+Behavior}} class using composition. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_behavior_base_a0d7538de002a902bf834c9962cee45c6}\label{classaderite_1_1scripting_1_1_behavior_base_a0d7538de002a902bf834c9962cee45c6}} 
+\index{aderite::scripting::BehaviorBase@{aderite::scripting::BehaviorBase}!BehaviorBase@{BehaviorBase}}
+\index{BehaviorBase@{BehaviorBase}!aderite::scripting::BehaviorBase@{aderite::scripting::BehaviorBase}}
+\doxysubsubsection{\texorpdfstring{BehaviorBase()}{BehaviorBase()}}
+{\footnotesize\ttfamily aderite\+::scripting\+::\+Behavior\+Base\+::\+Behavior\+Base (\begin{DoxyParamCaption}\item[{Mono\+Class $\ast$}]{klass }\end{DoxyParamCaption})}
+
+
+
+Create \mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base}{Behavior\+Base}} class from Mono\+Class object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em klass} & Mono\+Class object \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_behavior_base_a9eec207ca8f231d9d47e80a5ca83fa7f}\label{classaderite_1_1scripting_1_1_behavior_base_a9eec207ca8f231d9d47e80a5ca83fa7f}} 
+\index{aderite::scripting::BehaviorBase@{aderite::scripting::BehaviorBase}!copyOver@{copyOver}}
+\index{copyOver@{copyOver}!aderite::scripting::BehaviorBase@{aderite::scripting::BehaviorBase}}
+\doxysubsubsection{\texorpdfstring{copyOver()}{copyOver()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Behavior\+Base\+::copy\+Over (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{Scripted\+Behavior}} $\ast$}]{source,  }\item[{\mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{Scripted\+Behavior}} $\ast$}]{dst }\end{DoxyParamCaption})}
+
+
+
+Copies field information from the specified source behavior to the specified destination behavior. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em source} & Source behavior to copy information from \\
+\hline
+{\em dst} & Destination behavior to copy information to \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_behavior_base_a091eb5cd52ebd4b7891b062d129d4046}\label{classaderite_1_1scripting_1_1_behavior_base_a091eb5cd52ebd4b7891b062d129d4046}} 
+\index{aderite::scripting::BehaviorBase@{aderite::scripting::BehaviorBase}!getField@{getField}}
+\index{getField@{getField}!aderite::scripting::BehaviorBase@{aderite::scripting::BehaviorBase}}
+\doxysubsubsection{\texorpdfstring{getField()}{getField()}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper}{Field\+Wrapper}} \& aderite\+::scripting\+::\+Behavior\+Base\+::get\+Field (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{name }\end{DoxyParamCaption}) const}
+
+
+
+Returns the field wrapper with the specified name. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the field \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_behavior_base_ab669a71b6fcb47807596e035ed5514a8}\label{classaderite_1_1scripting_1_1_behavior_base_ab669a71b6fcb47807596e035ed5514a8}} 
+\index{aderite::scripting::BehaviorBase@{aderite::scripting::BehaviorBase}!hasField@{hasField}}
+\index{hasField@{hasField}!aderite::scripting::BehaviorBase@{aderite::scripting::BehaviorBase}}
+\doxysubsubsection{\texorpdfstring{hasField()}{hasField()}}
+{\footnotesize\ttfamily bool aderite\+::scripting\+::\+Behavior\+Base\+::has\+Field (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{name }\end{DoxyParamCaption}) const}
+
+
+
+Returns true if the system has a field with the specified name. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the field \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scripting/Behavior\+Base.\+hpp\item 
+src/aderite/scripting/Behavior\+Base.\+cpp\end{DoxyCompactItemize}

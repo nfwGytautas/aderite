@@ -1,0 +1,168 @@
+\hypertarget{classaderite_1_1physics_1_1_physics_properties}{}\doxysection{aderite\+::physics\+::Physics\+Properties Class Reference}
+\label{classaderite_1_1physics_1_1_physics_properties}\index{aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}}
+
+
+Properties that can be applied to a physics actor.  
+
+
+
+
+{\ttfamily \#include $<$Physics\+Properties.\+hpp$>$}
+
+Inheritance diagram for aderite\+::physics\+::Physics\+Properties\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classaderite_1_1physics_1_1_physics_properties}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a89877caa5fef6ce9337a586ef11eb494}{add\+Geometry}} (\mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} $\ast$geometry)
+\begin{DoxyCompactList}\small\item\em Add geometry. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a4b609a82e366f6a9c9eaba3ee95c4d42}{remove\+Geometry}} (\mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} $\ast$geometry)
+\begin{DoxyCompactList}\small\item\em Remove geometry. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a099a42120691b82ab320e9fed30f1aed}\label{classaderite_1_1physics_1_1_physics_properties_a099a42120691b82ab320e9fed30f1aed}} 
+std\+::vector$<$ \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} $\ast$ $>$ \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a099a42120691b82ab320e9fed30f1aed}{get\+Attached\+Geometries}} () const
+\begin{DoxyCompactList}\small\item\em Returns a list of attached geometries. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_aa6cc07662f10bfd00c5da0227e65aa6c}\label{classaderite_1_1physics_1_1_physics_properties_aa6cc07662f10bfd00c5da0227e65aa6c}} 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_aa6cc07662f10bfd00c5da0227e65aa6c}{has\+Geometry\+Changed}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if geometry was changed. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a55456bfd8eca2f4b8f290c81d7874f57}\label{classaderite_1_1physics_1_1_physics_properties_a55456bfd8eca2f4b8f290c81d7874f57}} 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a55456bfd8eca2f4b8f290c81d7874f57}{reset\+Geometry\+Changed\+Flag}} ()
+\begin{DoxyCompactList}\small\item\em Resets the geometry change flag. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_af09869f39fad03d9f6cedc6b0779cf75}\label{classaderite_1_1physics_1_1_physics_properties_af09869f39fad03d9f6cedc6b0779cf75}} 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_af09869f39fad03d9f6cedc6b0779cf75}{is\+Dynamic}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the actor should be dynamic. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a72f612327ec572d36c4872e94b5a0649}\label{classaderite_1_1physics_1_1_physics_properties_a72f612327ec572d36c4872e94b5a0649}} 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a72f612327ec572d36c4872e94b5a0649}{make\+Static}} ()
+\begin{DoxyCompactList}\small\item\em Make actor dynamic. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_aba2ca6ba72a2cf2c8ba274afd9576177}\label{classaderite_1_1physics_1_1_physics_properties_aba2ca6ba72a2cf2c8ba274afd9576177}} 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_aba2ca6ba72a2cf2c8ba274afd9576177}{make\+Dynamic}} ()
+\begin{DoxyCompactList}\small\item\em Make actor static. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a9fc9b03816939b7d77c3747ca34a12ab}\label{classaderite_1_1physics_1_1_physics_properties_a9fc9b03816939b7d77c3747ca34a12ab}} 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a9fc9b03816939b7d77c3747ca34a12ab}{has\+Gravity}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the actor has gravity, false otherwise, always false for static actors. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a3c695efad9a9f4a712a7415ad01b820b}\label{classaderite_1_1physics_1_1_physics_properties_a3c695efad9a9f4a712a7415ad01b820b}} 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a3c695efad9a9f4a712a7415ad01b820b}{disable\+Gravity}} ()
+\begin{DoxyCompactList}\small\item\em Disable gravity. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a3857d2c8e7f00f3e95a6bfb29edd21b6}\label{classaderite_1_1physics_1_1_physics_properties_a3857d2c8e7f00f3e95a6bfb29edd21b6}} 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a3857d2c8e7f00f3e95a6bfb29edd21b6}{enable\+Gravity}} ()
+\begin{DoxyCompactList}\small\item\em Enable gravity. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a49740bed684d8093dcc845efa8b7110c}\label{classaderite_1_1physics_1_1_physics_properties_a49740bed684d8093dcc845efa8b7110c}} 
+float \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a49740bed684d8093dcc845efa8b7110c}{get\+Mass}} () const
+\begin{DoxyCompactList}\small\item\em Returns the mass of the actor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_af2d8705b95d1df9766b49e51d1a50a1d}{set\+Mass}} (float mass)
+\begin{DoxyCompactList}\small\item\em Set the mass of the actor. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a6128e6ac3e4ba27c20669b3e4a2144f1}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties_a4dfe3027c6e8f9ed82f175f6da401300}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_ae02c55aa0587f8d4c92610938449feea}\label{classaderite_1_1physics_1_1_physics_properties_ae02c55aa0587f8d4c92610938449feea}} 
+\mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties}{Physics\+Properties}} \& {\bfseries operator=} (const \mbox{\hyperlink{classaderite_1_1physics_1_1_physics_properties}{Physics\+Properties}} \&other)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Properties that can be applied to a physics actor. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a89877caa5fef6ce9337a586ef11eb494}\label{classaderite_1_1physics_1_1_physics_properties_a89877caa5fef6ce9337a586ef11eb494}} 
+\index{aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}!addGeometry@{addGeometry}}
+\index{addGeometry@{addGeometry}!aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}}
+\doxysubsubsection{\texorpdfstring{addGeometry()}{addGeometry()}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Physics\+Properties\+::add\+Geometry (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} $\ast$}]{geometry }\end{DoxyParamCaption})}
+
+
+
+Add geometry. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em geometry} & \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} instance \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a4dfe3027c6e8f9ed82f175f6da401300}\label{classaderite_1_1physics_1_1_physics_properties_a4dfe3027c6e8f9ed82f175f6da401300}} 
+\index{aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::physics\+::\+Physics\+Properties\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a4b609a82e366f6a9c9eaba3ee95c4d42}\label{classaderite_1_1physics_1_1_physics_properties_a4b609a82e366f6a9c9eaba3ee95c4d42}} 
+\index{aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}!removeGeometry@{removeGeometry}}
+\index{removeGeometry@{removeGeometry}!aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}}
+\doxysubsubsection{\texorpdfstring{removeGeometry()}{removeGeometry()}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Physics\+Properties\+::remove\+Geometry (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} $\ast$}]{geometry }\end{DoxyParamCaption})}
+
+
+
+Remove geometry. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em geometry} & \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} to remove \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_a6128e6ac3e4ba27c20669b3e4a2144f1}\label{classaderite_1_1physics_1_1_physics_properties_a6128e6ac3e4ba27c20669b3e4a2144f1}} 
+\index{aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::physics\+::\+Physics\+Properties\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_physics_properties_af2d8705b95d1df9766b49e51d1a50a1d}\label{classaderite_1_1physics_1_1_physics_properties_af2d8705b95d1df9766b49e51d1a50a1d}} 
+\index{aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}!setMass@{setMass}}
+\index{setMass@{setMass}!aderite::physics::PhysicsProperties@{aderite::physics::PhysicsProperties}}
+\doxysubsubsection{\texorpdfstring{setMass()}{setMass()}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Physics\+Properties\+::set\+Mass (\begin{DoxyParamCaption}\item[{float}]{mass }\end{DoxyParamCaption})}
+
+
+
+Set the mass of the actor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mass} & New mass of the actor \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/physics/Physics\+Properties.\+hpp\item 
+src/aderite/physics/Physics\+Properties.\+cpp\end{DoxyCompactItemize}

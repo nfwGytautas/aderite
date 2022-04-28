@@ -1,0 +1,156 @@
+\hypertarget{classaderite_1_1io_1_1_loader}{}\doxysection{aderite\+::io\+::Loader Class Reference}
+\label{classaderite_1_1io_1_1_loader}\index{aderite::io::Loader@{aderite::io::Loader}}
+
+
+A general purpose data loader, each loader runs on it\textquotesingle{}s own thread.  
+
+
+
+
+{\ttfamily \#include $<$Loader.\+hpp$>$}
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_binary_load_result}{Binary\+Load\+Result}}
+\item 
+class \mbox{\hyperlink{classaderite_1_1io_1_1_loader_1_1_loader_impl}{Loader\+Impl}}
+\item 
+struct \mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_load_result}{Load\+Result}}
+\item 
+struct \mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_mesh_load_result}{Mesh\+Load\+Result}}
+\item 
+struct \mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_shader_load_result}{Shader\+Load\+Result}}
+\item 
+struct \mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_texture_load_result}{Texture\+Load\+Result}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_loader_aeb95255ea5a2cdaddacd0552ad714f60}\label{classaderite_1_1io_1_1_loader_aeb95255ea5a2cdaddacd0552ad714f60}} 
+{\bfseries Loader} (\mbox{\hyperlink{classaderite_1_1io_1_1_loader_pool}{Loader\+Pool}} $\ast$pool)
+\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_loader_ad7ffa72a0ad8039563770207e1360934}\label{classaderite_1_1io_1_1_loader_ad7ffa72a0ad8039563770207e1360934}} 
+void \mbox{\hyperlink{classaderite_1_1io_1_1_loader_ad7ffa72a0ad8039563770207e1360934}{startup}} ()
+\begin{DoxyCompactList}\small\item\em Start the worker thread. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_loader_a440fc9b3685a4c023a8013c836e7c4df}\label{classaderite_1_1io_1_1_loader_a440fc9b3685a4c023a8013c836e7c4df}} 
+void \mbox{\hyperlink{classaderite_1_1io_1_1_loader_a440fc9b3685a4c023a8013c836e7c4df}{terminate}} ()
+\begin{DoxyCompactList}\small\item\em Terminate the worker thread. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_loader_a4359bc0fc07a4351445c10bdb2cfb045}\label{classaderite_1_1io_1_1_loader_a4359bc0fc07a4351445c10bdb2cfb045}} 
+\mbox{\hyperlink{classaderite_1_1io_1_1_i_loadable}{ILoadable}} $\ast$ \mbox{\hyperlink{classaderite_1_1io_1_1_loader_a4359bc0fc07a4351445c10bdb2cfb045}{current}} () const
+\begin{DoxyCompactList}\small\item\em Returns the current loadable of the loader. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_loader_a4b31de641c9a33cf20738af5418b0f86}\label{classaderite_1_1io_1_1_loader_a4b31de641c9a33cf20738af5418b0f86}} 
+bool \mbox{\hyperlink{classaderite_1_1io_1_1_loader_a4b31de641c9a33cf20738af5418b0f86}{is\+Ready}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the loader instance is ready to load. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_mesh_load_result}{Mesh\+Load\+Result}} \mbox{\hyperlink{classaderite_1_1io_1_1_loader_adb376f20b1f1a4a5f08c5cb1b3a34188}{load\+Mesh}} (Loadable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Loads a mesh from specified file. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_texture_load_result}{Texture\+Load\+Result}}$<$ unsigned char $>$ \mbox{\hyperlink{classaderite_1_1io_1_1_loader_abb7e9f27694f46b5ebde54752e19827f}{load\+Texture}} (Loadable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Loads a texture from specified file. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_texture_load_result}{Texture\+Load\+Result}}$<$ float $>$ \mbox{\hyperlink{classaderite_1_1io_1_1_loader_ace487d6adda29a7e49970738e0b16bca}{load\+Hdr\+Texture}} (Loadable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Loads a HDR texture from specified file. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_shader_load_result}{Shader\+Load\+Result}} \mbox{\hyperlink{classaderite_1_1io_1_1_loader_a309c8a8a406932900cecc24f736e265f}{load\+Shader}} (Loadable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Loads shader content from specified file. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_binary_load_result}{Binary\+Load\+Result}} \mbox{\hyperlink{classaderite_1_1io_1_1_loader_a00d507a9bacfbd1c87c57690d5dcf2d8}{load\+Binary}} (Loadable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Loads binary content from specified file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A general purpose data loader, each loader runs on it\textquotesingle{}s own thread. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_loader_a00d507a9bacfbd1c87c57690d5dcf2d8}\label{classaderite_1_1io_1_1_loader_a00d507a9bacfbd1c87c57690d5dcf2d8}} 
+\index{aderite::io::Loader@{aderite::io::Loader}!loadBinary@{loadBinary}}
+\index{loadBinary@{loadBinary}!aderite::io::Loader@{aderite::io::Loader}}
+\doxysubsubsection{\texorpdfstring{loadBinary()}{loadBinary()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_binary_load_result}{Loader\+::\+Binary\+Load\+Result}} aderite\+::io\+::\+Loader\+::load\+Binary (\begin{DoxyParamCaption}\item[{Loadable\+Handle}]{handle }\end{DoxyParamCaption}) const}
+
+
+
+Loads binary content from specified file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Loadable handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_binary_load_result}{Binary\+Load\+Result}} object 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_loader_ace487d6adda29a7e49970738e0b16bca}\label{classaderite_1_1io_1_1_loader_ace487d6adda29a7e49970738e0b16bca}} 
+\index{aderite::io::Loader@{aderite::io::Loader}!loadHdrTexture@{loadHdrTexture}}
+\index{loadHdrTexture@{loadHdrTexture}!aderite::io::Loader@{aderite::io::Loader}}
+\doxysubsubsection{\texorpdfstring{loadHdrTexture()}{loadHdrTexture()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_texture_load_result}{Loader\+::\+Texture\+Load\+Result}}$<$ float $>$ aderite\+::io\+::\+Loader\+::load\+Hdr\+Texture (\begin{DoxyParamCaption}\item[{Loadable\+Handle}]{handle }\end{DoxyParamCaption}) const}
+
+
+
+Loads a HDR texture from specified file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Loadable handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Image\+Load\+Result object 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_loader_adb376f20b1f1a4a5f08c5cb1b3a34188}\label{classaderite_1_1io_1_1_loader_adb376f20b1f1a4a5f08c5cb1b3a34188}} 
+\index{aderite::io::Loader@{aderite::io::Loader}!loadMesh@{loadMesh}}
+\index{loadMesh@{loadMesh}!aderite::io::Loader@{aderite::io::Loader}}
+\doxysubsubsection{\texorpdfstring{loadMesh()}{loadMesh()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_mesh_load_result}{Loader\+::\+Mesh\+Load\+Result}} aderite\+::io\+::\+Loader\+::load\+Mesh (\begin{DoxyParamCaption}\item[{Loadable\+Handle}]{handle }\end{DoxyParamCaption}) const}
+
+
+
+Loads a mesh from specified file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Loadable handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_mesh_load_result}{Mesh\+Load\+Result}} object 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_loader_a309c8a8a406932900cecc24f736e265f}\label{classaderite_1_1io_1_1_loader_a309c8a8a406932900cecc24f736e265f}} 
+\index{aderite::io::Loader@{aderite::io::Loader}!loadShader@{loadShader}}
+\index{loadShader@{loadShader}!aderite::io::Loader@{aderite::io::Loader}}
+\doxysubsubsection{\texorpdfstring{loadShader()}{loadShader()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_shader_load_result}{Loader\+::\+Shader\+Load\+Result}} aderite\+::io\+::\+Loader\+::load\+Shader (\begin{DoxyParamCaption}\item[{Loadable\+Handle}]{handle }\end{DoxyParamCaption}) const}
+
+
+
+Loads shader content from specified file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Loadable handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_shader_load_result}{Shader\+Load\+Result}} object 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_loader_abb7e9f27694f46b5ebde54752e19827f}\label{classaderite_1_1io_1_1_loader_abb7e9f27694f46b5ebde54752e19827f}} 
+\index{aderite::io::Loader@{aderite::io::Loader}!loadTexture@{loadTexture}}
+\index{loadTexture@{loadTexture}!aderite::io::Loader@{aderite::io::Loader}}
+\doxysubsubsection{\texorpdfstring{loadTexture()}{loadTexture()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structaderite_1_1io_1_1_loader_1_1_texture_load_result}{Loader\+::\+Texture\+Load\+Result}}$<$ unsigned char $>$ aderite\+::io\+::\+Loader\+::load\+Texture (\begin{DoxyParamCaption}\item[{Loadable\+Handle}]{handle }\end{DoxyParamCaption}) const}
+
+
+
+Loads a texture from specified file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Loadable handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Image\+Load\+Result object 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/io/Loader.\+hpp\item 
+src/aderite/io/Loader.\+cpp\end{DoxyCompactItemize}

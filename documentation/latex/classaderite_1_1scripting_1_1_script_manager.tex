@@ -1,0 +1,249 @@
+\hypertarget{classaderite_1_1scripting_1_1_script_manager}{}\doxysection{aderite\+::scripting\+::Script\+Manager Class Reference}
+\label{classaderite_1_1scripting_1_1_script_manager}\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+
+
+The class responsible for handling all scripting related functionality.  
+
+
+
+
+{\ttfamily \#include $<$Script\+Manager.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_add4cc0753c929f09159d2180c6feb301}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the serializer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_af06a6db7b76382a90b4a8683cb227334}\label{classaderite_1_1scripting_1_1_script_manager_af06a6db7b76382a90b4a8683cb227334}} 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_af06a6db7b76382a90b4a8683cb227334}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shutdown serializer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_ae323ccfb0e9da1d5edc61a9f8937ffcc}\label{classaderite_1_1scripting_1_1_script_manager_ae323ccfb0e9da1d5edc61a9f8937ffcc}} 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_ae323ccfb0e9da1d5edc61a9f8937ffcc}{load\+Assemblies}} ()
+\begin{DoxyCompactList}\small\item\em Loads the game code assembly. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_add65d7e5daeb6b8ef1a7021a11cf38be}\label{classaderite_1_1scripting_1_1_script_manager_add65d7e5daeb6b8ef1a7021a11cf38be}} 
+Mono\+Domain $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_add65d7e5daeb6b8ef1a7021a11cf38be}{get\+Domain}} () const
+\begin{DoxyCompactList}\small\item\em Returns the current domain. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_ac5dbe42c94ae7ee6d8d7eabf51182e62}\label{classaderite_1_1scripting_1_1_script_manager_ac5dbe42c94ae7ee6d8d7eabf51182e62}} 
+Mono\+Image $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_ac5dbe42c94ae7ee6d8d7eabf51182e62}{get\+Code\+Image}} () const
+\begin{DoxyCompactList}\small\item\em Returns the image of the code assembly. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_a52bec01d664e8878880fe36434ae1635}{create\+Instance}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{io\+::\+Serializable\+Object}} $\ast$serializable)
+\begin{DoxyCompactList}\small\item\em Create C\# instance of a serializable, multiple calls with the same serializable will return the same object instance this way saving on memory and time. \end{DoxyCompactList}\item 
+Mono\+Class $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_aaae3939f7cbfea54b28612fc9b3072c6}{resolve\+Class}} (const std\+::string \&n\+Space, const std\+::string \&name) const
+\begin{DoxyCompactList}\small\item\em Tries to resolve a class with the specified name. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_a17b5542f796d143cfd00c96ee3d8f455}{instantiate}} (Mono\+Class $\ast$klass) const
+\begin{DoxyCompactList}\small\item\em Instantiate the specified object (0 argument constructor) \end{DoxyCompactList}\item 
+Mono\+Method $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_a20a39aa4a4ce890496b3c02b2931fa71}{get\+Method}} (Mono\+Class $\ast$klass, const std\+::string \&name, size\+\_\+t param\+Count) const
+\begin{DoxyCompactList}\small\item\em Tries to locate a method in the code assembly and returns it. \end{DoxyCompactList}\item 
+Mono\+Method $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_a84dc14b9908146aef0252c2473112647}{get\+Method}} (const std\+::string \&signature) const
+\begin{DoxyCompactList}\small\item\em Tries to locate a method in the code assembly and returns it. \end{DoxyCompactList}\item 
+Field\+Type \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_af9ed52821b3d5f2b2752969187e6333b}{get\+Type}} (Mono\+Type $\ast$type) const
+\begin{DoxyCompactList}\small\item\em Returns Field\+Type from the Mono\+Type. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator}{Lib\+Class\+Locator}} \& \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_a63c79925053e11e35f5f42eb8d70571d}{get\+Locator}} ()
+\begin{DoxyCompactList}\small\item\em Returns the script lib locator. \end{DoxyCompactList}\item 
+Mono\+String $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_a2e8af92b8e03e8d56e5851aadd6101d0}{string}} (const char $\ast$value) const
+\begin{DoxyCompactList}\small\item\em Creates a Mono\+String from the specified value. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_aa9216fdf6cf78fe09429c68984240387}{on\+Script\+Exception}} (Mono\+Exception $\ast$exception)
+\begin{DoxyCompactList}\small\item\em Function invoked when an exception happens in scripted behaviors. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_a105ee48e33999f1e7c8676dc49dcd084}\label{classaderite_1_1scripting_1_1_script_manager_a105ee48e33999f1e7c8676dc49dcd084}} 
+std\+::vector$<$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base}{Behavior\+Base}} $\ast$ $>$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_a105ee48e33999f1e7c8676dc49dcd084}{get\+Behaviors}} () const
+\begin{DoxyCompactList}\small\item\em Returns the list of discovered behaviors. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base}{Behavior\+Base}} $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_script_manager_ab0158fee5b9180307369583b8c01159d}{get\+Behavior}} (const std\+::string \&name) const
+\begin{DoxyCompactList}\small\item\em Returns a behavior with the specified name. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The class responsible for handling all scripting related functionality. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_a52bec01d664e8878880fe36434ae1635}\label{classaderite_1_1scripting_1_1_script_manager_a52bec01d664e8878880fe36434ae1635}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!createInstance@{createInstance}}
+\index{createInstance@{createInstance}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{createInstance()}{createInstance()}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Script\+Manager\+::create\+Instance (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{io\+::\+Serializable\+Object}} $\ast$}]{serializable }\end{DoxyParamCaption})}
+
+
+
+Create C\# instance of a serializable, multiple calls with the same serializable will return the same object instance this way saving on memory and time. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializable} & Serializable to create for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_ab0158fee5b9180307369583b8c01159d}\label{classaderite_1_1scripting_1_1_script_manager_ab0158fee5b9180307369583b8c01159d}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!getBehavior@{getBehavior}}
+\index{getBehavior@{getBehavior}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{getBehavior()}{getBehavior()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base}{Behavior\+Base}} $\ast$ aderite\+::scripting\+::\+Script\+Manager\+::get\+Behavior (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{name }\end{DoxyParamCaption}) const}
+
+
+
+Returns a behavior with the specified name. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & Name of the behavior \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base}{Behavior\+Base}} instance or nullptr 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_a63c79925053e11e35f5f42eb8d70571d}\label{classaderite_1_1scripting_1_1_script_manager_a63c79925053e11e35f5f42eb8d70571d}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!getLocator@{getLocator}}
+\index{getLocator@{getLocator}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{getLocator()}{getLocator()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator}{Lib\+Class\+Locator}} \& aderite\+::scripting\+::\+Script\+Manager\+::get\+Locator (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Returns the script lib locator. 
+
+\begin{DoxyReturn}{Returns}
+Locator reference 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_a84dc14b9908146aef0252c2473112647}\label{classaderite_1_1scripting_1_1_script_manager_a84dc14b9908146aef0252c2473112647}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!getMethod@{getMethod}}
+\index{getMethod@{getMethod}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{getMethod()}{getMethod()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Mono\+Method $\ast$ aderite\+::scripting\+::\+Script\+Manager\+::get\+Method (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{signature }\end{DoxyParamCaption}) const}
+
+
+
+Tries to locate a method in the code assembly and returns it. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em signature} & Method signature \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Method instance or nullptr 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_a20a39aa4a4ce890496b3c02b2931fa71}\label{classaderite_1_1scripting_1_1_script_manager_a20a39aa4a4ce890496b3c02b2931fa71}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!getMethod@{getMethod}}
+\index{getMethod@{getMethod}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{getMethod()}{getMethod()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Mono\+Method $\ast$ aderite\+::scripting\+::\+Script\+Manager\+::get\+Method (\begin{DoxyParamCaption}\item[{Mono\+Class $\ast$}]{klass,  }\item[{const std\+::string \&}]{name,  }\item[{size\+\_\+t}]{param\+Count }\end{DoxyParamCaption}) const}
+
+
+
+Tries to locate a method in the code assembly and returns it. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em klass} & Class to search in \\
+\hline
+{\em signature} & Method signature \\
+\hline
+{\em param\+Count} & Number of arguments in the method \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Method instance or nullptr 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_af9ed52821b3d5f2b2752969187e6333b}\label{classaderite_1_1scripting_1_1_script_manager_af9ed52821b3d5f2b2752969187e6333b}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!getType@{getType}}
+\index{getType@{getType}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{getType()}{getType()}}
+{\footnotesize\ttfamily Field\+Type aderite\+::scripting\+::\+Script\+Manager\+::get\+Type (\begin{DoxyParamCaption}\item[{Mono\+Type $\ast$}]{type }\end{DoxyParamCaption}) const}
+
+
+
+Returns Field\+Type from the Mono\+Type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & Mono\+Type instance \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Corresponding Field\+Type enum value 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_add4cc0753c929f09159d2180c6feb301}\label{classaderite_1_1scripting_1_1_script_manager_add4cc0753c929f09159d2180c6feb301}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!init@{init}}
+\index{init@{init}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily bool aderite\+::scripting\+::\+Script\+Manager\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Initializes the serializer. 
+
+\begin{DoxyReturn}{Returns}
+True if initialized without error, false otherwise 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_a17b5542f796d143cfd00c96ee3d8f455}\label{classaderite_1_1scripting_1_1_script_manager_a17b5542f796d143cfd00c96ee3d8f455}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!instantiate@{instantiate}}
+\index{instantiate@{instantiate}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{instantiate()}{instantiate()}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Script\+Manager\+::instantiate (\begin{DoxyParamCaption}\item[{Mono\+Class $\ast$}]{klass }\end{DoxyParamCaption}) const}
+
+
+
+Instantiate the specified object (0 argument constructor) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em klass} & Class to initialize \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_aa9216fdf6cf78fe09429c68984240387}\label{classaderite_1_1scripting_1_1_script_manager_aa9216fdf6cf78fe09429c68984240387}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!onScriptException@{onScriptException}}
+\index{onScriptException@{onScriptException}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{onScriptException()}{onScriptException()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Script\+Manager\+::on\+Script\+Exception (\begin{DoxyParamCaption}\item[{Mono\+Exception $\ast$}]{exception }\end{DoxyParamCaption})}
+
+
+
+Function invoked when an exception happens in scripted behaviors. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em exception} & Exception instance \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_aaae3939f7cbfea54b28612fc9b3072c6}\label{classaderite_1_1scripting_1_1_script_manager_aaae3939f7cbfea54b28612fc9b3072c6}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!resolveClass@{resolveClass}}
+\index{resolveClass@{resolveClass}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{resolveClass()}{resolveClass()}}
+{\footnotesize\ttfamily Mono\+Class $\ast$ aderite\+::scripting\+::\+Script\+Manager\+::resolve\+Class (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{n\+Space,  }\item[{const std\+::string \&}]{name }\end{DoxyParamCaption}) const}
+
+
+
+Tries to resolve a class with the specified name. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n\+Space} & Namespace of the class \\
+\hline
+{\em name} & Name of the class \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Class instance or nullptr if failed to resolve 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_script_manager_a2e8af92b8e03e8d56e5851aadd6101d0}\label{classaderite_1_1scripting_1_1_script_manager_a2e8af92b8e03e8d56e5851aadd6101d0}} 
+\index{aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}!string@{string}}
+\index{string@{string}!aderite::scripting::ScriptManager@{aderite::scripting::ScriptManager}}
+\doxysubsubsection{\texorpdfstring{string()}{string()}}
+{\footnotesize\ttfamily Mono\+String $\ast$ aderite\+::scripting\+::\+Script\+Manager\+::string (\begin{DoxyParamCaption}\item[{const char $\ast$}]{value }\end{DoxyParamCaption}) const}
+
+
+
+Creates a Mono\+String from the specified value. 
+
+\begin{DoxyReturn}{Returns}
+Mono\+String object 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scripting/Script\+Manager.\+hpp\item 
+src/aderite/scripting/Script\+Manager.\+cpp\end{DoxyCompactItemize}

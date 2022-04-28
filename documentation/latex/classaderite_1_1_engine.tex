@@ -1,0 +1,139 @@
+\hypertarget{classaderite_1_1_engine}{}\doxysection{aderite\+::Engine Class Reference}
+\label{classaderite_1_1_engine}\index{aderite::Engine@{aderite::Engine}}
+
+
+Main aderite engine instance.  
+
+
+
+
+{\ttfamily \#include $<$Aderite.\+hpp$>$}
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structaderite_1_1_engine_1_1_init_options}{Init\+Options}}
+\begin{DoxyCompactList}\small\item\em \mbox{\hyperlink{classaderite_1_1_engine}{Engine}} init options. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1_engine_a5cd18770391d70e9e67451923c4b87c4}\label{classaderite_1_1_engine_a5cd18770391d70e9e67451923c4b87c4}} 
+enum class \mbox{\hyperlink{classaderite_1_1_engine_a5cd18770391d70e9e67451923c4b87c4}{Current\+State}} \{ \newline
+{\bfseries INIT}
+, {\bfseries AWAITING\+\_\+\+SHUTDOWN}
+, {\bfseries RENDER\+\_\+\+ONLY}
+, {\bfseries SYSTEM\+\_\+\+UPDATE}
+, \newline
+{\bfseries LOGIC}
+, {\bfseries FULL}
+ \}
+\begin{DoxyCompactList}\small\item\em Enum representing the current engine state. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classaderite_1_1_engine_a1f9afb7f857d0775c31148cfd75000d2}{init}} (\mbox{\hyperlink{structaderite_1_1_engine_1_1_init_options}{Init\+Options}} options)
+\begin{DoxyCompactList}\small\item\em Initializes the aderite engine. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1_engine_a1190c8ac3a86119f9ad997fc30caef32}\label{classaderite_1_1_engine_a1190c8ac3a86119f9ad997fc30caef32}} 
+void \mbox{\hyperlink{classaderite_1_1_engine_a1190c8ac3a86119f9ad997fc30caef32}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shutdown aderite engine. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1_engine_a4d88dce84e9f37b26631fa285dc0a134}\label{classaderite_1_1_engine_a4d88dce84e9f37b26631fa285dc0a134}} 
+void \mbox{\hyperlink{classaderite_1_1_engine_a4d88dce84e9f37b26631fa285dc0a134}{loop}} ()
+\begin{DoxyCompactList}\small\item\em Begins aderite engine loop. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1_engine_a8c8583f568e20ad63873b4bb31060592}\label{classaderite_1_1_engine_a8c8583f568e20ad63873b4bb31060592}} 
+void \mbox{\hyperlink{classaderite_1_1_engine_a8c8583f568e20ad63873b4bb31060592}{tick}} ()
+\begin{DoxyCompactList}\small\item\em Does a single engine system tick, can be used for custom game loops. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1_engine_a9a625f121bcc2973e746bf5e32e37d88}\label{classaderite_1_1_engine_a9a625f121bcc2973e746bf5e32e37d88}} 
+void \mbox{\hyperlink{classaderite_1_1_engine_a9a625f121bcc2973e746bf5e32e37d88}{on\+Renderer\+Initialized}} () const
+\begin{DoxyCompactList}\small\item\em Function is invoked when the Renderer was initialized. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1_engine_a2a46fc19742d5870a25f8d12c944fb0c}\label{classaderite_1_1_engine_a2a46fc19742d5870a25f8d12c944fb0c}} 
+void \mbox{\hyperlink{classaderite_1_1_engine_a2a46fc19742d5870a25f8d12c944fb0c}{on\+Scene\+Changed}} (\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{scene\+::\+Scene}} $\ast$scene) const
+\begin{DoxyCompactList}\small\item\em Function is invoked when the active scene was changed. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1_engine_aa678b0ebe8564567436e973d3425f2b8}{on\+Window\+Resized}} (unsigned int new\+Width, unsigned int new\+Height) const
+\begin{DoxyCompactList}\small\item\em Function invoked by input manager when the windows has been resized. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1_engine_a4e6609976299cc8f2a3937caa46183f0}{attach\+Middleware}} (\mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware}{interfaces\+::\+IEngine\+Middleware}} $\ast$middleware)
+\begin{DoxyCompactList}\small\item\em Attaches a aderite middleware instance to the runtime, previous one is deleted. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1_engine_a4b07c8b6083b27aecc5056a6339981ef}\label{classaderite_1_1_engine_a4b07c8b6083b27aecc5056a6339981ef}} 
+\mbox{\hyperlink{classaderite_1_1_engine_a5cd18770391d70e9e67451923c4b87c4}{Current\+State}} \mbox{\hyperlink{classaderite_1_1_engine_a4b07c8b6083b27aecc5056a6339981ef}{get\+State}} () const
+\begin{DoxyCompactList}\small\item\em Returns the current state of the engine. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1_engine_a198a807c6ed7d389cc2e9a75e5d0d745}{set\+State}} (\mbox{\hyperlink{classaderite_1_1_engine_a5cd18770391d70e9e67451923c4b87c4}{Current\+State}} state)
+\begin{DoxyCompactList}\small\item\em Transitions the engine to the specified state. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1_engine_a1c96d5dd7041786adb26733c47c0e7bf}\label{classaderite_1_1_engine_a1c96d5dd7041786adb26733c47c0e7bf}} 
+static \mbox{\hyperlink{classaderite_1_1_engine}{Engine}} $\ast$ \mbox{\hyperlink{classaderite_1_1_engine_a1c96d5dd7041786adb26733c47c0e7bf}{get}} ()
+\begin{DoxyCompactList}\small\item\em Returns the instance of the engine. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Main aderite engine instance. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1_engine_a4e6609976299cc8f2a3937caa46183f0}\label{classaderite_1_1_engine_a4e6609976299cc8f2a3937caa46183f0}} 
+\index{aderite::Engine@{aderite::Engine}!attachMiddleware@{attachMiddleware}}
+\index{attachMiddleware@{attachMiddleware}!aderite::Engine@{aderite::Engine}}
+\doxysubsubsection{\texorpdfstring{attachMiddleware()}{attachMiddleware()}}
+{\footnotesize\ttfamily void aderite\+::\+Engine\+::attach\+Middleware (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1interfaces_1_1_i_engine_middleware}{interfaces\+::\+IEngine\+Middleware}} $\ast$}]{middleware }\end{DoxyParamCaption})}
+
+
+
+Attaches a aderite middleware instance to the runtime, previous one is deleted. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em middleware} & Middleware to attach \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1_engine_a1f9afb7f857d0775c31148cfd75000d2}\label{classaderite_1_1_engine_a1f9afb7f857d0775c31148cfd75000d2}} 
+\index{aderite::Engine@{aderite::Engine}!init@{init}}
+\index{init@{init}!aderite::Engine@{aderite::Engine}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily bool aderite\+::\+Engine\+::init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structaderite_1_1_engine_1_1_init_options}{Init\+Options}}}]{options }\end{DoxyParamCaption})}
+
+
+
+Initializes the aderite engine. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em options} & Initialization options for the engine, some can be changed at runtime \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1_engine_aa678b0ebe8564567436e973d3425f2b8}\label{classaderite_1_1_engine_aa678b0ebe8564567436e973d3425f2b8}} 
+\index{aderite::Engine@{aderite::Engine}!onWindowResized@{onWindowResized}}
+\index{onWindowResized@{onWindowResized}!aderite::Engine@{aderite::Engine}}
+\doxysubsubsection{\texorpdfstring{onWindowResized()}{onWindowResized()}}
+{\footnotesize\ttfamily void aderite\+::\+Engine\+::on\+Window\+Resized (\begin{DoxyParamCaption}\item[{unsigned int}]{new\+Width,  }\item[{unsigned int}]{new\+Height }\end{DoxyParamCaption}) const}
+
+
+
+Function invoked by input manager when the windows has been resized. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em new\+Width} & New width of the window \\
+\hline
+{\em new\+Height} & New height of the window \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1_engine_a198a807c6ed7d389cc2e9a75e5d0d745}\label{classaderite_1_1_engine_a198a807c6ed7d389cc2e9a75e5d0d745}} 
+\index{aderite::Engine@{aderite::Engine}!setState@{setState}}
+\index{setState@{setState}!aderite::Engine@{aderite::Engine}}
+\doxysubsubsection{\texorpdfstring{setState()}{setState()}}
+{\footnotesize\ttfamily void aderite\+::\+Engine\+::set\+State (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1_engine_a5cd18770391d70e9e67451923c4b87c4}{Current\+State}}}]{state }\end{DoxyParamCaption})}
+
+
+
+Transitions the engine to the specified state. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em state} & New state of the engine \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/Aderite.\+hpp\item 
+src/aderite/Aderite.\+cpp\end{DoxyCompactItemize}

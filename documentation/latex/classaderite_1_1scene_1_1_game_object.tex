@@ -1,0 +1,334 @@
+\hypertarget{classaderite_1_1scene_1_1_game_object}{}\doxysection{aderite\+::scene\+::Game\+Object Class Reference}
+\label{classaderite_1_1scene_1_1_game_object}\index{aderite::scene::GameObject@{aderite::scene::GameObject}}
+
+
+The main class used to represent an object in a scene.  
+
+
+
+
+{\ttfamily \#include $<$Game\+Object.\+hpp$>$}
+
+Inheritance diagram for aderite\+::scene\+::Game\+Object\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classaderite_1_1scene_1_1_game_object}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a01510e83a615437a28e1643022e7ec77}{Game\+Object}} (\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{scene\+::\+Scene}} $\ast$scene, const std\+::string \&name)
+\begin{DoxyCompactList}\small\item\em Create an empty \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}} for the specified scene. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_af8b883fb014defebd507fba8718d3f98}\label{classaderite_1_1scene_1_1_game_object_af8b883fb014defebd507fba8718d3f98}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_af8b883fb014defebd507fba8718d3f98}{$\sim$\+Game\+Object}} ()
+\begin{DoxyCompactList}\small\item\em Destroys the \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}} instance and frees its memory. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a7fd2a53342174cd2477f84b2a3e59eb9}{update}} (float delta)
+\begin{DoxyCompactList}\small\item\em Update scene. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_addac4990905054f91c954028ff4d42c7}{on\+Trigger\+Enter}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&te)
+\begin{DoxyCompactList}\small\item\em Function called when this game object enters another trigger. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a1c8daef783429e845948fc6a1be9acee}{on\+Trigger\+Leave}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&te)
+\begin{DoxyCompactList}\small\item\em Function called when this game object leaves another trigger. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_ac422a24b3e37454fb60f8b8767e4d3fc}{on\+Trigger\+Was\+Entered}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&te)
+\begin{DoxyCompactList}\small\item\em Function called when the game object enters this trigger zone. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_ac1fdf73f769cd31693f071884dc55ee8}{on\+Trigger\+Was\+Left}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&te)
+\begin{DoxyCompactList}\small\item\em Function called when the game object leaves this trigger zone. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_ad00ee70c61469cdab33d5a2fa184c3b5}{on\+Collision\+Enter}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{physics\+::\+Collision\+Event}} \&ce)
+\begin{DoxyCompactList}\small\item\em Function called when the game object enters a collision. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_afb368ad6d5fb3b995bedf3f9cdd00b12}{on\+Collision\+Leave}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{physics\+::\+Collision\+Event}} \&ce)
+\begin{DoxyCompactList}\small\item\em Function called when the game object leaves a collision. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a1041b38ec469f8f95fcf95fc022753d9}\label{classaderite_1_1scene_1_1_game_object_a1041b38ec469f8f95fcf95fc022753d9}} 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a1041b38ec469f8f95fcf95fc022753d9}{mark\+For\+Deletion}} ()
+\begin{DoxyCompactList}\small\item\em Marks the game object for deletion. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a430bfa1f7075e28835a40eb918d0369b}\label{classaderite_1_1scene_1_1_game_object_a430bfa1f7075e28835a40eb918d0369b}} 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a430bfa1f7075e28835a40eb918d0369b}{is\+Marked\+For\+Deletion}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the game object is marked to be deleted. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a64de987b8e561264feec05686e000669}\label{classaderite_1_1scene_1_1_game_object_a64de987b8e561264feec05686e000669}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a64de987b8e561264feec05686e000669}{get\+Scene}} () const
+\begin{DoxyCompactList}\small\item\em Returns the scene of the object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_ae1fe89a4d1eb29a21cf6014fdb729aa5}\label{classaderite_1_1scene_1_1_game_object_ae1fe89a4d1eb29a21cf6014fdb729aa5}} 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_ae1fe89a4d1eb29a21cf6014fdb729aa5}{get\+Script\+Instance}} () const
+\begin{DoxyCompactList}\small\item\em Returns the Mono\+Object instance of the object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a093e74fe56207f7a94b0d7f89f44c853}\label{classaderite_1_1scene_1_1_game_object_a093e74fe56207f7a94b0d7f89f44c853}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider}{Transform\+Provider}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a093e74fe56207f7a94b0d7f89f44c853}{add\+Transform}} ()
+\begin{DoxyCompactList}\small\item\em Attach transform component to this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_ad85e21c20c3b629779005f191f97941c}\label{classaderite_1_1scene_1_1_game_object_ad85e21c20c3b629779005f191f97941c}} 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_ad85e21c20c3b629779005f191f97941c}{remove\+Transform}} ()
+\begin{DoxyCompactList}\small\item\em Remove transform component from this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_ad4565239bb7881cc8741979057f436a6}\label{classaderite_1_1scene_1_1_game_object_ad4565239bb7881cc8741979057f436a6}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider}{Transform\+Provider}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_ad4565239bb7881cc8741979057f436a6}{get\+Transform}} () const
+\begin{DoxyCompactList}\small\item\em Returns the transform of this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_ac1c4c1c10d6f890ebe4de9996b5e7a81}\label{classaderite_1_1scene_1_1_game_object_ac1c4c1c10d6f890ebe4de9996b5e7a81}} 
+\mbox{\hyperlink{classaderite_1_1rendering_1_1_renderable}{rendering\+::\+Renderable}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_ac1c4c1c10d6f890ebe4de9996b5e7a81}{add\+Renderable}} ()
+\begin{DoxyCompactList}\small\item\em Attach renderable component to this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_ab85d8e9fc1e971343570eebd26998a0d}\label{classaderite_1_1scene_1_1_game_object_ab85d8e9fc1e971343570eebd26998a0d}} 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_ab85d8e9fc1e971343570eebd26998a0d}{remove\+Renderable}} ()
+\begin{DoxyCompactList}\small\item\em Remove renderable component from this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a82d324f04d6fb844e3e489b6c681d2c5}\label{classaderite_1_1scene_1_1_game_object_a82d324f04d6fb844e3e489b6c681d2c5}} 
+\mbox{\hyperlink{classaderite_1_1rendering_1_1_renderable}{rendering\+::\+Renderable}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a82d324f04d6fb844e3e489b6c681d2c5}{get\+Renderable}} () const
+\begin{DoxyCompactList}\small\item\em Returns the renderable of this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a07d0606717e4f201c7fa70b9ab3aa610}\label{classaderite_1_1scene_1_1_game_object_a07d0606717e4f201c7fa70b9ab3aa610}} 
+\mbox{\hyperlink{classaderite_1_1physics_1_1_phys_x_actor}{physics\+::\+Phys\+XActor}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a07d0606717e4f201c7fa70b9ab3aa610}{add\+Actor}} ()
+\begin{DoxyCompactList}\small\item\em Attach actor component to this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_aec2bc9dc49c2f13b1046d57c1ed1f0d6}\label{classaderite_1_1scene_1_1_game_object_aec2bc9dc49c2f13b1046d57c1ed1f0d6}} 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_aec2bc9dc49c2f13b1046d57c1ed1f0d6}{remove\+Actor}} ()
+\begin{DoxyCompactList}\small\item\em Remove actor component from this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_aec3a128d1d5709c995e4fdb38173d5cb}\label{classaderite_1_1scene_1_1_game_object_aec3a128d1d5709c995e4fdb38173d5cb}} 
+\mbox{\hyperlink{classaderite_1_1physics_1_1_phys_x_actor}{physics\+::\+Phys\+XActor}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_aec3a128d1d5709c995e4fdb38173d5cb}{get\+Actor}} () const
+\begin{DoxyCompactList}\small\item\em Returns the actor of this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_aeed682ef4dccd07ca7fbccdb90913880}\label{classaderite_1_1scene_1_1_game_object_aeed682ef4dccd07ca7fbccdb90913880}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_camera}{Camera}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_aeed682ef4dccd07ca7fbccdb90913880}{add\+Camera}} ()
+\begin{DoxyCompactList}\small\item\em Attach camera component to this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a0060b2ccbea65cc038b0fed1f4a31f21}\label{classaderite_1_1scene_1_1_game_object_a0060b2ccbea65cc038b0fed1f4a31f21}} 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a0060b2ccbea65cc038b0fed1f4a31f21}{remove\+Camera}} ()
+\begin{DoxyCompactList}\small\item\em Remove camera component from this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a1f026da00e9bc432197f38bb190e8d52}\label{classaderite_1_1scene_1_1_game_object_a1f026da00e9bc432197f38bb190e8d52}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_camera}{Camera}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a1f026da00e9bc432197f38bb190e8d52}{get\+Camera}} () const
+\begin{DoxyCompactList}\small\item\em Returns the camera of this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a6dae6b3aa3b3550722fe04d5c4d7dd0e}\label{classaderite_1_1scene_1_1_game_object_a6dae6b3aa3b3550722fe04d5c4d7dd0e}} 
+\mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source}{audio\+::\+Audio\+Source}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a6dae6b3aa3b3550722fe04d5c4d7dd0e}{add\+Audio\+Source}} ()
+\begin{DoxyCompactList}\small\item\em Attach audio source component to this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a9169d5ff7688ede29cab59c6046c7526}\label{classaderite_1_1scene_1_1_game_object_a9169d5ff7688ede29cab59c6046c7526}} 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a9169d5ff7688ede29cab59c6046c7526}{remove\+Audio\+Source}} ()
+\begin{DoxyCompactList}\small\item\em Remove audio source component from this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a95acef56035f94f0b7d4b3fae3b18dbf}\label{classaderite_1_1scene_1_1_game_object_a95acef56035f94f0b7d4b3fae3b18dbf}} 
+\mbox{\hyperlink{classaderite_1_1audio_1_1_audio_source}{audio\+::\+Audio\+Source}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a95acef56035f94f0b7d4b3fae3b18dbf}{get\+Audio\+Source}} () const
+\begin{DoxyCompactList}\small\item\em Returns the audio source component of this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a89e6db71155cbe2fb2d02df05004a697}\label{classaderite_1_1scene_1_1_game_object_a89e6db71155cbe2fb2d02df05004a697}} 
+\mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener}{audio\+::\+Audio\+Listener}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a89e6db71155cbe2fb2d02df05004a697}{add\+Audio\+Listener}} ()
+\begin{DoxyCompactList}\small\item\em Attach audio listener component to this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a141b28d5960919948a5aa8d5c32d7a54}\label{classaderite_1_1scene_1_1_game_object_a141b28d5960919948a5aa8d5c32d7a54}} 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a141b28d5960919948a5aa8d5c32d7a54}{remove\+Audio\+Listener}} ()
+\begin{DoxyCompactList}\small\item\em Remove audio listener component from this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_ad29b1c8f02473efbdabb83c901e3e3f5}\label{classaderite_1_1scene_1_1_game_object_ad29b1c8f02473efbdabb83c901e3e3f5}} 
+\mbox{\hyperlink{classaderite_1_1audio_1_1_audio_listener}{audio\+::\+Audio\+Listener}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_ad29b1c8f02473efbdabb83c901e3e3f5}{get\+Audio\+Listener}} () const
+\begin{DoxyCompactList}\small\item\em Returns the audio source component of this \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}}. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_ac43b49e1703faaf9f0ae048f9bddc14f}{add\+Behavior}} (\mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{scripting\+::\+Scripted\+Behavior}} $\ast$behavior)
+\begin{DoxyCompactList}\small\item\em Adds behavior to this game object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a795e3374367c1069b1827490cb5bda66}{remove\+Behavior}} (\mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{scripting\+::\+Scripted\+Behavior}} $\ast$behavior)
+\begin{DoxyCompactList}\small\item\em Remove behavior from this game object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a2bf7b7d672c378dfc2a551e616ddb355}\label{classaderite_1_1scene_1_1_game_object_a2bf7b7d672c378dfc2a551e616ddb355}} 
+std\+::vector$<$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{scripting\+::\+Scripted\+Behavior}} $\ast$ $>$ \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a2bf7b7d672c378dfc2a551e616ddb355}{get\+Behaviors}} () const
+\begin{DoxyCompactList}\small\item\em Returns the behaviors of this game object. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a75a36a0d4a93cda5a512be719200c40a}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_a92da7d0b50934605613846dffee303a3}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_aec0e598d909ba8aa8d9e4c78cb100912}\label{classaderite_1_1scene_1_1_game_object_aec0e598d909ba8aa8d9e4c78cb100912}} 
+reflection\+::\+Type \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object_aec0e598d909ba8aa8d9e4c78cb100912}{get\+Type}} () const override
+\begin{DoxyCompactList}\small\item\em Returns the type of the reflectable. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The main class used to represent an object in a scene. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a01510e83a615437a28e1643022e7ec77}\label{classaderite_1_1scene_1_1_game_object_a01510e83a615437a28e1643022e7ec77}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!GameObject@{GameObject}}
+\index{GameObject@{GameObject}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{GameObject()}{GameObject()}}
+{\footnotesize\ttfamily aderite\+::scene\+::\+Game\+Object\+::\+Game\+Object (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{scene\+::\+Scene}} $\ast$}]{scene,  }\item[{const std\+::string \&}]{name }\end{DoxyParamCaption})}
+
+
+
+Create an empty \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{Game\+Object}} for the specified scene. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em scene} & \mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} object to create in \\
+\hline
+{\em name} & Name of the object \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_ac43b49e1703faaf9f0ae048f9bddc14f}\label{classaderite_1_1scene_1_1_game_object_ac43b49e1703faaf9f0ae048f9bddc14f}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!addBehavior@{addBehavior}}
+\index{addBehavior@{addBehavior}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{addBehavior()}{addBehavior()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Game\+Object\+::add\+Behavior (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{scripting\+::\+Scripted\+Behavior}} $\ast$}]{behavior }\end{DoxyParamCaption})}
+
+
+
+Adds behavior to this game object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em behavior} & Behavior instance \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a92da7d0b50934605613846dffee303a3}\label{classaderite_1_1scene_1_1_game_object_a92da7d0b50934605613846dffee303a3}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::scene\+::\+Game\+Object\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_ad00ee70c61469cdab33d5a2fa184c3b5}\label{classaderite_1_1scene_1_1_game_object_ad00ee70c61469cdab33d5a2fa184c3b5}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!onCollisionEnter@{onCollisionEnter}}
+\index{onCollisionEnter@{onCollisionEnter}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{onCollisionEnter()}{onCollisionEnter()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Game\+Object\+::on\+Collision\+Enter (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{physics\+::\+Collision\+Event}} \&}]{ce }\end{DoxyParamCaption})}
+
+
+
+Function called when the game object enters a collision. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ce} & Collision event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_afb368ad6d5fb3b995bedf3f9cdd00b12}\label{classaderite_1_1scene_1_1_game_object_afb368ad6d5fb3b995bedf3f9cdd00b12}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!onCollisionLeave@{onCollisionLeave}}
+\index{onCollisionLeave@{onCollisionLeave}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{onCollisionLeave()}{onCollisionLeave()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Game\+Object\+::on\+Collision\+Leave (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{physics\+::\+Collision\+Event}} \&}]{ce }\end{DoxyParamCaption})}
+
+
+
+Function called when the game object leaves a collision. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ce} & Collision event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_addac4990905054f91c954028ff4d42c7}\label{classaderite_1_1scene_1_1_game_object_addac4990905054f91c954028ff4d42c7}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!onTriggerEnter@{onTriggerEnter}}
+\index{onTriggerEnter@{onTriggerEnter}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{onTriggerEnter()}{onTriggerEnter()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Game\+Object\+::on\+Trigger\+Enter (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&}]{te }\end{DoxyParamCaption})}
+
+
+
+Function called when this game object enters another trigger. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em te} & Trigger event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a1c8daef783429e845948fc6a1be9acee}\label{classaderite_1_1scene_1_1_game_object_a1c8daef783429e845948fc6a1be9acee}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!onTriggerLeave@{onTriggerLeave}}
+\index{onTriggerLeave@{onTriggerLeave}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{onTriggerLeave()}{onTriggerLeave()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Game\+Object\+::on\+Trigger\+Leave (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&}]{te }\end{DoxyParamCaption})}
+
+
+
+Function called when this game object leaves another trigger. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em te} & Trigger event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_ac422a24b3e37454fb60f8b8767e4d3fc}\label{classaderite_1_1scene_1_1_game_object_ac422a24b3e37454fb60f8b8767e4d3fc}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!onTriggerWasEntered@{onTriggerWasEntered}}
+\index{onTriggerWasEntered@{onTriggerWasEntered}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{onTriggerWasEntered()}{onTriggerWasEntered()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Game\+Object\+::on\+Trigger\+Was\+Entered (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&}]{te }\end{DoxyParamCaption})}
+
+
+
+Function called when the game object enters this trigger zone. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em te} & Trigger event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_ac1fdf73f769cd31693f071884dc55ee8}\label{classaderite_1_1scene_1_1_game_object_ac1fdf73f769cd31693f071884dc55ee8}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!onTriggerWasLeft@{onTriggerWasLeft}}
+\index{onTriggerWasLeft@{onTriggerWasLeft}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{onTriggerWasLeft()}{onTriggerWasLeft()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Game\+Object\+::on\+Trigger\+Was\+Left (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&}]{te }\end{DoxyParamCaption})}
+
+
+
+Function called when the game object leaves this trigger zone. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em te} & Trigger event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a795e3374367c1069b1827490cb5bda66}\label{classaderite_1_1scene_1_1_game_object_a795e3374367c1069b1827490cb5bda66}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!removeBehavior@{removeBehavior}}
+\index{removeBehavior@{removeBehavior}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{removeBehavior()}{removeBehavior()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Game\+Object\+::remove\+Behavior (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior}{scripting\+::\+Scripted\+Behavior}} $\ast$}]{behavior }\end{DoxyParamCaption})}
+
+
+
+Remove behavior from this game object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em behavior} & Behavior to remove \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a75a36a0d4a93cda5a512be719200c40a}\label{classaderite_1_1scene_1_1_game_object_a75a36a0d4a93cda5a512be719200c40a}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::scene\+::\+Game\+Object\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_game_object_a7fd2a53342174cd2477f84b2a3e59eb9}\label{classaderite_1_1scene_1_1_game_object_a7fd2a53342174cd2477f84b2a3e59eb9}} 
+\index{aderite::scene::GameObject@{aderite::scene::GameObject}!update@{update}}
+\index{update@{update}!aderite::scene::GameObject@{aderite::scene::GameObject}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Game\+Object\+::update (\begin{DoxyParamCaption}\item[{float}]{delta }\end{DoxyParamCaption})}
+
+
+
+Update scene. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em delta} & Delta time between frames \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scene/Game\+Object.\+hpp\item 
+src/aderite/scene/Game\+Object.\+cpp\end{DoxyCompactItemize}

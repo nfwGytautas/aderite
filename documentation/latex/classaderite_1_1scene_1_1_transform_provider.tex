@@ -1,0 +1,153 @@
+\hypertarget{classaderite_1_1scene_1_1_transform_provider}{}\doxysection{aderite\+::scene\+::Transform\+Provider Class Reference}
+\label{classaderite_1_1scene_1_1_transform_provider}\index{aderite::scene::TransformProvider@{aderite::scene::TransformProvider}}
+
+
+\mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider}{Transform\+Provider}} is an interface for objects that have transform information.  
+
+
+
+
+{\ttfamily \#include $<$Transform\+Provider.\+hpp$>$}
+
+Inheritance diagram for aderite\+::scene\+::Transform\+Provider\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classaderite_1_1scene_1_1_transform_provider}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_a93f9032615fc86a558ac555b71c76a2e}\label{classaderite_1_1scene_1_1_transform_provider_a93f9032615fc86a558ac555b71c76a2e}} 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_a93f9032615fc86a558ac555b71c76a2e}{was\+Modified}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the transform was modified, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_a13f0420558304ebfebbd364c123fff11}\label{classaderite_1_1scene_1_1_transform_provider_a13f0420558304ebfebbd364c123fff11}} 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_a13f0420558304ebfebbd364c123fff11}{reset\+Modified\+Flag}} ()
+\begin{DoxyCompactList}\small\item\em Resets the modified flag. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_ab06bdd6b6c6bd35d37832698e012b560}\label{classaderite_1_1scene_1_1_transform_provider_ab06bdd6b6c6bd35d37832698e012b560}} 
+const glm\+::vec3 \& \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_ab06bdd6b6c6bd35d37832698e012b560}{get\+Position}} () const
+\begin{DoxyCompactList}\small\item\em Returns the position value. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_afb825fdc0beb9004e15cc6aa3227a780}\label{classaderite_1_1scene_1_1_transform_provider_afb825fdc0beb9004e15cc6aa3227a780}} 
+const glm\+::quat \& \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_afb825fdc0beb9004e15cc6aa3227a780}{get\+Rotation}} () const
+\begin{DoxyCompactList}\small\item\em Returns the rotation value. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_ace769876584e0ef1e150785a751df3c7}\label{classaderite_1_1scene_1_1_transform_provider_ace769876584e0ef1e150785a751df3c7}} 
+const glm\+::vec3 \& \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_ace769876584e0ef1e150785a751df3c7}{get\+Scale}} () const
+\begin{DoxyCompactList}\small\item\em Returns the scale value. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_a29147266b5a802bf91ab79204c8a273f}{set\+Position}} (const glm\+::vec3 \&position)
+\begin{DoxyCompactList}\small\item\em Sets the position. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_a6182238125c728e3eb2252145d905241}{set\+Rotation}} (const glm\+::quat \&rotation)
+\begin{DoxyCompactList}\small\item\em Sets the rotation. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_a7e8e6788d2c520edf9ca06c0952b56a2}{set\+Scale}} (const glm\+::vec3 \&scale)
+\begin{DoxyCompactList}\small\item\em Sets the scale. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_af2e64c2a1ac195c1452f56c2aff9c439}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider_a280fb5a12d63888a3fcdb9d86e41357d}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_a852caee865e8e8351ea1f5df77353cd7}\label{classaderite_1_1scene_1_1_transform_provider_a852caee865e8e8351ea1f5df77353cd7}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider}{Transform\+Provider}} \& {\bfseries operator=} (const \mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider}{Transform\+Provider}} \&other)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider}{Transform\+Provider}} is an interface for objects that have transform information. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_a280fb5a12d63888a3fcdb9d86e41357d}\label{classaderite_1_1scene_1_1_transform_provider_a280fb5a12d63888a3fcdb9d86e41357d}} 
+\index{aderite::scene::TransformProvider@{aderite::scene::TransformProvider}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::scene::TransformProvider@{aderite::scene::TransformProvider}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::scene\+::\+Transform\+Provider\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_af2e64c2a1ac195c1452f56c2aff9c439}\label{classaderite_1_1scene_1_1_transform_provider_af2e64c2a1ac195c1452f56c2aff9c439}} 
+\index{aderite::scene::TransformProvider@{aderite::scene::TransformProvider}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::scene::TransformProvider@{aderite::scene::TransformProvider}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::scene\+::\+Transform\+Provider\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_a29147266b5a802bf91ab79204c8a273f}\label{classaderite_1_1scene_1_1_transform_provider_a29147266b5a802bf91ab79204c8a273f}} 
+\index{aderite::scene::TransformProvider@{aderite::scene::TransformProvider}!setPosition@{setPosition}}
+\index{setPosition@{setPosition}!aderite::scene::TransformProvider@{aderite::scene::TransformProvider}}
+\doxysubsubsection{\texorpdfstring{setPosition()}{setPosition()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Transform\+Provider\+::set\+Position (\begin{DoxyParamCaption}\item[{const glm\+::vec3 \&}]{position }\end{DoxyParamCaption})}
+
+
+
+Sets the position. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em position} & New position value \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_a6182238125c728e3eb2252145d905241}\label{classaderite_1_1scene_1_1_transform_provider_a6182238125c728e3eb2252145d905241}} 
+\index{aderite::scene::TransformProvider@{aderite::scene::TransformProvider}!setRotation@{setRotation}}
+\index{setRotation@{setRotation}!aderite::scene::TransformProvider@{aderite::scene::TransformProvider}}
+\doxysubsubsection{\texorpdfstring{setRotation()}{setRotation()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Transform\+Provider\+::set\+Rotation (\begin{DoxyParamCaption}\item[{const glm\+::quat \&}]{rotation }\end{DoxyParamCaption})}
+
+
+
+Sets the rotation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rotation} & New rotation value \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_transform_provider_a7e8e6788d2c520edf9ca06c0952b56a2}\label{classaderite_1_1scene_1_1_transform_provider_a7e8e6788d2c520edf9ca06c0952b56a2}} 
+\index{aderite::scene::TransformProvider@{aderite::scene::TransformProvider}!setScale@{setScale}}
+\index{setScale@{setScale}!aderite::scene::TransformProvider@{aderite::scene::TransformProvider}}
+\doxysubsubsection{\texorpdfstring{setScale()}{setScale()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Transform\+Provider\+::set\+Scale (\begin{DoxyParamCaption}\item[{const glm\+::vec3 \&}]{scale }\end{DoxyParamCaption})}
+
+
+
+Sets the scale. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em scale} & New scale value \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scene/Transform\+Provider.\+hpp\item 
+src/aderite/scene/Transform\+Provider.\+cpp\end{DoxyCompactItemize}

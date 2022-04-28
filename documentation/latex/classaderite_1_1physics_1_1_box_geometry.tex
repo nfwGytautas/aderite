@@ -1,0 +1,144 @@
+\hypertarget{classaderite_1_1physics_1_1_box_geometry}{}\doxysection{aderite\+::physics\+::Box\+Geometry Class Reference}
+\label{classaderite_1_1physics_1_1_box_geometry}\index{aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}}
+
+
+Simple 3D box geometry.  
+
+
+
+
+{\ttfamily \#include $<$Box\+Geometry.\+hpp$>$}
+
+Inheritance diagram for aderite\+::physics\+::Box\+Geometry\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{classaderite_1_1physics_1_1_box_geometry}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+glm\+::vec3 \mbox{\hyperlink{classaderite_1_1physics_1_1_box_geometry_a287da2cc0cf2d06563ac46c54901c7d8}{get\+Size}} () const
+\begin{DoxyCompactList}\small\item\em Returns the size of the box collider. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_box_geometry_a0abf6c6642da0c7050bff5d87da5fe9d}{set\+Size}} (const glm\+::vec3 size)
+\begin{DoxyCompactList}\small\item\em Sets the size of the box collider. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1physics_1_1_box_geometry_af73d630c9c3c52069aaeb77e056fa1fa}{apply\+Scale}} (const glm\+::vec3 \&scale) override
+\begin{DoxyCompactList}\small\item\em Apply scale to geometry. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_box_geometry_a66b6b2ba4a47e31718d59a0e14a3bfc3}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1physics_1_1_box_geometry_a9f6b07994fd5288b676ce4e28250a2fe}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_box_geometry_ae03f6891897c757abe8b70f443e12590}\label{classaderite_1_1physics_1_1_box_geometry_ae03f6891897c757abe8b70f443e12590}} 
+reflection\+::\+Type \mbox{\hyperlink{classaderite_1_1physics_1_1_box_geometry_ae03f6891897c757abe8b70f443e12590}{get\+Type}} () const override
+\begin{DoxyCompactList}\small\item\em Returns the type of the reflectable. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_box_geometry_a2d3ef25d1217d0daefe6ab29b17696ea}\label{classaderite_1_1physics_1_1_box_geometry_a2d3ef25d1217d0daefe6ab29b17696ea}} 
+\mbox{\hyperlink{classaderite_1_1physics_1_1_geometry}{Geometry}} $\ast$ \mbox{\hyperlink{classaderite_1_1physics_1_1_box_geometry_a2d3ef25d1217d0daefe6ab29b17696ea}{clone}} () override
+\begin{DoxyCompactList}\small\item\em Clone the geometry and return the new instance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+Simple 3D box geometry. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_box_geometry_af73d630c9c3c52069aaeb77e056fa1fa}\label{classaderite_1_1physics_1_1_box_geometry_af73d630c9c3c52069aaeb77e056fa1fa}} 
+\index{aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}!applyScale@{applyScale}}
+\index{applyScale@{applyScale}!aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}}
+\doxysubsubsection{\texorpdfstring{applyScale()}{applyScale()}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Box\+Geometry\+::apply\+Scale (\begin{DoxyParamCaption}\item[{const glm\+::vec3 \&}]{scale }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Apply scale to geometry. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em scale} & Scale to apply \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1physics_1_1_geometry_a9a957e5eef086e4144d4b1a6eca56634}{aderite\+::physics\+::\+Geometry}}.
+
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_box_geometry_a9f6b07994fd5288b676ce4e28250a2fe}\label{classaderite_1_1physics_1_1_box_geometry_a9f6b07994fd5288b676ce4e28250a2fe}} 
+\index{aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::physics\+::\+Box\+Geometry\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_box_geometry_a287da2cc0cf2d06563ac46c54901c7d8}\label{classaderite_1_1physics_1_1_box_geometry_a287da2cc0cf2d06563ac46c54901c7d8}} 
+\index{aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}!getSize@{getSize}}
+\index{getSize@{getSize}!aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}}
+\doxysubsubsection{\texorpdfstring{getSize()}{getSize()}}
+{\footnotesize\ttfamily glm\+::vec3 aderite\+::physics\+::\+Box\+Geometry\+::get\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Returns the size of the box collider. 
+
+\begin{DoxyReturn}{Returns}
+Box collider size 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_box_geometry_a66b6b2ba4a47e31718d59a0e14a3bfc3}\label{classaderite_1_1physics_1_1_box_geometry_a66b6b2ba4a47e31718d59a0e14a3bfc3}} 
+\index{aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::physics\+::\+Box\+Geometry\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1physics_1_1_box_geometry_a0abf6c6642da0c7050bff5d87da5fe9d}\label{classaderite_1_1physics_1_1_box_geometry_a0abf6c6642da0c7050bff5d87da5fe9d}} 
+\index{aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}!setSize@{setSize}}
+\index{setSize@{setSize}!aderite::physics::BoxGeometry@{aderite::physics::BoxGeometry}}
+\doxysubsubsection{\texorpdfstring{setSize()}{setSize()}}
+{\footnotesize\ttfamily void aderite\+::physics\+::\+Box\+Geometry\+::set\+Size (\begin{DoxyParamCaption}\item[{const glm\+::vec3}]{size }\end{DoxyParamCaption})}
+
+
+
+Sets the size of the box collider. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em size} & New size of the box collider \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/physics/geometry/Box\+Geometry.\+hpp\item 
+src/aderite/physics/geometry/Box\+Geometry.\+cpp\end{DoxyCompactItemize}

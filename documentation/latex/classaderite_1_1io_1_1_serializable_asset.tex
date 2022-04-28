@@ -1,0 +1,93 @@
+\hypertarget{classaderite_1_1io_1_1_serializable_asset}{}\doxysection{aderite\+::io\+::Serializable\+Asset Class Reference}
+\label{classaderite_1_1io_1_1_serializable_asset}\index{aderite::io::SerializableAsset@{aderite::io::SerializableAsset}}
+
+
+Base class for serializable objects that require reference counting.  
+
+
+
+
+{\ttfamily \#include $<$Serializable\+Asset.\+hpp$>$}
+
+Inheritance diagram for aderite\+::io\+::Serializable\+Asset\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=1.122807cm]{classaderite_1_1io_1_1_serializable_asset}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Serializable\+Handle \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a48434686b8ac76f7569a4f539c42eeca}{get\+Handle}} () const
+\begin{DoxyCompactList}\small\item\em Returns the handle of this serializable object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializable_asset_af86c7645560647615bf0f425d7564515}\label{classaderite_1_1io_1_1_serializable_asset_af86c7645560647615bf0f425d7564515}} 
+size\+\_\+t \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_af86c7645560647615bf0f425d7564515}{get\+Ref\+Count}} () const
+\begin{DoxyCompactList}\small\item\em Returns the number of outstanding references to this object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializable_asset_a7ab835cd8c3928894d1a2bbae41e914e}\label{classaderite_1_1io_1_1_serializable_asset_a7ab835cd8c3928894d1a2bbae41e914e}} 
+void \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a7ab835cd8c3928894d1a2bbae41e914e}{release}} ()
+\begin{DoxyCompactList}\small\item\em Releases a reference, this doesn\textquotesingle{}t actually delete if a 0 is reached, this is controlled by the serializer. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializable_asset_a46f1a7692272763e0b3150b294682ea8}\label{classaderite_1_1io_1_1_serializable_asset_a46f1a7692272763e0b3150b294682ea8}} 
+void \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a46f1a7692272763e0b3150b294682ea8}{acquire}} ()
+\begin{DoxyCompactList}\small\item\em Acquires a reference. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a6a6ae7d870dc85b66cbdd2766f1dd0ac}{load}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$loader) override
+\begin{DoxyCompactList}\small\item\em Load the object data, this function is executed in a separate thread. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializable_asset_a413d279d95abf5354d90d47b1552b333}\label{classaderite_1_1io_1_1_serializable_asset_a413d279d95abf5354d90d47b1552b333}} 
+virtual void \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a413d279d95abf5354d90d47b1552b333}{unload}} () override
+\begin{DoxyCompactList}\small\item\em Unload the object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializable_asset_aa18a9357931fc1b9b896e5234a68e11b}\label{classaderite_1_1io_1_1_serializable_asset_aa18a9357931fc1b9b896e5234a68e11b}} 
+virtual bool \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_aa18a9357931fc1b9b896e5234a68e11b}{needs\+Loading}} () const override
+\begin{DoxyCompactList}\small\item\em Returns true if the object needs loading, false otherwise. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializable_asset_a2a2892f184e0f6af49f3c8bf3161e88e}\label{classaderite_1_1io_1_1_serializable_asset_a2a2892f184e0f6af49f3c8bf3161e88e}} 
+static constexpr size\+\_\+t {\bfseries c\+\_\+\+Invalid\+Handle} = 0xffffffffffffffff
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Base class for serializable objects that require reference counting. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializable_asset_a48434686b8ac76f7569a4f539c42eeca}\label{classaderite_1_1io_1_1_serializable_asset_a48434686b8ac76f7569a4f539c42eeca}} 
+\index{aderite::io::SerializableAsset@{aderite::io::SerializableAsset}!getHandle@{getHandle}}
+\index{getHandle@{getHandle}!aderite::io::SerializableAsset@{aderite::io::SerializableAsset}}
+\doxysubsubsection{\texorpdfstring{getHandle()}{getHandle()}}
+{\footnotesize\ttfamily Serializable\+Handle aderite\+::io\+::\+Serializable\+Asset\+::get\+Handle (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Returns the handle of this serializable object. 
+
+\begin{DoxyReturn}{Returns}
+Object handle 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_serializable_asset_a6a6ae7d870dc85b66cbdd2766f1dd0ac}\label{classaderite_1_1io_1_1_serializable_asset_a6a6ae7d870dc85b66cbdd2766f1dd0ac}} 
+\index{aderite::io::SerializableAsset@{aderite::io::SerializableAsset}!load@{load}}
+\index{load@{load}!aderite::io::SerializableAsset@{aderite::io::SerializableAsset}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily void aderite\+::io\+::\+Serializable\+Asset\+::load (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$}]{loader }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Load the object data, this function is executed in a separate thread. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em loader} & \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{Loader}} instance \\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_loadable_a56604c6e1d7136a3dedff9167375a87c}{aderite\+::io\+::\+ILoadable}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a76623de0e65fad6bf036c00b7e6e98db}{aderite\+::asset\+::\+Texture\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset_a507f59b2574c881c1156fb4a8c7b4ffd}{aderite\+::asset\+::\+Prefab\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_mesh_asset_a0f5858eea4b5bf070d1ba4d9aeb7398e}{aderite\+::asset\+::\+Mesh\+Asset}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_a_d_e_r_i_t_e___m_i_d_d_l_e_w_a_r_e___f_i_n_a_l_a9cc2d3ccdc7e79876cf0ed2a2b6998f4}{aderite\+::asset\+::\+ADERITE\+\_\+\+MIDDLEWARE\+\_\+\+FINAL}}, \mbox{\hyperlink{classaderite_1_1asset_1_1_material_asset_a30d49bb617ad318d385367005a44a820}{aderite\+::asset\+::\+Material\+Asset}}, and \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset_a9725bd4a9db1b07bbe4801cd62357736}{aderite\+::asset\+::\+Audio\+Asset}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/io/Serializable\+Asset.\+hpp\item 
+src/aderite/io/Serializable\+Asset.\+cpp\end{DoxyCompactItemize}

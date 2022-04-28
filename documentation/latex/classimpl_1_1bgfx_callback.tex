@@ -1,0 +1,60 @@
+\hypertarget{classimpl_1_1bgfx_callback}{}\doxysection{impl\+::bgfx\+Callback Class Reference}
+\label{classimpl_1_1bgfx_callback}\index{impl::bgfxCallback@{impl::bgfxCallback}}
+
+
+bgfx logging callback  
+
+
+Inheritance diagram for impl\+::bgfx\+Callback\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classimpl_1_1bgfx_callback}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_a28d14d0bd4e2a6e751cab0f73300b975}\label{classimpl_1_1bgfx_callback_a28d14d0bd4e2a6e751cab0f73300b975}} 
+virtual void {\bfseries fatal} (const char $\ast$file\+Path, uint16\+\_\+t line, bgfx\+::\+Fatal\+::\+Enum code, const char $\ast$str) override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_afb7067e3894145f487bb3af7d6aad8b7}\label{classimpl_1_1bgfx_callback_afb7067e3894145f487bb3af7d6aad8b7}} 
+virtual void {\bfseries trace\+Vargs} (const char $\ast$file\+Path, uint16\+\_\+t line, const char $\ast$format, va\+\_\+list args) override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_a28000eea19b84b4ed663b7b13b169959}\label{classimpl_1_1bgfx_callback_a28000eea19b84b4ed663b7b13b169959}} 
+virtual void {\bfseries profiler\+Begin} (const char $\ast$, uint32\+\_\+t, const char $\ast$, uint16\+\_\+t) override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_acddbe4c0a33add39b4f71f872593c446}\label{classimpl_1_1bgfx_callback_acddbe4c0a33add39b4f71f872593c446}} 
+virtual void {\bfseries profiler\+Begin\+Literal} (const char $\ast$, uint32\+\_\+t, const char $\ast$, uint16\+\_\+t) override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_aa3432c4224e09d0233e9210b58e2f6e1}\label{classimpl_1_1bgfx_callback_aa3432c4224e09d0233e9210b58e2f6e1}} 
+virtual void {\bfseries profiler\+End} () override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_a2202c73b79144bfa6485c29cec3e9c3b}\label{classimpl_1_1bgfx_callback_a2202c73b79144bfa6485c29cec3e9c3b}} 
+virtual uint32\+\_\+t {\bfseries cache\+Read\+Size} (uint64\+\_\+t) override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_a5a25f756d709252972e05ac73e938959}\label{classimpl_1_1bgfx_callback_a5a25f756d709252972e05ac73e938959}} 
+virtual bool {\bfseries cache\+Read} (uint64\+\_\+t, void $\ast$, uint32\+\_\+t) override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_a769dfaf4a0c5a5a497efec8cb2898124}\label{classimpl_1_1bgfx_callback_a769dfaf4a0c5a5a497efec8cb2898124}} 
+virtual void {\bfseries cache\+Write} (uint64\+\_\+t, const void $\ast$, uint32\+\_\+t) override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_a0db1b40bf371922f50b6eeec77911537}\label{classimpl_1_1bgfx_callback_a0db1b40bf371922f50b6eeec77911537}} 
+virtual void {\bfseries capture\+Begin} (uint32\+\_\+t, uint32\+\_\+t, uint32\+\_\+t, bgfx\+::\+Texture\+Format\+::\+Enum, bool) override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_a1f60aea7f98619bc6766a22742b2816e}\label{classimpl_1_1bgfx_callback_a1f60aea7f98619bc6766a22742b2816e}} 
+virtual void {\bfseries capture\+End} () override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_aa47934b77c09e87463f32cc7e5a9bc6a}\label{classimpl_1_1bgfx_callback_aa47934b77c09e87463f32cc7e5a9bc6a}} 
+virtual void {\bfseries capture\+Frame} (const void $\ast$, uint32\+\_\+t) override
+\item 
+\mbox{\Hypertarget{classimpl_1_1bgfx_callback_ad1d415b4e1cb9b834a14b7c601cf49ff}\label{classimpl_1_1bgfx_callback_ad1d415b4e1cb9b834a14b7c601cf49ff}} 
+virtual void {\bfseries screen\+Shot} (const char $\ast$, uint32\+\_\+t, uint32\+\_\+t, uint32\+\_\+t, const void $\ast$, uint32\+\_\+t, bool yflip) override
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+bgfx logging callback 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/rendering/Renderer.\+cpp\end{DoxyCompactItemize}

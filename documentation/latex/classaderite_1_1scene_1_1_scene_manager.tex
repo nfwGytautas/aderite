@@ -1,0 +1,52 @@
+\hypertarget{classaderite_1_1scene_1_1_scene_manager}{}\doxysection{aderite\+::scene\+::Scene\+Manager Class Reference}
+\label{classaderite_1_1scene_1_1_scene_manager}\index{aderite::scene::SceneManager@{aderite::scene::SceneManager}}
+
+
+\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} manager for aderite.  
+
+
+
+
+{\ttfamily \#include $<$Scene\+Manager.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_manager_aabf28a65bf47dfa1c7050f2e67633015}\label{classaderite_1_1scene_1_1_scene_manager_aabf28a65bf47dfa1c7050f2e67633015}} 
+bool \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_manager_aabf28a65bf47dfa1c7050f2e67633015}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the scene manager. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_manager_a9357e2e299a10be38567980273d2097d}\label{classaderite_1_1scene_1_1_scene_manager_a9357e2e299a10be38567980273d2097d}} 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_manager_a9357e2e299a10be38567980273d2097d}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Frees all scene manager information. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_manager_a47abf827d4b615ea26dba0da64521c81}{set\+Active}} (\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} $\ast$scene)
+\begin{DoxyCompactList}\small\item\em Sets the specified scene as active, if the new scene isn\textquotesingle{}t fully loaded, then the engine defaults to the loading screen. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_manager_ab135f3db8f01baa0576888405bf3ddd2}\label{classaderite_1_1scene_1_1_scene_manager_ab135f3db8f01baa0576888405bf3ddd2}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} $\ast$ \mbox{\hyperlink{classaderite_1_1scene_1_1_scene_manager_ab135f3db8f01baa0576888405bf3ddd2}{get\+Current\+Scene}} () const
+\begin{DoxyCompactList}\small\item\em Returns the current active scene or nullptr if no active scene. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} manager for aderite. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scene_1_1_scene_manager_a47abf827d4b615ea26dba0da64521c81}\label{classaderite_1_1scene_1_1_scene_manager_a47abf827d4b615ea26dba0da64521c81}} 
+\index{aderite::scene::SceneManager@{aderite::scene::SceneManager}!setActive@{setActive}}
+\index{setActive@{setActive}!aderite::scene::SceneManager@{aderite::scene::SceneManager}}
+\doxysubsubsection{\texorpdfstring{setActive()}{setActive()}}
+{\footnotesize\ttfamily void aderite\+::scene\+::\+Scene\+Manager\+::set\+Active (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scene_1_1_scene}{Scene}} $\ast$}]{scene }\end{DoxyParamCaption})}
+
+
+
+Sets the specified scene as active, if the new scene isn\textquotesingle{}t fully loaded, then the engine defaults to the loading screen. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em scene} & New active scene \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scene/Scene\+Manager.\+hpp\item 
+src/aderite/scene/Scene\+Manager.\+cpp\end{DoxyCompactItemize}

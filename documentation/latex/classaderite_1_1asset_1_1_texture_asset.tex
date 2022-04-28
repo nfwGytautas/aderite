@@ -1,0 +1,161 @@
+\hypertarget{classaderite_1_1asset_1_1_texture_asset}{}\doxysection{aderite\+::asset\+::Texture\+Asset Class Reference}
+\label{classaderite_1_1asset_1_1_texture_asset}\index{aderite::asset::TextureAsset@{aderite::asset::TextureAsset}}
+
+
+Texture asset implementation.  
+
+
+
+
+{\ttfamily \#include $<$Texture\+Asset.\+hpp$>$}
+
+Inheritance diagram for aderite\+::asset\+::Texture\+Asset\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.992870cm]{classaderite_1_1asset_1_1_texture_asset}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_aeedd31e08808148b2bcb742570ac024a}{set\+HDR}} (bool value)
+\begin{DoxyCompactList}\small\item\em Set the HDR format value, will need to reload. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_a00a5d38b8f4cac3c878fb2655e389d86}\label{classaderite_1_1asset_1_1_texture_asset_a00a5d38b8f4cac3c878fb2655e389d86}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a00a5d38b8f4cac3c878fb2655e389d86}{is\+HDR}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the texture is HDR format, false otherwise. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a40bebe7e016ebf3fb602456bcac1c1be}{set\+Cubemap}} (bool value)
+\begin{DoxyCompactList}\small\item\em Set the cubemap format value, will need to reload. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_a70311df6cbd5fef70d911f53fa24b858}\label{classaderite_1_1asset_1_1_texture_asset_a70311df6cbd5fef70d911f53fa24b858}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a70311df6cbd5fef70d911f53fa24b858}{is\+Cubemap}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the texture is cubemap format, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_a019aa30aa09182da4c2116925712f45b}\label{classaderite_1_1asset_1_1_texture_asset_a019aa30aa09182da4c2116925712f45b}} 
+bgfx\+::\+Texture\+Handle \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a019aa30aa09182da4c2116925712f45b}{get\+Texture\+Handle}} () const
+\begin{DoxyCompactList}\small\item\em Returns texture handle of this asset. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_ac6ee27f8766e57dfc9ff7de66e52b612}\label{classaderite_1_1asset_1_1_texture_asset_ac6ee27f8766e57dfc9ff7de66e52b612}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_ac6ee27f8766e57dfc9ff7de66e52b612}{is\+Valid}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the texture is valid, false otherwise. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a76623de0e65fad6bf036c00b7e6e98db}{load}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$loader) override
+\begin{DoxyCompactList}\small\item\em Load the object data, this function is executed in a separate thread. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_accb5e56624142e86d45a5c6b0f2b12a2}\label{classaderite_1_1asset_1_1_texture_asset_accb5e56624142e86d45a5c6b0f2b12a2}} 
+void \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_accb5e56624142e86d45a5c6b0f2b12a2}{unload}} () override
+\begin{DoxyCompactList}\small\item\em Unload the object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_ad69f90bccdea38dddff2f62318574d97}\label{classaderite_1_1asset_1_1_texture_asset_ad69f90bccdea38dddff2f62318574d97}} 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_ad69f90bccdea38dddff2f62318574d97}{needs\+Loading}} () const override
+\begin{DoxyCompactList}\small\item\em Returns true if the object needs loading, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_abe401be3da608019a794d1c586627765}\label{classaderite_1_1asset_1_1_texture_asset_abe401be3da608019a794d1c586627765}} 
+reflection\+::\+Type \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_abe401be3da608019a794d1c586627765}{get\+Type}} () const override
+\begin{DoxyCompactList}\small\item\em Returns the type of the reflectable. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a830e56e066664a309e85d409a789edfe}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classaderite_1_1asset_1_1_texture_asset_a75746f7d3f1317d08c593678b3f81b84}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+\doxysubsection{Detailed Description}
+Texture asset implementation. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_a75746f7d3f1317d08c593678b3f81b84}\label{classaderite_1_1asset_1_1_texture_asset_a75746f7d3f1317d08c593678b3f81b84}} 
+\index{aderite::asset::TextureAsset@{aderite::asset::TextureAsset}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::asset::TextureAsset@{aderite::asset::TextureAsset}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Texture\+Asset\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_a76623de0e65fad6bf036c00b7e6e98db}\label{classaderite_1_1asset_1_1_texture_asset_a76623de0e65fad6bf036c00b7e6e98db}} 
+\index{aderite::asset::TextureAsset@{aderite::asset::TextureAsset}!load@{load}}
+\index{load@{load}!aderite::asset::TextureAsset@{aderite::asset::TextureAsset}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Texture\+Asset\+::load (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_loader}{io\+::\+Loader}} $\ast$}]{loader }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Load the object data, this function is executed in a separate thread. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em loader} & Loader instance \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset_a6a6ae7d870dc85b66cbdd2766f1dd0ac}{aderite\+::io\+::\+Serializable\+Asset}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_a830e56e066664a309e85d409a789edfe}\label{classaderite_1_1asset_1_1_texture_asset_a830e56e066664a309e85d409a789edfe}} 
+\index{aderite::asset::TextureAsset@{aderite::asset::TextureAsset}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::asset::TextureAsset@{aderite::asset::TextureAsset}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::asset\+::\+Texture\+Asset\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_a40bebe7e016ebf3fb602456bcac1c1be}\label{classaderite_1_1asset_1_1_texture_asset_a40bebe7e016ebf3fb602456bcac1c1be}} 
+\index{aderite::asset::TextureAsset@{aderite::asset::TextureAsset}!setCubemap@{setCubemap}}
+\index{setCubemap@{setCubemap}!aderite::asset::TextureAsset@{aderite::asset::TextureAsset}}
+\doxysubsubsection{\texorpdfstring{setCubemap()}{setCubemap()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Texture\+Asset\+::set\+Cubemap (\begin{DoxyParamCaption}\item[{bool}]{value }\end{DoxyParamCaption})}
+
+
+
+Set the cubemap format value, will need to reload. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & If true then the texture is set to cubemap format, if false then to single image format \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1asset_1_1_texture_asset_aeedd31e08808148b2bcb742570ac024a}\label{classaderite_1_1asset_1_1_texture_asset_aeedd31e08808148b2bcb742570ac024a}} 
+\index{aderite::asset::TextureAsset@{aderite::asset::TextureAsset}!setHDR@{setHDR}}
+\index{setHDR@{setHDR}!aderite::asset::TextureAsset@{aderite::asset::TextureAsset}}
+\doxysubsubsection{\texorpdfstring{setHDR()}{setHDR()}}
+{\footnotesize\ttfamily void aderite\+::asset\+::\+Texture\+Asset\+::set\+HDR (\begin{DoxyParamCaption}\item[{bool}]{value }\end{DoxyParamCaption})}
+
+
+
+Set the HDR format value, will need to reload. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & If true then the texture is set to HDR format, if false then to normal format \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/asset/Texture\+Asset.\+hpp\item 
+src/aderite/asset/Texture\+Asset.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,167 @@
+\hypertarget{classaderite_1_1io_1_1_file_handler}{}\doxysection{aderite\+::io\+::File\+Handler Class Reference}
+\label{classaderite_1_1io_1_1_file_handler}\index{aderite::io::FileHandler@{aderite::io::FileHandler}}
+
+
+Class that is responsible for reading and writing to device memory.  
+
+
+
+
+{\ttfamily \#include $<$File\+Handler.\+hpp$>$}
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structaderite_1_1io_1_1_file_handler_1_1_reserved}{Reserved}}
+\begin{DoxyCompactList}\small\item\em Struct containing reserved serializable and loadable ids. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} \mbox{\hyperlink{classaderite_1_1io_1_1_file_handler_add4c1b4313e96ab220fca57c513fc7cb}{open\+Serializable}} (Serializable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Resolves the handle file and chunk, loads it and returns it. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} \mbox{\hyperlink{classaderite_1_1io_1_1_file_handler_a3ff2fef5a3f8837b1df161686b9d90c4}{open\+Reserved\+Loadable}} (Loadable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Resolves the reserved handle file and chunk, loads it and returns it. \end{DoxyCompactList}\item 
+std\+::filesystem\+::path \mbox{\hyperlink{classaderite_1_1io_1_1_file_handler_a2b7c238524a3e90c1642b41191a29e95}{path\+To\+Reserved}} (Loadable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Returns the path to the reserved loadable handle. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} \mbox{\hyperlink{classaderite_1_1io_1_1_file_handler_ae0a3cb821c3d517ed06741d8b1ec3781}{open\+Loadable}} (Serializable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Resolves the handle file and chunk, loads it and returns it. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1io_1_1_file_handler_ae062ddfd717d22038fd0ebcc53727c58}{commit}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} \&chunk) const
+\begin{DoxyCompactList}\small\item\em Commit changes to the data chunk to it\textquotesingle{}s respective file. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1io_1_1_file_handler_abd130395cc69de6c1d54585951519722}{set\+Root}} (const std\+::filesystem\+::path \&root)
+\begin{DoxyCompactList}\small\item\em Set the root directory of \mbox{\hyperlink{classaderite_1_1io_1_1_file_handler}{File\+Handler}}. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1io_1_1_file_handler_a72099404d8052533ab14129a3d816993}{write\+Physical\+File}} (Loadable\+Handle handle, const std\+::filesystem\+::path \&file) const
+\begin{DoxyCompactList}\small\item\em Writes physical file contents into a loadable file. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1io_1_1_file_handler_a26fbee4b85ab44f9c905f188a64a6531}\label{classaderite_1_1io_1_1_file_handler_a26fbee4b85ab44f9c905f188a64a6531}} 
+bool \mbox{\hyperlink{classaderite_1_1io_1_1_file_handler_a26fbee4b85ab44f9c905f188a64a6531}{exists}} (Loadable\+Handle handle) const
+\begin{DoxyCompactList}\small\item\em Returns true if a loadable with the specified handle has a data file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class that is responsible for reading and writing to device memory. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_file_handler_ae062ddfd717d22038fd0ebcc53727c58}\label{classaderite_1_1io_1_1_file_handler_ae062ddfd717d22038fd0ebcc53727c58}} 
+\index{aderite::io::FileHandler@{aderite::io::FileHandler}!commit@{commit}}
+\index{commit@{commit}!aderite::io::FileHandler@{aderite::io::FileHandler}}
+\doxysubsubsection{\texorpdfstring{commit()}{commit()}}
+{\footnotesize\ttfamily void aderite\+::io\+::\+File\+Handler\+::commit (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} \&}]{chunk }\end{DoxyParamCaption}) const}
+
+
+
+Commit changes to the data chunk to it\textquotesingle{}s respective file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em chunk} & Chunk to commit \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_file_handler_ae0a3cb821c3d517ed06741d8b1ec3781}\label{classaderite_1_1io_1_1_file_handler_ae0a3cb821c3d517ed06741d8b1ec3781}} 
+\index{aderite::io::FileHandler@{aderite::io::FileHandler}!openLoadable@{openLoadable}}
+\index{openLoadable@{openLoadable}!aderite::io::FileHandler@{aderite::io::FileHandler}}
+\doxysubsubsection{\texorpdfstring{openLoadable()}{openLoadable()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} aderite\+::io\+::\+File\+Handler\+::open\+Loadable (\begin{DoxyParamCaption}\item[{Serializable\+Handle}]{handle }\end{DoxyParamCaption}) const}
+
+
+
+Resolves the handle file and chunk, loads it and returns it. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Handle to read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_file_handler_a3ff2fef5a3f8837b1df161686b9d90c4}\label{classaderite_1_1io_1_1_file_handler_a3ff2fef5a3f8837b1df161686b9d90c4}} 
+\index{aderite::io::FileHandler@{aderite::io::FileHandler}!openReservedLoadable@{openReservedLoadable}}
+\index{openReservedLoadable@{openReservedLoadable}!aderite::io::FileHandler@{aderite::io::FileHandler}}
+\doxysubsubsection{\texorpdfstring{openReservedLoadable()}{openReservedLoadable()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} aderite\+::io\+::\+File\+Handler\+::open\+Reserved\+Loadable (\begin{DoxyParamCaption}\item[{Loadable\+Handle}]{handle }\end{DoxyParamCaption}) const}
+
+
+
+Resolves the reserved handle file and chunk, loads it and returns it. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Handle to read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_file_handler_add4c1b4313e96ab220fca57c513fc7cb}\label{classaderite_1_1io_1_1_file_handler_add4c1b4313e96ab220fca57c513fc7cb}} 
+\index{aderite::io::FileHandler@{aderite::io::FileHandler}!openSerializable@{openSerializable}}
+\index{openSerializable@{openSerializable}!aderite::io::FileHandler@{aderite::io::FileHandler}}
+\doxysubsubsection{\texorpdfstring{openSerializable()}{openSerializable()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} aderite\+::io\+::\+File\+Handler\+::open\+Serializable (\begin{DoxyParamCaption}\item[{Serializable\+Handle}]{handle }\end{DoxyParamCaption}) const}
+
+
+
+Resolves the handle file and chunk, loads it and returns it. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Handle to read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classaderite_1_1io_1_1_data_chunk}{Data\+Chunk}} instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_file_handler_a2b7c238524a3e90c1642b41191a29e95}\label{classaderite_1_1io_1_1_file_handler_a2b7c238524a3e90c1642b41191a29e95}} 
+\index{aderite::io::FileHandler@{aderite::io::FileHandler}!pathToReserved@{pathToReserved}}
+\index{pathToReserved@{pathToReserved}!aderite::io::FileHandler@{aderite::io::FileHandler}}
+\doxysubsubsection{\texorpdfstring{pathToReserved()}{pathToReserved()}}
+{\footnotesize\ttfamily std\+::filesystem\+::path aderite\+::io\+::\+File\+Handler\+::path\+To\+Reserved (\begin{DoxyParamCaption}\item[{Loadable\+Handle}]{handle }\end{DoxyParamCaption}) const}
+
+
+
+Returns the path to the reserved loadable handle. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & \mbox{\hyperlink{structaderite_1_1io_1_1_file_handler_1_1_reserved}{Reserved}} handle \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Path (not guaranteed to exist) 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_file_handler_abd130395cc69de6c1d54585951519722}\label{classaderite_1_1io_1_1_file_handler_abd130395cc69de6c1d54585951519722}} 
+\index{aderite::io::FileHandler@{aderite::io::FileHandler}!setRoot@{setRoot}}
+\index{setRoot@{setRoot}!aderite::io::FileHandler@{aderite::io::FileHandler}}
+\doxysubsubsection{\texorpdfstring{setRoot()}{setRoot()}}
+{\footnotesize\ttfamily void aderite\+::io\+::\+File\+Handler\+::set\+Root (\begin{DoxyParamCaption}\item[{const std\+::filesystem\+::path \&}]{root }\end{DoxyParamCaption})}
+
+
+
+Set the root directory of \mbox{\hyperlink{classaderite_1_1io_1_1_file_handler}{File\+Handler}}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em root} & New root directory \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1io_1_1_file_handler_a72099404d8052533ab14129a3d816993}\label{classaderite_1_1io_1_1_file_handler_a72099404d8052533ab14129a3d816993}} 
+\index{aderite::io::FileHandler@{aderite::io::FileHandler}!writePhysicalFile@{writePhysicalFile}}
+\index{writePhysicalFile@{writePhysicalFile}!aderite::io::FileHandler@{aderite::io::FileHandler}}
+\doxysubsubsection{\texorpdfstring{writePhysicalFile()}{writePhysicalFile()}}
+{\footnotesize\ttfamily void aderite\+::io\+::\+File\+Handler\+::write\+Physical\+File (\begin{DoxyParamCaption}\item[{Loadable\+Handle}]{handle,  }\item[{const std\+::filesystem\+::path \&}]{file }\end{DoxyParamCaption}) const}
+
+
+
+Writes physical file contents into a loadable file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & Handle to write to \\
+\hline
+{\em file} & Physical file to write \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/io/File\+Handler.\+hpp\item 
+src/aderite/io/File\+Handler.\+cpp\end{DoxyCompactItemize}

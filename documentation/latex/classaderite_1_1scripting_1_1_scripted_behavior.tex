@@ -1,0 +1,221 @@
+\hypertarget{classaderite_1_1scripting_1_1_scripted_behavior}{}\doxysection{aderite\+::scripting\+::Scripted\+Behavior Class Reference}
+\label{classaderite_1_1scripting_1_1_scripted_behavior}\index{aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}}
+
+
+Class used to wrap around a scripted behavior component.  
+
+
+
+
+{\ttfamily \#include $<$Scripted\+Behavior.\+hpp$>$}
+
+Inheritance diagram for aderite\+::scripting\+::Scripted\+Behavior\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classaderite_1_1scripting_1_1_scripted_behavior}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a8d31d3e431a94680e1c45330e1706e3e}\label{classaderite_1_1scripting_1_1_scripted_behavior_a8d31d3e431a94680e1c45330e1706e3e}} 
+{\bfseries Scripted\+Behavior} (\mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base}{Behavior\+Base}} $\ast$behavior, \mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{scene\+::\+Game\+Object}} $\ast$g\+Object)
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a015ccaba28fa7e753d5675c927cf99aa}\label{classaderite_1_1scripting_1_1_scripted_behavior_a015ccaba28fa7e753d5675c927cf99aa}} 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a015ccaba28fa7e753d5675c927cf99aa}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes scripted behavior. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a8c0d6b1eba117dc9b98f26aae116e75d}\label{classaderite_1_1scripting_1_1_scripted_behavior_a8c0d6b1eba117dc9b98f26aae116e75d}} 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a8c0d6b1eba117dc9b98f26aae116e75d}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shuts down scripted behavior. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a8b4ae7aaf750e3ef2d440f811ab67f8d}{update}} (float delta)
+\begin{DoxyCompactList}\small\item\em Performs a script update. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a7500c48e3e0c0ec3bb7f300ef50cf9c5}{on\+Trigger\+Enter}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&te)
+\begin{DoxyCompactList}\small\item\em Function called when this game object enters another trigger. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_aa70f2eadb84161522e6174ff084e5a54}{on\+Trigger\+Leave}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&te)
+\begin{DoxyCompactList}\small\item\em Function called when this game object leaves another trigger. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_adb01f8639516bdbfdf278c605ea540ab}{on\+Trigger\+Was\+Entered}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&te)
+\begin{DoxyCompactList}\small\item\em Function called when the game object enters this trigger zone. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a104686591e989773334ca9f979e8755a}{on\+Trigger\+Was\+Left}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&te)
+\begin{DoxyCompactList}\small\item\em Function called when the game object leaves this trigger zone. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_aadddfc2a63e7c50815fe44e43505cb22}{on\+Collision\+Enter}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{physics\+::\+Collision\+Event}} \&ce)
+\begin{DoxyCompactList}\small\item\em Function called when the game object enters a collision. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a2df7941bc8cceea3858e320ffaabc74f}{on\+Collision\+Leave}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{physics\+::\+Collision\+Event}} \&ce)
+\begin{DoxyCompactList}\small\item\em Function called when the game object leaves a collision. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a7941e1ff3b1e57f8b63767df66f7deef}\label{classaderite_1_1scripting_1_1_scripted_behavior_a7941e1ff3b1e57f8b63767df66f7deef}} 
+\mbox{\hyperlink{classaderite_1_1scripting_1_1_behavior_base}{Behavior\+Base}} $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a7941e1ff3b1e57f8b63767df66f7deef}{get\+Base}} () const
+\begin{DoxyCompactList}\small\item\em Returns the behavior base. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a069708956b8b0bd7cc9d7f436c65cbfc}\label{classaderite_1_1scripting_1_1_scripted_behavior_a069708956b8b0bd7cc9d7f436c65cbfc}} 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a069708956b8b0bd7cc9d7f436c65cbfc}{get\+Instance}} () const
+\begin{DoxyCompactList}\small\item\em Returns the C\# instance of this object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a2379455c4740976657b4e6b85f7cee61}\label{classaderite_1_1scripting_1_1_scripted_behavior_a2379455c4740976657b4e6b85f7cee61}} 
+\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{scene\+::\+Game\+Object}} $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a2379455c4740976657b4e6b85f7cee61}{get\+Game\+Object}} () const
+\begin{DoxyCompactList}\small\item\em Returns the game object that this script is attached to. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_aeb99cbd57a28dcd31e7b54c818a35de0}{serialize}} (const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, YAML\+::\+Emitter \&emitter) const override
+\begin{DoxyCompactList}\small\item\em Serialize object to emmitter. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{classaderite_1_1scripting_1_1_scripted_behavior_a857c8086565c8f78d97c6655dde39529}{deserialize}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$serializer, const YAML\+::\+Node \&data) override
+\begin{DoxyCompactList}\small\item\em Deserialize object from data node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class used to wrap around a scripted behavior component. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a857c8086565c8f78d97c6655dde39529}\label{classaderite_1_1scripting_1_1_scripted_behavior_a857c8086565c8f78d97c6655dde39529}} 
+\index{aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily bool aderite\+::scripting\+::\+Scripted\+Behavior\+::deserialize (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{const YAML\+::\+Node \&}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Deserialize object from data node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em data} & Data node \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if deserialized, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a362489b76c4e118932856b6a9328543e}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_aadddfc2a63e7c50815fe44e43505cb22}\label{classaderite_1_1scripting_1_1_scripted_behavior_aadddfc2a63e7c50815fe44e43505cb22}} 
+\index{aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}!onCollisionEnter@{onCollisionEnter}}
+\index{onCollisionEnter@{onCollisionEnter}!aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}}
+\doxysubsubsection{\texorpdfstring{onCollisionEnter()}{onCollisionEnter()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Scripted\+Behavior\+::on\+Collision\+Enter (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{physics\+::\+Collision\+Event}} \&}]{ce }\end{DoxyParamCaption})}
+
+
+
+Function called when the game object enters a collision. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ce} & Collision event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a2df7941bc8cceea3858e320ffaabc74f}\label{classaderite_1_1scripting_1_1_scripted_behavior_a2df7941bc8cceea3858e320ffaabc74f}} 
+\index{aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}!onCollisionLeave@{onCollisionLeave}}
+\index{onCollisionLeave@{onCollisionLeave}!aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}}
+\doxysubsubsection{\texorpdfstring{onCollisionLeave()}{onCollisionLeave()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Scripted\+Behavior\+::on\+Collision\+Leave (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{physics\+::\+Collision\+Event}} \&}]{ce }\end{DoxyParamCaption})}
+
+
+
+Function called when the game object leaves a collision. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ce} & Collision event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a7500c48e3e0c0ec3bb7f300ef50cf9c5}\label{classaderite_1_1scripting_1_1_scripted_behavior_a7500c48e3e0c0ec3bb7f300ef50cf9c5}} 
+\index{aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}!onTriggerEnter@{onTriggerEnter}}
+\index{onTriggerEnter@{onTriggerEnter}!aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}}
+\doxysubsubsection{\texorpdfstring{onTriggerEnter()}{onTriggerEnter()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Scripted\+Behavior\+::on\+Trigger\+Enter (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&}]{te }\end{DoxyParamCaption})}
+
+
+
+Function called when this game object enters another trigger. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em te} & Trigger event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_aa70f2eadb84161522e6174ff084e5a54}\label{classaderite_1_1scripting_1_1_scripted_behavior_aa70f2eadb84161522e6174ff084e5a54}} 
+\index{aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}!onTriggerLeave@{onTriggerLeave}}
+\index{onTriggerLeave@{onTriggerLeave}!aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}}
+\doxysubsubsection{\texorpdfstring{onTriggerLeave()}{onTriggerLeave()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Scripted\+Behavior\+::on\+Trigger\+Leave (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&}]{te }\end{DoxyParamCaption})}
+
+
+
+Function called when this game object leaves another trigger. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em te} & Trigger event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_adb01f8639516bdbfdf278c605ea540ab}\label{classaderite_1_1scripting_1_1_scripted_behavior_adb01f8639516bdbfdf278c605ea540ab}} 
+\index{aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}!onTriggerWasEntered@{onTriggerWasEntered}}
+\index{onTriggerWasEntered@{onTriggerWasEntered}!aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}}
+\doxysubsubsection{\texorpdfstring{onTriggerWasEntered()}{onTriggerWasEntered()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Scripted\+Behavior\+::on\+Trigger\+Was\+Entered (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&}]{te }\end{DoxyParamCaption})}
+
+
+
+Function called when the game object enters this trigger zone. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em te} & Trigger event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a104686591e989773334ca9f979e8755a}\label{classaderite_1_1scripting_1_1_scripted_behavior_a104686591e989773334ca9f979e8755a}} 
+\index{aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}!onTriggerWasLeft@{onTriggerWasLeft}}
+\index{onTriggerWasLeft@{onTriggerWasLeft}!aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}}
+\doxysubsubsection{\texorpdfstring{onTriggerWasLeft()}{onTriggerWasLeft()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Scripted\+Behavior\+::on\+Trigger\+Was\+Left (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&}]{te }\end{DoxyParamCaption})}
+
+
+
+Function called when the game object leaves this trigger zone. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em te} & Trigger event \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_aeb99cbd57a28dcd31e7b54c818a35de0}\label{classaderite_1_1scripting_1_1_scripted_behavior_aeb99cbd57a28dcd31e7b54c818a35de0}} 
+\index{aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}!serialize@{serialize}}
+\index{serialize@{serialize}!aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily bool aderite\+::scripting\+::\+Scripted\+Behavior\+::serialize (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1io_1_1_serializer}{io\+::\+Serializer}} $\ast$}]{serializer,  }\item[{YAML\+::\+Emitter \&}]{emitter }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Serialize object to emmitter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializer} & Serializer instance \\
+\hline
+{\em emitter} & Emmitter to serialize to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if serialized without errors, false otherwise 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{classaderite_1_1io_1_1_i_serializable_a2304328b5eeec50bcbe8bdfca49466cc}{aderite\+::io\+::\+ISerializable}}.
+
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_scripted_behavior_a8b4ae7aaf750e3ef2d440f811ab67f8d}\label{classaderite_1_1scripting_1_1_scripted_behavior_a8b4ae7aaf750e3ef2d440f811ab67f8d}} 
+\index{aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}!update@{update}}
+\index{update@{update}!aderite::scripting::ScriptedBehavior@{aderite::scripting::ScriptedBehavior}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Scripted\+Behavior\+::update (\begin{DoxyParamCaption}\item[{float}]{delta }\end{DoxyParamCaption})}
+
+
+
+Performs a script update. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em delta} & Delta time of the frame \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scripting/Scripted\+Behavior.\+hpp\item 
+src/aderite/scripting/Scripted\+Behavior.\+cpp\end{DoxyCompactItemize}

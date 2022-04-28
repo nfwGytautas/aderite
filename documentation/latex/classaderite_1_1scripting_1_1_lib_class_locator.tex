@@ -1,0 +1,292 @@
+\hypertarget{classaderite_1_1scripting_1_1_lib_class_locator}{}\doxysection{aderite\+::scripting\+::Lib\+Class\+Locator Class Reference}
+\label{classaderite_1_1scripting_1_1_lib_class_locator}\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+
+
+Class used to locate engine classes and provide ways to instantiate them.  
+
+
+
+
+{\ttfamily \#include $<$Lib\+Class\+Locator.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator_a3ad2ff9c4049210b783cbf475f0f90d2}{locate}} (Mono\+Image $\ast$image)
+\begin{DoxyCompactList}\small\item\em Locates engine classes from the specified image. \end{DoxyCompactList}\item 
+Field\+Type \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator_a943cd83a6bbff28d6e7a9d89962b970f}{get\+Type}} (Mono\+Type $\ast$type) const
+\begin{DoxyCompactList}\small\item\em Check if the specified type is part of the script lib and returns it Field\+Type representation. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator_afe484f3273823be86fa34486bb9c695d}{create}} (\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{io\+::\+Serializable\+Object}} $\ast$serializable) const
+\begin{DoxyCompactList}\small\item\em Create a C\# script instance object from generic C++ serializable object. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator_adc43636a3b8da92a4bffd7659442848f}{create}} (\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{scene\+::\+Game\+Object}} $\ast$g\+Object) const
+\begin{DoxyCompactList}\small\item\em Creates a C\# game object from C++ asset. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator_ada20580bad3bdc58657403882b42f593}{create}} (\mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider}{scene\+::\+Transform\+Provider}} $\ast$transform) const
+\begin{DoxyCompactList}\small\item\em Creates a C\# transform from C++ asset. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator_aeddd664bbc06892b16d86a6fd3a2351f}{create}} (\mbox{\hyperlink{classaderite_1_1scene_1_1_camera}{scene\+::\+Camera}} $\ast$camera) const
+\begin{DoxyCompactList}\small\item\em Creates a C\# camera from C++ asset. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator_ae00df6da85eb934a984ae28c84e081ea}{create}} (\mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset}{asset\+::\+Prefab\+Asset}} $\ast$prefab) const
+\begin{DoxyCompactList}\small\item\em Creates a C\# prefab from C++ asset. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator_ac4ed0f0569a99f38959e94cecefe68e7}{create}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&te) const
+\begin{DoxyCompactList}\small\item\em Creates a C\# trigger event from C++ object. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator_a409d4b5023b3014cce3df1268baf64f7}{create}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{physics\+::\+Collision\+Event}} \&ce) const
+\begin{DoxyCompactList}\small\item\em Creates a C\# collision event from C++ object. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_lib_class_locator_a15c082f79e684328b137208c1ac89571}{create}} (const \mbox{\hyperlink{structaderite_1_1physics_1_1_raycast_result}{physics\+::\+Raycast\+Result}} \&rr) const
+\begin{DoxyCompactList}\small\item\em Creates a C\# raycast hit from C++ object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_a1beafb391d2fd041f1e34f9b1d8c4241}\label{classaderite_1_1scripting_1_1_lib_class_locator_a1beafb391d2fd041f1e34f9b1d8c4241}} 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>MonoClass $\ast$ {\bfseries Klass} = nullptr\\
+\>MonoMethod $\ast$ {\bfseries Ctor} = nullptr\\
+\} {\bfseries Behavior}\\
+
+\end{tabbing}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_a0236015bd869981303d840150f291c3d}\label{classaderite_1_1scripting_1_1_lib_class_locator_a0236015bd869981303d840150f291c3d}} 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>MonoClass $\ast$ {\bfseries Klass} = nullptr\\
+\>MonoMethod $\ast$ {\bfseries Ctor} = nullptr\\
+\} {\bfseries GameObject}\\
+
+\end{tabbing}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_a6eb81eee3617605be6d057ef2d5e1405}\label{classaderite_1_1scripting_1_1_lib_class_locator_a6eb81eee3617605be6d057ef2d5e1405}} 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>MonoClass $\ast$ {\bfseries Klass} = nullptr\\
+\>MonoMethod $\ast$ {\bfseries Ctor} = nullptr\\
+\} {\bfseries Prefab}\\
+
+\end{tabbing}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_a76c6d0f5b719d2533984e235c59820d1}\label{classaderite_1_1scripting_1_1_lib_class_locator_a76c6d0f5b719d2533984e235c59820d1}} 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>MonoClass $\ast$ {\bfseries Klass} = nullptr\\
+\>MonoMethod $\ast$ {\bfseries Ctor} = nullptr\\
+\} {\bfseries Transform}\\
+
+\end{tabbing}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_ab66f13e1c67694a342f8213764f6f379}\label{classaderite_1_1scripting_1_1_lib_class_locator_ab66f13e1c67694a342f8213764f6f379}} 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>MonoClass $\ast$ {\bfseries Klass} = nullptr\\
+\>MonoMethod $\ast$ {\bfseries Ctor} = nullptr\\
+\} {\bfseries Camera}\\
+
+\end{tabbing}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_a425eaf58ed52a5ded74b1d494fdb2d40}\label{classaderite_1_1scripting_1_1_lib_class_locator_a425eaf58ed52a5ded74b1d494fdb2d40}} 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>MonoClass $\ast$ {\bfseries Klass} = nullptr\\
+\>MonoMethod $\ast$ {\bfseries Ctor} = nullptr\\
+\} {\bfseries RaycastResult}\\
+
+\end{tabbing}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_a04a39cd004721e28a83a7bd0111b0aa8}\label{classaderite_1_1scripting_1_1_lib_class_locator_a04a39cd004721e28a83a7bd0111b0aa8}} 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>MonoClass $\ast$ {\bfseries Klass} = nullptr\\
+\>MonoMethod $\ast$ {\bfseries Ctor} = nullptr\\
+\} {\bfseries CollisionEvent}\\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class used to locate engine classes and provide ways to instantiate them. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_ae00df6da85eb934a984ae28c84e081ea}\label{classaderite_1_1scripting_1_1_lib_class_locator_ae00df6da85eb934a984ae28c84e081ea}} 
+\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}!create@{create}}
+\index{create@{create}!aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Lib\+Class\+Locator\+::create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1asset_1_1_prefab_asset}{asset\+::\+Prefab\+Asset}} $\ast$}]{prefab }\end{DoxyParamCaption}) const}
+
+
+
+Creates a C\# prefab from C++ asset. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em prefab} & Prefab from which to create \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_a409d4b5023b3014cce3df1268baf64f7}\label{classaderite_1_1scripting_1_1_lib_class_locator_a409d4b5023b3014cce3df1268baf64f7}} 
+\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}!create@{create}}
+\index{create@{create}!aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Lib\+Class\+Locator\+::create (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_collision_event}{physics\+::\+Collision\+Event}} \&}]{ce }\end{DoxyParamCaption}) const}
+
+
+
+Creates a C\# collision event from C++ object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ce} & Collision event struct from which to create \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_a15c082f79e684328b137208c1ac89571}\label{classaderite_1_1scripting_1_1_lib_class_locator_a15c082f79e684328b137208c1ac89571}} 
+\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}!create@{create}}
+\index{create@{create}!aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Lib\+Class\+Locator\+::create (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_raycast_result}{physics\+::\+Raycast\+Result}} \&}]{rr }\end{DoxyParamCaption}) const}
+
+
+
+Creates a C\# raycast hit from C++ object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rr} & Raycast hit struct from which to create \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_ac4ed0f0569a99f38959e94cecefe68e7}\label{classaderite_1_1scripting_1_1_lib_class_locator_ac4ed0f0569a99f38959e94cecefe68e7}} 
+\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}!create@{create}}
+\index{create@{create}!aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Lib\+Class\+Locator\+::create (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structaderite_1_1physics_1_1_trigger_event}{physics\+::\+Trigger\+Event}} \&}]{te }\end{DoxyParamCaption}) const}
+
+
+
+Creates a C\# trigger event from C++ object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em te} & Trigger event struct from which to create \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_afe484f3273823be86fa34486bb9c695d}\label{classaderite_1_1scripting_1_1_lib_class_locator_afe484f3273823be86fa34486bb9c695d}} 
+\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}!create@{create}}
+\index{create@{create}!aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Lib\+Class\+Locator\+::create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{io\+::\+Serializable\+Object}} $\ast$}]{serializable }\end{DoxyParamCaption}) const}
+
+
+
+Create a C\# script instance object from generic C++ serializable object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em serializable} & Serializable object \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_aeddd664bbc06892b16d86a6fd3a2351f}\label{classaderite_1_1scripting_1_1_lib_class_locator_aeddd664bbc06892b16d86a6fd3a2351f}} 
+\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}!create@{create}}
+\index{create@{create}!aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Lib\+Class\+Locator\+::create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scene_1_1_camera}{scene\+::\+Camera}} $\ast$}]{camera }\end{DoxyParamCaption}) const}
+
+
+
+Creates a C\# camera from C++ asset. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em camera} & Camera object from which to create \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_adc43636a3b8da92a4bffd7659442848f}\label{classaderite_1_1scripting_1_1_lib_class_locator_adc43636a3b8da92a4bffd7659442848f}} 
+\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}!create@{create}}
+\index{create@{create}!aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Lib\+Class\+Locator\+::create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scene_1_1_game_object}{scene\+::\+Game\+Object}} $\ast$}]{g\+Object }\end{DoxyParamCaption}) const}
+
+
+
+Creates a C\# game object from C++ asset. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em g\+Object} & Game object from which to create \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_ada20580bad3bdc58657403882b42f593}\label{classaderite_1_1scripting_1_1_lib_class_locator_ada20580bad3bdc58657403882b42f593}} 
+\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}!create@{create}}
+\index{create@{create}!aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+\doxysubsubsection{\texorpdfstring{create()}{create()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Lib\+Class\+Locator\+::create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classaderite_1_1scene_1_1_transform_provider}{scene\+::\+Transform\+Provider}} $\ast$}]{transform }\end{DoxyParamCaption}) const}
+
+
+
+Creates a C\# transform from C++ asset. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Transform} & Transform object from which to create \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Mono\+Object instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_a943cd83a6bbff28d6e7a9d89962b970f}\label{classaderite_1_1scripting_1_1_lib_class_locator_a943cd83a6bbff28d6e7a9d89962b970f}} 
+\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}!getType@{getType}}
+\index{getType@{getType}!aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+\doxysubsubsection{\texorpdfstring{getType()}{getType()}}
+{\footnotesize\ttfamily Field\+Type aderite\+::scripting\+::\+Lib\+Class\+Locator\+::get\+Type (\begin{DoxyParamCaption}\item[{Mono\+Type $\ast$}]{type }\end{DoxyParamCaption}) const}
+
+
+
+Check if the specified type is part of the script lib and returns it Field\+Type representation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & Type to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Field\+Type value 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_lib_class_locator_a3ad2ff9c4049210b783cbf475f0f90d2}\label{classaderite_1_1scripting_1_1_lib_class_locator_a3ad2ff9c4049210b783cbf475f0f90d2}} 
+\index{aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}!locate@{locate}}
+\index{locate@{locate}!aderite::scripting::LibClassLocator@{aderite::scripting::LibClassLocator}}
+\doxysubsubsection{\texorpdfstring{locate()}{locate()}}
+{\footnotesize\ttfamily bool aderite\+::scripting\+::\+Lib\+Class\+Locator\+::locate (\begin{DoxyParamCaption}\item[{Mono\+Image $\ast$}]{image }\end{DoxyParamCaption})}
+
+
+
+Locates engine classes from the specified image. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em image} & Image to locate in \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if all classes found, false otherwise 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scripting/Lib\+Class\+Locator.\+hpp\item 
+src/aderite/scripting/Lib\+Class\+Locator.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,153 @@
+\hypertarget{classaderite_1_1input_1_1_input_manager}{}\doxysection{aderite\+::input\+::Input\+Manager Class Reference}
+\label{classaderite_1_1input_1_1_input_manager}\index{aderite::input::InputManager@{aderite::input::InputManager}}
+
+
+Class responsible for all input actions received from the operating system, this class is closely related to the Window\+Manager, cause all inputs come through the window and the \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager}{Input\+Manager}} is tasked with handling them.  
+
+
+
+
+{\ttfamily \#include $<$Input\+Manager.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a1b386d3e99f213be94fbc5452d9a087a}\label{classaderite_1_1input_1_1_input_manager_a1b386d3e99f213be94fbc5452d9a087a}} 
+bool \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a1b386d3e99f213be94fbc5452d9a087a}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the input manager. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a3b3e1bf7df3087820ee657d4b74574de}\label{classaderite_1_1input_1_1_input_manager_a3b3e1bf7df3087820ee657d4b74574de}} 
+void \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a3b3e1bf7df3087820ee657d4b74574de}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shutdown the input manager. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a3b10dad09b086cfbaacabddb3b6a29c0}\label{classaderite_1_1input_1_1_input_manager_a3b10dad09b086cfbaacabddb3b6a29c0}} 
+void \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a3b10dad09b086cfbaacabddb3b6a29c0}{update}} ()
+\begin{DoxyCompactList}\small\item\em Updates input state. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a0e241aa7fde0744b4ad10deabdb1a554}{on\+Window\+Resized}} (unsigned int new\+Width, unsigned int new\+Height)
+\begin{DoxyCompactList}\small\item\em Function invoked when the window has been resized. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a8b1342f211c149d14f07b38932ef18c5}{on\+Key\+State\+Change}} (Key key, Key\+Action action, Key\+Modifier modifiers)
+\begin{DoxyCompactList}\small\item\em Function invoked when a key was pressed/released on the keyboard. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a25361442d188b8aa1297721da9ad6cb8}{on\+Mouse\+Key\+State\+Change}} (Mouse\+Key key, Key\+Action action, Key\+Modifier modifiers)
+\begin{DoxyCompactList}\small\item\em Function invoked when a mouse key was pressed/released on the keyboard. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a5ec3b65ce4cd083272689890facc8281}{on\+Mouse\+Move}} (double x\+Pos, double y\+Pos)
+\begin{DoxyCompactList}\small\item\em Function invoked when a mouse was moved. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_ab035325bd714579654ee58722f821156}{on\+Mouse\+Scrolled}} (double y\+Offset)
+\begin{DoxyCompactList}\small\item\em Function invoked when a mouse was scrolled. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_ae54d346156a511fc31e467703b56380c}\label{classaderite_1_1input_1_1_input_manager_ae54d346156a511fc31e467703b56380c}} 
+void \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_ae54d346156a511fc31e467703b56380c}{on\+Window\+Closed}} ()
+\begin{DoxyCompactList}\small\item\em Function invoked when the window has been closed by the user. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a93431dbee787b410e72a854ba4265794}\label{classaderite_1_1input_1_1_input_manager_a93431dbee787b410e72a854ba4265794}} 
+bool \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a93431dbee787b410e72a854ba4265794}{is\+Key\+Pressed}} (Key key) const
+\begin{DoxyCompactList}\small\item\em Returns true if the specified key is pressed, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a541f2e389696ed98dc2ae695cf7fa017}\label{classaderite_1_1input_1_1_input_manager_a541f2e389696ed98dc2ae695cf7fa017}} 
+bool \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a541f2e389696ed98dc2ae695cf7fa017}{was\+Key\+Released}} (Key key) const
+\begin{DoxyCompactList}\small\item\em Returns true if the specified key was released this frame, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a038b456a18a51c4fad2171fe4f9fd5f4}\label{classaderite_1_1input_1_1_input_manager_a038b456a18a51c4fad2171fe4f9fd5f4}} 
+bool \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a038b456a18a51c4fad2171fe4f9fd5f4}{is\+Mouse\+Key\+Pressed}} (Mouse\+Key key) const
+\begin{DoxyCompactList}\small\item\em Returns true if the specified mouse key is pressed, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a308d9eadf113ad228701f3cb59817442}\label{classaderite_1_1input_1_1_input_manager_a308d9eadf113ad228701f3cb59817442}} 
+glm\+::dvec2 \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a308d9eadf113ad228701f3cb59817442}{get\+Mouse\+Position}} () const
+\begin{DoxyCompactList}\small\item\em Returns the mouse position relative to top-\/left corner of the screen. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_acf649843b5edc5c4eaf49199f662cc0c}\label{classaderite_1_1input_1_1_input_manager_acf649843b5edc5c4eaf49199f662cc0c}} 
+glm\+::dvec2 \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_acf649843b5edc5c4eaf49199f662cc0c}{get\+Mouse\+Delta}} () const
+\begin{DoxyCompactList}\small\item\em Returns the mouse position change since last frame. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a01530e12fd8dc1f784cb9e0d6a934f7a}\label{classaderite_1_1input_1_1_input_manager_a01530e12fd8dc1f784cb9e0d6a934f7a}} 
+double \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager_a01530e12fd8dc1f784cb9e0d6a934f7a}{get\+Scroll\+Delta}} () const
+\begin{DoxyCompactList}\small\item\em Returns the mouse scroll change since last frame. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class responsible for all input actions received from the operating system, this class is closely related to the Window\+Manager, cause all inputs come through the window and the \mbox{\hyperlink{classaderite_1_1input_1_1_input_manager}{Input\+Manager}} is tasked with handling them. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a8b1342f211c149d14f07b38932ef18c5}\label{classaderite_1_1input_1_1_input_manager_a8b1342f211c149d14f07b38932ef18c5}} 
+\index{aderite::input::InputManager@{aderite::input::InputManager}!onKeyStateChange@{onKeyStateChange}}
+\index{onKeyStateChange@{onKeyStateChange}!aderite::input::InputManager@{aderite::input::InputManager}}
+\doxysubsubsection{\texorpdfstring{onKeyStateChange()}{onKeyStateChange()}}
+{\footnotesize\ttfamily void aderite\+::input\+::\+Input\+Manager\+::on\+Key\+State\+Change (\begin{DoxyParamCaption}\item[{Key}]{key,  }\item[{Key\+Action}]{action,  }\item[{Key\+Modifier}]{modifiers }\end{DoxyParamCaption})}
+
+
+
+Function invoked when a key was pressed/released on the keyboard. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & Key that was pressed \\
+\hline
+{\em action} & Action, for more info look at Key\+Action enum \\
+\hline
+{\em modifiers} & Modifiers applied when the event was submitted \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a25361442d188b8aa1297721da9ad6cb8}\label{classaderite_1_1input_1_1_input_manager_a25361442d188b8aa1297721da9ad6cb8}} 
+\index{aderite::input::InputManager@{aderite::input::InputManager}!onMouseKeyStateChange@{onMouseKeyStateChange}}
+\index{onMouseKeyStateChange@{onMouseKeyStateChange}!aderite::input::InputManager@{aderite::input::InputManager}}
+\doxysubsubsection{\texorpdfstring{onMouseKeyStateChange()}{onMouseKeyStateChange()}}
+{\footnotesize\ttfamily void aderite\+::input\+::\+Input\+Manager\+::on\+Mouse\+Key\+State\+Change (\begin{DoxyParamCaption}\item[{Mouse\+Key}]{key,  }\item[{Key\+Action}]{action,  }\item[{Key\+Modifier}]{modifiers }\end{DoxyParamCaption})}
+
+
+
+Function invoked when a mouse key was pressed/released on the keyboard. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & Key that was pressed \\
+\hline
+{\em action} & Action, for more info look at Key\+Action enum \\
+\hline
+{\em modifiers} & Modifiers applied when the event was submitted \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a5ec3b65ce4cd083272689890facc8281}\label{classaderite_1_1input_1_1_input_manager_a5ec3b65ce4cd083272689890facc8281}} 
+\index{aderite::input::InputManager@{aderite::input::InputManager}!onMouseMove@{onMouseMove}}
+\index{onMouseMove@{onMouseMove}!aderite::input::InputManager@{aderite::input::InputManager}}
+\doxysubsubsection{\texorpdfstring{onMouseMove()}{onMouseMove()}}
+{\footnotesize\ttfamily void aderite\+::input\+::\+Input\+Manager\+::on\+Mouse\+Move (\begin{DoxyParamCaption}\item[{double}]{x\+Pos,  }\item[{double}]{y\+Pos }\end{DoxyParamCaption})}
+
+
+
+Function invoked when a mouse was moved. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em x\+Pos} & New x position of the mouse \\
+\hline
+{\em y\+Pos} & New y position of the mouse \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_ab035325bd714579654ee58722f821156}\label{classaderite_1_1input_1_1_input_manager_ab035325bd714579654ee58722f821156}} 
+\index{aderite::input::InputManager@{aderite::input::InputManager}!onMouseScrolled@{onMouseScrolled}}
+\index{onMouseScrolled@{onMouseScrolled}!aderite::input::InputManager@{aderite::input::InputManager}}
+\doxysubsubsection{\texorpdfstring{onMouseScrolled()}{onMouseScrolled()}}
+{\footnotesize\ttfamily void aderite\+::input\+::\+Input\+Manager\+::on\+Mouse\+Scrolled (\begin{DoxyParamCaption}\item[{double}]{y\+Offset }\end{DoxyParamCaption})}
+
+
+
+Function invoked when a mouse was scrolled. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em y\+Offset} & New y offset of the scroll wheel \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1input_1_1_input_manager_a0e241aa7fde0744b4ad10deabdb1a554}\label{classaderite_1_1input_1_1_input_manager_a0e241aa7fde0744b4ad10deabdb1a554}} 
+\index{aderite::input::InputManager@{aderite::input::InputManager}!onWindowResized@{onWindowResized}}
+\index{onWindowResized@{onWindowResized}!aderite::input::InputManager@{aderite::input::InputManager}}
+\doxysubsubsection{\texorpdfstring{onWindowResized()}{onWindowResized()}}
+{\footnotesize\ttfamily void aderite\+::input\+::\+Input\+Manager\+::on\+Window\+Resized (\begin{DoxyParamCaption}\item[{unsigned int}]{new\+Width,  }\item[{unsigned int}]{new\+Height }\end{DoxyParamCaption})}
+
+
+
+Function invoked when the window has been resized. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em new\+Width} & New width of the window \\
+\hline
+{\em new\+Height} & New height of the window \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/input/Input\+Manager.\+hpp\item 
+src/aderite/input/Input\+Manager.\+cpp\end{DoxyCompactItemize}

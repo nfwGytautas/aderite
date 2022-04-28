@@ -1,0 +1,78 @@
+\hypertarget{namespaceaderite}{}\doxysection{aderite Namespace Reference}
+\label{namespaceaderite}\index{aderite@{aderite}}
+
+
+This file is used to define forward declarations for all asset types.  
+
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classaderite_1_1_engine}{Engine}}
+\begin{DoxyCompactList}\small\item\em Main aderite engine instance. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classaderite_1_1_logger}{Logger}}
+\begin{DoxyCompactList}\small\item\em Aderite spdlog interface. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceaderite_a08d0bddde5f361465119ffae86b48aa3}\label{namespaceaderite_a08d0bddde5f361465119ffae86b48aa3}} 
+using {\bfseries Handle\+Type} = size\+\_\+t
+\item 
+\mbox{\Hypertarget{namespaceaderite_a4145a6e4a97388e71d5a0648dca4367c}\label{namespaceaderite_a4145a6e4a97388e71d5a0648dca4367c}} 
+using {\bfseries Universal\+Handle} = Handle\+Type
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceaderite_a3ac0c030121a4cf3c89ab8b88fbcaf6c}\label{namespaceaderite_a3ac0c030121a4cf3c89ab8b88fbcaf6c}} 
+constexpr size\+\_\+t {\bfseries c\+\_\+\+Invalid\+Handle} = 0xffffffffffffffff
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This file is used to define forward declarations for all asset types. 
+
+This file is used to define forward declarations for all windowing types.
+
+This file is used to define forward declarations for all scripting related objects.
+
+This file is used to define forward declarations for all Scene types.
+
+This file is used to define forward declarations for all rendering types.
+
+This file contains all serializable types that the runtime has.
+
+This file is used to define forward declarations for the reflection system.
+
+This file is used to define forward declarations for all physics types.
+
+This file contains all versions of the serialization library. These versions are used to define the structure of the serialized files. The serialization system will try to upgrade older version files to newer ones.
+
+This file defines the Serializer class. Serializer is responsible for handling all META data io operations.
+
+This file is used to define forward declarations for all serialization related objects.
+
+This file is used to define forward declarations for all input types.
+
+This file contains all handle definitions in the engine.
+
+The serializer works in a pretty simple way and utilizes a mini reflection system. Every serializable file (for this example instance yaml files are used, but for most compiled projects) a binary format will be used.
+
+The file starts with a version definition, then the Type and Name specifier Version\+: xxxxxx Type\+: 0 Name\+: name\+Of\+Object
+
+Then a data section, this section is passed to the object Data\+: \{\}
+
+Instancers are used to resolve Type to instance of an object, because of this every serializable object needs to have an empty constructor implementation.
+
+In the event that the user has nested objects e.\+g. \+:
+
+Version\+: xxxxx Type\+: 0 Name\+: example1 Data\+:
+\begin{DoxyItemize}
+\item Some\+Data\+: 0 Objects\+:
+\begin{DoxyItemize}
+\item Type\+: 1 Name\+: example2 Data\+: \{\}
+\item Type 2 Name\+: example3 Data\+: \{\}
+\end{DoxyItemize}
+\end{DoxyItemize}
+
+The serializer can be used to parse a node by calling Serializer\+::parse\+Type(const YAML\+::\+Node\& node) Where the Node would be Objects\mbox{[}idx\mbox{]} item, and the return will be a Serializable\+Object, which can be casted to necessary type or used as is. 

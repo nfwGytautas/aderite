@@ -1,0 +1,183 @@
+\hypertarget{classaderite_1_1scripting_1_1_field_wrapper}{}\doxysection{aderite\+::scripting\+::Field\+Wrapper Class Reference}
+\label{classaderite_1_1scripting_1_1_field_wrapper}\index{aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}}
+
+
+Wrappper for mono fields.  
+
+
+
+
+{\ttfamily \#include $<$Field\+Wrapper.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_field_wrapper_a6524fd4a9985b9cf15631f7b46099999}\label{classaderite_1_1scripting_1_1_field_wrapper_a6524fd4a9985b9cf15631f7b46099999}} 
+{\bfseries Field\+Wrapper} (Mono\+Class\+Field $\ast$field)
+\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_field_wrapper_a7b11f04dbc8020e6b8faaba5410d79e0}\label{classaderite_1_1scripting_1_1_field_wrapper_a7b11f04dbc8020e6b8faaba5410d79e0}} 
+std\+::string \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper_a7b11f04dbc8020e6b8faaba5410d79e0}{get\+Name}} () const
+\begin{DoxyCompactList}\small\item\em Returns the name of the field. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_field_wrapper_a62de532a3ddccb99c0c0b83315d1c1b0}\label{classaderite_1_1scripting_1_1_field_wrapper_a62de532a3ddccb99c0c0b83315d1c1b0}} 
+Field\+Type \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper_a62de532a3ddccb99c0c0b83315d1c1b0}{get\+Type}} () const
+\begin{DoxyCompactList}\small\item\em Returns the type of the field. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper_a48770ee3f77c08913729a0b2e6adc1ac}{get\+Value}} (Mono\+Object $\ast$instance, void $\ast$value) const
+\begin{DoxyCompactList}\small\item\em Get value and store it in the specified pointer. \end{DoxyCompactList}\item 
+Mono\+Object $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper_a6696e84204967547dd1bbd0ddb0687dd}{get\+Value\+Object}} (Mono\+Object $\ast$instance) const
+\begin{DoxyCompactList}\small\item\em Returns the value of the field in the specified instance. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper_aa6da3c459ecf75bb30ef180159fcdf6c}{set\+Value}} (Mono\+Object $\ast$instance, void $\ast$value) const
+\begin{DoxyCompactList}\small\item\em Sets the value of the field for the specified instance. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\T \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper_a54d85e2bfeb5d8c8a613ae5035e254fb}{get\+Value\+Type}} (Mono\+Object $\ast$instance) const
+\begin{DoxyCompactList}\small\item\em Get the field value as a value type object. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\void \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper_a2531ab29e6692eb346d86dfb9058ebe7}{set\+Value\+Type}} (Mono\+Object $\ast$instance, T value) const
+\begin{DoxyCompactList}\small\item\em Set the field value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset}{io\+::\+Serializable\+Asset}} $\ast$ \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper_adb80fe4669c94e3321ac4c61acee0f13}{get\+Serializable}} (Mono\+Object $\ast$instance) const
+\begin{DoxyCompactList}\small\item\em If the type is of serializable, then this method can be used to directly extract the C++ instance. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1scripting_1_1_field_wrapper_ac405e0a1e72bbfd2454f2b403aa4c495}{set\+Serializable}} (Mono\+Object $\ast$instance, \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{io\+::\+Serializable\+Object}} $\ast$serializable) const
+\begin{DoxyCompactList}\small\item\em If the type is of serializable, then this method can be used to directly set the instance of it. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Wrappper for mono fields. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_field_wrapper_adb80fe4669c94e3321ac4c61acee0f13}\label{classaderite_1_1scripting_1_1_field_wrapper_adb80fe4669c94e3321ac4c61acee0f13}} 
+\index{aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}!getSerializable@{getSerializable}}
+\index{getSerializable@{getSerializable}!aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}}
+\doxysubsubsection{\texorpdfstring{getSerializable()}{getSerializable()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classaderite_1_1io_1_1_serializable_asset}{io\+::\+Serializable\+Asset}} $\ast$ aderite\+::scripting\+::\+Field\+Wrapper\+::get\+Serializable (\begin{DoxyParamCaption}\item[{Mono\+Object $\ast$}]{instance }\end{DoxyParamCaption}) const}
+
+
+
+If the type is of serializable, then this method can be used to directly extract the C++ instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instance} & Instance to set for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+ISerializable instance 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_field_wrapper_a48770ee3f77c08913729a0b2e6adc1ac}\label{classaderite_1_1scripting_1_1_field_wrapper_a48770ee3f77c08913729a0b2e6adc1ac}} 
+\index{aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}!getValue@{getValue}}
+\index{getValue@{getValue}!aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}}
+\doxysubsubsection{\texorpdfstring{getValue()}{getValue()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Field\+Wrapper\+::get\+Value (\begin{DoxyParamCaption}\item[{Mono\+Object $\ast$}]{instance,  }\item[{void $\ast$}]{value }\end{DoxyParamCaption}) const}
+
+
+
+Get value and store it in the specified pointer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instance} & Instance of the object \\
+\hline
+{\em target} & Pointer where value will be stored, must be correct size \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_field_wrapper_a6696e84204967547dd1bbd0ddb0687dd}\label{classaderite_1_1scripting_1_1_field_wrapper_a6696e84204967547dd1bbd0ddb0687dd}} 
+\index{aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}!getValueObject@{getValueObject}}
+\index{getValueObject@{getValueObject}!aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}}
+\doxysubsubsection{\texorpdfstring{getValueObject()}{getValueObject()}}
+{\footnotesize\ttfamily Mono\+Object $\ast$ aderite\+::scripting\+::\+Field\+Wrapper\+::get\+Value\+Object (\begin{DoxyParamCaption}\item[{Mono\+Object $\ast$}]{instance }\end{DoxyParamCaption}) const}
+
+
+
+Returns the value of the field in the specified instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instance} & Instance of the object \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_field_wrapper_a54d85e2bfeb5d8c8a613ae5035e254fb}\label{classaderite_1_1scripting_1_1_field_wrapper_a54d85e2bfeb5d8c8a613ae5035e254fb}} 
+\index{aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}!getValueType@{getValueType}}
+\index{getValueType@{getValueType}!aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}}
+\doxysubsubsection{\texorpdfstring{getValueType()}{getValueType()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+T aderite\+::scripting\+::\+Field\+Wrapper\+::get\+Value\+Type (\begin{DoxyParamCaption}\item[{Mono\+Object $\ast$}]{instance }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get the field value as a value type object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instance} & Instance to set for \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Type of the field \\
+\hline
+\end{DoxyTemplParams}
+\begin{DoxyReturn}{Returns}
+Value of the field 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_field_wrapper_ac405e0a1e72bbfd2454f2b403aa4c495}\label{classaderite_1_1scripting_1_1_field_wrapper_ac405e0a1e72bbfd2454f2b403aa4c495}} 
+\index{aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}!setSerializable@{setSerializable}}
+\index{setSerializable@{setSerializable}!aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}}
+\doxysubsubsection{\texorpdfstring{setSerializable()}{setSerializable()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Field\+Wrapper\+::set\+Serializable (\begin{DoxyParamCaption}\item[{Mono\+Object $\ast$}]{instance,  }\item[{\mbox{\hyperlink{classaderite_1_1io_1_1_serializable_object}{io\+::\+Serializable\+Object}} $\ast$}]{serializable }\end{DoxyParamCaption}) const}
+
+
+
+If the type is of serializable, then this method can be used to directly set the instance of it. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instance} & Instance to set for \\
+\hline
+{\em serializable} & New instance of the field \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_field_wrapper_aa6da3c459ecf75bb30ef180159fcdf6c}\label{classaderite_1_1scripting_1_1_field_wrapper_aa6da3c459ecf75bb30ef180159fcdf6c}} 
+\index{aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}!setValue@{setValue}}
+\index{setValue@{setValue}!aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}}
+\doxysubsubsection{\texorpdfstring{setValue()}{setValue()}}
+{\footnotesize\ttfamily void aderite\+::scripting\+::\+Field\+Wrapper\+::set\+Value (\begin{DoxyParamCaption}\item[{Mono\+Object $\ast$}]{instance,  }\item[{void $\ast$}]{value }\end{DoxyParamCaption}) const}
+
+
+
+Sets the value of the field for the specified instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instance} & Instance to set for \\
+\hline
+{\em value} & New value to set \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1scripting_1_1_field_wrapper_a2531ab29e6692eb346d86dfb9058ebe7}\label{classaderite_1_1scripting_1_1_field_wrapper_a2531ab29e6692eb346d86dfb9058ebe7}} 
+\index{aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}!setValueType@{setValueType}}
+\index{setValueType@{setValueType}!aderite::scripting::FieldWrapper@{aderite::scripting::FieldWrapper}}
+\doxysubsubsection{\texorpdfstring{setValueType()}{setValueType()}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void aderite\+::scripting\+::\+Field\+Wrapper\+::set\+Value\+Type (\begin{DoxyParamCaption}\item[{Mono\+Object $\ast$}]{instance,  }\item[{T}]{value }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Set the field value. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instance} & Instance to set for \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Type of the field \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em value} & New value of the field \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/scripting/Field\+Wrapper.\+hpp\item 
+src/aderite/scripting/Field\+Wrapper.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,135 @@
+\hypertarget{classaderite_1_1window_1_1_window_manager}{}\doxysection{aderite\+::window\+::Window\+Manager Class Reference}
+\label{classaderite_1_1window_1_1_window_manager}\index{aderite::window::WindowManager@{aderite::window::WindowManager}}
+
+
+Window manager of aderite engine, this allows to create and manipulate a SINGLE output window.  
+
+
+
+
+{\ttfamily \#include $<$Window\+Manager.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_aabd4203e56a40507bd83f9487c658a43}\label{classaderite_1_1window_1_1_window_manager_aabd4203e56a40507bd83f9487c658a43}} 
+bool \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_aabd4203e56a40507bd83f9487c658a43}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the window manager. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_adb4b8a7a5cef77ec9a2c6b125179c9b2}\label{classaderite_1_1window_1_1_window_manager_adb4b8a7a5cef77ec9a2c6b125179c9b2}} 
+void \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_adb4b8a7a5cef77ec9a2c6b125179c9b2}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shutdown the window manager. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_ae25f2ca6c1a8193ebf2ab97136680525}{set\+Size}} (unsigned int width, unsigned int height) const
+\begin{DoxyCompactList}\small\item\em Set the width and height of the display to the one specified. \end{DoxyCompactList}\item 
+glm\+::i32vec2 \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_a3ce22f841e0b893cc1d27efb364ca7c6}{get\+Size}} () const
+\begin{DoxyCompactList}\small\item\em Returns the size of the window. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_a1e0bf2a50691d385574bdac57a5956cb}\label{classaderite_1_1window_1_1_window_manager_a1e0bf2a50691d385574bdac57a5956cb}} 
+bool \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_a1e0bf2a50691d385574bdac57a5956cb}{is\+Closed}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if the window is closed, false otherwise. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_a3d4df82781e6725a1cd18f9443e1210d}{set\+Title}} (const std\+::string \&title) const
+\begin{DoxyCompactList}\small\item\em Set the title of the display to the one specified. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_ad29ec49c2d2e66a2233529582bda2b52}{set\+Position}} (const glm\+::i32vec2 \&position) const
+\begin{DoxyCompactList}\small\item\em Set the new position of the window. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_a05f70d103f985ce5f309df9d33b0e643}\label{classaderite_1_1window_1_1_window_manager_a05f70d103f985ce5f309df9d33b0e643}} 
+glm\+::i32vec2 \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_a05f70d103f985ce5f309df9d33b0e643}{get\+Position}} () const
+\begin{DoxyCompactList}\small\item\em Returns the current position of the window. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_a2d6a51db3cb3d54136d463cfad99f0b0}\label{classaderite_1_1window_1_1_window_manager_a2d6a51db3cb3d54136d463cfad99f0b0}} 
+void \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_a2d6a51db3cb3d54136d463cfad99f0b0}{center\+On\+Screen}} () const
+\begin{DoxyCompactList}\small\item\em Centers the window to the screen. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_a6e715fc6362f79af1f2820e5a4cbf714}{move\+Window}} (const glm\+::i32vec2 \&delta) const
+\begin{DoxyCompactList}\small\item\em Moves the window by specified delta. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_ab8a1d2011719f78aa28eb2cb6eba3c64}\label{classaderite_1_1window_1_1_window_manager_ab8a1d2011719f78aa28eb2cb6eba3c64}} 
+void \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_ab8a1d2011719f78aa28eb2cb6eba3c64}{minimize}} () const
+\begin{DoxyCompactList}\small\item\em Minimize the window. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_adbd2b052e81c2decb67e248ed14ff98e}\label{classaderite_1_1window_1_1_window_manager_adbd2b052e81c2decb67e248ed14ff98e}} 
+void $\ast$ \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_adbd2b052e81c2decb67e248ed14ff98e}{get\+Native\+Handle}} () const
+\begin{DoxyCompactList}\small\item\em Returns the native system handle of the display, for example on windows this will return HWND. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_ad5d82c0cb40d43b47d985ac8897f650f}\label{classaderite_1_1window_1_1_window_manager_ad5d82c0cb40d43b47d985ac8897f650f}} 
+void $\ast$ \mbox{\hyperlink{classaderite_1_1window_1_1_window_manager_ad5d82c0cb40d43b47d985ac8897f650f}{get\+Implementation\+Handle}} () const
+\begin{DoxyCompactList}\small\item\em Returns the implementation framework of the display, for desktop applications this will be a GLFWwindow. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Window manager of aderite engine, this allows to create and manipulate a SINGLE output window. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_a3ce22f841e0b893cc1d27efb364ca7c6}\label{classaderite_1_1window_1_1_window_manager_a3ce22f841e0b893cc1d27efb364ca7c6}} 
+\index{aderite::window::WindowManager@{aderite::window::WindowManager}!getSize@{getSize}}
+\index{getSize@{getSize}!aderite::window::WindowManager@{aderite::window::WindowManager}}
+\doxysubsubsection{\texorpdfstring{getSize()}{getSize()}}
+{\footnotesize\ttfamily glm\+::i32vec2 aderite\+::window\+::\+Window\+Manager\+::get\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Returns the size of the window. 
+
+\begin{DoxyReturn}{Returns}
+The size of the window 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_a6e715fc6362f79af1f2820e5a4cbf714}\label{classaderite_1_1window_1_1_window_manager_a6e715fc6362f79af1f2820e5a4cbf714}} 
+\index{aderite::window::WindowManager@{aderite::window::WindowManager}!moveWindow@{moveWindow}}
+\index{moveWindow@{moveWindow}!aderite::window::WindowManager@{aderite::window::WindowManager}}
+\doxysubsubsection{\texorpdfstring{moveWindow()}{moveWindow()}}
+{\footnotesize\ttfamily void aderite\+::window\+::\+Window\+Manager\+::move\+Window (\begin{DoxyParamCaption}\item[{const glm\+::i32vec2 \&}]{delta }\end{DoxyParamCaption}) const}
+
+
+
+Moves the window by specified delta. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em delta} & Position delta \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_ad29ec49c2d2e66a2233529582bda2b52}\label{classaderite_1_1window_1_1_window_manager_ad29ec49c2d2e66a2233529582bda2b52}} 
+\index{aderite::window::WindowManager@{aderite::window::WindowManager}!setPosition@{setPosition}}
+\index{setPosition@{setPosition}!aderite::window::WindowManager@{aderite::window::WindowManager}}
+\doxysubsubsection{\texorpdfstring{setPosition()}{setPosition()}}
+{\footnotesize\ttfamily void aderite\+::window\+::\+Window\+Manager\+::set\+Position (\begin{DoxyParamCaption}\item[{const glm\+::i32vec2 \&}]{position }\end{DoxyParamCaption}) const}
+
+
+
+Set the new position of the window. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em position} & Position of the window \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_ae25f2ca6c1a8193ebf2ab97136680525}\label{classaderite_1_1window_1_1_window_manager_ae25f2ca6c1a8193ebf2ab97136680525}} 
+\index{aderite::window::WindowManager@{aderite::window::WindowManager}!setSize@{setSize}}
+\index{setSize@{setSize}!aderite::window::WindowManager@{aderite::window::WindowManager}}
+\doxysubsubsection{\texorpdfstring{setSize()}{setSize()}}
+{\footnotesize\ttfamily void aderite\+::window\+::\+Window\+Manager\+::set\+Size (\begin{DoxyParamCaption}\item[{unsigned int}]{width,  }\item[{unsigned int}]{height }\end{DoxyParamCaption}) const}
+
+
+
+Set the width and height of the display to the one specified. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em width} & New width of the window \\
+\hline
+{\em height} & New height of the window \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classaderite_1_1window_1_1_window_manager_a3d4df82781e6725a1cd18f9443e1210d}\label{classaderite_1_1window_1_1_window_manager_a3d4df82781e6725a1cd18f9443e1210d}} 
+\index{aderite::window::WindowManager@{aderite::window::WindowManager}!setTitle@{setTitle}}
+\index{setTitle@{setTitle}!aderite::window::WindowManager@{aderite::window::WindowManager}}
+\doxysubsubsection{\texorpdfstring{setTitle()}{setTitle()}}
+{\footnotesize\ttfamily void aderite\+::window\+::\+Window\+Manager\+::set\+Title (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{title }\end{DoxyParamCaption}) const}
+
+
+
+Set the title of the display to the one specified. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em title} & New title of the display \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/window/Window\+Manager.\+hpp\item 
+src/aderite/window/Window\+Manager.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,73 @@
+\hypertarget{classaderite_1_1audio_1_1_audio_controller}{}\doxysection{aderite\+::audio\+::Audio\+Controller Class Reference}
+\label{classaderite_1_1audio_1_1_audio_controller}\index{aderite::audio::AudioController@{aderite::audio::AudioController}}
+
+
+Class used to control audio API FMOD and provide a functionality to play audio in aderite.  
+
+
+
+
+{\ttfamily \#include $<$Audio\+Controller.\+hpp$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_controller_a6a4206de1a65733e7509e385215ac3c5}\label{classaderite_1_1audio_1_1_audio_controller_a6a4206de1a65733e7509e385215ac3c5}} 
+bool \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_controller_a6a4206de1a65733e7509e385215ac3c5}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initializes the audio controller. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_controller_accd71b7e923017a2b654f89b56e09207}\label{classaderite_1_1audio_1_1_audio_controller_accd71b7e923017a2b654f89b56e09207}} 
+void \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_controller_accd71b7e923017a2b654f89b56e09207}{shutdown}} ()
+\begin{DoxyCompactList}\small\item\em Shutdown the audio controller. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_controller_a10eebbe6a39bea3b622ff14b2a5bfeff}\label{classaderite_1_1audio_1_1_audio_controller_a10eebbe6a39bea3b622ff14b2a5bfeff}} 
+void \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_controller_a10eebbe6a39bea3b622ff14b2a5bfeff}{update}} ()
+\begin{DoxyCompactList}\small\item\em Updates all audio components of current scene. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_controller_a3d9bd10efde1a50875312da47280df59}\label{classaderite_1_1audio_1_1_audio_controller_a3d9bd10efde1a50875312da47280df59}} 
+void \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_controller_a3d9bd10efde1a50875312da47280df59}{load\+Master\+Bank}} ()
+\begin{DoxyCompactList}\small\item\em Loads the master bank (invoked automatically or by hand through the editor) \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_controller_a556f523739774c9e999a795928171b99}\label{classaderite_1_1audio_1_1_audio_controller_a556f523739774c9e999a795928171b99}} 
+bool \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_controller_a556f523739774c9e999a795928171b99}{master\+Banks\+Loaded}} () const
+\begin{DoxyCompactList}\small\item\em Returns true if master banks loaded, false otherwise. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_controller_a7e3ac156fc56871e493ad5e5c793d151}\label{classaderite_1_1audio_1_1_audio_controller_a7e3ac156fc56871e493ad5e5c793d151}} 
+void \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_controller_a7e3ac156fc56871e493ad5e5c793d151}{set\+Mute}} (bool value) const
+\begin{DoxyCompactList}\small\item\em If true all sounds will be muted (not stopped) \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_controller_a8870f7e8be06245386a1bdb396829171}\label{classaderite_1_1audio_1_1_audio_controller_a8870f7e8be06245386a1bdb396829171}} 
+void \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_controller_a8870f7e8be06245386a1bdb396829171}{disable}} (bool value) const
+\begin{DoxyCompactList}\small\item\em If true the audio controller will stop all audio instances and won\textquotesingle{}t play any new ones until false is passed. Every time this cycle is done play on start instances will start playing. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_controller_a19bdc9751f8c535ff272d0aa50bea616}\label{classaderite_1_1audio_1_1_audio_controller_a19bdc9751f8c535ff272d0aa50bea616}} 
+const std\+::vector$<$ std\+::string $>$ \& \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_controller_a19bdc9751f8c535ff272d0aa50bea616}{get\+Known\+Events}} () const
+\begin{DoxyCompactList}\small\item\em Returns vector of known events. \end{DoxyCompactList}\item 
+FMOD\+::\+Studio\+::\+Event\+Instance $\ast$ \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_controller_a084818528bca929cb455204631177a9e}{create\+Audio\+Instance}} (const \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset}{asset\+::\+Audio\+Asset}} $\ast$audio\+Asset) const
+\begin{DoxyCompactList}\small\item\em \mbox{[}Internal use\mbox{]} Creates and returns an audio instance \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_controller_a933188b255b09df776b85a481f1e7cc6}\label{classaderite_1_1audio_1_1_audio_controller_a933188b255b09df776b85a481f1e7cc6}} 
+FMOD\+::\+Studio\+::\+System $\ast$ \mbox{\hyperlink{classaderite_1_1audio_1_1_audio_controller_a933188b255b09df776b85a481f1e7cc6}{get\+Fmod\+System}} () const
+\begin{DoxyCompactList}\small\item\em Returns the fmod system instance of aderite. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class used to control audio API FMOD and provide a functionality to play audio in aderite. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classaderite_1_1audio_1_1_audio_controller_a084818528bca929cb455204631177a9e}\label{classaderite_1_1audio_1_1_audio_controller_a084818528bca929cb455204631177a9e}} 
+\index{aderite::audio::AudioController@{aderite::audio::AudioController}!createAudioInstance@{createAudioInstance}}
+\index{createAudioInstance@{createAudioInstance}!aderite::audio::AudioController@{aderite::audio::AudioController}}
+\doxysubsubsection{\texorpdfstring{createAudioInstance()}{createAudioInstance()}}
+{\footnotesize\ttfamily FMOD\+::\+Studio\+::\+Event\+Instance $\ast$ aderite\+::audio\+::\+Audio\+Controller\+::create\+Audio\+Instance (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classaderite_1_1asset_1_1_audio_asset}{asset\+::\+Audio\+Asset}} $\ast$}]{audio\+Asset }\end{DoxyParamCaption}) const}
+
+
+
+\mbox{[}Internal use\mbox{]} Creates and returns an audio instance 
+
+
+\begin{DoxyParams}{Parameters}
+{\em audio\+Asset} & Audio\+Asset instance to create FMOD event for \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+FMOD event instance object 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/aderite/audio/Audio\+Controller.\+hpp\item 
+src/aderite/audio/Audio\+Controller.\+cpp\end{DoxyCompactItemize}
