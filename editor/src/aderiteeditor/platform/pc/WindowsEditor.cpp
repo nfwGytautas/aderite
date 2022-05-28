@@ -130,9 +130,6 @@ void WindowsEditor::onNewProject(const std::string& dir, const std::string& name
     // Setup asset manager
     ::aderite::Engine::getFileHandler()->setRoot(editor::State::Project->getRootDir());
 
-    // Create new scene
-    onNewScene("Untitled scene");
-
     // Registry
     ::aderite::Engine::getAssetManager()->saveRegistry();
 
@@ -193,18 +190,6 @@ void WindowsEditor::onSceneChanged(scene::Scene* scene) {}
 
 void WindowsEditor::onSystemUpdate(float delta) {
     editor::State::getInstance().getEditorCamera()->update(delta);
-}
-
-void WindowsEditor::onNewScene(const std::string& name) {
-    LOG_TRACE("New scene with name: {0}", name);
-
-    // TODO: Error screen or special naming
-    scene::Scene* s = new scene::Scene();
-    /*::aderite::Engine::getAssetManager()->track(s);
-    ::aderite::Engine::getAssetManager()->save(s);*/
-    // vfs::File* file = new vfs::File(name, s->getHandle(), editor::State::Project->getVfs()->getRoot());
-
-    ::aderite::Engine::getSceneManager()->setActive(s);
 }
 
 void WindowsEditor::onStopGame() {

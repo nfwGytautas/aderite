@@ -1,0 +1,100 @@
+Type: 4
+Name: Material
+Data:
+  DataSize: 1
+  SamplerCount: 1
+  SamplerNames: [Texture]
+  Properties:
+    - Name: Color
+      Type: 3
+      Offset: 0
+  Samplers:
+    - Name: Texture
+      Type: 5
+  Graph:
+    Nodes:
+      - Type: Material
+        Name: Material
+        Position: [-8, 228]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 3
+              Name: Color
+            - Type: 5
+              Name: Texture
+      - Type: Output
+        Name: qL32RKHBgFA7
+        Position: [640, 201]
+        Pins:
+          In:
+            - Type: 4
+              Name: Output
+              Connected: Yn056mMqDKWB_Sum
+          Out:
+            []
+      - Type: Value
+        Name: H9qs8ICb3s8A
+        Position: [-88, 63]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 1
+              Name: Value
+        ValueType: 1
+        Value: 0
+      - Type: Vec4
+        Name: r8B8lZ6eQh1V
+        Position: [234, 17]
+        Pins:
+          In:
+            - Type: 3
+              Name: xyz
+              Connected: Material_Color
+            - Type: 1
+              Name: w
+              Connected: H9qs8ICb3s8A_Value
+          Out:
+            - Type: 4
+              Name: Out
+        CtorType: 2
+      - Type: Vertex UV
+        Name: QeunzNfzyzaa
+        Position: [3, 342]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 2
+              Name: v_texcoord
+      - Type: Sample 2D
+        Name: yTxQxPEVVx3e
+        Position: [243, 271]
+        Pins:
+          In:
+            - Type: 5
+              Name: Texture
+              Connected: Material_Texture
+            - Type: 2
+              Name: UV
+              Connected: QeunzNfzyzaa_v_texcoord
+          Out:
+            - Type: 4
+              Name: Color
+      - Type: Add
+        Name: Yn056mMqDKWB
+        Position: [462, 125]
+        Pins:
+          In:
+            - Type: 4
+              Name: Lhs
+              Connected: r8B8lZ6eQh1V_Out
+            - Type: 4
+              Name: Rhs
+              Connected: yTxQxPEVVx3e_Color
+          Out:
+            - Type: 4
+              Name: Sum
+        OpType: 4

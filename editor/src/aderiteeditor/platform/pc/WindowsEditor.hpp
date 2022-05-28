@@ -32,7 +32,6 @@ public:
     virtual void onNewProject(const std::string& dir, const std::string& name) override;
     virtual void onSaveProject() override;
     virtual void onLoadProject(const std::string& path) override;
-    virtual void onNewScene(const std::string& name) override;
     virtual void onStopGame() override;
     virtual void onStartGame() override;
     virtual void onResetGameState() override;

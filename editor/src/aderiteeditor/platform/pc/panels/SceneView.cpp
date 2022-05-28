@@ -43,6 +43,8 @@ void SceneView::render() {
     scene::Scene* currentScene = ::aderite::Engine::getSceneManager()->getCurrentScene();
 
     if (currentScene == nullptr) {
+        ImGui::End();
+        ImGui::PopStyleVar();
         return;
     }
 

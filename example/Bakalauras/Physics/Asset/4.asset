@@ -1,0 +1,7 @@
+Type: 1
+Name: PlaneMaterial
+Data:
+  MaterialType: 3
+  Properties:
+    Data: [0, 0, 0, 0]
+  Samplers: [2]

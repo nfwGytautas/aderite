@@ -1,0 +1,22 @@
+Type: 7
+Name: Obstacle
+Data:
+  Transform:
+    Position: [0, 0, 0]
+    Rotation: [1, 0, 0, 0]
+    Scale: [1, 1, 1]
+  Renderable:
+    Mesh: 1
+    Material: 8
+  PhysicsActor:
+    Dynamic: false
+    Mass: 1
+    HasGravity: false
+    Geometry:
+      - Type: 75
+        Name: sIocjh5jzv4n
+        Data:
+          Size: [1, 1, 1]
+          IsTrigger: false
+  Behaviors:
+    []

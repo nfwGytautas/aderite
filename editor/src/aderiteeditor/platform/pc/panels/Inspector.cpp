@@ -19,6 +19,7 @@
 #include "aderite/physics/geometry/Geometry.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
 #include "aderite/rendering/Renderable.hpp"
+#include "aderite/rendering/Renderer.hpp"
 #include "aderite/scene/Camera.hpp"
 #include "aderite/scene/CameraSettings.hpp"
 #include "aderite/scene/GameObject.hpp"
@@ -127,6 +128,10 @@ void Inspector::render() {
     }
     case reflection::RuntimeTypes::AUDIO: {
         this->renderAudioClip(object);
+        break;
+    }
+    case reflection::RuntimeTypes::SCENE: {
+        this->renderScene(object);
         break;
     }
     default: {
@@ -300,6 +305,7 @@ void Inspector::renderCamera(scene::Camera* camera) {
     if (ImGui::CollapsingHeader("Camera")) {
         // Settings
         scene::CameraSettings& settings = camera->getData();
+        ::aderite::Engine::getRenderer()->getWriteFrameData().Cameras.push_back(camera->computeRenderingData());
 
         if (ImGui::BeginTable("CameraSettingsTable", 2)) {
             ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 130.0f);
@@ -875,6 +881,16 @@ void Inspector::renderAudioClip(io::SerializableObject* asset) {
 
         ImGui::EndCombo();
     }
+}
+
+void Inspector::renderScene(io::SerializableObject* asset) {
+    scene::Scene* scene = static_cast<scene::Scene*>(asset);
+
+    ImGui::PushItemWidth(-FLT_MIN);
+    if (ImGui::Button("Make active", ImVec2(ImGui::CalcItemWidth(), 0.0f))) {
+        aderite::Engine::getSceneManager()->setActive(scene);
+    }
+    ImGui::PopItemWidth();
 }
 
 } // namespace editor

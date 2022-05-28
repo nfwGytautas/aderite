@@ -3,6 +3,7 @@
 #include <bgfx/bgfx.h>
 #include <glm/glm.hpp>
 
+#include "aderite/rendering/Forward.hpp"
 #include "aderite/scene/CameraSettings.hpp"
 #include "aderite/scene/Forward.hpp"
 
@@ -32,6 +33,11 @@ public:
      * @brief Returns the camera data
      */
     CameraSettings& getData();
+
+    /**
+     * @brief Computes rendering data of this camera object
+     */
+    rendering::CameraData computeRenderingData() const;
 
     /**
      * @brief Returns the forward vector of this camera, can be used for raycasting from the camera point of view

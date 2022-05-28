@@ -25,7 +25,8 @@ void DragDropImportModal::render() {
                                ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
                                    ImGuiWindowFlags_AlwaysAutoResize)) {
         // Content
-        ImGui::Text(("Importing " + m_path.string()).c_str());
+        std::string importName = "Importing ..." + m_path.string().substr(m_path.string().length() / 2);
+        ImGui::Text(importName.c_str());
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
         ImGui::Text("Please select what type this file is:");
 

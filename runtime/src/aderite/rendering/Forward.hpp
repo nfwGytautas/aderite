@@ -11,6 +11,7 @@ class Renderer;
 class DrawCall;
 class Renderable;
 class RenderableData;
+struct CameraData;
 struct FrameData;
 
 } // namespace rendering

@@ -1,0 +1,79 @@
+Type: 3
+Name: Scripting
+Data:
+  PhysicsScene:
+    {}
+  GameObjects:
+    - GameObject:
+        Name: MoveCube
+        Transform:
+          Position: [0, 0, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [1, 1, 1]
+        Renderable:
+          Mesh: 2
+          Material: 6
+        Behaviors:
+          - Script: Scripts.MovementExample
+            Fields:
+              Speed: 5
+    - GameObject:
+        Name: Camera
+        Transform:
+          Position: [0, 0, 10]
+          Rotation: [1, 0, 0, 0]
+          Scale: [1, 1, 1]
+        Camera:
+          FoV: 90
+        Behaviors:
+          []
+    - GameObject:
+        Name: Ground
+        Transform:
+          Position: [0, -5.9000001, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [10, 0.200000003, 10]
+        Renderable:
+          Mesh: 2
+          Material: 7
+        PhysicsActor:
+          Dynamic: false
+          Mass: 1
+          HasGravity: false
+          Geometry:
+            - Type: 75
+              Name: XdMbjvHegYRP
+              Data:
+                Size: [1, 1, 1]
+                IsTrigger: false
+        Behaviors:
+          []
+    - GameObject:
+        Name: FallingCube
+        Transform:
+          Position: [4.69999981, 4.0999999, 0]
+          Rotation: [1, 0, 0, 0]
+          Scale: [1, 1, 1]
+        Renderable:
+          Mesh: 2
+          Material: 8
+        PhysicsActor:
+          Dynamic: true
+          Mass: 1
+          HasGravity: true
+          Geometry:
+            - Type: 75
+              Name: kem6tLDKrDUT
+              Data:
+                Size: [1, 1, 1]
+                IsTrigger: false
+        Behaviors:
+          - Script: Scripts.Physics
+            Fields:
+              {}
+    - GameObject:
+        Name: Basics
+        Behaviors:
+          - Script: Scripts.Basics
+            Fields:
+              ShowUpdateMessage: true
