@@ -383,7 +383,9 @@ bool Node::deserialize(io::Serializer* serializer, const YAML::Node& data) {
     p_outPins.clear();
 
     // Deserialize
-    m_name = data["Name"].as<std::string>();
+    if (std::string(this->getTypeName()) != "Material") {
+        m_name = data["Name"].as<std::string>();
+    }
     m_position = data["Position"].as<glm::vec2>();
 
     // Pins

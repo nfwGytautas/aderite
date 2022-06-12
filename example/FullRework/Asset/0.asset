@@ -42,7 +42,7 @@ Data:
         Name: Player
         Transform:
           Position: [0, 0, 0]
-          Rotation: [1, 0, 0, 0]
+          Rotation: [0.707106769, 0.707106769, 0, 0]
           Scale: [1, 1, 1]
         Camera:
           FoV: 90

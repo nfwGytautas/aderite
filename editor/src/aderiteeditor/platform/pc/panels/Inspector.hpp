@@ -42,6 +42,7 @@ private:
     void renderMaterial(io::SerializableObject* asset);
     void renderMaterialType(io::SerializableObject* object);
     void renderAudioClip(io::SerializableObject* asset);
+    void renderScene(io::SerializableObject* asset);
 };
 
 } // namespace editor

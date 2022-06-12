@@ -408,6 +408,8 @@ void AssetBrowser::handleDirectoryChange(const std::filesystem::path& newDirecto
     // Release from previous directory
     this->releaseCurrentDirectoryReferences();
 
+    editor::State::getInstance().setSelectedObject(nullptr);
+
     m_currentDirectory = newDirectory;
 }
 

@@ -1,0 +1,7 @@
+Type: 1
+Name: SimulationMaterial
+Data:
+  MaterialType: 3
+  Properties:
+    Data: [1, 0, 0, 0]
+  Samplers: [2]

@@ -9,6 +9,9 @@
 namespace aderite {
 namespace rendering {
 
+/**
+ * @brief Object used to hold data of a camera object
+ */
 struct CameraData {
     std::string Name;
     bgfx::TextureHandle Output;

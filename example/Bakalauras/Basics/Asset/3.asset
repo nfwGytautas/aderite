@@ -1,0 +1,55 @@
+Type: 4
+Name: ExampleType
+Data:
+  DataSize: 0
+  SamplerCount: 1
+  SamplerNames: [Texture]
+  Properties:
+    []
+  Samplers:
+    - Name: Texture
+      Type: 5
+  Graph:
+    Nodes:
+      - Type: Material
+        Name: ExampleType
+        Position: [16, 156]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 5
+              Name: Texture
+      - Type: Output
+        Name: aI3Ycp1PjmGI
+        Position: [499, 274]
+        Pins:
+          In:
+            - Type: 4
+              Name: Output
+              Connected: aH9Dk50pNqXp_Color
+          Out:
+            []
+      - Type: Vertex UV
+        Name: aAimd6pTmQVy
+        Position: [29, 273]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 2
+              Name: v_texcoord
+      - Type: Sample 2D
+        Name: aH9Dk50pNqXp
+        Position: [241, 204]
+        Pins:
+          In:
+            - Type: 5
+              Name: Texture
+              Connected: ExampleType_Texture
+            - Type: 2
+              Name: UV
+              Connected: aAimd6pTmQVy_v_texcoord
+          Out:
+            - Type: 4
+              Name: Color

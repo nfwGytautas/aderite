@@ -1,8 +1,0 @@
-Version: 2021_10_15r1
-Type: 1
-Handle: 6
-Data:
-  MaterialType: 3
-  Properties:
-    Data: [0, 1, 0, 0]
-  Samplers: [1]

@@ -28,8 +28,8 @@ std::string generateString(const size_t& len) {
 
     const char* v = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
-    std::string res;
-    for (int i = 0; i < len; i++) {
+    std::string res = "a";
+    for (int i = 0; i < len - 1; i++) {
         res += v[dist(rng)];
     }
     return res;

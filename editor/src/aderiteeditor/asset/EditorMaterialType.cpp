@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "aderite/Aderite.hpp"
+#include "aderite/asset/AssetManager.hpp"
 #include "aderite/io/FileHandler.hpp"
 #include "aderite/io/Serializer.hpp"
 #include "aderite/reflection/RuntimeTypes.hpp"
@@ -177,6 +178,13 @@ void EditorMaterialType::compile() {
     std::uint64_t vertexDataSize = 0;
     std::uint64_t fragmentDataSize = 0;
 
+    // Add sampler names
+    std::vector<std::string> samplerNames;
+    for (const Sampler* sampler : m_samplers) {
+        samplerNames.push_back(sampler->getName());
+    }
+    this->setSamplerNames(samplerNames);
+
     // Recalculate offsets
     this->recalculate();
 
@@ -231,6 +239,9 @@ void EditorMaterialType::compile() {
     inFragment.read(reinterpret_cast<char*>(chunk.Data.data() + vertexDataSize + sizeof(std::uint64_t)), fragmentDataSize);
 
     ::aderite::Engine::getFileHandler()->commit(chunk);
+
+    // Save the material type
+    ::aderite::Engine::getAssetManager()->save(this);
 
     // Now flag for reload
     this->unload();

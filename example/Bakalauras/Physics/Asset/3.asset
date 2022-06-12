@@ -1,0 +1,100 @@
+Type: 4
+Name: ColorMaterial
+Data:
+  DataSize: 1
+  SamplerCount: 1
+  SamplerNames: [s_Texture]
+  Properties:
+    - Name: p_Color
+      Type: 3
+      Offset: 0
+  Samplers:
+    - Name: s_Texture
+      Type: 5
+  Graph:
+    Nodes:
+      - Type: Material
+        Name: ColorMaterial
+        Position: [38, 95]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 3
+              Name: p_Color
+            - Type: 5
+              Name: s_Texture
+      - Type: Output
+        Name: ZKqKMxwQ6izn
+        Position: [762.360718, 158.493546]
+        Pins:
+          In:
+            - Type: 4
+              Name: Output
+              Connected: oMOAOGxtTtGH_Sum
+          Out:
+            []
+      - Type: Vec4
+        Name: UUmNj1qmdZ9h
+        Position: [372.087036, -33.7028046]
+        Pins:
+          In:
+            - Type: 3
+              Name: xyz
+              Connected: ColorMaterial_p_Color
+            - Type: 1
+              Name: w
+              Connected: Y3kY6SeiGPlT_Value
+          Out:
+            - Type: 4
+              Name: Out
+        CtorType: 2
+      - Type: Value
+        Name: Y3kY6SeiGPlT
+        Position: [38.0870056, -59.7028046]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 1
+              Name: Value
+        ValueType: 1
+        Value: 0
+      - Type: Sample 2D
+        Name: mdAnJBEFHVW0
+        Position: [319.087006, 136.297195]
+        Pins:
+          In:
+            - Type: 5
+              Name: Texture
+              Connected: ColorMaterial_s_Texture
+            - Type: 2
+              Name: UV
+              Connected: KnKpZ1P5NsgY_v_texcoord
+          Out:
+            - Type: 4
+              Name: Color
+      - Type: Vertex UV
+        Name: KnKpZ1P5NsgY
+        Position: [47.0870056, 217.297195]
+        Pins:
+          In:
+            []
+          Out:
+            - Type: 2
+              Name: v_texcoord
+      - Type: Add
+        Name: oMOAOGxtTtGH
+        Position: [569.447632, 76.7907181]
+        Pins:
+          In:
+            - Type: 4
+              Name: Lhs
+              Connected: UUmNj1qmdZ9h_Out
+            - Type: 4
+              Name: Rhs
+              Connected: mdAnJBEFHVW0_Color
+          Out:
+            - Type: 4
+              Name: Sum
+        OpType: 4

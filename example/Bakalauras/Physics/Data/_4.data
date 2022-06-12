@@ -1,0 +1,13 @@
+Registry:
+  NextHandle: 10
+  Entries:
+    - Handle: 0
+    - Handle: 1
+    - Handle: 2
+    - Handle: 3
+    - Handle: 4
+    - Handle: 5
+    - Handle: 6
+    - Handle: 7
+    - Handle: 8
+    - Handle: 9

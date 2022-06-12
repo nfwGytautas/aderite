@@ -31,16 +31,9 @@ void Camera::update(float delta) {
     }
 
     rendering::FrameData& fd = ::aderite::Engine::getRenderer()->getWriteFrameData();
-
-    // Fill camera data
-    rendering::CameraData cd;
-    cd.Name = m_gObject->getName();
-    cd.Output = m_output;
-    cd.ProjectionMatrix = glm::perspective(glm::radians(m_settings.getFoV()), 1.0f, 0.1f, 1000.0f);
-    cd.ViewMatrix = glm::inverse(glm::translate(glm::mat4(1.0f), transform->getPosition()) * glm::toMat4(transform->getRotation()));
-
+    
     // Push to the list
-    fd.Cameras.push_back(cd);
+    fd.Cameras.push_back(this->computeRenderingData());
 }
 
 bgfx::TextureHandle Camera::getOutputHandle() const {
@@ -49,6 +42,22 @@ bgfx::TextureHandle Camera::getOutputHandle() const {
 
 CameraSettings& Camera::getData() {
     return m_settings;
+}
+
+rendering::CameraData Camera::computeRenderingData() const {
+    scene::TransformProvider* const transform = m_gObject->getTransform();
+
+    if (transform == nullptr) {
+        return {};
+    }
+
+    rendering::CameraData cd;
+    cd.Name = m_gObject->getName();
+    cd.Output = m_output;
+    cd.ProjectionMatrix = glm::perspective(glm::radians(m_settings.getFoV()), 1.0f, 0.1f, 1000.0f);
+    cd.ViewMatrix = glm::inverse(glm::translate(glm::mat4(1.0f), transform->getPosition()) * glm::toMat4(transform->getRotation()));
+
+    return cd;
 }
 
 glm::vec3 Camera::getForwardDirection() const {

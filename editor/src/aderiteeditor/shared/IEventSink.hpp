@@ -35,12 +35,6 @@ public:
     virtual void onLoadProject(const std::string& path) = 0;
 
     /**
-     * @brief Create new Scene
-     * @param name Name of the Scene
-     */
-    virtual void onNewScene(const std::string& name) = 0;
-
-    /**
      * @brief Invoked when the game should be stopped
      */
     virtual void onStopGame() = 0;

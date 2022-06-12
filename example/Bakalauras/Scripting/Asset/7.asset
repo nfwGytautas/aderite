@@ -1,0 +1,7 @@
+Type: 1
+Name: Red
+Data:
+  MaterialType: 5
+  Properties:
+    Data: [1, 0, 0, 0]
+  Samplers: [3]
